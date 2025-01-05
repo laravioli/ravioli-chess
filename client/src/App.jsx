@@ -1,11 +1,11 @@
 import './App.css';
 import 'chessboard/src/chessboard.css';
-import { BoardCanvas } from './components/board/container';
+import { Board } from './components/board/board';
 
 function App() {
   return (
     <>
-      <BoardCanvas />
+      <Board />
     </>
   );
 }

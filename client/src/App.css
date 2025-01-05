@@ -6,25 +6,14 @@
   height: 100%;
 }
 
-#board-canvas {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  min-width: 400px;
-  max-width: 800px;
-  padding: 10px;
-  box-sizing: border-box;
+.board-editor {
+  display: grid;
+  grid-template-columns: 10fr 1fr 3fr;
+  grid-template-rows: min-content auto min-content;
 }
 
-#board-canvas > *:first-child {
-  width: 100%;
-  min-width: 400px;
-  min-height: 400px;
-  max-width: none;
-  max-height: none;
-}
-
-#toolbar {
-  margin-top: 10px;
+.board {
+  box-sizing: content-box;
+  width: clamp(400px, min(80vmin, 100%), 800px);
+  height: clamp(400px, min(80vmin, 100%), 800px);
 }
