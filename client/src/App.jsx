@@ -1,11 +1,11 @@
 import './App.css';
 import 'chessboard/src/chessboard.css';
-import { Board } from './components/board/board';
+import { Editor } from './components/editor/editor';
 
 function App() {
   return (
     <>
-      <Board />
+      <Editor />
     </>
   );
 }
