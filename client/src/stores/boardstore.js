@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import chessBoard from 'chessboard';
-import { Chess } from 'chess.js';
+import { DEFAULT_POSITION, Chess } from 'chess.js';
 import { EDITOR, GAME } from '../configs/boardconfig';
 import { onDragStart, onDrop } from '../configs/logicconfig';
 
@@ -35,7 +35,7 @@ const configReducer = (state, action) => {
       config.position = useBoardStore.getState().widget.fen() + ' w KQkq - 0 1';
       break;
     default:
-      config.position = 'start';
+      config.position = DEFAULT_POSITION;
       break;
   }
 
@@ -73,7 +73,7 @@ const setWidget = (div) => {
         onSnapEnd: onSnapEnd,
       });
       config.position === 'start'
-        ? chessRef.load()
+        ? chessRef.load(DEFAULT_POSITION)
         : chessRef.load(config.position);
       break;
     }

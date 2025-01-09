@@ -1,6 +1,7 @@
+import { DEFAULT_POSITION } from 'chess.js';
 export const EDITOR = {
   type: 'editor',
-  position: 'start',
+  position: DEFAULT_POSITION,
   pieceTheme: './images/{piece}.png',
   draggable: true,
   dropOffBoard: 'trash',
@@ -10,7 +11,7 @@ export const EDITOR = {
 
 export const GAME = {
   type: 'game',
-  position: 'start',
+  position: DEFAULT_POSITION,
   pieceTheme: './images/{piece}.png',
   draggable: true,
   showNotation: true,
