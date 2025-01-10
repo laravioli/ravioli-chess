@@ -1,31 +1,17 @@
 import { useShallow } from 'zustand/shallow';
-import { useBoundStore } from '../../stores/boundstore';
+import { useBoardActions, useGameActions } from '../../stores/hooks/useactions';
+import { useBoundStore } from '../../stores/hooks/useboundstore';
 import { mode } from '../../stores/configboardstore';
 import { Button } from '../button/button';
 import { chess } from '../../stores/gamestore';
 
 export function EditorActions() {
   //probably better to use ref here, tbd
-  const [
-    startBoard,
-    clearBoard,
-    flipBoard,
-    boardPosition,
-    confMode,
-    dispatch,
-    newGame,
-    clearGame,
-  ] = useBoundStore(
-    useShallow((state) => [
-      state.startBoard,
-      state.clearBoard,
-      state.flipBoard,
-      state.boardPosition,
-      state.mode,
-      state.dispatchConf,
-      state.newGame,
-      state.clearGame,
-    ])
+  const { startBoard, clearBoard, flipBoard, boardPosition } =
+    useBoardActions();
+  const { newGame, clearGame } = useGameActions();
+  const [confMode, dispatch] = useBoundStore(
+    useShallow((state) => [state.mode, state.dispatchConf])
   );
 
   const onStartingPosition = () => {

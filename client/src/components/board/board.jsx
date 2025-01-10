@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { useBoundStore } from '../../stores/boundstore';
+import { useBoundStore } from '../../stores/hooks/useboundstore';
 
 export function Board() {
   const divRef = useRef(null);

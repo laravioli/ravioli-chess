@@ -65,7 +65,6 @@ export const createBoardSlice = (set, get) => ({
       configMode == mode.game
         ? chess.load(DEFAULT_POSITION)
         : chess.load(get().config.position);
-      console.log('here ' + chess.fen(), configMode);
     }
 
     window.addEventListener('resize', board.resize);
