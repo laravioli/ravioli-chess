@@ -1,46 +1,56 @@
 import { useShallow } from 'zustand/shallow';
-import { useBoardStore } from '../../stores/boardstore';
+import { useBoundStore } from '../../stores/boundstore';
+import { mode } from '../../stores/configboardstore';
 import { Button } from '../button/button';
+import { chess } from '../../stores/gamestore';
 
 export function EditorActions() {
   //probably better to use ref here, tbd
-  const [chessRef, widget, config, dispatchConfig] = useBoardStore(
+  const [
+    startBoard,
+    clearBoard,
+    flipBoard,
+    boardPosition,
+    confMode,
+    dispatch,
+    newGame,
+    clearGame,
+  ] = useBoundStore(
     useShallow((state) => [
-      state.chessRef,
-      state.widget,
-      state.config,
-      state.dispatchConfig,
+      state.startBoard,
+      state.clearBoard,
+      state.flipBoard,
+      state.boardPosition,
+      state.mode,
+      state.dispatchConf,
+      state.newGame,
+      state.clearGame,
     ])
   );
 
   const onStartingPosition = () => {
-    widget.start();
-    chessRef.load(widget.fen() + ' w KQkq - 0 1');
+    startBoard();
+    newGame(boardPosition() + ' w KQkq - 0 1');
   };
 
   const onClearBoard = () => {
-    widget.clear();
-    chessRef.clear();
+    clearBoard();
+    clearGame();
   };
 
   const onFlipBoard = () => {
-    widget.flip();
+    flipBoard();
   };
 
   //move logic into button
 
   const onContinue = () => {
-    dispatchConfig({
-      config: config.type === 'editor' ? 'game' : 'editor',
-      position: 'current',
-      orientation: widget.orientation,
-    });
+    dispatch({ mode: confMode === mode.editor ? mode.continue : mode.editor });
   };
 
   const test = () => {
-    console.log(useBoardStore.getState().chessRef.fen());
-    console.log(widget.fen());
-    console.log(widget.position());
+    console.log('board ' + boardPosition());
+    console.log('chess ' + chess.fen());
   };
 
   return (

@@ -1,91 +1,74 @@
-import { create } from 'zustand';
+import { DEFAULT_POSITION } from 'chess.js';
+import { chess } from './gamestore';
 import chessBoard from 'chessboard';
-import { DEFAULT_POSITION, Chess } from 'chess.js';
-import { EDITOR, GAME } from '../configs/boardconfig';
-import { onDragStart, onDrop } from '../configs/logicconfig';
+import { mode } from './configboardstore';
 
-//refactor the store(follow github doc and zustand website)
+export const createBoardSlice = (set, get) => ({
+  board: undefined,
 
-export const useBoardStore = create((set) => ({
-  chessRef: new Chess(),
-  config: EDITOR,
-  widget: null,
-  dispatchConfig: (action) => set((state) => configReducer(state, action)),
-  setWidget: (div) => setWidget(div),
+  startBoard: () => get().board?.start(),
 
-  destroyWidget: () => destroyWidget(),
-}));
+  clearBoard: () => get().board?.clear(),
 
-const configReducer = (state, action) => {
-  let config = null;
+  destroyBoard: () => {
+    window.removeEventListener('resize', get().board.resize);
+    get().board?.destroy();
+  },
 
-  switch (action.config) {
-    case 'editor':
-      config = EDITOR;
-      break;
-    case 'game':
-      config = GAME;
-      break;
-    default:
-      return state;
-  }
+  flipBoard: () => get().board?.flip(),
 
-  switch (action.position) {
-    case 'current':
-      config.position = useBoardStore.getState().widget.fen() + ' w KQkq - 0 1';
-      break;
-    default:
-      config.position = DEFAULT_POSITION;
-      break;
-  }
+  boardPosition: () => get().board?.fen(),
 
-  switch (action.orientation) {
-    case 'write':
-    case 'black':
-      config.orientation = action.orientation;
-      break;
-    default:
-      config.orientation = 'write';
-      break;
-  }
+  /* eslint-disable no-unused-vars */
+  setBoard: (div) => {
+    const configMode = get().mode;
+    let board = null;
 
-  return { config: config };
-};
+    if (configMode === mode.editor) {
+      board = chessBoard(div, get().config);
+    }
 
-const setWidget = (div) => {
-  const chessRef = useBoardStore.getState().chessRef;
-  const config = useBoardStore.getState().config;
-  let widget = null;
-  console.log(config);
-
-  switch (config.type) {
-    case 'editor':
-      widget = chessBoard(div, config);
-      break;
-    case 'game': {
-      const onSnapEnd = () => {
-        widget.position(chessRef.fen());
+    if (configMode === mode.game || configMode === mode.continue) {
+      const onDragStart = (source, piece, position, orientation) => {
+        if (chess.isGameOver()) return false;
+        if (
+          (chess.turn() === 'w' && piece.search(/^b/) !== -1) ||
+          (chess.turn() === 'b' && piece.search(/^w/) !== -1)
+        ) {
+          return false;
+        }
       };
-      widget = chessBoard(div, {
-        ...config,
-        onDragStart: onDragStart(chessRef),
-        onDrop: onDrop(chessRef),
+
+      const onDrop = (source, target) => {
+        try {
+          chess.move({
+            from: source,
+            to: target,
+            promotion: 'q',
+          });
+        } catch (error) {
+          return 'snapback';
+        }
+      };
+
+      const onSnapEnd = () => {
+        board.position(chess.fen());
+      };
+
+      board = chessBoard(div, {
+        ...get().config,
+        onDragStart: onDragStart,
+        onDrop: onDrop,
         onSnapEnd: onSnapEnd,
       });
-      config.position === 'start'
-        ? chessRef.load(DEFAULT_POSITION)
-        : chessRef.load(config.position);
-      break;
-    }
-    default:
-      widget = chessBoard(div, config);
-      break;
-  }
-  window.addEventListener('resize', widget.resize);
-  useBoardStore.setState({ widget: widget });
-};
 
-const destroyWidget = () => {
-  window.removeEventListener('resize', useBoardStore.getState().widget.resize);
-  useBoardStore.getState().widget?.destroy();
-};
+      configMode == mode.game
+        ? chess.load(DEFAULT_POSITION)
+        : chess.load(get().config.position);
+      console.log('here ' + chess.fen(), configMode);
+    }
+
+    window.addEventListener('resize', board.resize);
+    set({ board: board });
+  },
+});

@@ -1,16 +1,16 @@
 import { useRef, useEffect } from 'react';
-import { useBoardStore } from '../../stores/boardstore.js';
+import { useBoundStore } from '../../stores/boundstore';
 
 export function Board() {
   const divRef = useRef(null);
-  const config = useBoardStore((state) => state.config);
-  const setWidget = useBoardStore((state) => state.setWidget);
-  const destroyWidget = useBoardStore((state) => state.destroyWidget);
+  const config = useBoundStore((state) => state.config);
+  const setBoard = useBoundStore((state) => state.setBoard);
+  const destroyBoard = useBoundStore((state) => state.destroyBoard);
 
   useEffect(() => {
-    setWidget(divRef.current);
-    return () => destroyWidget();
-  }, [divRef, config, setWidget, destroyWidget]);
+    setBoard(divRef.current);
+    return () => destroyBoard();
+  }, [divRef, config, setBoard, destroyBoard]);
 
   return <div className="board" ref={divRef} />;
 }
