@@ -519,17 +519,25 @@ function calculatePositionFromMoves(position, moves) {
 // HTML
 // ---------------------------------------------------------------------------
 
-function buildContainerHTML(hasSparePieces) {
+function buildContainerHTML(hasSparePieces, hideSparePieces) {
   var html = '<div class="{chessboard}">';
 
   if (hasSparePieces) {
-    html += '<div class="{sparePieces} {sparePiecesTop}"></div>';
+    html += '<div class="{sparePieces} {sparePiecesTop}"';
+    if (hideSparePieces) {
+      html += ' style= "visibility : hidden"';
+    }
+    html += '></div>';
   }
 
   html += '<div class="{board}"></div>';
 
   if (hasSparePieces) {
-    html += '<div class="{sparePieces} {sparePiecesBottom}"></div>';
+    html += '<div class="{sparePieces} {sparePiecesBottom}"';
+    if (hideSparePieces) {
+      html += ' style= "visibility : hidden"';
+    }
+    html += '></div>';
   }
 
   html += '</div>';
@@ -903,8 +911,10 @@ function constructor(containerElOrString, config) {
 
   function buildPieceHTML(piece, hidden, id) {
     var html = '<img src="' + buildPieceImgSrc(piece) + '" ';
+    let _squareSize = squareSize;
     if (isString(id) && id !== '') {
       html += 'id="' + id + '" ';
+      _squareSize /= 1.25;
     }
     html +=
       'alt="" ' +
@@ -913,10 +923,10 @@ function constructor(containerElOrString, config) {
       piece +
       '" ' +
       'style="width:' +
-      squareSize +
+      _squareSize +
       'px;' +
       'height:' +
-      squareSize +
+      _squareSize +
       'px;';
 
     if (hidden) {
@@ -1631,9 +1641,9 @@ function constructor(containerElOrString, config) {
 
     // spare pieces
     if (config.sparePieces) {
-      $container
-        .find('.' + CSS.sparePieces)
-        .css('paddingLeft', squareSize + boardBorderSize + 'px');
+      $container.find('.' + CSS.sparePieces).css({
+        paddingLeft: (squareSize + boardBorderSize) * 1.55 + 'px',
+      });
     }
 
     // redraw the board
@@ -1863,7 +1873,9 @@ function constructor(containerElOrString, config) {
     createElIds();
 
     // build board and save it in memory
-    $container.html(buildContainerHTML(config.sparePieces));
+    $container.html(
+      buildContainerHTML(config.sparePieces, config.hideSparePieces)
+    );
     $board = $container.find('.' + CSS.board);
 
     if (config.sparePieces) {

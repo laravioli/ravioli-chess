@@ -7,30 +7,39 @@ export const mode = Object.freeze({
 });
 
 export const createConfigSlice = (set, get) => ({
-  mode: mode.game,
+  mode: mode.continue,
   config: {
     position: DEFAULT_POSITION,
     pieceTheme: './images/{piece}.png',
     draggable: true,
     dropOffBoard: 'snapback',
-    sparePieces: false,
+    sparePieces: true,
+    hideSparePieces: true,
   },
   dispatchConf: (action) => set((state) => get()._reducerConf(state, action)),
   _reducerConf: (state, action) => {
     switch (action.mode) {
       case mode.game:
-      case mode.continue:
         return {
-          mode: action.mode,
+          mode: mode.game,
           config: {
             ...state.config,
-            position:
-              action.mode === mode.game
-                ? DEFAULT_POSITION
-                : get().boardPosition() + ' w KQkq - 0 1',
+            position: DEFAULT_POSITION,
             draggable: true,
             dropOffBoard: 'snapback',
             sparePieces: false,
+          },
+        };
+      case mode.continue:
+        return {
+          mode: mode.continue,
+          config: {
+            ...state.config,
+            position: get().boardPosition() + ' w KQkq - 0 1',
+            draggable: true,
+            dropOffBoard: 'snapback',
+            sparePieces: true,
+            hideSparePieces: true,
           },
         };
       case mode.editor:
@@ -42,6 +51,7 @@ export const createConfigSlice = (set, get) => ({
             draggable: true,
             dropOffBoard: 'trash',
             sparePieces: true,
+            hideSparePieces: false,
           },
         };
       default:
