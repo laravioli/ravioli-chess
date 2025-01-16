@@ -6,8 +6,9 @@ export const mode = Object.freeze({
   continue: Symbol('continue'),
 });
 
-export const createConfigSlice = (set, get) => ({
+export const createBoardControllerSlice = (set, get) => ({
   mode: mode.continue,
+
   config: {
     position: DEFAULT_POSITION,
     pieceTheme: './images/{piece}.png',
@@ -16,7 +17,16 @@ export const createConfigSlice = (set, get) => ({
     sparePieces: true,
     hideSparePieces: true,
   },
+
+  castling: {
+    woo: 'K',
+    wooo: 'Q',
+    boo: 'k',
+    booo: 'q',
+  },
+
   dispatchConf: (action) => set((state) => get()._reducerConf(state, action)),
+
   _reducerConf: (state, action) => {
     switch (action.mode) {
       case mode.game:
@@ -35,7 +45,7 @@ export const createConfigSlice = (set, get) => ({
           mode: mode.continue,
           config: {
             ...state.config,
-            position: get().boardPosition() + ' w KQkq - 0 1',
+            position: get().boardApi.getBoardFen() + ' w KQkq - 0 1',
             draggable: true,
             dropOffBoard: 'snapback',
             sparePieces: true,
@@ -47,7 +57,7 @@ export const createConfigSlice = (set, get) => ({
           mode: mode.editor,
           config: {
             ...state.config,
-            position: get().boardPosition() + ' w KQkq - 0 1',
+            position: get().boardApi.getBoardFen() + ' w KQkq - 0 1',
             draggable: true,
             dropOffBoard: 'trash',
             sparePieces: true,

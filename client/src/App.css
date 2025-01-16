@@ -12,7 +12,7 @@
     '.            .                 tools' min-content
     'board        .                 tools' auto
     '.            .                 tools' min-content
-    / auto 2vmin minmax(100px, 200px);
+    / clamp(300px, 72vmin, 700px) 2vmin minmax(100px, 200px);
 }
 
 .editor-toolbar {
@@ -27,5 +27,5 @@
 
 .board {
   grid-area: board;
-  width: clamp(300px, 72vmin, 700px);
+  width: 100%;
 }

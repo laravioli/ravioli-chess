@@ -11,9 +11,9 @@ import {
 
 export function EditorActions() {
   //test purpose
-  const boardPosition = useBoundStore((state) => state.boardPosition);
+  const boardApi = useBoundStore((state) => state.boardApi);
   const test = () => {
-    console.log('board ' + boardPosition());
+    console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + chess.fen());
   };
   //endtest
