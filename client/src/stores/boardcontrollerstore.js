@@ -18,6 +18,8 @@ export const createBoardControllerSlice = (set, get) => ({
     hideSparePieces: true,
   },
 
+  fen: DEFAULT_POSITION,
+
   castling: {
     woo: 'K',
     wooo: 'Q',

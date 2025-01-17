@@ -12,6 +12,7 @@ import {
 export function EditorActions() {
   //test purpose
   const boardApi = useBoundStore((state) => state.boardApi);
+
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + chess.fen());

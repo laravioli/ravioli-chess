@@ -1,10 +1,9 @@
 import { DEFAULT_POSITION, Chess } from 'chess.js';
-
 export const chess = new Chess();
 
-export const createGameSlice = () => ({
+export const createGameSlice = (get) => ({
   newGame: (pos = DEFAULT_POSITION) => {
-    chess.load(pos);
+    get().chess.load(pos);
   },
-  clearGame: () => chess.clear(),
+  clearGame: () => get().chess.clear(),
 });

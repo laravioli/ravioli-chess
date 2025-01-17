@@ -1,7 +1,8 @@
 import { DEFAULT_POSITION } from 'chess.js';
-import { chess } from './gamestore';
 import chessBoard from 'chessboard';
+import { useBoundStore } from './hooks/useboundstore';
 import { mode } from './boardcontrollerstore';
+import { chess } from './gamestore';
 
 export const createBoardSlice = (set, get) => ({
   board: undefined,
@@ -15,57 +16,18 @@ export const createBoardSlice = (set, get) => ({
     getBoardFen: () => get().board?.fen(),
 
     destroyBoard: () => {
-      window.removeEventListener('resize', get().board.resize);
+      window.removeEventListener('resize', get().board?.resize);
       get().board?.destroy();
     },
 
-    /* eslint-disable no-unused-vars */
     setBoard: (div) => {
-      const configMode = get().mode;
       let board = null;
 
-      if (configMode === mode.editor) {
-        board = chessBoard(div, get().config);
-      }
+      board = chessBoard(div, makeconfig());
 
-      if (configMode === mode.game || configMode === mode.continue) {
-        const onDragStart = (source, piece, position, orientation) => {
-          if (chess.isGameOver()) return false;
-          if (
-            (chess.turn() === 'w' && piece.search(/^b/) !== -1) ||
-            (chess.turn() === 'b' && piece.search(/^w/) !== -1)
-          ) {
-            return false;
-          }
-        };
-
-        const onDrop = (source, target) => {
-          try {
-            chess.move({
-              from: source,
-              to: target,
-              promotion: 'q',
-            });
-          } catch (error) {
-            return 'snapback';
-          }
-        };
-
-        const onSnapEnd = () => {
-          board.position(chess.fen());
-        };
-
-        board = chessBoard(div, {
-          ...get().config,
-          onDragStart: onDragStart,
-          onDrop: onDrop,
-          onSnapEnd: onSnapEnd,
-        });
-
-        configMode == mode.game
-          ? chess.load(DEFAULT_POSITION)
-          : chess.load(get().config.position);
-      }
+      get().mode == mode.game
+        ? chess.load(DEFAULT_POSITION)
+        : chess.load(get().config.position);
 
       window.addEventListener('resize', board.resize);
       set({ board: board });
@@ -73,6 +35,39 @@ export const createBoardSlice = (set, get) => ({
   },
 });
 
-function makeConfig(conf) {
-  return {};
+function makeconfig() {
+  const config = useBoundStore.getState().config;
+  const handler = onMouseEvent();
+  if (useBoundStore.getState().mode === mode.editor) return config;
+  return { ...config, ...handler };
+}
+
+/* eslint-disable no-unused-vars */
+function onMouseEvent() {
+  return {
+    onDragStart(source, piece, position, orientation) {
+      if (chess.isGameOver()) return false;
+      if (
+        (chess.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (chess.turn() === 'b' && piece.search(/^w/) !== -1)
+      ) {
+        return false;
+      }
+    },
+    onDrop(source, target) {
+      try {
+        chess.move({
+          from: source,
+          to: target,
+          promotion: 'q',
+        });
+      } catch (error) {
+        return 'snapback';
+      }
+    },
+    onSnapEnd() {
+      const board = useBoundStore.getState().board;
+      board.position(chess.fen());
+    },
+  };
 }
