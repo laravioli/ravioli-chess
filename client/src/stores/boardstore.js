@@ -1,6 +1,5 @@
 import { DEFAULT_POSITION } from 'chess.js';
 import chessBoard from 'chessboard';
-import { useBoundStore } from './hooks/useboundstore';
 import { mode } from './boardcontrollerstore';
 import { chess } from './gamestore';
 
@@ -23,7 +22,7 @@ export const createBoardSlice = (set, get) => ({
     setBoard: (div) => {
       let board = null;
 
-      board = chessBoard(div, makeconfig());
+      board = chessBoard(div, makeConfig(get));
 
       get().mode == mode.game
         ? chess.load(DEFAULT_POSITION)
@@ -35,15 +34,16 @@ export const createBoardSlice = (set, get) => ({
   },
 });
 
-function makeconfig() {
-  const config = useBoundStore.getState().config;
-  const handler = onMouseEvent();
-  if (useBoundStore.getState().mode === mode.editor) return config;
-  return { ...config, ...handler };
+function makeConfig(get) {
+  if (get().mode === mode.editor) {
+    return get().config;
+  } else {
+    return { ...get().config, ...onMouseClick(get) };
+  }
 }
 
 /* eslint-disable no-unused-vars */
-function onMouseEvent() {
+function onMouseClick(get) {
   return {
     onDragStart(source, piece, position, orientation) {
       if (chess.isGameOver()) return false;
@@ -65,9 +65,9 @@ function onMouseEvent() {
         return 'snapback';
       }
     },
+
     onSnapEnd() {
-      const board = useBoundStore.getState().board;
-      board.position(chess.fen());
+      get().board.position(chess.fen());
     },
   };
 }
