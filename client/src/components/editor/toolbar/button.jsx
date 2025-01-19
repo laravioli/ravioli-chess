@@ -1,7 +1,7 @@
 import { Button } from '@mantine/core';
 import { useState } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
-import { mode } from '../../../stores/boardcontrollerstore';
+import { mode } from '../../../stores/controllerstore';
 import { DEFAULT_POSITION } from 'chess.js';
 
 const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {

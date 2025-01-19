@@ -5,11 +5,12 @@ export function Board() {
   const divRef = useRef(null);
   const config = useBoundStore((state) => state.config);
   const boardApi = useBoundStore((state) => state.boardApi);
+  const setBoard = useBoundStore((state) => state.setBoard);
 
   useEffect(() => {
-    boardApi.setBoard(divRef.current);
+    setBoard(divRef.current);
     return () => boardApi.destroyBoard();
-  }, [config, boardApi]);
+  }, [config, setBoard, boardApi]);
 
   return <div className="board" ref={divRef} />;
 }

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { createGameSlice } from '../gamestore';
-import { createBoardControllerSlice } from '../boardcontrollerstore';
 import { createBoardSlice } from '../boardstore';
+import { createControllerSlice } from '../controllerstore';
+import { createFenSlice } from '../fenstore';
 
 const createSelectors = (_store) => {
   let store = _store;
@@ -16,7 +17,8 @@ const createSelectors = (_store) => {
 export const useBoundStore = createSelectors(
   create((...a) => ({
     ...createGameSlice(...a),
-    ...createBoardControllerSlice(...a),
     ...createBoardSlice(...a),
+    ...createControllerSlice(...a),
+    ...createFenSlice(...a),
   }))
 );

@@ -6,7 +6,7 @@ export const mode = Object.freeze({
   continue: Symbol('continue'),
 });
 
-export const createBoardControllerSlice = (set, get) => ({
+export const createControllerSlice = (set, get) => ({
   mode: mode.continue,
 
   config: {
@@ -16,15 +16,6 @@ export const createBoardControllerSlice = (set, get) => ({
     dropOffBoard: 'snapback',
     sparePieces: true,
     hideSparePieces: true,
-  },
-
-  fen: DEFAULT_POSITION,
-
-  castling: {
-    woo: 'K',
-    wooo: 'Q',
-    boo: 'k',
-    booo: 'q',
   },
 
   dispatchConf: (action) => set((state) => get()._reducerConf(state, action)),
@@ -47,7 +38,7 @@ export const createBoardControllerSlice = (set, get) => ({
           mode: mode.continue,
           config: {
             ...state.config,
-            position: get().boardApi.getBoardFen() + ' w KQkq - 0 1',
+            position: get().fen,
             draggable: true,
             dropOffBoard: 'snapback',
             sparePieces: true,
@@ -59,7 +50,7 @@ export const createBoardControllerSlice = (set, get) => ({
           mode: mode.editor,
           config: {
             ...state.config,
-            position: get().boardApi.getBoardFen() + ' w KQkq - 0 1',
+            position: get().fen,
             draggable: true,
             dropOffBoard: 'trash',
             sparePieces: true,
