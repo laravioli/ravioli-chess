@@ -7,8 +7,9 @@ export const mode = Object.freeze({
 });
 
 export const createControllerSlice = (set, get) => ({
-  mode: mode.continue,
+  currentMode: mode.continue,
 
+  //board config to control widget instanciation
   config: {
     position: DEFAULT_POSITION,
     pieceTheme: './images/{piece}.png',
@@ -24,7 +25,7 @@ export const createControllerSlice = (set, get) => ({
     switch (action.mode) {
       case mode.game:
         return {
-          mode: mode.game,
+          currentMode: mode.game,
           config: {
             ...state.config,
             position: DEFAULT_POSITION,
@@ -35,7 +36,7 @@ export const createControllerSlice = (set, get) => ({
         };
       case mode.continue:
         return {
-          mode: mode.continue,
+          currentMode: mode.continue,
           config: {
             ...state.config,
             position: get().fen,
@@ -47,7 +48,7 @@ export const createControllerSlice = (set, get) => ({
         };
       case mode.editor:
         return {
-          mode: mode.editor,
+          currentMode: mode.editor,
           config: {
             ...state.config,
             position: get().fen,

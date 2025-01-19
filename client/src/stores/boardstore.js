@@ -1,4 +1,3 @@
-import { DEFAULT_POSITION } from 'chess.js';
 import chessBoard from 'chessboard';
 import { mode } from './controllerstore';
 import { chess } from './gamestore';
@@ -14,6 +13,8 @@ export const createBoardSlice = (set, get) => ({
 
     getBoardFen: () => get().board?.fen(),
 
+    setBoardPosition: (fen) => get().board?.position(fen, true),
+
     destroyBoard: () => {
       window.removeEventListener('resize', get().board?.resize);
       get().board?.destroy();
@@ -24,12 +25,8 @@ export const createBoardSlice = (set, get) => ({
     let board = null;
 
     board = chessBoard(div, makeConfig(get));
-
-    get().mode === mode.game
-      ? chess.load(DEFAULT_POSITION)
-      : chess.load(get().fen);
-
     window.addEventListener('resize', board.resize);
+
     set({ board: board });
   },
 });
@@ -42,12 +39,12 @@ function makeConfig(get) {
 function onMouseClick(get) {
   const handlers = {};
 
-  if (get().mode !== mode.game)
+  if (get().currentMode !== mode.game)
     handlers['onChange'] = (oldPos, newPos) => {
       get().setFen(get().board.objToFen(newPos));
     };
 
-  if (get().mode !== mode.editor) {
+  if (get().currentMode !== mode.editor) {
     handlers['onDragStart'] = (source, piece, position, orientation) => {
       if (chess.isGameOver()) return false;
       if (
