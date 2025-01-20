@@ -1,35 +1,39 @@
 import { TextInput } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { mode } from '../../../stores/controllerstore';
+
+//todo : when user go to continue but didnt press enter on input => lichess behavior
+//finish turn implementation and thats it
 
 export const FenInput = () => {
   const fen = useBoundStore((state) => state.fen);
   const setFen = useBoundStore((state) => state.setFen);
-  const [value, setValue] = useState(fen);
+  const currentMode = useBoundStore((state) => state.currentMode);
+  const inputRef = useRef(null);
 
   useEffect(() => {
-    setValue(fen);
+    inputRef.current.value = fen;
   }, [fen]);
 
-  const onChange = (event) => {
-    setValue(event.currentTarget.value);
-  };
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
-      const success = setFen(value, true);
-      if (!success) setValue(fen);
+      const isFenUpdated = setFen(inputRef.current.value, true);
+      if (!isFenUpdated) {
+        inputRef.current.value = fen;
+      }
     }
   };
 
   return (
     <TextInput
-      value={value}
+      ref={inputRef}
       leftSectionPointerEvents="none"
       leftSection="FEN:"
       variant="filled"
       radius="xs"
-      onChange={onChange}
       onKeyDown={onKeyDown}
+      disabled={currentMode !== mode.editor}
     />
   );
 };

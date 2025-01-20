@@ -32,7 +32,6 @@ export const StartButton = () => {
 export const ClearButton = () => {
   const currentMode = useBoundStore((state) => state.currentMode);
   const boardApi = useBoundStore((state) => state.boardApi);
-  const isDisabled = currentMode === mode.editor ? false : true;
 
   const onClear = () => {
     boardApi.clearBoard();
@@ -42,7 +41,7 @@ export const ClearButton = () => {
     <EditorButton
       label="clear board"
       onClick={onClear}
-      isDisabled={isDisabled}
+      isDisabled={currentMode !== mode.editor}
     />
   );
 };
