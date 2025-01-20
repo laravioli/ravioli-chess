@@ -1,13 +1,15 @@
+import { TurnToPlay } from '../fen/turn';
 import { CastlingBoxes } from '../fen/fencontrols';
 import { EditorActions } from './actions';
-import { FenInput } from '../fen/feninput';
 
 export function EditorToolBar() {
   return (
     <div className="editor-toolbar">
-      <CastlingBoxes />
+      <div className="fen-controls">
+        <TurnToPlay />
+        <CastlingBoxes />
+      </div>
       <EditorActions />
-      <FenInput />
     </div>
   );
 }

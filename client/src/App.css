@@ -11,7 +11,7 @@
   grid:
     '.            .                 tools' min-content
     'board        .                 tools' auto
-    '.            .                 tools' min-content
+    'copyables    .                 tools' min-content
     / clamp(300px, 72vmin, 700px) 2vmin minmax(100px, 200px);
 }
 
@@ -28,4 +28,12 @@
 .board {
   grid-area: board;
   width: 100%;
+}
+
+.copyables {
+  grid-area: copyables;
+}
+
+.fen-controls {
+  margin: 1.5rem 0;
 }

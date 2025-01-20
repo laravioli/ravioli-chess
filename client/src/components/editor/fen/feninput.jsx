@@ -28,6 +28,7 @@ export const FenInput = () => {
   return (
     <TextInput
       ref={inputRef}
+      className="copyables"
       leftSectionPointerEvents="none"
       leftSection="FEN:"
       variant="filled"
