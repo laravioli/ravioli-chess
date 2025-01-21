@@ -1,5 +1,6 @@
 import { DEFAULT_POSITION, Chess } from 'chess.js';
 import { mode } from './controllerstore';
+
 export const chess = new Chess();
 
 export const createGameSlice = (set, get) => ({

@@ -1,5 +1,3 @@
-import { useBoundStore } from '../../../stores/hooks/useboundstore';
-import { chess } from '../../../stores/gamestore';
 import { Button } from '@mantine/core';
 import {
   StartButton,
@@ -8,6 +6,8 @@ import {
   ContinueEditButton,
   TestButton,
 } from './button';
+import { chess } from '../../../stores/gamestore';
+import { useBoundStore } from '../../../stores/hooks/useboundstore';
 
 export function EditorActions() {
   //test purpose
@@ -16,6 +16,7 @@ export function EditorActions() {
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + chess.fen());
+    console.log('fen ' + useBoundStore.getState().fen);
   };
   //endtest
 

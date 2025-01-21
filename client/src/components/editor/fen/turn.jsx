@@ -1,44 +1,26 @@
-import { useState } from 'react';
-import { Combobox, Input, InputBase, useCombobox } from '@mantine/core';
+import { NativeSelect } from '@mantine/core';
+import styles from './fen.module.css';
+import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { mode } from '../../../stores/controllerstore';
 
-const turn = ['White to play', 'Black to play'];
+export const TurnToPlay = () => {
+  const turn = useBoundStore((state) => state.turn);
+  const setTurn = useBoundStore((state) => state.setTurn);
+  const currentMode = useBoundStore((state) => state.currentMode);
+  const data = ['White to play', 'Black to play'];
+  const value = turn === 'w' ? 0 : 1;
 
-export function TurnToPlay() {
-  const combobox = useCombobox({
-    onDropdownClose: () => combobox.resetSelectedOption(),
-  });
-
-  const [value, setValue] = useState('White to play');
-
-  const options = turn.map((item) => (
-    <Combobox.Option value={item} key={item}>
-      {item}
-    </Combobox.Option>
-  ));
+  const onChange = () => {
+    setTurn();
+  };
 
   return (
-    <Combobox
-      store={combobox}
-      withinPortal={false}
-      onOptionSubmit={(val) => {
-        setValue(val);
-        combobox.closeDropdown();
-      }}>
-      <Combobox.Target>
-        <InputBase
-          component="button"
-          type="button"
-          pointer
-          rightSection={<Combobox.Chevron />}
-          onClick={() => combobox.toggleDropdown()}
-          rightSectionPointerEvents="none">
-          {value || <Input.Placeholder>Pick value</Input.Placeholder>}
-        </InputBase>
-      </Combobox.Target>
-
-      <Combobox.Dropdown>
-        <Combobox.Options>{options}</Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
+    <NativeSelect
+      value={data[value]}
+      onChange={onChange}
+      data={data}
+      classNames={{ wrapper: styles.wrapper }}
+      disabled={currentMode !== mode.editor}
+    />
   );
-}
+};

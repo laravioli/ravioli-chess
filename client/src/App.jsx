@@ -1,6 +1,6 @@
-import '@mantine/core/styles.css';
 import './App.css';
 import 'chessboard/src/chessboard.css';
+import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
 import { Editor } from './components/editor/editor';
 

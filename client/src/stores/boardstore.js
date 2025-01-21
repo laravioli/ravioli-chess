@@ -1,6 +1,6 @@
 import chessBoard from 'chessboard';
-import { mode } from './controllerstore';
 import { chess } from './gamestore';
+import { mode } from './controllerstore';
 
 export const createBoardSlice = (set, get) => ({
   board: undefined,
@@ -41,7 +41,7 @@ function onMouseClick(get) {
 
   if (get().currentMode !== mode.game)
     handlers['onChange'] = (oldPos, newPos) => {
-      get().setFen(get().board.objToFen(newPos));
+      get().updateFen(get().board.objToFen(newPos));
     };
 
   if (get().currentMode !== mode.editor) {

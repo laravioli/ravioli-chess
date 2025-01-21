@@ -1,9 +1,9 @@
-import { DEFAULT_POSITION } from 'chess.js';
-import { validateFen } from 'chess.js';
+import { DEFAULT_POSITION, validateFen } from 'chess.js';
 
 export const createFenSlice = (set, get) => ({
   fen: DEFAULT_POSITION,
-  isValidFen: true,
+  fenInputRef: undefined,
+  isLegalFen: true,
   turn: 'w',
   castling: {
     K: true,
@@ -12,9 +12,23 @@ export const createFenSlice = (set, get) => ({
     q: true,
   },
 
-  setCastlingRight(id, value) {
-    set((state) => ({ castling: { ...state.castling, [id]: value } }));
-    get().setFen();
+  setTurn(turn = undefined) {
+    set((state) => {
+      const newTurn = turn ?? state.turn === 'w' ? 'b' : 'w';
+      return { turn: newTurn };
+    });
+    get().updateFen();
+  },
+
+  setCastlingRights(id, value) {
+    if (Array.isArray(id)) {
+      id.forEach((i) =>
+        set((state) => ({ castling: { ...state.castling, [i]: value } }))
+      );
+    } else {
+      set((state) => ({ castling: { ...state.castling, [id]: value } }));
+    }
+    get().updateFen();
   },
 
   _getCastlingRights() {
@@ -25,21 +39,17 @@ export const createFenSlice = (set, get) => ({
     return cr === '' ? '-' : cr;
   },
 
-  setFen(source = get().boardApi.getBoardFen(), input = false) {
+  updateFen(source = get().boardApi.getBoardFen(), input = false) {
     const fenParser = get()._fenParser(source, input);
     if (fenParser.update) {
-      set({ fen: fenParser.result, isValidFen: fenParser.ok });
-      if (input == true) {
-        get()._fenUpdateUi(source);
-      }
+      set({ fen: fenParser.result, isLegalFen: fenParser.ok });
     }
-
     return fenParser.update;
   },
 
   _fenParser(source, input = false) {
     if (!input) {
-      const turn = 'w';
+      const turn = get().turn;
       const castlingRights = get()._getCastlingRights();
       const fen = [source, turn, castlingRights, '- 0 1'].join(' ');
       return { result: fen, ok: validateFen(fen).ok, update: true };
@@ -58,13 +68,33 @@ export const createFenSlice = (set, get) => ({
     }
   },
 
-  _fenUpdateUi(source) {
+  validateFen() {
+    const input = get().fenInputRef.current.value;
+    if (input !== get().fen) {
+      const isValidFen = get().updateFen(input, true);
+      if (isValidFen) {
+        get()._inputUpdateUi(input);
+      } else {
+        get().fenInputRef.current.value = get().fen;
+      }
+    }
+    return get().isLegalFen;
+  },
+
+  _inputUpdateUi(source) {
     get().boardApi.setBoardPosition(source);
+    set({ turn: source.split(' ')[1] });
     set({
       castling: Object.keys(get().castling).reduce((acc, key) => {
         acc[key] = source.split(' ')[2].includes(key);
         return acc;
       }, {}),
     });
+  },
+
+  fenResetUi(cr) {
+    const castlingRights = ['K', 'Q', 'k', 'q'];
+    get().setCastlingRights(castlingRights, cr);
+    set({ turn: 'w' });
   },
 });

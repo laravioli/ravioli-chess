@@ -19,10 +19,12 @@ const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
 
 export const StartButton = () => {
   const boardApi = useBoundStore((state) => state.boardApi);
+  const fenResetUi = useBoundStore((state) => state.fenResetUi);
   const resetGame = useBoundStore((state) => state.resetGame);
 
   const onStart = () => {
     boardApi.startBoard();
+    fenResetUi(true);
     resetGame();
   };
 
@@ -32,9 +34,11 @@ export const StartButton = () => {
 export const ClearButton = () => {
   const currentMode = useBoundStore((state) => state.currentMode);
   const boardApi = useBoundStore((state) => state.boardApi);
+  const fenResetUi = useBoundStore((state) => state.fenResetUi);
 
   const onClear = () => {
     boardApi.clearBoard();
+    fenResetUi(false);
   };
 
   return (
@@ -55,26 +59,27 @@ export const FlipButton = () => {
 };
 
 export const ContinueEditButton = () => {
-  //add a test that check if the position is valid to continue
   const [isEdit, setIsEdit] = useState(false);
-  const isValidFen = useBoundStore((state) => state.isValidFen);
+  const isLegalFen = useBoundStore((state) => state.isLegalFen);
+  const validateFen = useBoundStore((state) => state.validateFen);
   const dispatchConf = useBoundStore((state) => state.dispatchConf);
   const dispatchGame = useBoundStore((state) => state.dispatchGame);
 
   const label = isEdit ? 'continue from here' : 'edit position';
 
   const onClick = () => {
-    dispatchConf({ mode: isEdit ? mode.continue : mode.editor });
-    dispatchGame({ mode: isEdit ? mode.continue : mode.editor });
-
-    setIsEdit(!isEdit);
+    if (validateFen()) {
+      dispatchConf({ mode: isEdit ? mode.continue : mode.editor });
+      dispatchGame({ mode: isEdit ? mode.continue : mode.editor });
+      setIsEdit(!isEdit);
+    }
   };
 
   return (
     <EditorButton
       label={label}
       onClick={onClick}
-      isDisabled={isEdit && !isValidFen}
+      isDisabled={isEdit && !isLegalFen}
     />
   );
 };

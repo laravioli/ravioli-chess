@@ -1,6 +1,6 @@
 import { Board } from '../board/board';
-import { EditorToolBar } from './toolbar/editortoolbar';
 import { FenInput } from './fen/feninput';
+import { EditorToolBar } from './toolbar/editortoolbar';
 
 export function Editor() {
   return (

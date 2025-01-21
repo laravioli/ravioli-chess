@@ -37,3 +37,13 @@
 .fen-controls {
   margin: 1.5rem 0;
 }
+
+.white-castle {
+  display: flex;
+  align-items: flex-end;
+}
+
+.black-castle {
+  display: flex;
+  align-items: flex-end;
+}

@@ -1,4 +1,5 @@
-import { SimpleGrid, Checkbox } from '@mantine/core';
+import { Checkbox } from '@mantine/core';
+import styles from './fen.module.css';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
 import { mode } from '../../../stores/controllerstore';
 
@@ -7,30 +8,22 @@ export const CastlingBoxes = () => {
   return (
     <>
       <strong>castling</strong>
-      <SimpleGrid cols={2} verticalSpacing="xs">
-        <div>
-          <CastlingBox id="K" label="O-O" currentMode={currentMode} />
-        </div>
-        <div>
-          <CastlingBox id="Q" label="O-O-O" currentMode={currentMode} />
-        </div>
-        <div>
-          <CastlingBox id="k" label="o-o" currentMode={currentMode} />
-        </div>
-        <div>
-          <CastlingBox id="q" label="o-o-o" currentMode={currentMode} />
-        </div>
-      </SimpleGrid>
+      <div className={styles.castle}>
+        <CastlingBox id="K" label="O-O" currentMode={currentMode} />
+        <CastlingBox id="Q" label="O-O-O" currentMode={currentMode} />
+        <CastlingBox id="k" label="o-o" currentMode={currentMode} />
+        <CastlingBox id="q" label="o-o-o" currentMode={currentMode} />
+      </div>
     </>
   );
 };
 
 const CastlingBox = ({ id, label, currentMode }) => {
   const castlingRight = useBoundStore((state) => state.castling[id]);
-  const setCastlingRight = useBoundStore((state) => state.setCastlingRight);
+  const setCastlingRights = useBoundStore((state) => state.setCastlingRights);
 
   const onChange = () => {
-    setCastlingRight(id, !castlingRight);
+    setCastlingRights(id, !castlingRight);
   };
 
   return (

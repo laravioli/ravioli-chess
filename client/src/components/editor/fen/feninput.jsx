@@ -1,27 +1,34 @@
 import { TextInput } from '@mantine/core';
+import styles from './fen.module.css';
 import { useRef, useEffect } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
 import { mode } from '../../../stores/controllerstore';
 
-//todo : when user go to continue but didnt press enter on input => lichess behavior
-//finish turn implementation and thats it
-
 export const FenInput = () => {
-  const fen = useBoundStore((state) => state.fen);
-  const setFen = useBoundStore((state) => state.setFen);
+  const validateFen = useBoundStore((state) => state.validateFen);
   const currentMode = useBoundStore((state) => state.currentMode);
   const inputRef = useRef(null);
 
+  if (!inputRef.current) {
+    useBoundStore.setState({ fenInputRef: inputRef });
+  }
+
   useEffect(() => {
-    inputRef.current.value = fen;
-  }, [fen]);
+    const unsub = useBoundStore.subscribe(
+      (state) => state.fen,
+      (fen) => {
+        inputRef.current.value = fen;
+      },
+      {
+        fireImmediately: true,
+      }
+    );
+    return unsub;
+  }, []);
 
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
-      const isFenUpdated = setFen(inputRef.current.value, true);
-      if (!isFenUpdated) {
-        inputRef.current.value = fen;
-      }
+      validateFen();
     }
   };
 
@@ -30,11 +37,12 @@ export const FenInput = () => {
       ref={inputRef}
       className="copyables"
       leftSectionPointerEvents="none"
-      leftSection="FEN:"
+      leftSection="FEN"
       variant="filled"
       radius="xs"
       onKeyDown={onKeyDown}
       disabled={currentMode !== mode.editor}
+      classNames={{ input: styles.input }}
     />
   );
 };
