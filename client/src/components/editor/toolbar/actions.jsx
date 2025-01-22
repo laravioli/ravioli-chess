@@ -16,7 +16,8 @@ export function EditorActions() {
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + chess.fen());
-    console.log('fen ' + useBoundStore.getState().fen);
+    console.log('fen ' + useBoundStore.getState().fen());
+    console.log(chess.history());
   };
   //endtest
 

@@ -39,7 +39,7 @@ export const createControllerSlice = (set, get) => ({
           currentMode: mode.continue,
           config: {
             ...state.config,
-            position: get().fen,
+            position: get().fen(),
             draggable: true,
             dropOffBoard: 'snapback',
             sparePieces: true,
@@ -51,7 +51,7 @@ export const createControllerSlice = (set, get) => ({
           currentMode: mode.editor,
           config: {
             ...state.config,
-            position: get().fen,
+            position: get().fen(),
             draggable: true,
             dropOffBoard: 'trash',
             sparePieces: true,

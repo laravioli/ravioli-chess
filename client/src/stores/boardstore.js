@@ -42,7 +42,7 @@ function onMouseClick(get, set) {
 
   if (state.currentMode === mode.editor) {
     handlers['onDrop'] = (source, target, piece, newPos) => {
-      get().updateFen({ source: get().board.objToFen(newPos) });
+      get().setFenPositionFromEditor(get().board.objToFen(newPos));
     };
   }
 
@@ -69,23 +69,12 @@ function onMouseClick(get, set) {
       }
     };
 
+    handlers['onChange'] = () => console.log('onChange');
+
     handlers['onSnapEnd'] = () => {
+      console.log('onSnapEnd');
       get().board.position(chess.fen());
-      const castlingRights =
-        chess.turn() === 'w'
-          ? chess.getCastlingRights('b')
-          : Object.fromEntries(
-              Object.entries(chess.getCastlingRights('w')).map(
-                ([key, value]) => [key.toUpperCase(), value]
-              )
-            );
-      set((state) => ({
-        turn: chess.turn(),
-        castling: { ...state.castling, ...castlingRights },
-        halfmove: chess.fen().split(' ')[4],
-        fullmove: chess.moveNumber(),
-      }));
-      get().updateFen();
+      get().setFenSliceFromChess(chess);
     };
   }
   return handlers;

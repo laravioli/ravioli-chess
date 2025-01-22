@@ -14,7 +14,7 @@ export const createGameSlice = (set, get) => ({
         chess.load(DEFAULT_POSITION);
         return state;
       case mode.continue:
-        chess.load(get().fen);
+        chess.load(get().fen());
         return state;
 
       case mode.editor:

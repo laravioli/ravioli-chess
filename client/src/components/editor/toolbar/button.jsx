@@ -61,14 +61,16 @@ export const FlipButton = () => {
 export const ContinueEditButton = () => {
   const [isEdit, setIsEdit] = useState(false);
   const isLegalFen = useBoundStore((state) => state.isLegalFen);
-  const validateFen = useBoundStore((state) => state.validateFen);
+  const setFenSliceContinue = useBoundStore(
+    (state) => state.setFenSliceContinue
+  );
   const dispatchConf = useBoundStore((state) => state.dispatchConf);
   const dispatchGame = useBoundStore((state) => state.dispatchGame);
 
   const label = isEdit ? 'continue from here' : 'edit position';
 
   const onClick = () => {
-    if (validateFen()) {
+    if (setFenSliceContinue()) {
       dispatchConf({ mode: isEdit ? mode.continue : mode.editor });
       dispatchGame({ mode: isEdit ? mode.continue : mode.editor });
       setIsEdit(!isEdit);
