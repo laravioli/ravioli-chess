@@ -38,13 +38,15 @@ function makeConfig(get) {
 /* eslint-disable no-unused-vars */
 function onMouseClick(get) {
   const handlers = {};
+  const state = get();
 
-  if (get().currentMode !== mode.game)
-    handlers['onChange'] = (oldPos, newPos) => {
-      get().updateFen(get().board.objToFen(newPos));
+  if (state.currentMode === mode.editor) {
+    handlers['onDrop'] = (source, target, piece, newPos) => {
+      get().updateFen({ source: get().board.objToFen(newPos) });
     };
+  }
 
-  if (get().currentMode !== mode.editor) {
+  if (state.currentMode !== mode.editor) {
     handlers['onDragStart'] = (source, piece, position, orientation) => {
       if (chess.isGameOver()) return false;
       if (
@@ -69,6 +71,7 @@ function onMouseClick(get) {
 
     handlers['onSnapEnd'] = () => {
       get().board.position(chess.fen());
+      get().updateFen();
     };
   }
   return handlers;

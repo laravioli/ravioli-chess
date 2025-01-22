@@ -19,12 +19,12 @@ const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
 
 export const StartButton = () => {
   const boardApi = useBoundStore((state) => state.boardApi);
-  const fenResetUi = useBoundStore((state) => state.fenResetUi);
+  const resetFen = useBoundStore((state) => state.resetFen);
   const resetGame = useBoundStore((state) => state.resetGame);
 
   const onStart = () => {
     boardApi.startBoard();
-    fenResetUi(true);
+    resetFen(true);
     resetGame();
   };
 
@@ -34,11 +34,11 @@ export const StartButton = () => {
 export const ClearButton = () => {
   const currentMode = useBoundStore((state) => state.currentMode);
   const boardApi = useBoundStore((state) => state.boardApi);
-  const fenResetUi = useBoundStore((state) => state.fenResetUi);
+  const resetFen = useBoundStore((state) => state.resetFen);
 
   const onClear = () => {
     boardApi.clearBoard();
-    fenResetUi(false);
+    resetFen(false);
   };
 
   return (

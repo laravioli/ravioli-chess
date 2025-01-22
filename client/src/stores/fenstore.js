@@ -1,4 +1,5 @@
-import { DEFAULT_POSITION, validateFen } from 'chess.js';
+import { DEFAULT_POSITION, validateFen as vf } from 'chess.js';
+import { produce } from 'immer';
 
 export const createFenSlice = (set, get) => ({
   fen: DEFAULT_POSITION,
@@ -11,23 +12,29 @@ export const createFenSlice = (set, get) => ({
     k: true,
     q: true,
   },
+  halfmove: 0,
+  fullmove: 1,
 
   setTurn(turn = undefined) {
     set((state) => {
-      const newTurn = turn ?? state.turn === 'w' ? 'b' : 'w';
+      const newTurn = turn ?? (state.turn === 'w' ? 'b' : 'w');
       return { turn: newTurn };
     });
     get().updateFen();
   },
 
   setCastlingRights(id, value) {
-    if (Array.isArray(id)) {
-      id.forEach((i) =>
-        set((state) => ({ castling: { ...state.castling, [i]: value } }))
-      );
-    } else {
-      set((state) => ({ castling: { ...state.castling, [id]: value } }));
-    }
+    set((state) =>
+      produce(state, (draft) => {
+        if (Array.isArray(id)) {
+          id.forEach((i) => {
+            draft.castling[i] = value;
+          });
+        } else {
+          draft.castling[id] = value;
+        }
+      })
+    );
     get().updateFen();
   },
 
@@ -39,62 +46,74 @@ export const createFenSlice = (set, get) => ({
     return cr === '' ? '-' : cr;
   },
 
-  updateFen(source = get().boardApi.getBoardFen(), input = false) {
-    const fenParser = get()._fenParser(source, input);
-    if (fenParser.update) {
-      set({ fen: fenParser.result, isLegalFen: fenParser.ok });
+  updateFen({ source = null, input = false } = {}) {
+    const fenParser = get()._fenParser({ source, input });
+    if (fenParser.valid) {
+      set({ fen: fenParser.fen, isLegalFen: fenParser.legal });
     }
-    return fenParser.update;
+    return fenParser.valid;
   },
 
-  _fenParser(source, input = false) {
+  _fenParser({ source, input }) {
+    const state = get();
     if (!input) {
-      const turn = get().turn;
-      const castlingRights = get()._getCastlingRights();
-      const fen = [source, turn, castlingRights, '- 0 1'].join(' ');
-      return { result: fen, ok: validateFen(fen).ok, update: true };
+      const fen = [
+        source ?? state.boardApi.getBoardFen(),
+        state.turn,
+        state._getCastlingRights(),
+        '-',
+        state.halfmove,
+        state.fullmove,
+      ].join(' ');
+      return { fen: fen, legal: vf(fen).ok, valid: true };
     } else {
-      const validation = validateFen(source);
-      if (
-        validation.ok ||
-        validation.error === 'Invalid FEN: some pawns are on the edge rows' ||
-        validation.error === 'Invalid FEN: missing white king' ||
-        validation.error === 'Invalid FEN: missing black king'
-      ) {
-        return { result: source, ok: validation.ok, update: true };
+      const input = state.fenInputRef.current.value;
+      const validation = vf(input);
+      const validErrors = [
+        'Invalid FEN: some pawns are on the edge rows',
+        'Invalid FEN: missing white king',
+        'Invalid FEN: missing black king',
+      ];
+      if (validation.ok || validErrors.includes(validation.error)) {
+        return { fen: input, legal: validation.ok, valid: true };
       } else {
-        return { update: false };
+        return { fen: state.fen, legal: validation.ok, valid: false };
       }
     }
   },
 
   validateFen() {
-    const input = get().fenInputRef.current.value;
-    if (input !== get().fen) {
-      const isValidFen = get().updateFen(input, true);
+    const state = get();
+    const input = state.fenInputRef.current.value;
+    if (input !== state.fen) {
+      const isValidFen = state.updateFen({ input: true });
       if (isValidFen) {
-        get()._inputUpdateUi(input);
+        state._inputUpdateUi(input);
       } else {
-        get().fenInputRef.current.value = get().fen;
+        state.fenInputRef.current.value = state.fen;
       }
     }
     return get().isLegalFen;
   },
 
   _inputUpdateUi(source) {
-    get().boardApi.setBoardPosition(source);
-    set({ turn: source.split(' ')[1] });
     set({
+      turn: source.split(' ')[1],
       castling: Object.keys(get().castling).reduce((acc, key) => {
         acc[key] = source.split(' ')[2].includes(key);
         return acc;
       }, {}),
     });
+    get().boardApi.setBoardPosition(source);
   },
 
-  fenResetUi(cr) {
+  resetFen(cr) {
     const castlingRights = ['K', 'Q', 'k', 'q'];
-    get().setCastlingRights(castlingRights, cr);
-    set({ turn: 'w' });
+    set((state) => {
+      state.setTurn('w');
+      state.setCastlingRights(castlingRights, cr);
+      return { halfmove: 0, fullmove: 1 };
+    });
+    get().updateFen();
   },
 });

@@ -9,11 +9,8 @@ export const FenInput = () => {
   const currentMode = useBoundStore((state) => state.currentMode);
   const inputRef = useRef(null);
 
-  if (!inputRef.current) {
-    useBoundStore.setState({ fenInputRef: inputRef });
-  }
-
   useEffect(() => {
+    useBoundStore.setState({ fenInputRef: inputRef });
     const unsub = useBoundStore.subscribe(
       (state) => state.fen,
       (fen) => {

@@ -21,9 +21,11 @@ export const CastlingBoxes = () => {
 const CastlingBox = ({ id, label, currentMode }) => {
   const castlingRight = useBoundStore((state) => state.castling[id]);
   const setCastlingRights = useBoundStore((state) => state.setCastlingRights);
+  const updateFen = useBoundStore((state) => state.updateFen);
 
   const onChange = () => {
     setCastlingRights(id, !castlingRight);
+    updateFen();
   };
 
   return (
