@@ -24,19 +24,19 @@ export const createBoardSlice = (set, get) => ({
   setBoard: (div) => {
     let board = null;
 
-    board = chessBoard(div, makeConfig(get));
+    board = chessBoard(div, makeConfig(get, set));
     window.addEventListener('resize', board.resize);
 
     set({ board: board });
   },
 });
 
-function makeConfig(get) {
-  return { ...get().config, ...onMouseClick(get) };
+function makeConfig(get, set) {
+  return { ...get().config, ...onMouseClick(get, set) };
 }
 
 /* eslint-disable no-unused-vars */
-function onMouseClick(get) {
+function onMouseClick(get, set) {
   const handlers = {};
   const state = get();
 
@@ -71,6 +71,20 @@ function onMouseClick(get) {
 
     handlers['onSnapEnd'] = () => {
       get().board.position(chess.fen());
+      const castlingRights =
+        chess.turn() === 'w'
+          ? chess.getCastlingRights('b')
+          : Object.fromEntries(
+              Object.entries(chess.getCastlingRights('w')).map(
+                ([key, value]) => [key.toUpperCase(), value]
+              )
+            );
+      set((state) => ({
+        turn: chess.turn(),
+        castling: { ...state.castling, ...castlingRights },
+        halfmove: chess.fen().split(' ')[4],
+        fullmove: chess.moveNumber(),
+      }));
       get().updateFen();
     };
   }

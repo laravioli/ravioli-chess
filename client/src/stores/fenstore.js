@@ -1,5 +1,4 @@
 import { DEFAULT_POSITION, validateFen as vf } from 'chess.js';
-import { produce } from 'immer';
 
 export const createFenSlice = (set, get) => ({
   fen: DEFAULT_POSITION,
@@ -23,27 +22,9 @@ export const createFenSlice = (set, get) => ({
     get().updateFen();
   },
 
-  setCastlingRights(id, value) {
-    set((state) =>
-      produce(state, (draft) => {
-        if (Array.isArray(id)) {
-          id.forEach((i) => {
-            draft.castling[i] = value;
-          });
-        } else {
-          draft.castling[id] = value;
-        }
-      })
-    );
+  setCastlingRight(id, value) {
+    set((state) => ({ castling: { ...state.castling, [id]: value } }));
     get().updateFen();
-  },
-
-  _getCastlingRights() {
-    const cr = Object.entries(get().castling)
-      .filter(([, value]) => value)
-      .map(([key]) => key)
-      .join('');
-    return cr === '' ? '-' : cr;
   },
 
   updateFen({ source = null, input = false } = {}) {
@@ -82,6 +63,14 @@ export const createFenSlice = (set, get) => ({
     }
   },
 
+  _getCastlingRights() {
+    const cr = Object.entries(get().castling)
+      .filter(([, value]) => value)
+      .map(([key]) => key)
+      .join('');
+    return cr === '' ? '-' : cr;
+  },
+
   validateFen() {
     const state = get();
     const input = state.fenInputRef.current.value;
@@ -103,16 +92,23 @@ export const createFenSlice = (set, get) => ({
         acc[key] = source.split(' ')[2].includes(key);
         return acc;
       }, {}),
+      halfmove: source.split(' ')[4],
+      fullmove: source.split(' ')[5],
     });
     get().boardApi.setBoardPosition(source);
   },
 
   resetFen(cr) {
-    const castlingRights = ['K', 'Q', 'k', 'q'];
-    set((state) => {
-      state.setTurn('w');
-      state.setCastlingRights(castlingRights, cr);
-      return { halfmove: 0, fullmove: 1 };
+    set({
+      turn: 'w',
+      castling: {
+        K: cr,
+        Q: cr,
+        k: cr,
+        q: cr,
+      },
+      halfmove: 0,
+      fullmove: 1,
     });
     get().updateFen();
   },
