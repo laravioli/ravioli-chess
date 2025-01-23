@@ -12,12 +12,21 @@ import { useBoundStore } from '../../../stores/hooks/useboundstore';
 export function EditorActions() {
   //test purpose
   const boardApi = useBoundStore((state) => state.boardApi);
+  const gameActions = useBoundStore((state) => state.gameActions);
 
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + chess.fen());
     console.log('fen ' + useBoundStore.getState().fen());
     console.log(chess.history());
+  };
+
+  const undo = () => {
+    gameActions.undoMove();
+  };
+
+  const redo = () => {
+    gameActions.redoMove();
   };
   //endtest
 
@@ -28,6 +37,8 @@ export function EditorActions() {
       <FlipButton />
       <ContinueEditButton />
       <TestButton label="position" onTest={test} />
+      <TestButton label="undo" onTest={undo} />
+      <TestButton label="redo" onTest={redo} />
     </Button.Group>
   );
 }

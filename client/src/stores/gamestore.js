@@ -1,28 +1,65 @@
-import { DEFAULT_POSITION, Chess } from 'chess.js';
+import { Chess } from 'chess.js';
 import { mode } from './controllerstore';
 
 export const chess = new Chess();
 
 export const createGameSlice = (set, get) => ({
-  resetGame: () => chess.reset(),
-  dispatchGame: (action) => set((state) => get()._reducerGame(state, action)),
+  gameHistory: [],
+  gamePointer: 0,
+  gameActions: {
+    resetGame: () => {
+      chess.reset();
+    },
 
-  //wether to load or clear game based on action
-  _reducerGame: (state, action) => {
+    updateGameHistory() {
+      const state = get();
+      if (state.gamePointer == state.gameHistory.length) {
+        set((state) => ({
+          gameHistory: chess.history(),
+          gamePointer: state.gamePointer + 1,
+        }));
+      }
+    },
+
+    undoMove() {
+      const state = get();
+      if (state.gamePointer > 0) {
+        chess.undo();
+        state.boardApi.setBoardPosition(chess.fen());
+        state.setFenSliceFromChess(chess);
+        set((state) => ({ gamePointer: state.gamePointer - 1 }));
+      }
+    },
+
+    redoMove() {
+      const state = get();
+      if (state.gamePointer < state.gameHistory.length) {
+        console.log(state.gameHistory, state.gameHistory[state.gamePointer]);
+        chess.move(state.gameHistory[state.gamePointer]);
+        state.boardApi.setBoardPosition(chess.fen());
+        state.setFenSliceFromChess(chess);
+        set((state) => ({ gamePointer: state.gamePointer + 1 }));
+      }
+    },
+  },
+
+  dispatchNewGame: (action) => set((state) => get()._reducerNG(state, action)),
+  _reducerNG: (state, action) => {
     switch (action.mode) {
       case mode.game:
-        chess.load(DEFAULT_POSITION);
-        return state;
+        chess.reset();
+        break;
       case mode.continue:
         chess.load(get().fen());
-        return state;
+        break;
 
       case mode.editor:
         chess.clear();
-        return state;
+        break;
 
       default:
-        return state;
+        break;
     }
+    return { gameHistory: [], gamePointer: 0 };
   },
 });

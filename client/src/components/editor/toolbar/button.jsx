@@ -20,12 +20,12 @@ const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
 export const StartButton = () => {
   const boardApi = useBoundStore((state) => state.boardApi);
   const resetFen = useBoundStore((state) => state.resetFen);
-  const resetGame = useBoundStore((state) => state.resetGame);
+  const gameActions = useBoundStore((state) => state.gameActions);
 
   const onStart = () => {
     boardApi.startBoard();
     resetFen(true);
-    resetGame();
+    gameActions.resetGame();
   };
 
   return <EditorButton label="starting position" onClick={onStart} />;
@@ -65,14 +65,14 @@ export const ContinueEditButton = () => {
     (state) => state.setFenSliceContinue
   );
   const dispatchConf = useBoundStore((state) => state.dispatchConf);
-  const dispatchGame = useBoundStore((state) => state.dispatchGame);
+  const dispatchNewGame = useBoundStore((state) => state.dispatchNewGame);
 
   const label = isEdit ? 'continue from here' : 'edit position';
 
   const onClick = () => {
     if (setFenSliceContinue()) {
       dispatchConf({ mode: isEdit ? mode.continue : mode.editor });
-      dispatchGame({ mode: isEdit ? mode.continue : mode.editor });
+      dispatchNewGame({ mode: isEdit ? mode.continue : mode.editor });
       setIsEdit(!isEdit);
     }
   };
