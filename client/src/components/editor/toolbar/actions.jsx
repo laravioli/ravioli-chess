@@ -1,4 +1,6 @@
 import { Button } from '@mantine/core';
+import styles from './toolbar.module.css';
+import { History } from './history';
 import {
   StartButton,
   ClearButton,
@@ -12,7 +14,6 @@ import { useBoundStore } from '../../../stores/hooks/useboundstore';
 export function EditorActions() {
   //test purpose
   const boardApi = useBoundStore((state) => state.boardApi);
-  const gameHistory = useBoundStore((state) => state.gameHistory);
 
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
@@ -21,24 +22,18 @@ export function EditorActions() {
     console.log(chess.history());
   };
 
-  const undo = () => {
-    gameHistory.next('undo');
-  };
-
-  const redo = () => {
-    gameHistory.next('redo');
-  };
   //endtest
 
   return (
-    <Button.Group orientation="vertical">
-      <StartButton />
-      <ClearButton />
-      <FlipButton />
-      <ContinueEditButton />
-      <TestButton label="position" onTest={test} />
-      <TestButton label="undo" onTest={undo} />
-      <TestButton label="redo" onTest={redo} />
-    </Button.Group>
+    <>
+      <Button.Group orientation="vertical" classNames={{ group: styles.group }}>
+        <StartButton />
+        <ClearButton />
+        <FlipButton />
+        <ContinueEditButton />
+        <TestButton label="position" onTest={test} />
+      </Button.Group>
+      <History />
+    </>
   );
 }

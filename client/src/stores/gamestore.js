@@ -1,41 +1,44 @@
-import { Chess } from 'chess.js';
+import { Chess, DEFAULT_POSITION } from 'chess.js';
 import { mode } from './controllerstore';
 
 export const chess = new Chess();
 
 export const createGameSlice = (set, get) => ({
-  gameHistory: dispatch([], get),
   gameActions: {
-    resetGame: () => {
-      chess.reset();
-    },
+    history: coHistory([], get),
 
-    _updateUI() {
-      get().boardApi.setBoardPosition(chess.fen());
-      get().setFenSliceFromChess(chess);
-    },
+    newGame: (action) => set((state) => get()._reducerNG(state, action)),
   },
 
-  dispatchNewGame: (action) => set((state) => get()._reducerNG(state, action)),
   _reducerNG: (state, action) => {
     switch (action.mode) {
       case mode.game:
         chess.reset();
-        set({ gameHistory: dispatch([], get) });
-        break;
+        return {
+          gameActions: { ...state.gameActions, history: coHistory([], get) },
+        };
       case mode.continue:
         chess.load(get().fen());
-        set({ gameHistory: dispatch([], get) });
-        break;
+        return {
+          gameActions: { ...state.gameActions, history: coHistory([], get) },
+        };
 
       case mode.editor:
         chess.clear();
-        break;
+        return { gameActions: { ...state.gameActions, history: null } };
 
       default:
-        break;
+        chess.reset();
+        return {
+          config: { ...state.config, position: DEFAULT_POSITION },
+          gameActions: { ...state.gameActions, history: coHistory([], get) },
+        };
     }
-    return { gameHistory: [], gamePointer: 0 };
+  },
+
+  _gameUpdateUI() {
+    get().boardApi.setBoardPosition(chess.fen());
+    get().setFenSliceFromChess(chess);
   },
 });
 
@@ -47,16 +50,45 @@ function coroutine(func) {
   };
 }
 
+const coHistory = coroutine(function* (history, get) {
+  const stack = [history];
+  const ptr = [history.length];
+  const [coUndo, coRedo, coReset, coMove] = [
+    undo(stack, ptr),
+    redo(stack, ptr),
+    reset(stack, ptr, get),
+    move(stack, ptr),
+  ];
+  while (true) {
+    let action = yield;
+    switch (action) {
+      case 'undo':
+        coUndo.next();
+        break;
+      case 'redo':
+        coRedo.next();
+        break;
+      case 'start':
+      case 'end':
+        coReset.next(action);
+        break;
+      default:
+        coMove.next(action);
+        break;
+    }
+    get()._gameUpdateUI();
+  }
+});
+
 const undo = coroutine(function* (stack, ptr) {
   while (true) {
     yield;
-    if (stack.length > 1 && ptr.at(-1) == 0) {
+    if (stack.length > 1 && ptr.at(-1) == 1) {
       stack.pop();
       ptr.pop();
-    } else if (ptr.at(-1) > 0) {
+      chess.undo();
+    } else if (ptr.at(-1) >= 1) {
       ptr.push(ptr.pop() - 1);
-    }
-    if (stack[0].length > 0) {
       chess.undo();
     }
   }
@@ -65,7 +97,7 @@ const undo = coroutine(function* (stack, ptr) {
 const redo = coroutine(function* (stack, ptr) {
   while (true) {
     yield;
-    if (ptr.at(-1) < stack.at(-1).length - 1) {
+    if (ptr.at(-1) >= 0 && ptr.at(-1) < stack.at(-1).length) {
       chess.move(stack.at(-1)[ptr.at(-1)]);
       ptr.push(ptr.pop() + 1);
     }
@@ -86,7 +118,7 @@ const reset = coroutine(function* (stack, ptr, get) {
     if (action == 'end') {
       chess.load(get().config.position);
       stack[0].forEach((mv) => chess.move(mv));
-      ptr.push(stack[0].length - 1);
+      ptr.push(stack[0].length);
     }
   }
 });
@@ -94,43 +126,12 @@ const reset = coroutine(function* (stack, ptr, get) {
 const move = coroutine(function* (stack, ptr) {
   while (true) {
     let move = yield;
-    if (ptr.at(-1) == stack.at(-1).length - 1) {
+    if (ptr.at(-1) == stack.at(-1).length) {
       stack.at(-1).push(move);
       ptr.push(ptr.pop() + 1);
     } else {
       stack.push([move]);
-      ptr.push(0);
+      ptr.push(1);
     }
-  }
-});
-
-const dispatch = coroutine(function* (history, get) {
-  const stack = [history];
-  const ptr = [history.length - 1];
-  const [coUndo, coRedo, coReset, coMove] = [
-    undo(stack, ptr),
-    redo(stack, ptr),
-    reset(stack, ptr),
-    move(stack, ptr),
-  ];
-  while (true) {
-    let action = yield;
-    switch (action) {
-      case 'undo':
-        coUndo.next();
-        break;
-      case 'redo':
-        coRedo.next();
-        break;
-      case 'start':
-      case 'end':
-        coReset.next(action);
-        break;
-      default:
-        coMove.next(action);
-        break;
-    }
-    get().gameActions._updateUI();
-    console.log(stack, ptr);
   }
 });

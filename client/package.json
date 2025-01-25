@@ -12,6 +12,7 @@
   "dependencies": {
     "@mantine/core": "^7.15.3",
     "@mantine/hooks": "^7.15.3",
+    "@tabler/icons-react": "^3.29.0",
     "chess.js": "^1.0.0-beta.8",
     "immer": "^10.1.1",
     "react": "^18.3.1",
