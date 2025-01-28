@@ -1,0 +1,9 @@
+.logo-container {
+  width: 100%; /* adjust to container size as needed */
+  height: 100%; /* adjust to container size as needed */
+}
+
+.logo-container img {
+  max-height: 60px;
+  display: flex;
+}

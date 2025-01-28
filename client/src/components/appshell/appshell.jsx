@@ -1,12 +1,13 @@
 import { AppShell, Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { Header } from './header/header';
 
 export const Shell = ({ children }) => {
   const [opened, { toggle }] = useDisclosure();
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: 60, offset: true }}
       navbar={{
         width: 100,
         breakpoint: 'sm',
@@ -15,7 +16,7 @@ export const Shell = ({ children }) => {
       padding="md">
       <AppShell.Header>
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-        <div>Logo</div>
+        <Header />
       </AppShell.Header>
 
       <AppShell.Navbar p="md">Navbar</AppShell.Navbar>
