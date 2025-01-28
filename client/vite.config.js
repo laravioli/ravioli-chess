@@ -10,4 +10,13 @@ export default defineConfig({
       '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
     },
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:8000',
+    },
+  },
+  base: '/static/',
+  build: {
+    manifest: 'manifest.json',
+  },
 });
