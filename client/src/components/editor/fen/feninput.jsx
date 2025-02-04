@@ -2,13 +2,12 @@ import { TextInput } from '@mantine/core';
 import styles from './fen.module.css';
 import { useRef, useEffect } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
-import { mode } from '../../../stores/controllerstore';
 
 export const FenInput = () => {
   const setFenSliceFromInput = useBoundStore(
     (state) => state.setFenSliceFromInput
   );
-  const currentMode = useBoundStore((state) => state.currentMode);
+  const mode = useBoundStore((state) => state.mode);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export const FenInput = () => {
       variant="filled"
       radius="xs"
       onKeyDown={onKeyDown}
-      disabled={currentMode !== mode.editor}
+      disabled={mode !== 'editor'}
       classNames={{ input: styles.input }}
     />
   );

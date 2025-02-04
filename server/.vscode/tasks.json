@@ -1,12 +1,35 @@
-{
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "echo",
-            "type": "shell",
-            "command": "echo Hello"
-        }
-    ]
-}
+
+    {
+        "version": "2.0.0",
+        "tasks": [
+          {
+            "label": "Client Build",
+            "command": "npm",
+            "args": ["run", "build"],
+            "options": {
+              "cwd": "${workspaceFolder}/../client"
+            }
+          },
+          {
+            "label": "Server collectstatic",
+            "type" : "shell",
+            "command": "python3",
+            "args" : ["manage.py", "collectstatic", "--noinput"],
+            "options": {
+              "cwd": "${workspaceFolder}/src"
+            }
+          },
+          {
+            "label": "Build",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Client Build", "Server collectstatic"],
+            "group": {
+                    "kind": "build",
+                    "isDefault": true
+                }
+                    }
+        ]
+      }
+      

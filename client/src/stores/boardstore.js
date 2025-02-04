@@ -1,6 +1,5 @@
 import chessBoard from 'chessboard';
 import { chess } from './gamestore';
-import { mode } from './controllerstore';
 
 export const createBoardSlice = (set, get) => ({
   board: undefined,
@@ -40,13 +39,13 @@ function onMouseClick(get) {
   const handlers = {};
   const state = get();
 
-  if (state.currentMode === mode.editor) {
+  if (state.mode === 'editor') {
     handlers['onDrop'] = (source, target, piece, newPos) => {
       get().setFenPositionFromEditor(get().board.objToFen(newPos));
     };
   }
 
-  if (state.currentMode !== mode.editor) {
+  if (state.mode !== 'editor') {
     handlers['onDragStart'] = (source, piece, position, orientation) => {
       if (chess.isGameOver()) return false;
       if (

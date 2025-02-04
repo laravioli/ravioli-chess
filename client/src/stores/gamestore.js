@@ -1,5 +1,4 @@
 import { Chess, DEFAULT_POSITION } from 'chess.js';
-import { mode } from './controllerstore';
 
 export const chess = new Chess();
 
@@ -12,18 +11,18 @@ export const createGameSlice = (set, get) => ({
 
   _reducerNG: (state, action) => {
     switch (action.mode) {
-      case mode.game:
+      case 'game':
         chess.reset();
         return {
           gameActions: { ...state.gameActions, history: coHistory([], get) },
         };
-      case mode.continue:
+      case 'continue':
         chess.load(get().fen());
         return {
           gameActions: { ...state.gameActions, history: coHistory([], get) },
         };
 
-      case mode.editor:
+      case 'editor':
         chess.clear();
         return { gameActions: { ...state.gameActions, history: null } };
 

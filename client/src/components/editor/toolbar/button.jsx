@@ -1,7 +1,6 @@
 import { Button } from '@mantine/core';
 import { useState } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
-import { mode } from '../../../stores/controllerstore';
 
 const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
   return (
@@ -21,12 +20,12 @@ export const StartButton = () => {
   const boardApi = useBoundStore((state) => state.boardApi);
   const resetFen = useBoundStore((state) => state.resetFen);
   const gameActions = useBoundStore((state) => state.gameActions);
-  const currentMode = useBoundStore((state) => state.currentMode);
+  const mode = useBoundStore((state) => state.mode);
 
   const onStart = () => {
     boardApi.startBoard();
     resetFen(true);
-    if (currentMode == mode.continue) {
+    if (mode == 'continue') {
       gameActions.newGame({});
     }
   };
@@ -35,7 +34,7 @@ export const StartButton = () => {
 };
 
 export const ClearButton = () => {
-  const currentMode = useBoundStore((state) => state.currentMode);
+  const mode = useBoundStore((state) => state.mode);
   const boardApi = useBoundStore((state) => state.boardApi);
   const resetFen = useBoundStore((state) => state.resetFen);
 
@@ -48,7 +47,7 @@ export const ClearButton = () => {
     <EditorButton
       label="clear board"
       onClick={onClear}
-      isDisabled={currentMode !== mode.editor}
+      isDisabled={mode !== 'editor'}
     />
   );
 };
@@ -74,8 +73,8 @@ export const ContinueEditButton = () => {
 
   const onClick = () => {
     if (setFenSliceContinue()) {
-      dispatchConf({ mode: isEdit ? mode.continue : mode.editor });
-      newGame({ mode: isEdit ? mode.continue : mode.editor });
+      dispatchConf({ mode: isEdit ? 'continue' : 'editor' });
+      newGame({ mode: isEdit ? 'continue' : 'editor' });
       setIsEdit(!isEdit);
     }
   };

@@ -1,18 +1,14 @@
 import { DEFAULT_POSITION } from 'chess.js';
-
-export const mode = Object.freeze({
-  game: Symbol('game'),
-  editor: Symbol('editor'),
-  continue: Symbol('continue'),
-});
+import piecesUrl from '/images/bK.png';
 
 export const createControllerSlice = (set, get) => ({
-  currentMode: mode.continue,
+  mode: 'continue',
 
   //board config to control widget instanciation
   config: {
     position: DEFAULT_POSITION,
-    pieceTheme: './images/{piece}.png',
+    pieceTheme: (piece) =>
+      piecesUrl.replace(/\/([^/]+)\.png$/, `/${piece}.png`),
     draggable: true,
     dropOffBoard: 'snapback',
     sparePieces: true,
@@ -23,9 +19,9 @@ export const createControllerSlice = (set, get) => ({
 
   _reducerConf: (state, action) => {
     switch (action.mode) {
-      case mode.game:
+      case 'game':
         return {
-          currentMode: mode.game,
+          mode: 'game',
           config: {
             ...state.config,
             position: DEFAULT_POSITION,
@@ -34,9 +30,9 @@ export const createControllerSlice = (set, get) => ({
             sparePieces: false,
           },
         };
-      case mode.continue:
+      case 'continue':
         return {
-          currentMode: mode.continue,
+          mode: 'continue',
           config: {
             ...state.config,
             position: get().fen(),
@@ -46,9 +42,9 @@ export const createControllerSlice = (set, get) => ({
             hideSparePieces: true,
           },
         };
-      case mode.editor:
+      case 'editor':
         return {
-          currentMode: mode.editor,
+          mode: 'editor',
           config: {
             ...state.config,
             position: get().fen(),
