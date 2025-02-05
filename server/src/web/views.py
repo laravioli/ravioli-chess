@@ -1,6 +1,8 @@
+from .models import ChessOpeningPosition as c
 from django.shortcuts import render
 
 
 def index(request):
 
-    return render(request, "web/index.html")
+    context = {"openings": list(c.objects.values("eco", "name", "fen").order_by("eco"))}
+    return render(request, "web/index.html", context)
