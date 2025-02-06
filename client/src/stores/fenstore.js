@@ -27,14 +27,6 @@ export const createFenSlice = (set, get) => ({
     return fen;
   },
 
-  _getCastlingRights() {
-    const cr = Object.entries(get().castling)
-      .filter(([, value]) => value)
-      .map(([key]) => key)
-      .join('');
-    return cr === '' ? '-' : cr;
-  },
-
   setFenPositionFromEditor(fenPosition) {
     set({ fenPosition });
     set({ isLegalFen: vf(get().fen()).ok });
@@ -47,13 +39,20 @@ export const createFenSlice = (set, get) => ({
     });
   },
 
+  _getCastlingRights() {
+    const cr = Object.entries(get().castling)
+      .filter(([, value]) => value)
+      .map(([key]) => key)
+      .join('');
+    return cr === '' ? '-' : cr;
+  },
+
   setCastlingRight(id, value) {
     set((state) => ({ castling: { ...state.castling, [id]: value } }));
   },
 
-  setFenSliceFromInput() {
+  setFenSliceFromInput(input) {
     const state = get();
-    const input = state.fenInputRef.current.value;
     if (input !== state.fen() && state._isValidInput(input)) {
       const newstate = input.split(' ');
       set({
@@ -88,7 +87,7 @@ export const createFenSlice = (set, get) => ({
   },
 
   setFenSliceContinue() {
-    get().setFenSliceFromInput();
+    get().setFenSliceFromInput(get().fenInputRef.current.value);
     return get().isLegalFen;
   },
 

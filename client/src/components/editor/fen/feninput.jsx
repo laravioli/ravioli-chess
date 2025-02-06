@@ -26,7 +26,7 @@ export const FenInput = () => {
 
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
-      setFenSliceFromInput();
+      setFenSliceFromInput(inputRef.current.value);
     }
   };
 
