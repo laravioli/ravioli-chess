@@ -71,7 +71,7 @@ function onMouseClick(get) {
     handlers['onSnapEnd'] = () => {
       get().board.position(chess.fen());
       get().setFenSliceFromChess(chess);
-      get().gameActions.history.next(chess.history().at(-1));
+      get().gameHistory.next(chess.history().at(-1));
     };
   }
   return handlers;

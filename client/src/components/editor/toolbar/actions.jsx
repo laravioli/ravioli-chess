@@ -1,10 +1,11 @@
-import { Button, Select } from '@mantine/core';
+import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { History } from './history';
 import { chess } from '../../../stores/gamestore';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
 import { useInitData } from '../../../context';
+import { short_fen } from './utils';
 
 export function EditorActions() {
   //test purpose
@@ -50,32 +51,51 @@ const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
 
 export const Position = () => {
   const position = useInitData();
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState('');
   const setFen = useBoundStore((state) => state.setFenSliceFromInput);
   const gameActions = useBoundStore((state) => state.gameActions);
 
   const data = useMemo(
-    () =>
-      position.map((item) => ({
-        label: [item.eco, item.name].join(' '),
-        value: item.fen,
+    () => [
+      { label: 'select position', value: '' },
+      ...position.map((obj) => ({
+        label: [obj.eco, obj.name].join(' '),
+        value: obj.fen,
       })),
+    ],
     [position]
   );
 
-  const onChange = (value) => {
-    setValue(value);
-    setFen(value);
-    if (useBoundStore.getState().mode == 'continue') {
-      //todo : implement a default option, set game correctly (eventualy change gamestore)
-      gameActions.newGame({});
+  const fens = useMemo(() => data.map((obj) => short_fen(obj.value)), [data]);
+
+  useEffect(() => {
+    const unsub = useBoundStore.subscribe(
+      (state) => state.fen(),
+      (fen) => {
+        const match = fens.findIndex((pos) => pos === short_fen(fen));
+        if (match > 0) {
+          setValue(data[match].value);
+        } else {
+          setValue(data[0].value);
+        }
+      }
+    );
+    return unsub;
+  }, [fens, data]);
+
+  const onChange = (event) => {
+    const fen = event.currentTarget.value;
+    if (fen && fen != useBoundStore.getState().fen()) {
+      setFen(fen);
+      gameActions.newGame({ mode: useBoundStore.getState().mode });
+    } else {
+      setValue(fen);
     }
   };
 
   return (
-    <Select
-      placeholder="select position"
-      value={value ? value : null}
+    <NativeSelect
+      value={value}
       onChange={onChange}
       data={data}
       classNames={{ wrapper: styles.wrapper }}
@@ -87,14 +107,11 @@ export const StartButton = () => {
   const boardApi = useBoundStore((state) => state.boardApi);
   const resetFen = useBoundStore((state) => state.resetFen);
   const gameActions = useBoundStore((state) => state.gameActions);
-  const mode = useBoundStore((state) => state.mode);
 
   const onStart = () => {
     boardApi.startBoard();
     resetFen(true);
-    if (mode == 'continue') {
-      gameActions.newGame({});
-    }
+    gameActions.newGame({ mode: useBoundStore.getState().mode });
   };
 
   return <EditorButton label="starting position" onClick={onStart} />;

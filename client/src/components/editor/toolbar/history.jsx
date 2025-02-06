@@ -8,7 +8,7 @@ import { ActionIcon, Group } from '@mantine/core';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
 
 export const History = () => {
-  const history = useBoundStore((state) => state.gameActions.history);
+  const history = useBoundStore((state) => state.gameHistory);
   const mode = useBoundStore((state) => state.mode);
   const isDisabled = mode == 'editor';
 

@@ -1,11 +1,10 @@
-import { Chess, DEFAULT_POSITION } from 'chess.js';
+import { Chess } from 'chess.js';
 
 export const chess = new Chess();
 
 export const createGameSlice = (set, get) => ({
+  gameHistory: coHistory([], get),
   gameActions: {
-    history: coHistory([], get),
-
     newGame: (action) => set((state) => get()._reducerNG(state, action)),
   },
 
@@ -14,23 +13,18 @@ export const createGameSlice = (set, get) => ({
       case 'game':
         chess.reset();
         return {
-          gameActions: { ...state.gameActions, history: coHistory([], get) },
+          gameHistory: coHistory([], get),
         };
       case 'continue':
         chess.load(get().fen());
         return {
-          gameActions: { ...state.gameActions, history: coHistory([], get) },
+          gameHistory: coHistory([], get),
         };
 
       case 'editor':
         chess.clear();
-        return { gameActions: { ...state.gameActions, history: null } };
-
-      default:
-        chess.reset();
         return {
-          config: { ...state.config, position: DEFAULT_POSITION },
-          gameActions: { ...state.gameActions, history: coHistory([], get) },
+          gameHistory: null,
         };
     }
   },
@@ -52,10 +46,11 @@ function coroutine(func) {
 const coHistory = coroutine(function* (history, get) {
   const stack = [history];
   const ptr = [history.length];
+  const startPos = chess.fen();
   const [coUndo, coRedo, coReset, coMove] = [
     undo(stack, ptr),
     redo(stack, ptr),
-    reset(stack, ptr, get),
+    reset(stack, ptr, startPos),
     move(stack, ptr),
   ];
   while (true) {
@@ -103,7 +98,7 @@ const redo = coroutine(function* (stack, ptr) {
   }
 });
 
-const reset = coroutine(function* (stack, ptr, get) {
+const reset = coroutine(function* (stack, ptr, startPos) {
   while (true) {
     let action = yield;
     if (stack.length > 1) {
@@ -111,11 +106,11 @@ const reset = coroutine(function* (stack, ptr, get) {
     }
     ptr.splice(0);
     if (action == 'start') {
-      chess.load(get().config.position);
+      chess.load(startPos);
       ptr.push(0);
     }
     if (action == 'end') {
-      chess.load(get().config.position);
+      chess.load(startPos);
       stack[0].forEach((mv) => chess.move(mv));
       ptr.push(stack[0].length);
     }
