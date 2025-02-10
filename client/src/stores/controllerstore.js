@@ -1,5 +1,5 @@
 import { DEFAULT_POSITION } from 'chess.js';
-import piecesUrl from '/images/bK.png';
+import piecesUrl from '/images/base/bK.png';
 
 export const createControllerSlice = (set, get) => ({
   mode: 'continue',
