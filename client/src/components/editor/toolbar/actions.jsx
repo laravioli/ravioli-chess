@@ -27,7 +27,7 @@ export function EditorActions() {
         <StartButton />
         <ClearButton />
         <FlipButton />
-        <ContinueEditButton />
+        <SwitchModeButton />
         <TestButton label="position" onTest={test} />
       </Button.Group>
       <History />
@@ -144,21 +144,19 @@ export const FlipButton = () => {
   return <EditorButton label="flip board" onClick={onFlip} />;
 };
 
-export const ContinueEditButton = () => {
+export const SwitchModeButton = () => {
   const [isEdit, setIsEdit] = useState(false);
   const isLegalFen = useBoundStore((state) => state.isLegalFen);
-  const setFenSliceContinue = useBoundStore(
-    (state) => state.setFenSliceContinue
-  );
+  const setFenSliceAnalyse = useBoundStore((state) => state.setFenSliceAnalyse);
   const dispatchConf = useBoundStore((state) => state.dispatchConf);
   const newGame = useBoundStore((state) => state.gameActions.newGame);
 
   const label = isEdit ? 'continue from here' : 'edit position';
 
   const onClick = () => {
-    if (setFenSliceContinue()) {
-      dispatchConf({ mode: isEdit ? 'continue' : 'editor' });
-      newGame({ mode: isEdit ? 'continue' : 'editor' });
+    if (setFenSliceAnalyse()) {
+      dispatchConf({ mode: isEdit ? 'analyse' : 'editor' });
+      newGame({ mode: isEdit ? 'analyse' : 'editor' });
       setIsEdit(!isEdit);
     }
   };

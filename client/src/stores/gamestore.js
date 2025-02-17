@@ -1,6 +1,7 @@
 import { Chess } from 'chess.js';
-
+import { GameCtrl } from './logic/game/gameCtrl';
 export const chess = new Chess();
+const games = new
 
 export const createGameSlice = (set, get) => ({
   gameHistory: coHistory([], get),
@@ -15,7 +16,7 @@ export const createGameSlice = (set, get) => ({
         return {
           gameHistory: coHistory([], get),
         };
-      case 'continue':
+      case 'analyse':
         chess.load(get().fen());
         return {
           gameHistory: coHistory([], get),

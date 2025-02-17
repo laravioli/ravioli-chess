@@ -2,7 +2,7 @@ import { DEFAULT_POSITION } from 'chess.js';
 import piecesUrl from '/images/base/bK.png';
 
 export const createControllerSlice = (set, get) => ({
-  mode: 'continue',
+  mode: 'analyse',
 
   //board config to control widget instanciation
   config: {
@@ -30,9 +30,9 @@ export const createControllerSlice = (set, get) => ({
             sparePieces: false,
           },
         };
-      case 'continue':
+      case 'analyse':
         return {
-          mode: 'continue',
+          mode: 'analyse',
           config: {
             ...state.config,
             position: get().fen(),

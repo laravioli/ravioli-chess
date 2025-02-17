@@ -86,7 +86,7 @@ export const createFenSlice = (set, get) => ({
     }
   },
 
-  setFenSliceContinue() {
+  setFenSliceAnalyse() {
     get().setFenSliceFromInput(get().fenInputRef.current.value);
     return get().isLegalFen;
   },

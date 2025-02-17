@@ -17,16 +17,5 @@
   <body style="background-color: #242424;">
     {% block content %}
     {% endblock content %}
-    <script src="{% static 'stockfish/js/stockfish.js' %}"></script>
-    <script>
-      Stockfish().then((sf) => {
-        sf.addMessageListener((line) => {
-          console.log(line);
-        });
-        window.sf = sf;
-
-        sf.postMessage("uci");
-      });
-    </script>
     </body>
 </html>
