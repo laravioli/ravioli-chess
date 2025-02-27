@@ -8,7 +8,7 @@ import { ActionIcon, Group } from '@mantine/core';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
 
 export const History = () => {
-  const history = useBoundStore((state) => state.gameHistory);
+  const history = useBoundStore((state) => state.gameApi.history);
   const mode = useBoundStore((state) => state.mode);
   const isDisabled = mode == 'editor';
 
@@ -17,7 +17,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => history.next('start')}
+        onClick={() => history('start')}
         disabled={isDisabled}>
         <IconChevronsLeft size={40} stroke={1.5} />
       </ActionIcon>
@@ -25,7 +25,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => history.next('undo')}
+        onClick={() => history('undo')}
         disabled={isDisabled}>
         <IconChevronLeft size={40} stroke={1.5} />
       </ActionIcon>
@@ -33,7 +33,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => history.next('redo')}
+        onClick={() => history('redo')}
         disabled={isDisabled}>
         <IconChevronRight size={40} stroke={1.5} />
       </ActionIcon>
@@ -41,7 +41,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => history.next('end')}
+        onClick={() => history('end')}
         disabled={isDisabled}>
         <IconChevronsRight size={40} stroke={1.5} />
       </ActionIcon>

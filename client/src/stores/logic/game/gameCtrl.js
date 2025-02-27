@@ -1,57 +1,38 @@
+import { DEFAULT_POSITION } from 'chess.js';
 import { GameAnalyse } from './gameAnalyse';
 import { GameComputer } from './gameComputer';
 import { GameOnline } from './gameOnline';
 
-export class GameCtrl {
-  constructor(chess) {
-    this.chess = chess;
-    this.selection = this.mapper();
+class ChessCtrl {
+  constructor() {
+    this.setMode('analyse', DEFAULT_POSITION);
+    this.ceval = undefined;
   }
 
-  mapper() {
-    const games = [
-      {
-        info: {
-          mode: 'analyse',
-          engine: true,
-          editable: true,
-        },
-        make: (e) => new GameAnalyse(e),
-      },
-      {
-        info: {
-          mode: 'computer',
-          engine: true,
-        },
-        make: (e) => new GameComputer(e),
-      },
-      {
-        info: {
-          mode: 'online',
-          engine: false,
-        },
-        make: (e) => new GameOnline(e),
-      },
-    ];
-
-    return new Map(
-      games.map((game) => [
-        game.info.mode,
-        { info: game.info, make: game.make },
-      ])
-    );
+  setMode(mode, initalFen) {
+    if (this.mode !== mode) this.initGame(mode, { fen: initalFen });
+    this.mode = mode;
   }
 
-  select(mode) {
-    return this.selection.get(mode);
+  getGame() {
+    return this.game;
   }
 
-  create(mode, opts) {
-    const selected = this.select(mode);
-    return selected.make({
-      chess: this.chess,
-      info: selected.info,
-      opts,
-    });
+  initGame(mode, info) {
+    let game = undefined;
+    if (mode === 'analyse') {
+      game = new GameAnalyse(info);
+    } else if (mode === 'computer') {
+      game = new GameComputer(info);
+    } else if (mode === 'online') {
+      game = new GameOnline(info);
+    }
+    this.game = game;
+  }
+
+  newGame(fen, history = []) {
+    this.game?.newGame(fen, history);
   }
 }
+
+export const chessController = new ChessCtrl();

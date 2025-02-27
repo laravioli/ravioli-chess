@@ -1,7 +1,7 @@
 import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { History } from './history';
-import { chess } from '../../../stores/gamestore';
+import { chessController } from '../../../stores/logic/game/gameCtrl';
 import { useState, useMemo, useEffect } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
 import { useInitData } from '../../../context';
@@ -13,9 +13,9 @@ export function EditorActions() {
 
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
-    console.log('chess ' + chess.fen());
+    console.log('chess ' + chessController.game?.fen());
     console.log('fen ' + useBoundStore.getState().fen());
-    console.log(chess.history());
+    console.log(chessController.game?.history());
   };
 
   //endtest
@@ -53,7 +53,7 @@ export const Position = () => {
   const position = useInitData();
   const [value, setValue] = useState('');
   const setFen = useBoundStore((state) => state.setFenSliceFromInput);
-  const gameActions = useBoundStore((state) => state.gameActions);
+  const newGame = useBoundStore((state) => state.gameApi.newGame);
 
   const data = useMemo(
     () => [
@@ -87,7 +87,7 @@ export const Position = () => {
     const fen = event.currentTarget.value;
     if (fen && fen != useBoundStore.getState().fen()) {
       setFen(fen);
-      gameActions.newGame({ mode: useBoundStore.getState().mode });
+      newGame();
     } else {
       setValue(fen);
     }
@@ -106,12 +106,12 @@ export const Position = () => {
 export const StartButton = () => {
   const boardApi = useBoundStore((state) => state.boardApi);
   const resetFen = useBoundStore((state) => state.resetFen);
-  const gameActions = useBoundStore((state) => state.gameActions);
+  const newGame = useBoundStore((state) => state.gameApi.newGame);
 
   const onStart = () => {
     boardApi.startBoard();
     resetFen(true);
-    gameActions.newGame({ mode: useBoundStore.getState().mode });
+    newGame();
   };
 
   return <EditorButton label="starting position" onClick={onStart} />;
@@ -148,15 +148,13 @@ export const SwitchModeButton = () => {
   const [isEdit, setIsEdit] = useState(false);
   const isLegalFen = useBoundStore((state) => state.isLegalFen);
   const setFenSliceAnalyse = useBoundStore((state) => state.setFenSliceAnalyse);
-  const dispatchConf = useBoundStore((state) => state.dispatchConf);
-  const newGame = useBoundStore((state) => state.gameActions.newGame);
+  const switchMode = useBoundStore((state) => state.switchMode);
 
   const label = isEdit ? 'continue from here' : 'edit position';
 
   const onClick = () => {
     if (setFenSliceAnalyse()) {
-      dispatchConf({ mode: isEdit ? 'analyse' : 'editor' });
-      newGame({ mode: isEdit ? 'analyse' : 'editor' });
+      switchMode({ mode: isEdit ? 'analyse' : 'editor' });
       setIsEdit(!isEdit);
     }
   };

@@ -91,22 +91,22 @@ export const createFenSlice = (set, get) => ({
     return get().isLegalFen;
   },
 
-  setFenSliceFromChess(chess) {
+  setFenSliceFromGame(game) {
     const castlingRights =
-      chess.turn() === 'w'
-        ? chess.getCastlingRights('b')
+      game.turn() === 'w'
+        ? game.getCastlingRights('b')
         : Object.fromEntries(
-            Object.entries(chess.getCastlingRights('w')).map(([key, value]) => [
+            Object.entries(game.getCastlingRights('w')).map(([key, value]) => [
               key.toUpperCase(),
               value,
             ])
           );
     set((state) => ({
-      fenPosition: chess.fen().split(' ')[0],
-      turn: chess.turn(),
+      fenPosition: game.fen().split(' ')[0],
+      turn: game.turn(),
       castling: { ...state.castling, ...castlingRights },
-      halfmove: chess.fen().split(' ')[4],
-      fullmove: chess.moveNumber(),
+      halfmove: game.fen().split(' ')[4],
+      fullmove: game.moveNumber(),
     }));
   },
 
@@ -124,6 +124,7 @@ export const createFenSlice = (set, get) => ({
       },
       halfmove: 0,
       fullmove: 1,
+      isLegalFen: cr,
     });
   },
 });

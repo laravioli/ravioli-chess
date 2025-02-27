@@ -1,7 +1,8 @@
 import { DEFAULT_POSITION } from 'chess.js';
+import { chessController } from './logic/game/gameCtrl';
 import piecesUrl from '/images/base/bK.png';
 
-export const createControllerSlice = (set, get) => ({
+export const createModeSlice = (set, get) => ({
   mode: 'analyse',
 
   //board config to control widget instanciation
@@ -15,13 +16,15 @@ export const createControllerSlice = (set, get) => ({
     hideSparePieces: true,
   },
 
-  dispatchConf: (action) => set((state) => get()._reducerConf(state, action)),
+  switchMode: (action) => set((state) => get()._reducerMode(state, action)),
 
-  _reducerConf: (state, action) => {
+  _reducerMode: (state, action) => {
+    chessController.setMode(action.mode, get().fen());
     switch (action.mode) {
-      case 'game':
+      case 'computer':
+      case 'online':
         return {
-          mode: 'game',
+          mode: action.mode,
           config: {
             ...state.config,
             position: DEFAULT_POSITION,

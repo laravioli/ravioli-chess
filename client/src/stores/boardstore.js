@@ -1,5 +1,4 @@
 import chessBoard from 'chessboard';
-import { chess } from './gamestore';
 
 export const createBoardSlice = (set, get) => ({
   board: undefined,
@@ -47,10 +46,11 @@ function onMouseClick(get) {
 
   if (state.mode !== 'editor') {
     handlers['onDragStart'] = (source, piece, position, orientation) => {
-      if (chess.isGameOver()) return false;
+      const game = get().getGame();
+      if (game?.isGameOver()) return false;
       if (
-        (chess.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (chess.turn() === 'b' && piece.search(/^w/) !== -1)
+        (game?.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (game?.turn() === 'b' && piece.search(/^w/) !== -1)
       ) {
         return false;
       }
@@ -58,7 +58,7 @@ function onMouseClick(get) {
 
     handlers['onDrop'] = (source, target) => {
       try {
-        chess.move({
+        get().getGame().move({
           from: source,
           to: target,
           promotion: 'q',
@@ -69,9 +69,7 @@ function onMouseClick(get) {
     };
 
     handlers['onSnapEnd'] = () => {
-      get().board.position(chess.fen());
-      get().setFenSliceFromChess(chess);
-      get().gameHistory.next(chess.history().at(-1));
+      get().gameApi.history('move');
     };
   }
   return handlers;
