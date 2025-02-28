@@ -1,5 +1,4 @@
 import { DEFAULT_POSITION } from 'chess.js';
-import { chessController } from './logic/game/gameCtrl';
 import piecesUrl from '/images/base/bK.png';
 
 export const createModeSlice = (set, get) => ({
@@ -19,7 +18,7 @@ export const createModeSlice = (set, get) => ({
   switchMode: (action) => set((state) => get()._reducerMode(state, action)),
 
   _reducerMode: (state, action) => {
-    chessController.setMode(action.mode, get().fen());
+    get().gameApi.setMode(action.mode, get().fen());
     switch (action.mode) {
       case 'computer':
       case 'online':

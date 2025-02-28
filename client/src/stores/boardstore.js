@@ -46,11 +46,11 @@ function onMouseClick(get) {
 
   if (state.mode !== 'editor') {
     handlers['onDragStart'] = (source, piece, position, orientation) => {
-      const game = get().getGame();
-      if (game?.isGameOver()) return false;
+      const chess = get().gameApi.getChessInstance();
+      if (chess?.isGameOver()) return false;
       if (
-        (game?.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (game?.turn() === 'b' && piece.search(/^w/) !== -1)
+        (chess?.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (chess?.turn() === 'b' && piece.search(/^w/) !== -1)
       ) {
         return false;
       }
@@ -58,18 +58,14 @@ function onMouseClick(get) {
 
     handlers['onDrop'] = (source, target) => {
       try {
-        get().getGame().move({
-          from: source,
-          to: target,
-          promotion: 'q',
-        });
+        get().gameApi.move(source, target);
       } catch (error) {
         return 'snapback';
       }
     };
 
     handlers['onSnapEnd'] = () => {
-      get().gameApi.history('move');
+      get().gameApi.jump('move');
     };
   }
   return handlers;

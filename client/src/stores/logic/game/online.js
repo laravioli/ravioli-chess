@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 
-export class GameOnline extends Chess {
+export class Online extends Chess {
   constructor({ info }) {
     super(info.fen);
     this.initialFen = info.fen;
