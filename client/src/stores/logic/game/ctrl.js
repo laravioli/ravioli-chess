@@ -62,4 +62,4 @@ class GameCtrl {
   }
 }
 
-export default new GameCtrl('analyse');
+export const gameCtrl = new GameCtrl('analyse');

@@ -41,7 +41,7 @@ const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
       variant="filled"
       color="rgba(56, 56, 56, 0.85)"
       size="md"
-      radius="xs"
+      radius="md"
       onClick={onClick}
       disabled={isDisabled}>
       {label}
