@@ -3,6 +3,7 @@ import styles from './toolbar.module.css';
 import { History } from './history';
 import { useState, useMemo, useEffect } from 'react';
 import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { useEvalStore } from '../../../stores/hooks/usepersiststore';
 import { useInitData } from '../../../context';
 import { short_fen } from './utils';
 
@@ -10,12 +11,14 @@ export function EditorActions() {
   //test purpose
   const boardApi = useBoundStore((state) => state.boardApi);
   const gameApi = useBoundStore((state) => state.gameApi);
+  const addABear = useEvalStore((state) => state.addABear);
 
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + gameApi.getChessInstance()?.fen());
     console.log('fen ' + useBoundStore.getState().fen());
     console.log('current move', gameApi.getCurrentMove());
+    addABear();
   };
 
   //endtest

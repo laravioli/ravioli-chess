@@ -1,5 +1,5 @@
 import { Protocol } from './protocol';
-import { CevalState, sharedWasmMemory, maxHash } from './util';
+import { CevalState, sharedWasmMemory, maxHash, browserSupport } from './util';
 
 export class StockfishWebEngine {
   constructor(info) {
@@ -141,3 +141,6 @@ const info = {
 export const makeEngine = () => {
   return new StockfishWebEngine(info);
 };
+
+export const engineSupported = () =>
+  info.requires.every((req) => browserSupport().includes(req));

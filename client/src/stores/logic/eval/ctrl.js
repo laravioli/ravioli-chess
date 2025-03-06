@@ -52,6 +52,11 @@ function enabledAfterDisable() {
   return enabledAfter === disable;
 }*/
 
+//possible : does browser support engine
+//allowed : does engine is allowed to run
+//active : does engine is instanciate (worker)
+//enabled : does the button enabled is on or off (mainly to handle tabs)
+
 export class CevalCtrl {
   //zustand
   storedPv = () => 2; //getter
@@ -88,7 +93,7 @@ export class CevalCtrl {
     this.sortPvsInPlace(ev.pvs, work.ply % 2 ? 'white' : 'black');
 
     this.curEval = ev;
-    this.opts.emit(ev, work); //this is where i use ev to set ui => see note*
+    this.opts.emit(ev); //this is where i use ev to set ui => see note*
     /*if (ev.fen !== this.lastEmitFen && enabledAfterDisable()) {
       // amnesty while auto disable not processed
       this.lastEmitFen = ev.fen;
@@ -100,14 +105,14 @@ export class CevalCtrl {
   //with a path(point to a stack, and step => the tab)
   //path could be usefull with on emit(save analyse on right node)
 
-  doStart = (path, steps, gameId) => {
+  doStart = (steps, gameId) => {
     if (!this.enabled() || !this.possible /*|| !enabledAfterDisable()*/) return;
     const step = steps[steps.length - 1];
     if (
       'movetime' in this.search.by &&
       (step.ceval?.millis ?? 0) >= this.search.by.movetime
     ) {
-      this.lastStarted = { path, steps, gameId };
+      this.lastStarted = { steps, gameId };
       return;
     }
     const work = {
@@ -118,7 +123,6 @@ export class CevalCtrl {
       initialFen: steps[0].fen,
       moves: [],
       currentFen: step.fen,
-      path,
       ply: step.ply,
       search: this.search.by,
       multiPv: this.search.multiPv,
@@ -143,15 +147,14 @@ export class CevalCtrl {
     this.worker.start(work);
 
     this.lastStarted = {
-      path,
       steps,
       gameId,
     };
   };
 
-  start = (path, steps, gameId) => {
+  start = (steps, gameId) => {
     console.log(this.worker);
-    this.doStart(path, steps, gameId);
+    this.doStart(steps, gameId);
   };
 
   stop = () => {

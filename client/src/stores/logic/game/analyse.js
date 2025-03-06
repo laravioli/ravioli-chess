@@ -1,9 +1,14 @@
 import { Chess } from 'chess.js';
+//import { throttle, isEvalBetter } from '../eval/util';
+//import { CevalCtrl } from '../eval/ctrl';
+//import { engineSupported } from '../eval/engine';
 
 export class Analyse {
   constructor(info) {
     this.initialFen = info.fen;
     this.game = new Game(info.fen);
+    /*this.initCeval();
+    this.startCeval();*/
   }
 
   clear() {
@@ -23,7 +28,46 @@ export class Analyse {
     else if (action === 'redo') this.game.redoMove();
     else if (action === 'start') this.game.goStart();
     else if (action === 'end') this.game.goEnd();
+    this.restartCeval();
   }
+
+  /*initCeval() {
+    const opts = {
+      initialFen: this.initialFen,
+      possible: engineSupported(),
+      emit: (ev) => {
+        this.onNewCeval(ev);
+      },
+    };
+    if (this.ceval) this.ceval.setOpts(opts);
+    else this.ceval = new CevalCtrl(opts);
+  }
+
+  onNewCeval(ev) {
+    console.log(ev);
+    let move = this.game.getCurrentMove();
+    if (!move.ceval || isEvalBetter(ev, move.ceval)) move.ceval = ev;
+  }
+
+  startCeval = throttle(800, () => {
+    if (this.ceval?.enabled()) {
+      if (this.game && !this.game.chess.isGameOver()) {
+        this.ceval.start(this.game.moveList, undefined);
+      } else this.ceval.stop();
+    }
+  });
+
+  restartCeval() {
+    this.ceval?.stop();
+    this.startCeval();
+  }
+
+  toggleCeval() {
+    this.ceval?.toggle();
+    this.startCeval();
+  }
+
+  getCeval = () => this.ceval;*/
 }
 
 class Game {
