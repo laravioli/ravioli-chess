@@ -15,6 +15,10 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       origin: 'http://localhost:5173',
+      headers: {
+        'cross-origin-opener-policy': 'same-origin',
+        'cross-origin-embedder-policy': 'credentialless',
+      },
       proxy: {
         [`^${env.BASE}$`]: {
           target: env.BACKEND_URL,

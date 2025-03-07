@@ -7,7 +7,7 @@ export const useEvalStore = create()(
       disable: 0,
       multipv: 1,
       searchms: 4000,
-      threads: 4,
+      threads: undefined,
       addABear: () => set({ threads: get().threads + 1 }),
     }),
     {

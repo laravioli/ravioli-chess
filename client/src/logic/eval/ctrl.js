@@ -1,13 +1,15 @@
 import {
   CevalState,
+  prop,
   toggle,
   throttle,
   clamp,
   fewerCores,
   povChances,
 } from './util';
+import { validateFen } from 'chess.js';
 import { makeEngine } from './engine';
-
+import { useEvalStore } from '../../stores/hooks/usepersiststore';
 /*TYPESCRIPT TYPE
 type WinningChances = number;
 type SearchBy =
@@ -58,17 +60,13 @@ function enabledAfterDisable() {
 //enabled : does the button enabled is on or off (mainly to handle tabs)
 
 export class CevalCtrl {
-  //zustand
-  storedPv = () => 2; //getter
-  storedMovetime = () => 8000; //getter
-  //once the code works, change allowed, active, enabled, etc logic (edit, game, analyse)
-  allowed = toggle(true); //probably useless in my case (maybe editor vs analyse)
-  active = toggle(true); //zustand state=> destroy or create (setter)
-  pvBoard = () => null; //setter
-
+  storedPv = () => useEvalStore.getState().multipv;
+  storedMovetime = () => useEvalStore.getState().searchms;
+  allowed = toggle(true);
+  pvBoard = prop(null);
   curEval = null;
   lastStarted = false;
-  showEnginePrefs = toggle(false); //getter
+  showEnginePrefs = toggle(false);
 
   constructor(opts) {
     this.init(opts);
@@ -80,13 +78,9 @@ export class CevalCtrl {
 
   init(opts) {
     this.opts = opts;
-    this.possible = this.opts.possible; //boolean :does wasm is supported ;
-    this.analysable = true; //is legal fen
+    this.possible = this.opts.possible;
+    this.analysable = validateFen(this.opts.initialFen).ok;
     this.enabled = toggle(this.possible && this.analysable && this.allowed()); //+tabs);
-    if (!this.active()) {
-      this.worker?.destroy();
-      this.worker = undefined;
-    }
   }
 
   onEmit = throttle(200, (ev, work) => {
@@ -161,6 +155,11 @@ export class CevalCtrl {
     this.worker?.stop();
   };
 
+  destroy = () => {
+    this.worker?.destroy();
+    this.worker = undefined;
+  };
+
   get state() {
     return this.worker?.getState() ?? CevalState.Initial;
   }
@@ -188,14 +187,9 @@ export class CevalCtrl {
     return this.state === CevalState.Computing;
   }
 
-  setThreads = (threads) => {
-    //zustand(rewrite)
-    console.log(threads);
-  };
-
   get threads() {
-    const stored = undefined; //zustand(getter)
-    const desired = stored ? parseInt(stored) : this.recommendedThreads;
+    const stored = useEvalStore.getState().threads;
+    const desired = stored ?? this.recommendedThreads;
     return clamp(desired, {
       min: this.worker?.minThreads ?? 1,
       max: this.maxThreads,
@@ -218,8 +212,6 @@ export class CevalCtrl {
       ? Math.min(this.worker?.maxThreads ?? 32, navigator.hardwareConcurrency)
       : this.worker?.maxThreads ?? 32;
   }
-
-  setHashSize = (hash) => console.log(hash); //zustand setter;
 
   get hashSize() {
     const stored = undefined;

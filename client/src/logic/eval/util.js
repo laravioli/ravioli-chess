@@ -101,15 +101,32 @@ export const browserSupport = memoize(() => {
 /*---CONTROLLER---*/
 /*----------------*/
 
-export const toggle = (state) => (value) => {
-  //define this properly with zustand
-  //should set state with outer function
-  if (value === undefined) {
-    return state;
-  } else {
-    state = value;
+const defined = (value) => value !== undefined;
+
+export const prop = (initialValue) => {
+  let value = initialValue;
+  return (v) => {
+    if (defined(v)) value = v;
     return value;
-  }
+  };
+};
+
+const propWithEffect = (initialValue, effect) => {
+  let value = initialValue;
+  return (v) => {
+    if (defined(v)) {
+      value = v;
+      effect(v);
+    }
+    return value;
+  };
+};
+
+export const toggle = (initialValue, effect = () => {}) => {
+  const prop = propWithEffect(initialValue, effect);
+  prop.toggle = () => prop(!prop());
+  prop.effect = effect;
+  return prop;
 };
 
 export function clamp(value, bounds) {

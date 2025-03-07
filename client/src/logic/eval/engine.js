@@ -21,7 +21,7 @@ export class StockfishWebEngine {
   }
 
   async boot() {
-    const makeModule = await import('./assets/sf16-7.js');
+    const makeModule = await import('./stockfish/sf16-7.js');
     const module = await makeModule.default({
       wasmMemory: sharedWasmMemory(this.info.minMem),
       onError: (msg) => Promise.reject(new Error(msg)),
@@ -61,7 +61,11 @@ export class StockfishWebEngine {
           return storedBuffer;
         const req = new XMLHttpRequest();
 
-        req.open('get', `./src/stockfish/assets/${nnueFilename}`, true);
+        req.open(
+          'get',
+          `./src/stores/logic/eval/stockfish/${nnueFilename}`,
+          true
+        );
         req.responseType = 'arraybuffer';
         req.onprogress = (e) =>
           this.status?.({ download: { bytes: e.loaded, total: e.total } });
