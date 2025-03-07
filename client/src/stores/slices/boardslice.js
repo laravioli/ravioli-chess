@@ -46,7 +46,7 @@ function onMouseClick(get) {
 
   if (state.mode !== 'editor') {
     handlers['onDragStart'] = (source, piece, position, orientation) => {
-      const chess = get().gameApi.getChessInstance();
+      const chess = get().gameApi.chess();
       if (chess?.isGameOver()) return false;
       if (
         (chess?.turn() === 'w' && piece.search(/^b/) !== -1) ||

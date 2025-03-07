@@ -15,9 +15,9 @@ export function EditorActions() {
 
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
-    console.log('chess ' + gameApi.getChessInstance()?.fen());
+    console.log('chess ' + gameApi.chess()?.fen());
     console.log('fen ' + useBoundStore.getState().fen());
-    console.log('current move', gameApi.getCurrentMove());
+    console.log('current move', gameApi.currentMove());
     addABear();
   };
 

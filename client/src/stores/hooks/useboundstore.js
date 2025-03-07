@@ -4,13 +4,13 @@ import { createGameSlice } from '../slices/gameslice';
 import { createBoardSlice } from '../slices/boardslice';
 import { createModeSlice } from '../slices/modeslice';
 import { createFenSlice } from '../slices/fenslice';
-import { gameCtrl } from '../logic/game/ctrl';
+import { mode } from '../logic';
 
 export const useBoundStore = create(
   subscribeWithSelector((...a) => ({
-    ...createGameSlice(gameCtrl)(...a),
+    ...createModeSlice(mode)(...a),
+    ...createGameSlice(...a),
     ...createBoardSlice(...a),
-    ...createModeSlice(...a),
     ...createFenSlice(...a),
   }))
 );

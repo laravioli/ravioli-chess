@@ -1,8 +1,9 @@
 import { DEFAULT_POSITION } from 'chess.js';
 import piecesUrl from '/images/base/bK.png';
 
-export const createModeSlice = (set, get) => ({
-  mode: 'analyse',
+export const createModeSlice = (mode) => (set, get) => ({
+  mode: 'analyse', //todo : change to a computed value () => mode.mode; usage: state => state.mode()
+  logic: () => mode.ctrl,
 
   //board config to control widget instanciation
   config: {
@@ -18,7 +19,7 @@ export const createModeSlice = (set, get) => ({
   switchMode: (action) => set((state) => get()._reducerMode(state, action)),
 
   _reducerMode: (state, action) => {
-    get().gameApi.setMode(action.mode, get().fen());
+    mode.setMode(action.mode, get().fen());
     switch (action.mode) {
       case 'computer':
       case 'online':

@@ -1,14 +1,16 @@
-export const createGameSlice = (ctrl) => (set, get) => ({
+export const createGameSlice = (set, get) => ({
   gameApi: {
-    setMode: (mode, fen) => ctrl.setMode(mode, fen),
-    newGame: () => ctrl.loadGame(get().fen()),
-    getChessInstance: () => ctrl.getChessInstance(),
-    getCurrentMove: () => ctrl.getCurrentMove(),
-    move: (source, target) => ctrl.move(source, target),
+    newGame: () => get().logic().newGame(get().fen()),
+    chess: () => get().logic().game?.chess,
+    currentMove: () => get().logic().game?.currentMove,
+    move: (source, target) => get().logic().game?.move(source, target),
     jump: (action) => {
-      ctrl.jump(action);
-      get().boardApi.setBoardPosition(ctrl.getCurrentMove().fen);
-      get().setFenSliceFromGame(ctrl.getChessInstance());
+      const game = get().logic().game;
+      if (game) {
+        get().logic().jump(action);
+        get().boardApi.setBoardPosition(game.currentMove.fen);
+        get().setFenSliceFromGame(game.chess);
+      }
     },
   },
 });
