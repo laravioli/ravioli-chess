@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     resolve: {
       alias: {
-        '@': resolve('src'),
+        src: resolve('src'),
         '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
       },
     },

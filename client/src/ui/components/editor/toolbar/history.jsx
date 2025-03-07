@@ -5,7 +5,7 @@ import {
   IconChevronsRight,
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
-import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { useBoundStore } from 'src/stores/hooks/useboundstore';
 
 export const History = () => {
   const jump = useBoundStore((state) => state.gameApi.jump);

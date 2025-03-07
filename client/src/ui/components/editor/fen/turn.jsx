@@ -1,6 +1,6 @@
 import { NativeSelect } from '@mantine/core';
 import styles from './fen.module.css';
-import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { useBoundStore } from 'src/stores/hooks/useboundstore';
 import { useState, useEffect } from 'react';
 
 export const TurnToPlay = () => {

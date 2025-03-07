@@ -1,5 +1,12 @@
 import { Protocol } from './protocol';
-import { CevalState, sharedWasmMemory, maxHash, browserSupport } from './util';
+import {
+  CevalState,
+  sharedWasmMemory,
+  maxHash,
+  browserSupport,
+  clamp,
+  fewerCores,
+} from './util';
 
 export class StockfishWebEngine {
   constructor(info) {
@@ -61,11 +68,7 @@ export class StockfishWebEngine {
           return storedBuffer;
         const req = new XMLHttpRequest();
 
-        req.open(
-          'get',
-          `./src/stores/logic/eval/stockfish/${nnueFilename}`,
-          true
-        );
+        req.open('get', `./src/logic/eval/stockfish/${nnueFilename}`, true);
         req.responseType = 'arraybuffer';
         req.onprogress = (e) =>
           this.status?.({ download: { bytes: e.loaded, total: e.total } });
@@ -148,3 +151,19 @@ export const makeEngine = () => {
 
 export const engineSupported = () =>
   info.requires.every((req) => browserSupport().includes(req));
+
+export const recommendedThreads = () => {
+  return clamp(
+    navigator.hardwareConcurrency - (navigator.hardwareConcurrency % 2 ? 0 : 1),
+    {
+      min: info.minThreads ?? 1,
+      max: maxThreads(),
+    }
+  );
+};
+
+export const maxThreads = () => {
+  return fewerCores()
+    ? Math.min(info.maxThreads ?? 32, navigator.hardwareConcurrency)
+    : info.maxThreads ?? 2;
+};

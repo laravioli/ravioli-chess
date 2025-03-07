@@ -1,7 +1,7 @@
 import { TextInput } from '@mantine/core';
 import styles from './fen.module.css';
 import { useRef, useEffect } from 'react';
-import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { useBoundStore } from '../../../../stores/hooks/useboundstore';
 
 export const FenInput = () => {
   const setFenSliceFromInput = useBoundStore(

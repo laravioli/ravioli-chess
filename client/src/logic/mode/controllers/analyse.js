@@ -1,10 +1,12 @@
 import { Game } from '../../game/game';
-import { throttle, isEvalBetter } from '../eval/util';
-import { CevalCtrl } from '../eval/ctrl';
-import { engineSupported } from '../eval/engine';
+import { throttle, isEvalBetter } from '../../eval/util';
+import { CevalCtrl } from '../../eval/ctrl';
+import { engineSupported } from '../../eval/engine';
+import { useEvalStore } from 'src/stores/hooks/usepersiststore';
 
 export class Analyse {
   constructor(info) {
+    window.analysis = this;
     this.initialFen = info.fen;
     this.status = 'analyse';
     this.game = new Game(info.fen);
@@ -48,7 +50,14 @@ export class Analyse {
       },
     };
     if (this.ceval) this.ceval.setOpts(opts);
-    else this.ceval = new CevalCtrl(opts);
+    else {
+      this.ceval = new CevalCtrl(opts);
+      useEvalStore.subscribe((state) => {
+        console.log('hello');
+        this.ceval.enabled(!state.disable);
+        this.restartCeval();
+      });
+    }
   }
 
   onNewCeval(ev) {

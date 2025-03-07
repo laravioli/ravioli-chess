@@ -1,6 +1,6 @@
 import { Checkbox } from '@mantine/core';
 import styles from './fen.module.css';
-import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { useBoundStore } from 'src/stores/hooks/useboundstore';
 
 export const CastlingBoxes = () => {
   const mode = useBoundStore((state) => state.mode);

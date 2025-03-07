@@ -1,14 +1,6 @@
-import {
-  CevalState,
-  prop,
-  toggle,
-  throttle,
-  clamp,
-  fewerCores,
-  povChances,
-} from './util';
+import { CevalState, toggle, throttle, clamp, povChances } from './util';
 import { validateFen } from 'chess.js';
-import { makeEngine } from './engine';
+import { makeEngine, maxThreads } from './engine';
 import { useEvalStore } from '../../stores/hooks/usepersiststore';
 /*TYPESCRIPT TYPE
 type WinningChances = number;
@@ -59,11 +51,11 @@ function enabledAfterDisable() {
 //active : does engine is instanciate (worker)
 //enabled : does the button enabled is on or off (mainly to handle tabs)
 
+//todo add tabs handling with session storage and toggle
 export class CevalCtrl {
   storedPv = () => useEvalStore.getState().multipv;
   storedMovetime = () => useEvalStore.getState().searchms;
   allowed = toggle(true);
-  pvBoard = prop(null);
   curEval = null;
   lastStarted = false;
   showEnginePrefs = toggle(false);
@@ -80,7 +72,9 @@ export class CevalCtrl {
     this.opts = opts;
     this.possible = this.opts.possible;
     this.analysable = validateFen(this.opts.initialFen).ok;
-    this.enabled = toggle(this.possible && this.analysable && this.allowed()); //+tabs);
+    this.enabled = toggle(
+      this.possible && this.analysable && this.allowed() && false
+    ); //+tabs);
   }
 
   onEmit = throttle(200, (ev, work) => {
@@ -189,47 +183,29 @@ export class CevalCtrl {
 
   get threads() {
     const stored = useEvalStore.getState().threads;
-    const desired = stored ?? this.recommendedThreads;
-    return clamp(desired, {
-      min: this.worker?.minThreads ?? 1,
-      max: this.maxThreads,
+    return clamp(stored, {
+      min: this.worker?.info.minThreads ?? 1,
+      max: maxThreads(),
     });
   }
 
-  get recommendedThreads() {
-    return clamp(
-      navigator.hardwareConcurrency -
-        (navigator.hardwareConcurrency % 2 ? 0 : 1),
-      {
-        min: this.worker?.minThreads ?? 1,
-        max: this.maxThreads,
-      }
-    );
-  }
-
-  get maxThreads() {
-    return fewerCores()
-      ? Math.min(this.worker?.maxThreads ?? 32, navigator.hardwareConcurrency)
-      : this.worker?.maxThreads ?? 32;
-  }
-
   get hashSize() {
-    const stored = undefined;
-    return Math.min(this.maxHash, stored ? parseInt(stored, 10) : 16);
+    const stored = useEvalStore.getState().hashsize;
+    return Math.min(this.maxHash, stored ?? 16);
   }
 
   get maxHash() {
-    return this.worker?.maxHash ?? 16;
+    return this.worker?.info.maxHash ?? 16;
   }
-
-  setPvBoard = (pvBoard) => {
-    //zustand setter, dont really need this function since pvBoard will be sufficient
-    this.pvBoard(pvBoard);
-  };
 
   toggle = () => {
     if (!this.possible || !this.allowed()) return;
     this.stop();
+    if (!this.enabled()) {
+      this.enabled(true);
+    } else {
+      this.enabled(false);
+    }
     /*if (!this.enabled() && !document.hidden) {
       const disable = storage.get('ceval.disable') || cevalDisabledSentinel;
       if (disable) tempStorage.set('ceval.enabled-after', disable);

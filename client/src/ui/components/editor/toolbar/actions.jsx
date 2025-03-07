@@ -2,23 +2,22 @@ import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { History } from './history';
 import { useState, useMemo, useEffect } from 'react';
-import { useBoundStore } from '../../../stores/hooks/useboundstore';
-import { useEvalStore } from '../../../stores/hooks/usepersiststore';
-import { useInitData } from '../../../context';
+import { useBoundStore, useEvalStore } from 'src/stores/hooks';
+import { useInitData } from 'src/ui/context';
 import { short_fen } from './utils';
 
 export function EditorActions() {
   //test purpose
   const boardApi = useBoundStore((state) => state.boardApi);
   const gameApi = useBoundStore((state) => state.gameApi);
-  const addABear = useEvalStore((state) => state.addABear);
+  const toggle = useEvalStore((state) => state.toggle);
 
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + gameApi.chess()?.fen());
     console.log('fen ' + useBoundStore.getState().fen());
     console.log('current move', gameApi.currentMove());
-    addABear();
+    toggle();
   };
 
   //endtest
