@@ -32,16 +32,21 @@ export class Game {
   }
 
   appendMove() {
-    const newMove = {
-      parent: this.currentMove,
-      ply: this.currentMove.ply + 1,
-      fen: this.chess.fen(),
-      san: this.chess.history({ verbose: true }).at(-1).san,
-      uci: this.chess.history({ verbose: true }).at(-1).lan,
-      children: [],
-    };
-    this.currentMove.children.push(newMove);
-    this.currentMove = newMove;
+    const info = this.chess.history({ verbose: true }).at(-1);
+    let move = this.currentMove.children.find((move) => move.uci === info.lan);
+
+    if (!move) {
+      move = {
+        parent: this.currentMove, //circular ref
+        ply: this.currentMove.ply + 1,
+        fen: this.chess.fen(),
+        san: info.san,
+        uci: info.lan,
+        children: [],
+      };
+      this.currentMove.children.push(move);
+    }
+    this.currentMove = move;
   }
 
   undoMove() {

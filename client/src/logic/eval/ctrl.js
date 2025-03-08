@@ -141,7 +141,6 @@ export class CevalCtrl {
   };
 
   start = (steps, gameId) => {
-    console.log(this.worker);
     this.doStart(steps, gameId);
   };
 

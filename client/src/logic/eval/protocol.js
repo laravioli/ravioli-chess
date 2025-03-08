@@ -53,7 +53,7 @@ export class Protocol {
 
   received(command) {
     //log for debug
-    console.log(`rcv : ${command}`);
+    //console.log(`rcv : ${command}`);
     //
     const parts = command.trim().split(/\s+/g);
     if (parts[0] === 'uciok') {
@@ -71,6 +71,8 @@ export class Protocol {
     } else if (parts[0] === 'id' && parts[1] === 'name') {
       this.engineName = parts.slice(2).join(' ');
     } else if (parts[0] === 'bestmove') {
+      console.log(`rcv : ${command}`);
+
       if (this.work && this.currentEval) this.work.emit(this.currentEval);
       this.work = undefined;
       this.swapWork();

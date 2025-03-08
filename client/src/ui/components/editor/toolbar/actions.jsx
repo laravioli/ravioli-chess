@@ -17,8 +17,9 @@ export function EditorActions() {
     console.log('chess ' + gameApi.chess()?.fen());
     console.log('fen ' + useBoundStore.getState().fen());
     console.log('current move', gameApi.currentMove());
-    toggle();
   };
+
+  const testEval = () => toggle();
 
   //endtest
 
@@ -31,6 +32,7 @@ export function EditorActions() {
         <FlipButton />
         <SwitchModeButton />
         <TestButton label="position" onTest={test} />
+        <TestButton label="eval" onTest={testEval} />
       </Button.Group>
       <History />
     </>

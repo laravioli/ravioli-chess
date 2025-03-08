@@ -50,7 +50,7 @@ export class StockfishWebEngine {
     module.listen = (data) => this.protocol.received(data);
     this.protocol.connected((cmd) => {
       //debug
-      console.log(`send : ${cmd}`);
+      //console.log(`send : ${cmd}`);
       //
       module.uci(cmd);
     });

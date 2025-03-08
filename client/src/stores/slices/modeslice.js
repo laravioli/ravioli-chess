@@ -2,7 +2,7 @@ import { DEFAULT_POSITION } from 'chess.js';
 import piecesUrl from '/images/base/bK.png';
 
 export const createModeSlice = (mode) => (set, get) => ({
-  mode: 'analyse', //todo : change to a computed value () => mode.mode; usage: state => state.mode()
+  mode: 'analyse',
   logic: () => mode.ctrl,
 
   //board config to control widget instanciation
