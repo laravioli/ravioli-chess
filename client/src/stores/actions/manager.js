@@ -1,2 +1,4 @@
 import { useEvalStore, useBoundStore } from '../hooks/';
-import { Mode } from '../../logic/main/ctrl';
+import { ChessController } from '../../logic';
+
+export class gameActions {}

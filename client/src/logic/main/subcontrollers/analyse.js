@@ -24,6 +24,7 @@ export class Analyse {
       if (!this.game) this.game = new Game(fen);
       this.initialFen = fen;
       this.game.load(fen);
+      this.restartCeval();
     }
   }
 

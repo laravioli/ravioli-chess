@@ -1,5 +1,5 @@
 import { DEFAULT_POSITION } from 'chess.js';
-import { Analyse } from './controllers/analyse';
+import { Analyse } from './subcontrollers/analyse';
 
 export class ChessController {
   constructor(mode) {

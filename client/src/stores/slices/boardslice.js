@@ -62,7 +62,6 @@ function onMouseClick(get) {
       } catch (error) {
         return 'snapback';
       }
-      console.log(get().logic().game.turn());
     };
 
     handlers['onSnapEnd'] = () => {
