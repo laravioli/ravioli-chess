@@ -14,17 +14,19 @@ export const createBoardSlice = (set, get) => ({
     setBoardPosition: (fen) => get().board?.position(fen, true),
 
     destroyBoard: () => {
-      window.removeEventListener('resize', get().board?.resize);
-      get().board?.destroy();
+      window.removeEventListener('resize', get().board.resize);
+      get().board.destroy();
+      set({ board: undefined });
     },
   },
 
   setBoard: (div) => {
-    let board = null;
-
-    board = chessBoard(div, makeConfig(get));
+    if (get().board) {
+      window.removeEventListener('resize', get().board.resize);
+      get().board.destroy();
+    }
+    const board = chessBoard(div, makeConfig(get));
     window.addEventListener('resize', board.resize);
-
     set({ board: board });
   },
 });
