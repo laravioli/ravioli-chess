@@ -1,7 +1,7 @@
 export const createGameSlice = (set, get) => ({
   gameApi: {
+    game: () => get().logic().game,
     newGame: () => get().logic().newGame(get().fen()),
-    chess: () => get().logic().game?.chess,
     currentMove: () => get().logic().game?.currentMove,
     move: (source, target) => get().logic().game?.move(source, target),
     jump: (action) => {
@@ -9,7 +9,7 @@ export const createGameSlice = (set, get) => ({
       if (game) {
         get().logic().jump(action);
         get().boardApi.setBoardPosition(game.currentMove.fen);
-        get().setFenSliceFromGame(game.chess);
+        get().setFenSliceFromGame(game);
       }
     },
   },

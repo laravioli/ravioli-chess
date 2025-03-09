@@ -71,7 +71,7 @@ export class Analyse {
 
   startCeval = throttle(800, () => {
     if (this.ceval?.enabled()) {
-      if (this.game && !this.game.chess.isGameOver()) {
+      if (this.game && !this.game.isGameOver()) {
         console.log('startceval :  a new eval');
         this.ceval.start(this.game.moveList, undefined);
       } else {

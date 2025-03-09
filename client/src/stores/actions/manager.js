@@ -1,2 +1,2 @@
 import { useEvalStore, useBoundStore } from '../hooks/';
-import { Mode } from '../../logic/mode/mode';
+import { Mode } from '../../logic/main/ctrl';

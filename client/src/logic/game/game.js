@@ -2,18 +2,33 @@ import { Chess } from 'chess.js';
 
 export class Game {
   constructor(fen) {
-    this.chess = new Chess(fen);
+    this._chess = new Chess(fen);
     this.root = { parent: null, ply: 0, fen, children: [] };
     this.currentMove = this.root;
+    return new Proxy(this, {
+      get(target, prop) {
+        if (prop in target) {
+          return target[prop];
+        }
+        if (prop in target._chess) {
+          const chessProp = target._chess[prop];
+          if (typeof chessProp === 'function') {
+            return (...args) => chessProp.apply(target._chess, args);
+          }
+          return chessProp;
+        }
+        return undefined;
+      },
+    });
   }
 
   load(fen) {
     this.currentMove = this.root = { parent: null, ply: 0, fen, children: [] };
-    this.chess.load(fen);
+    this._chess.load(fen);
   }
 
   move(source, target) {
-    this.chess.move({
+    this._chess.move({
       from: source,
       to: target,
       promotion: 'q',
@@ -32,14 +47,14 @@ export class Game {
   }
 
   appendMove() {
-    const info = this.chess.history({ verbose: true }).at(-1);
+    const info = this._chess.history({ verbose: true }).at(-1);
     let move = this.currentMove.children.find((move) => move.uci === info.lan);
 
     if (!move) {
       move = {
         parent: this.currentMove, //circular ref
         ply: this.currentMove.ply + 1,
-        fen: this.chess.fen(),
+        fen: this._chess.fen(),
         san: info.san,
         uci: info.lan,
         children: [],
@@ -52,30 +67,30 @@ export class Game {
   undoMove() {
     if (this.currentMove.parent) {
       this.currentMove = this.currentMove.parent;
-      this.chess.undo();
+      this._chess.undo();
     }
   }
 
   redoMove() {
     if (this.currentMove.children.length > 0) {
       this.currentMove = this.currentMove.children[0];
-      this.chess.move(this.currentMove.san);
+      this._chess.move(this.currentMove.san);
     }
   }
 
   goStart() {
     this.currentMove = this.root;
-    this.chess.load(this.currentMove.fen);
+    this._chess.load(this.currentMove.fen);
   }
 
   goEnd() {
     if (this.currentMove !== this.root) {
       this.currentMove = this.root;
-      this.chess.load(this.root.fen);
+      this._chess.load(this.root.fen);
     }
     while (this.currentMove.children.length > 0) {
       this.currentMove = this.currentMove.children[0];
-      this.chess.move(this.currentMove.san);
+      this._chess.move(this.currentMove.san);
     }
   }
 }

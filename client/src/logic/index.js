@@ -1,2 +1,1 @@
-import { Mode } from './mode/mode';
-export const mode = new Mode('analyse');
+export { ChessController } from './main/ctrl';
