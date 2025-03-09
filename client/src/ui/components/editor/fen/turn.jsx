@@ -1,19 +1,19 @@
 import { NativeSelect } from '@mantine/core';
 import styles from './fen.module.css';
-import { useBoundStore } from 'src/stores/hooks/useboundstore';
+import { mainStore, useMainStore } from 'src/stores';
 import { useState, useEffect } from 'react';
 
 export const TurnToPlay = () => {
   const [value, setValue] = useState('w');
-  const setTurn = useBoundStore((state) => state.setTurn);
-  const mode = useBoundStore((state) => state.mode);
+  const setTurn = useMainStore((state) => state.setTurn);
+  const mode = useMainStore((state) => state.mode);
   const data = [
     { label: 'White to play', value: 'w' },
     { label: 'Black to play', value: 'b' },
   ];
 
   useEffect(() => {
-    const unsub = useBoundStore.subscribe(
+    const unsub = mainStore.subscribe(
       (state) => state.turn,
       (turn) => {
         setValue(turn);

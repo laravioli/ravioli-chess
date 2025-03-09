@@ -1,13 +1,13 @@
 import { useRef, useEffect } from 'react';
-import { useBoundStore } from '../../../stores/hooks/useboundstore';
+import { mainStore, useMainStore } from 'src/stores/';
 
 export function Board() {
   const divRef = useRef(null);
-  const boardApi = useBoundStore((state) => state.boardApi);
-  const setBoard = useBoundStore((state) => state.setBoard);
+  const boardApi = useMainStore((state) => state.boardApi);
+  const setBoard = useMainStore((state) => state.setBoard);
 
   useEffect(() => {
-    const unsub = useBoundStore.subscribe(
+    const unsub = mainStore.subscribe(
       (state) => state.config,
       () => {
         setBoard(divRef.current);

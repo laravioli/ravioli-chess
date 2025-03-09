@@ -1,7 +1,7 @@
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
 import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
-import { useEvalStore } from '../../stores/hooks/usepersiststore';
+import { evalStore } from 'src/stores';
 /*TYPESCRIPT TYPE
 type WinningChances = number;
 type SearchBy =
@@ -53,8 +53,8 @@ function enabledAfterDisable() {
 
 //todo add tabs handling with session storage and toggle
 export class CevalCtrl {
-  storedPv = () => useEvalStore.getState().multipv;
-  storedMovetime = () => useEvalStore.getState().searchms;
+  storedPv = () => evalStore.getState().multipv;
+  storedMovetime = () => evalStore.getState().searchms;
   allowed = toggle(true);
   curEval = null;
   lastStarted = false;
@@ -181,7 +181,7 @@ export class CevalCtrl {
   }
 
   get threads() {
-    const stored = useEvalStore.getState().threads;
+    const stored = evalStore.getState().threads;
     return clamp(stored, {
       min: this.worker?.info.minThreads ?? 1,
       max: maxThreads(),
@@ -189,7 +189,7 @@ export class CevalCtrl {
   }
 
   get hashSize() {
-    const stored = useEvalStore.getState().hashsize;
+    const stored = evalStore.getState().hashsize;
     return Math.min(this.maxHash, stored ?? 16);
   }
 

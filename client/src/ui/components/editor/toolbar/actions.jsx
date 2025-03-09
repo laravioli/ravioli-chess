@@ -2,20 +2,20 @@ import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { History } from './history';
 import { useState, useMemo, useEffect } from 'react';
-import { useBoundStore, useEvalStore } from 'src/stores/hooks';
+import { mainStore, useMainStore, useEvalStore } from 'src/stores';
 import { useInitData } from 'src/ui/context';
 import { short_fen } from './utils';
 
 export function EditorActions() {
   //test purpose
-  const boardApi = useBoundStore((state) => state.boardApi);
-  const gameApi = useBoundStore((state) => state.gameApi);
+  const boardApi = useMainStore((state) => state.boardApi);
+  const gameApi = useMainStore((state) => state.gameApi);
   const toggle = useEvalStore((state) => state.toggle);
 
   const test = () => {
     console.log('board ' + boardApi.getBoardFen());
     console.log('chess ' + gameApi.game()?.fen());
-    console.log('fen ' + useBoundStore.getState().fen());
+    console.log('fen ' + mainStore.getState().fen());
     console.log('current move', gameApi.currentMove());
   };
 
@@ -56,8 +56,8 @@ const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
 export const Position = () => {
   const position = useInitData();
   const [value, setValue] = useState('');
-  const setFen = useBoundStore((state) => state.setFenSliceFromInput);
-  const newGame = useBoundStore((state) => state.gameApi.newGame);
+  const setFen = useMainStore((state) => state.setFenSliceFromInput);
+  const newGame = useMainStore((state) => state.gameApi.newGame);
 
   const data = useMemo(
     () => [
@@ -73,7 +73,7 @@ export const Position = () => {
   const fens = useMemo(() => data.map((obj) => short_fen(obj.value)), [data]);
 
   useEffect(() => {
-    const unsub = useBoundStore.subscribe(
+    const unsub = mainStore.subscribe(
       (state) => state.fen(),
       (fen) => {
         const match = fens.findIndex((pos) => pos === short_fen(fen));
@@ -89,7 +89,7 @@ export const Position = () => {
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
-    if (fen && fen != useBoundStore.getState().fen()) {
+    if (fen && fen != mainStore.getState().fen()) {
       setFen(fen);
       newGame();
     } else {
@@ -108,9 +108,9 @@ export const Position = () => {
 };
 
 export const StartButton = () => {
-  const boardApi = useBoundStore((state) => state.boardApi);
-  const resetFen = useBoundStore((state) => state.resetFen);
-  const newGame = useBoundStore((state) => state.gameApi.newGame);
+  const boardApi = useMainStore((state) => state.boardApi);
+  const resetFen = useMainStore((state) => state.resetFen);
+  const newGame = useMainStore((state) => state.gameApi.newGame);
 
   const onStart = () => {
     boardApi.startBoard();
@@ -122,9 +122,9 @@ export const StartButton = () => {
 };
 
 export const ClearButton = () => {
-  const mode = useBoundStore((state) => state.mode);
-  const boardApi = useBoundStore((state) => state.boardApi);
-  const resetFen = useBoundStore((state) => state.resetFen);
+  const mode = useMainStore((state) => state.mode);
+  const boardApi = useMainStore((state) => state.boardApi);
+  const resetFen = useMainStore((state) => state.resetFen);
 
   const onClear = () => {
     boardApi.clearBoard();
@@ -141,7 +141,7 @@ export const ClearButton = () => {
 };
 
 export const FlipButton = () => {
-  const boardApi = useBoundStore((state) => state.boardApi);
+  const boardApi = useMainStore((state) => state.boardApi);
 
   const onFlip = () => boardApi.flipBoard();
 
@@ -150,9 +150,9 @@ export const FlipButton = () => {
 
 export const SwitchModeButton = () => {
   const [isEdit, setIsEdit] = useState(false);
-  const isLegalFen = useBoundStore((state) => state.isLegalFen);
-  const setFenSliceAnalyse = useBoundStore((state) => state.setFenSliceAnalyse);
-  const switchMode = useBoundStore((state) => state.switchMode);
+  const isLegalFen = useMainStore((state) => state.isLegalFen);
+  const setFenSliceAnalyse = useMainStore((state) => state.setFenSliceAnalyse);
+  const switchMode = useMainStore((state) => state.switchMode);
 
   const label = isEdit ? 'continue from here' : 'edit position';
 

@@ -5,11 +5,11 @@ import {
   IconChevronsRight,
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
-import { useBoundStore } from 'src/stores/hooks/useboundstore';
+import { useMainStore } from 'src/stores/';
 
 export const History = () => {
-  const jump = useBoundStore((state) => state.gameApi.jump);
-  const mode = useBoundStore((state) => state.mode);
+  const jump = useMainStore((state) => state.gameApi.jump);
+  const mode = useMainStore((state) => state.mode);
   const isDisabled = mode == 'editor';
 
   return (

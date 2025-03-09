@@ -2,7 +2,7 @@ import { Game } from '../../game/game';
 import { throttle, isEvalBetter } from '../../eval/util';
 import { CevalCtrl } from '../../eval/ctrl';
 import { engineSupported } from '../../eval/engine';
-import { useEvalStore } from 'src/stores/hooks/usepersiststore';
+import { evalStore } from 'src/stores/';
 
 export class Analyse {
   constructor(info) {
@@ -53,7 +53,7 @@ export class Analyse {
     if (this.ceval) this.ceval.setOpts(opts);
     else {
       this.ceval = new CevalCtrl(opts);
-      useEvalStore.subscribe(
+      evalStore.subscribe(
         (state) => state.disable,
         (disable) => {
           console.log('hello');

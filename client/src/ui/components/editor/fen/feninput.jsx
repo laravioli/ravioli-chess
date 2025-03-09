@@ -1,18 +1,18 @@
 import { TextInput } from '@mantine/core';
 import styles from './fen.module.css';
 import { useRef, useEffect } from 'react';
-import { useBoundStore } from '../../../../stores/hooks/useboundstore';
+import { mainStore, useMainStore } from 'src/stores';
 
 export const FenInput = () => {
-  const setFenSliceFromInput = useBoundStore(
+  const setFenSliceFromInput = useMainStore(
     (state) => state.setFenSliceFromInput
   );
-  const mode = useBoundStore((state) => state.mode);
+  const mode = useMainStore((state) => state.mode);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    useBoundStore.setState({ fenInputRef: inputRef });
-    const unsub = useBoundStore.subscribe(
+    mainStore.setState({ fenInputRef: inputRef });
+    const unsub = mainStore.subscribe(
       (state) => state.fen(),
       (fen) => {
         inputRef.current.value = fen;

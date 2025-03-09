@@ -1,9 +1,9 @@
 import { Checkbox } from '@mantine/core';
 import styles from './fen.module.css';
-import { useBoundStore } from 'src/stores/hooks/useboundstore';
+import { useMainStore } from 'src/stores';
 
 export const CastlingBoxes = () => {
-  const mode = useBoundStore((state) => state.mode);
+  const mode = useMainStore((state) => state.mode);
   const disabled = mode !== 'editor';
 
   return (
@@ -20,8 +20,8 @@ export const CastlingBoxes = () => {
 };
 
 const CastlingBox = ({ id, label, disabled }) => {
-  const castlingRight = useBoundStore((state) => state.castling[id]);
-  const setCastlingRight = useBoundStore((state) => state.setCastlingRight);
+  const castlingRight = useMainStore((state) => state.castling[id]);
+  const setCastlingRight = useMainStore((state) => state.setCastlingRight);
 
   const onChange = () => {
     setCastlingRight(id, !castlingRight);
