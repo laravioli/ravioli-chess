@@ -4,7 +4,7 @@ import { createGameSlice } from './slices/gameslice';
 import { createBoardSlice } from './slices/boardslice';
 import { createModeSlice } from './slices/modeslice';
 import { createFenSlice } from './slices/fenslice';
-import { ChessController } from 'src/logic/';
+import { MainController } from 'src/logic/';
 import { recommendedThreads } from 'src/logic/eval/engine';
 
 export const evalStore = createStore(
@@ -27,7 +27,7 @@ export const evalStore = createStore(
 
 export const mainStore = createStore(
   subscribeWithSelector((...a) => ({
-    ...createModeSlice(new ChessController('analyse'))(...a),
+    ...createModeSlice(new MainController('analyse'))(...a),
     ...createGameSlice(...a),
     ...createBoardSlice(...a),
     ...createFenSlice(...a),

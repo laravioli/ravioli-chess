@@ -94,4 +94,32 @@ export class Analyse {
   }
 
   getCeval = () => this.ceval;
+
+  boardCfg = () => {
+    const config = new Map([
+      [
+        'analyse',
+        {
+          onDragStart: (source, piece) => {
+            if (this.game?.isGameOver()) return false;
+            if (
+              (this.game?.turn() === 'w' && piece.search(/^b/) !== -1) ||
+              (this.game?.turn() === 'b' && piece.search(/^w/) !== -1)
+            ) {
+              return false;
+            }
+          },
+          onDrop: (source, target) => {
+            try {
+              this.game.move(source, target);
+              // eslint-disable-next-line no-unused-vars
+            } catch (error) {
+              return 'snapback';
+            }
+          },
+        },
+      ],
+    ]);
+    return config.get(this.status);
+  }; //to do continue
 }

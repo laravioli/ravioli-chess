@@ -1,7 +1,7 @@
 import { DEFAULT_POSITION } from 'chess.js';
 import { Analyse } from './subcontrollers/analyse';
 
-export class ChessController {
+export class MainController {
   constructor(mode) {
     this.mode = mode;
     this.#selectCtrl(mode, { fen: DEFAULT_POSITION });

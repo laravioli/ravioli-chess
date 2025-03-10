@@ -1,1 +1,1 @@
-export { ChessController } from './main/ctrl';
+export { MainController } from './main/ctrl';

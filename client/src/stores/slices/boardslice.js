@@ -37,7 +37,7 @@ function makeConfig(get) {
 
 /* eslint-disable no-unused-vars */
 function onMouseClick(get) {
-  const handlers = {};
+  let handlers = {};
   const state = get();
 
   if (state.mode === 'editor') {
@@ -47,28 +47,10 @@ function onMouseClick(get) {
   }
 
   if (state.mode !== 'editor') {
-    handlers['onDragStart'] = (source, piece, position, orientation) => {
-      const game = get().gameApi.game();
-      if (game?.isGameOver()) return false;
-      if (
-        (game?.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (game?.turn() === 'b' && piece.search(/^w/) !== -1)
-      ) {
-        return false;
-      }
-    };
-
-    handlers['onDrop'] = (source, target) => {
-      try {
-        get().gameApi.move(source, target);
-      } catch (error) {
-        return 'snapback';
-      }
-    };
-
-    handlers['onSnapEnd'] = () => {
-      get().gameApi.jump('move');
+    handlers = {
+      ...get().logic().boardCfg(),
+      onSnapEnd: () => get().gameApi.jump('move'),
     };
   }
   return handlers;
-}
+} //todo continue with analyse migration
