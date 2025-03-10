@@ -71,8 +71,6 @@ export class Protocol {
     } else if (parts[0] === 'id' && parts[1] === 'name') {
       this.engineName = parts.slice(2).join(' ');
     } else if (parts[0] === 'bestmove') {
-      console.log(`rcv : ${command}`);
-
       if (this.work && this.currentEval) this.work.emit(this.currentEval);
       this.work = undefined;
       this.swapWork();

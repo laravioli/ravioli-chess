@@ -6,7 +6,7 @@ export class MainController {
   constructor(mode, stores) {
     this.mode = mode;
     this.stores = stores;
-    this.#selectCtrl(mode, { fen: DEFAULT_POSITION });
+    this.#selectCtrl(mode, { fen: DEFAULT_POSITION, stores: stores });
   }
 
   setMode(mode, initalFen = DEFAULT_POSITION) {
@@ -15,6 +15,18 @@ export class MainController {
       this.mode = mode;
       this.stores.ui.set({ mode: mode });
     }
+  }
+
+  getGame() {
+    return this.ctrl?.game;
+  }
+
+  newGame(fen) {
+    this.ctrl?.newGame(fen);
+  }
+
+  getBoard() {
+    return this.ctrl?.board;
   }
 
   setBoard(div, config) {
@@ -26,6 +38,11 @@ export class MainController {
   destroyBoard() {
     window.removeEventListener('resize', this.ctrl.board.resize);
     this.ctrl.board.destroy();
+    this.ctrl.setBoard(undefined);
+  }
+
+  jump(action) {
+    this.ctrl?.jump(action);
   }
 
   #activateCtrl(mode, info) {
@@ -41,6 +58,7 @@ export class MainController {
   }
 
   #selectCtrl(mode, info) {
+    this.ctrl?.destroyBoard();
     const make = this.#makeCtrl(mode);
     this.ctrl = make(info);
     this.ctrl.setboardCfg();

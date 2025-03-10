@@ -2,11 +2,10 @@ import { TextInput } from '@mantine/core';
 import styles from './fen.module.css';
 import { useRef, useEffect } from 'react';
 import { mainStore, useMainStore } from 'src/stores';
+import { controller } from 'src/logic';
 
 export const FenInput = () => {
-  const setFenSliceFromInput = useMainStore(
-    (state) => state.setFenSliceFromInput
-  );
+  const setFenFromInput = useMainStore((state) => state.setFenFromInput);
   const mode = useMainStore((state) => state.mode);
   const inputRef = useRef(null);
 
@@ -26,7 +25,9 @@ export const FenInput = () => {
 
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
-      setFenSliceFromInput(inputRef.current.value);
+      const fen = inputRef.current.value;
+      setFenFromInput(fen);
+      controller.getBoard().position(mainStore.getState().fen(), true);
     }
   };
 

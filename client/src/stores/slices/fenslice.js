@@ -27,11 +27,6 @@ export const createFenSlice = (set, get) => ({
     return fen;
   },
 
-  setFenPositionFromEditor(fenPosition) {
-    set({ fenPosition });
-    set({ isLegalFen: vf(get().fen()).ok });
-  },
-
   setTurn(turn = undefined) {
     set((state) => {
       const newTurn = turn ?? (state.turn === 'w' ? 'b' : 'w');
@@ -51,7 +46,7 @@ export const createFenSlice = (set, get) => ({
     set((state) => ({ castling: { ...state.castling, [id]: value } }));
   },
 
-  setFenSliceFromInput(input) {
+  setFenFromInput(input) {
     const state = get();
     if (input !== state.fen() && state._isValidInput(input)) {
       const newstate = input.split(' ');
@@ -65,7 +60,6 @@ export const createFenSlice = (set, get) => ({
         halfmove: newstate[4],
         fullmove: newstate[5],
       });
-      get().boardApi.setBoardPosition(input);
     } else {
       state.fenInputRef.current.value = state.fen();
     }
@@ -87,7 +81,7 @@ export const createFenSlice = (set, get) => ({
   },
 
   setFenSliceAnalyse() {
-    get().setFenSliceFromInput(get().fenInputRef.current.value);
+    get().setFenFromInput(get().fenInputRef.current.value);
     return get().isLegalFen;
   },
 

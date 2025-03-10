@@ -6,9 +6,9 @@ import {
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
 import { useMainStore } from 'src/stores/';
+import { controller } from 'src/logic';
 
 export const History = () => {
-  const jump = useMainStore((state) => state.gameApi.jump);
   const mode = useMainStore((state) => state.mode);
   const isDisabled = mode == 'editor';
 
@@ -17,7 +17,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => jump('start')}
+        onClick={() => controller.jump('start')}
         disabled={isDisabled}>
         <IconChevronsLeft size={40} stroke={1.5} />
       </ActionIcon>
@@ -25,7 +25,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => jump('undo')}
+        onClick={() => controller.jump('undo')}
         disabled={isDisabled}>
         <IconChevronLeft size={40} stroke={1.5} />
       </ActionIcon>
@@ -33,7 +33,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => jump('redo')}
+        onClick={() => controller.jump('redo')}
         disabled={isDisabled}>
         <IconChevronRight size={40} stroke={1.5} />
       </ActionIcon>
@@ -41,7 +41,7 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => jump('end')}
+        onClick={() => controller.jump('end')}
         disabled={isDisabled}>
         <IconChevronsRight size={40} stroke={1.5} />
       </ActionIcon>

@@ -60,7 +60,6 @@ export class Analyse {
       evalStore.subscribe(
         (state) => state.disable,
         (disable) => {
-          console.log('hello');
           this.ceval.enabled(!disable);
           this.restartCeval();
         }
@@ -69,7 +68,6 @@ export class Analyse {
   }
 
   onNewCeval(ev) {
-    console.log(ev);
     let move = this.game.currentMove;
     if (!move.ceval || isEvalBetter(ev, move.ceval)) move.ceval = ev;
   }
@@ -77,13 +75,10 @@ export class Analyse {
   startCeval = throttle(800, () => {
     if (this.ceval?.enabled()) {
       if (this.game && !this.game.isGameOver()) {
-        console.log('startceval :  a new eval');
         this.ceval.start(this.game.moveList, undefined);
       } else {
         this.ceval.stop();
       }
-    } else {
-      console.log('startceval : ceval disabled');
     }
   });
 
