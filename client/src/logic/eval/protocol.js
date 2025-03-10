@@ -1,23 +1,3 @@
-/*interface Work {
-    path: string;
-    search: SearchBy;
-    ply: number;
-    threatMode: boolean;
-
-
-
-    threads: number;
-    hashSize: number | undefined;
-    gameId: string | undefined; // send ucinewgame when changed
-    stopRequested: boolean;
-  
-    multiPv: number;
-    initialFen: string;
-    currentFen: string;
-    moves: string[];
-    emit: (ev: Tree.LocalEval) => void;
-  }*/
-
 export class Protocol {
   expectedPvs = 1;
   options = new Map();

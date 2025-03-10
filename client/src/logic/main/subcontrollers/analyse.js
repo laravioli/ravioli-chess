@@ -7,7 +7,6 @@ import { evalStore } from 'src/stores/';
 
 export class Analyse {
   constructor(info) {
-    window.analysis = this;
     this.initialFen = info.fen;
     this.stores = info.stores;
     this.status = 'analyse';
