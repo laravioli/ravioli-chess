@@ -154,7 +154,7 @@ export const SwitchModeButton = () => {
   const setFenSliceAnalyse = useMainStore((state) => state.setFenSliceAnalyse);
   const switchMode = useMainStore((state) => state.switchMode);
 
-  const label = isEdit ? 'continue from here' : 'edit position';
+  const label = isEdit ? 'analyse' : 'edit';
 
   const onClick = () => {
     if (setFenSliceAnalyse()) {

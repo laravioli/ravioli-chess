@@ -8,6 +8,7 @@ export class MainController {
   }
 
   setMode(mode, initalFen = DEFAULT_POSITION) {
+    console.log('tamaman');
     if (this.mode !== mode) {
       this.#activateCtrl(mode, { fen: initalFen });
       this.mode = mode;

@@ -21,6 +21,7 @@ export const createBoardSlice = (set, get) => ({
   },
 
   setBoard: (div) => {
+    console.log('tonpapa');
     if (get().board) {
       window.removeEventListener('resize', get().board.resize);
       get().board.destroy();
