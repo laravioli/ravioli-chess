@@ -1,7 +1,7 @@
 import { DEFAULT_POSITION } from 'chess.js';
 import piecesUrl from '/images/base/bK.png';
 
-export const createModeSlice = (mode) => (set, get) => ({
+export const createModeSlice = () => ({
   mode: 'analyse',
 
   config: {
@@ -14,7 +14,7 @@ export const createModeSlice = (mode) => (set, get) => ({
     hideSparePieces: true,
   },
 
-  switchMode: (action) => set((state) => get()._reducerMode(state, action)),
+  /*switchMode: (action) => set((state) => get()._reducerMode(state, action)),
 
   _reducerMode: (state, action) => {
     mode.setMode(action.mode, get().fen());
@@ -58,5 +58,5 @@ export const createModeSlice = (mode) => (set, get) => ({
       default:
         return state;
     }
-  },
+  },*/
 });

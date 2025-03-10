@@ -1,4 +1,4 @@
-import chessBoard from 'chessboard';
+/*import chessBoard from 'chessboard';
 
 export const createBoardSlice = (set, get) => ({
   board: undefined,
@@ -53,4 +53,4 @@ function onMouseClick(get) {
     };
   }
   return handlers;
-} //todo continue with analyse migration
+}*/

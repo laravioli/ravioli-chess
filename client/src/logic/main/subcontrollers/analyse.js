@@ -1,3 +1,4 @@
+import { validateFen } from 'chess.js';
 import { Game } from '../../game/game';
 import { throttle, isEvalBetter } from '../../eval/util';
 import { CevalCtrl } from '../../eval/ctrl';
@@ -150,6 +151,26 @@ export class Analyse {
           onSnapEnd: () => {
             this.jump('move');
           },
+        },
+      ],
+      [
+        'editor',
+        {
+          position: this.initialFen,
+          draggable: true,
+          dropOffBoard: 'trash',
+          sparePieces: true,
+          hideSparePieces: false,
+          onDragStart: () => {},
+          onDrop: (s, t, p, newPos) => {
+            this.stores.ui.set({
+              fenPosition: this.board.objToFen(newPos),
+            });
+            this.stores.ui.set({
+              isLegalFen: validateFen(this.stores.ui.get().fen()).ok,
+            });
+          },
+          onSnapEnd: () => {},
         },
       ],
     ]);
