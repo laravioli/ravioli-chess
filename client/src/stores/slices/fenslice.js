@@ -91,25 +91,6 @@ export const createFenSlice = (set, get) => ({
     return get().isLegalFen;
   },
 
-  setFenSliceFromGame(game) {
-    const castlingRights =
-      game.turn() === 'w'
-        ? game.getCastlingRights('b')
-        : Object.fromEntries(
-            Object.entries(game.getCastlingRights('w')).map(([key, value]) => [
-              key.toUpperCase(),
-              value,
-            ])
-          );
-    set((state) => ({
-      fenPosition: game.fen().split(' ')[0],
-      turn: game.turn(),
-      castling: { ...state.castling, ...castlingRights },
-      halfmove: game.fen().split(' ')[4],
-      fullmove: game.moveNumber(),
-    }));
-  },
-
   resetFen(cr) {
     set({
       fenPosition: cr

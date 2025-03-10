@@ -8,6 +8,7 @@ export class Analyse {
   constructor(info) {
     window.analysis = this;
     this.initialFen = info.fen;
+    this.stores = info.stores;
     this.status = 'analyse';
     this.game = new Game(info.fen);
     this.initCeval();
@@ -15,7 +16,6 @@ export class Analyse {
   }
 
   clear() {
-    this.initialFen = undefined;
     this.game = undefined;
   }
 
@@ -31,6 +31,7 @@ export class Analyse {
   updateStatus(status, fen) {
     this.status = status;
     status === 'analyse' ? this.newGame(fen) : this.clear();
+    this.initialFen = fen;
   }
 
   jump(action) {
@@ -40,6 +41,8 @@ export class Analyse {
     else if (action === 'start') this.game.goStart();
     else if (action === 'end') this.game.goEnd();
     this.restartCeval();
+    this.board.position(this.game.currentMove.fen, true);
+    this.setFen();
   }
 
   initCeval() {
@@ -95,11 +98,38 @@ export class Analyse {
 
   getCeval = () => this.ceval;
 
-  boardCfg = () => {
-    const config = new Map([
+  setBoard(board) {
+    this.board = board;
+  }
+
+  setFen() {
+    const castlingRights =
+      this.game.turn() === 'w'
+        ? this.game.getCastlingRights('b')
+        : Object.fromEntries(
+            Object.entries(this.game.getCastlingRights('w')).map(
+              ([key, value]) => [key.toUpperCase(), value]
+            )
+          );
+    this.stores.ui.set((state) => ({
+      fenPosition: this.game.fen().split(' ')[0],
+      turn: this.game.turn(),
+      castling: { ...state.castling, ...castlingRights },
+      halfmove: this.game.fen().split(' ')[4],
+      fullmove: this.game.moveNumber(),
+    }));
+  }
+
+  setboardCfg = () => {
+    const boardConfig = new Map([
       [
         'analyse',
         {
+          position: this.initialFen,
+          draggable: true,
+          dropOffBoard: 'snapback',
+          sparePieces: true,
+          hideSparePieces: true,
           onDragStart: (source, piece) => {
             if (this.game?.isGameOver()) return false;
             if (
@@ -117,9 +147,14 @@ export class Analyse {
               return 'snapback';
             }
           },
+          onSnapEnd: () => {
+            this.jump('move');
+          },
         },
       ],
     ]);
-    return config.get(this.status);
-  }; //to do continue
+    this.stores.ui.set((state) => ({
+      config: { ...state.config, ...boardConfig.get(this.status) },
+    }));
+  };
 }

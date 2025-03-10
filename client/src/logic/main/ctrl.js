@@ -1,18 +1,31 @@
+import chessBoard from 'chessboard';
 import { DEFAULT_POSITION } from 'chess.js';
 import { Analyse } from './subcontrollers/analyse';
 
 export class MainController {
-  constructor(mode) {
+  constructor(mode, stores) {
     this.mode = mode;
+    this.stores = stores;
     this.#selectCtrl(mode, { fen: DEFAULT_POSITION });
   }
 
   setMode(mode, initalFen = DEFAULT_POSITION) {
-    console.log('tamaman');
     if (this.mode !== mode) {
-      this.#activateCtrl(mode, { fen: initalFen });
+      this.#activateCtrl(mode, { fen: initalFen, stores: this.stores });
       this.mode = mode;
+      this.stores.ui.set({ mode: mode });
     }
+  }
+
+  setBoard(div, config) {
+    if (this.ctrl.board) this.destroyBoard();
+    this.ctrl.setBoard(chessBoard(div, config));
+    window.addEventListener('resize', this.ctrl.board.resize);
+  }
+
+  destroyBoard() {
+    window.removeEventListener('resize', this.ctrl.board.resize);
+    this.ctrl.board.destroy();
   }
 
   #activateCtrl(mode, info) {
@@ -21,6 +34,7 @@ export class MainController {
       (this.mode === 'analyse' && mode === 'editor')
     ) {
       this.ctrl.updateStatus(mode, info.fen);
+      this.ctrl.setboardCfg();
     } else {
       this.#selectCtrl(mode, info);
     }
@@ -29,6 +43,7 @@ export class MainController {
   #selectCtrl(mode, info) {
     const make = this.#makeCtrl(mode);
     this.ctrl = make(info);
+    this.ctrl.setboardCfg();
   }
 
   #makeCtrl(mode) {

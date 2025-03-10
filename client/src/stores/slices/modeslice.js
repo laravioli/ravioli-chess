@@ -3,9 +3,7 @@ import piecesUrl from '/images/base/bK.png';
 
 export const createModeSlice = (mode) => (set, get) => ({
   mode: 'analyse',
-  logic: () => mode.ctrl,
 
-  //board config to control widget instanciation
   config: {
     position: DEFAULT_POSITION,
     pieceTheme: (piece) =>

@@ -36,7 +36,6 @@ function makeConfig(get) {
   return { ...get().config, ...onMouseClick(get) };
 }
 
-/* eslint-disable no-unused-vars */
 function onMouseClick(get) {
   let handlers = {};
   const state = get();
