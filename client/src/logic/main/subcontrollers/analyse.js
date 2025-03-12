@@ -69,6 +69,7 @@ export class Analyse {
   onNewCeval(ev) {
     let move = this.game.currentMove;
     if (!move.ceval || isEvalBetter(ev, move.ceval)) move.ceval = ev;
+    console.log(ev);
   }
 
   startCeval = throttle(800, () => {

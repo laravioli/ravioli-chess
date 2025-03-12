@@ -1,0 +1,9 @@
+@import './chessboard.css';
+@import '@mantine/core/styles.css';
+@import './App.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}

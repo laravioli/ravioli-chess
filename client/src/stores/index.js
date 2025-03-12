@@ -1,6 +1,6 @@
 import { createStore, useStore } from 'zustand';
 import { subscribeWithSelector, persist } from 'zustand/middleware';
-import { createModeSlice } from './slices/modeslice';
+import { createSettingSlice } from './slices/settingslice';
 import { createFenSlice } from './slices/fenslice';
 import { recommendedThreads } from 'src/logic/eval/engine';
 
@@ -24,7 +24,7 @@ export const evalStore = createStore(
 
 export const mainStore = createStore(
   subscribeWithSelector((...a) => ({
-    ...createModeSlice(...a),
+    ...createSettingSlice(...a),
     ...createFenSlice(...a),
   }))
 );
