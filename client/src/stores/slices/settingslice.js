@@ -5,7 +5,7 @@ export const createSettingSlice = () => ({
 
   config: {
     position: DEFAULT_POSITION,
-    pieceTheme: '/static/frontend/images/wiki/{piece}.png',
+    pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
     draggable: true,
     dropOffBoard: 'snapback',
     sparePieces: true,
