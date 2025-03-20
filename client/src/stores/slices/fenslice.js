@@ -1,4 +1,4 @@
-import { validateFen as vf } from 'chess.js';
+import { validateFen } from 'chess.js';
 
 export const createFenSlice = (set, get) => ({
   fenPosition: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
@@ -66,7 +66,7 @@ export const createFenSlice = (set, get) => ({
   },
 
   _isValidInput(input) {
-    const validation = vf(input);
+    const validation = validateFen(input);
     const validErrors = [
       'Invalid FEN: some pawns are on the edge rows',
       'Invalid FEN: missing white king',

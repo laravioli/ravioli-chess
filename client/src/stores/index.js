@@ -28,5 +28,6 @@ export const mainStore = createStore(
     ...createFenSlice(...a),
   }))
 );
+
 export const useMainStore = (selector) => useStore(mainStore, selector);
 export const useEvalStore = (selector) => useStore(evalStore, selector);

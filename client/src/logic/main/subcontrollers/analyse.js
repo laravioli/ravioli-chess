@@ -6,7 +6,8 @@ import { engineSupported } from '../../eval/engine';
 import { evalStore } from 'src/stores/';
 
 export class Analyse {
-  constructor(info) {
+  constructor(ctrl, info) {
+    this.controller = ctrl;
     this.initialFen = info.fen;
     this.stores = info.stores;
     this.status = 'analyse';
