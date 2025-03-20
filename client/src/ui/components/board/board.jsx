@@ -7,9 +7,9 @@ export function Board() {
 
   useEffect(() => {
     const unsub = mainStore.subscribe(
-      (state) => state.config,
-      (config) => {
-        controller.setBoard(divRef.current, config);
+      (state) => state.mode,
+      () => {
+        controller.setBoard(divRef.current);
       },
       { fireImmediately: true }
     );

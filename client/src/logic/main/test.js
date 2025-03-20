@@ -1,10 +1,10 @@
-import { Analyse } from './subcontrollers/analyse';
-import { Editor } from './subcontrollers/editor';
-import { Computer } from './subcontrollers/computer';
-import { Online } from './subcontrollers/online';
+import { Analyse } from './modules/analyse';
+import { Editor } from './modules/editor';
+import { Computer } from './modules/computer';
+import { Online } from './modules/online';
 
 export class Controller {
-  states = new Map([
+  modules = new Map([
     ['analyse', { make: () => new Analyse(this), current: undefined }],
     ['editor', { make: () => new Editor(this), current: undefined }],
     ['computer', { make: () => new Computer(this), current: undefined }],

@@ -116,12 +116,12 @@ export class Analyse {
       fullmove: this.game.moveNumber(),
     }));
   }
-
-  setboardCfg = () => {
+  makeboardCfg = () => {
     const boardConfig = new Map([
       [
         'analyse',
         {
+          pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
           position: this.initialFen,
           draggable: true,
           dropOffBoard: 'snapback',
@@ -152,6 +152,7 @@ export class Analyse {
       [
         'editor',
         {
+          pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
           position: this.initialFen,
           draggable: true,
           dropOffBoard: 'trash',
@@ -170,8 +171,6 @@ export class Analyse {
         },
       ],
     ]);
-    this.stores.ui.set((state) => ({
-      config: { ...state.config, ...boardConfig.get(this.status) },
-    }));
+    return boardConfig.get(this.status);
   };
 }
