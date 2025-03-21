@@ -15,16 +15,17 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       origin: 'http://localhost:5173',
+      open: '/',
       headers: {
         'cross-origin-opener-policy': 'same-origin',
         'cross-origin-embedder-policy': 'credentialless',
       },
       proxy: {
-        [`^${env.BASE}$`]: {
+        '^/(\\w+)?$': {
           target: env.BACKEND_URL,
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(new RegExp(`^${env.BASE}`), ''),
+          rewrite: (path) => path.replace(path, ''),
         },
       },
     },

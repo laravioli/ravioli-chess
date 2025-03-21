@@ -10,7 +10,7 @@ export const evalStore = createStore(
       (set) => ({
         disable: true,
         multipv: 1,
-        searchms: 1000,
+        searchms: 3000,
         threads: recommendedThreads(),
         hashsize: 16,
         toggle: () => set((state) => ({ disable: !state.disable })),

@@ -68,7 +68,11 @@ export class StockfishWebEngine {
           return storedBuffer;
         const req = new XMLHttpRequest();
 
-        req.open('get', `./src/logic/eval/stockfish/${nnueFilename}`, true);
+        req.open(
+          'get',
+          `./static/frontend/src/logic/eval/stockfish/${nnueFilename}`,
+          true
+        );
         req.responseType = 'arraybuffer';
         req.onprogress = (e) =>
           this.status?.({ download: { bytes: e.loaded, total: e.total } });

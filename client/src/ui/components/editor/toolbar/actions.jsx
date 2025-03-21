@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Link } from 'react-router';
 import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { History } from './history';
@@ -175,3 +176,11 @@ export const SwitchModeButton = () => {
 export const TestButton = ({ label, onTest }) => {
   return <EditorButton label={label} onClick={onTest} />;
 };
+
+export function NavAnalyse() {
+  return (
+    <p>
+      <Link to="/analyse">Analyse</Link>
+    </p>
+  );
+}
