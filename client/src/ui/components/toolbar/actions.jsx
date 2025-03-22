@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { History } from './history';
@@ -9,7 +9,7 @@ import { useInitData } from 'src/ui/context';
 import { short_fen } from './utils';
 import { DEFAULT_POSITION } from 'chess.js';
 
-export function EditorActions() {
+export function EditorActions({ path }) {
   //test purpose
   const toggle = useEvalStore((state) => state.toggle);
 
@@ -27,6 +27,7 @@ export function EditorActions() {
   return (
     <>
       <Position />
+      <Navigate path={path} />
       <Button.Group orientation="vertical" classNames={{ group: styles.group }}>
         <StartButton />
         <ClearButton />
@@ -40,7 +41,12 @@ export function EditorActions() {
   );
 }
 
-const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
+const EditorButton = ({
+  label,
+  onClick = () => {},
+  isDisabled = false,
+  style = {},
+}) => {
   return (
     <Button
       variant="filled"
@@ -48,7 +54,8 @@ const EditorButton = ({ label, onClick = () => {}, isDisabled = false }) => {
       size="md"
       radius="md"
       onClick={onClick}
-      disabled={isDisabled}>
+      disabled={isDisabled}
+      style={style}>
       {label}
     </Button>
   );
@@ -173,14 +180,28 @@ export const SwitchModeButton = () => {
   );
 };
 
-export const TestButton = ({ label, onTest }) => {
-  return <EditorButton label={label} onClick={onTest} />;
+export const TestButton = ({ label, onTest, style = {} }) => {
+  return <EditorButton label={label} onClick={onTest} style={style} />;
 };
 
 export function NavAnalyse() {
   return (
     <p>
-      <Link to="/analyse">Analyse</Link>
+      <Link to="/analysis">Analyse</Link>
     </p>
+  );
+}
+
+export function Navigate({ path }) {
+  const navigate = useNavigate();
+  return (
+    <TestButton
+      label="navigate"
+      onTest={() => {
+        console.log(path);
+        navigate(path);
+      }}
+      style={{ margin: '0px 0px 10px 0px' }}
+    />
   );
 }
