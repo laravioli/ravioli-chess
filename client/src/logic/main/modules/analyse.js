@@ -10,7 +10,7 @@ export class Analyse {
     this.controller = ctrl;
     this.initialFen = info.fen;
     this.stores = info.stores;
-    this.status = 'analyse';
+    this.status = 'analysis';
     this.game = new Game(info.fen);
     this.initCeval();
     this.startCeval();
@@ -21,7 +21,7 @@ export class Analyse {
   }
 
   newGame(fen) {
-    if (this.status === 'analyse') {
+    if (this.status === 'analysis') {
       if (!this.game) this.game = new Game(fen);
       this.initialFen = fen;
       this.game.load(fen);
@@ -31,7 +31,7 @@ export class Analyse {
 
   updateStatus(status, fen) {
     this.status = status;
-    status === 'analyse' ? this.newGame(fen) : this.clear();
+    status === 'analysis' ? this.newGame(fen) : this.clear();
     this.initialFen = fen;
   }
 
@@ -119,7 +119,7 @@ export class Analyse {
   makeboardCfg = () => {
     const boardConfig = new Map([
       [
-        'analyse',
+        'analysis',
         {
           pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
           position: this.initialFen,

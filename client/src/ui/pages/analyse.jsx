@@ -2,19 +2,32 @@ import { Board } from '../components/board/board';
 import { FenInput } from '../components/fen/feninput';
 import { TurnToPlay } from '../components/fen/turn';
 import { CastlingBoxes } from '../components/fen/fencontrols';
-import { EditorActions } from '../components/toolbar/actions';
+import {
+  Position,
+  Navigate,
+  Buttons,
+  StartButton,
+  FlipButton,
+} from '../components/toolbar/actions';
+import { History } from '../components/toolbar/history';
 
 export function Analyse() {
   return (
-    <div className="editor">
+    <div className="main-wrap">
       <Board />
       <FenInput />
-      <div className="editor-toolbar">
+      <div className="toolbar">
         <div className="fen-controls">
           <TurnToPlay />
           <CastlingBoxes />
         </div>
-        <EditorActions path="/editor" />
+        <Position />
+        <Navigate path="/editor" />
+        <Buttons>
+          <StartButton />
+          <FlipButton />
+        </Buttons>
+        <History />
       </div>
     </div>
   );

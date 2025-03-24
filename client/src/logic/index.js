@@ -1,12 +1,23 @@
 import { mainStore, evalStore } from '../stores';
 import { MainController } from './main/ctrl';
 
-const storeApi = (store) => ({
-  get: store.getState,
-  set: store.setState,
-  subscribe: store.subscribe,
-});
+function getModuleUrl() {
+  const url = new URL(window.location);
+  return (
+    url.pathname.split('/').filter((segment) => segment !== '')[0] ??
+    import.meta.env.VITE_DEFAULT_MODULE
+  );
+}
 
-const stores = { ui: storeApi(mainStore), eval: storeApi(evalStore) };
+function initModule() {
+  const storeApi = (store) => ({
+    get: store.getState,
+    set: store.setState,
+    subscribe: store.subscribe,
+  });
+  const stores = { ui: storeApi(mainStore), eval: storeApi(evalStore) };
+  const moduleUrl = getModuleUrl();
+  return new MainController(moduleUrl, stores);
+}
 
-export const controller = new MainController('analyse', stores);
+export const controller = initModule();

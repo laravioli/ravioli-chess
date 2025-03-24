@@ -2,14 +2,16 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
-import { History } from './history';
 import { mainStore, useMainStore, useEvalStore } from 'src/stores';
 import { controller } from 'src/logic';
 import { useInitData } from 'src/ui/context';
 import { short_fen } from './utils';
 import { DEFAULT_POSITION } from 'chess.js';
 
-export function EditorActions({ path }) {
+//todo reorganise this file
+//for path: when user reload the page: init controller properly, when user navigate with client : use button to set the controller
+
+export function Buttons({ children }) {
   //test purpose
   const toggle = useEvalStore((state) => state.toggle);
 
@@ -21,22 +23,15 @@ export function EditorActions({ path }) {
   };
 
   const testEval = () => toggle();
-
-  //endtest
+  //end Test
 
   return (
     <>
-      <Position />
-      <Navigate path={path} />
       <Button.Group orientation="vertical" classNames={{ group: styles.group }}>
-        <StartButton />
-        <ClearButton />
-        <FlipButton />
-        <SwitchModeButton />
+        {children}
         <TestButton label="position" onTest={test} />
         <TestButton label="eval" onTest={testEval} />
       </Button.Group>
-      <History />
     </>
   );
 }
@@ -128,7 +123,6 @@ export const StartButton = () => {
 };
 
 export const ClearButton = () => {
-  const mode = useMainStore((state) => state.mode);
   const resetFen = useMainStore((state) => state.resetFen);
 
   const onClear = () => {
@@ -140,7 +134,7 @@ export const ClearButton = () => {
     <EditorButton
       label="clear board"
       onClick={onClear}
-      isDisabled={mode !== 'editor'}
+      isDisabled={controller.mode !== 'editor'}
     />
   );
 };
@@ -156,12 +150,12 @@ export const SwitchModeButton = () => {
   const isLegalFen = useMainStore((state) => state.isLegalFen);
   const setFenSliceAnalyse = useMainStore((state) => state.setFenSliceAnalyse);
 
-  const label = isEdit ? 'analyse' : 'edit';
+  const label = isEdit ? 'analysis board' : 'edit board';
 
   const onClick = () => {
     if (setFenSliceAnalyse()) {
       controller.setMode(
-        isEdit ? 'analyse' : 'editor',
+        isEdit ? 'analysis' : 'editor',
         mainStore.getState().fen()
       );
 
@@ -194,14 +188,28 @@ export function NavAnalyse() {
 
 export function Navigate({ path }) {
   const navigate = useNavigate();
+  const isLegalFen = useMainStore((state) => state.isLegalFen);
+  const setFenSliceAnalyse = useMainStore((state) => state.setFenSliceAnalyse);
+
+  const isEdit = path !== '/editor';
+  const label = isEdit ? 'analysis board' : 'edit board';
+
+  const onClick = () => {
+    const fen = mainStore.getState().fen();
+    if (setFenSliceAnalyse()) {
+      controller.setMode(path.slice(1), fen);
+      navigate(path, { replace: true });
+    } else {
+      controller.getBoard().position(fen);
+    }
+  };
+
   return (
-    <TestButton
-      label="navigate"
-      onTest={() => {
-        console.log(path);
-        navigate(path);
-      }}
-      style={{ margin: '0px 0px 10px 0px' }}
+    <EditorButton
+      label={label}
+      onClick={onClick}
+      isDisabled={isEdit && !isLegalFen}
+      style={{ margin: '0px 0px 12px 0px' }}
     />
   );
 }

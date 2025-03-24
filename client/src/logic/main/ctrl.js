@@ -4,13 +4,13 @@ import { Analyse } from './modules/analyse';
 
 export class MainController {
   constructor(mode, stores) {
+    window.ctrl = this;
     this.mode = mode;
     this.stores = stores;
     this.#selectCtrl(mode, { fen: DEFAULT_POSITION, stores: stores });
   }
 
   setMode(mode, initalFen = DEFAULT_POSITION) {
-    console.log('a');
     if (this.mode !== mode) {
       this.#activateCtrl(mode, { fen: initalFen, stores: this.stores });
       this.mode = mode;
@@ -48,8 +48,8 @@ export class MainController {
 
   #activateCtrl(mode, info) {
     if (
-      (this.mode === 'editor' && mode === 'analyse') ||
-      (this.mode === 'analyse' && mode === 'editor')
+      (this.mode === 'editor' && mode === 'analysis') ||
+      (this.mode === 'analysis' && mode === 'editor')
     ) {
       this.ctrl.updateStatus(mode, info.fen);
     } else {
@@ -66,8 +66,16 @@ export class MainController {
   #makeCtrl(mode) {
     const controllers = [
       {
-        mode: 'analyse',
+        mode: 'analysis',
         make: (info) => new Analyse(this, info),
+      },
+      {
+        mode: 'editor',
+        make: (info) => {
+          const module = new Analyse(this, info);
+          module.updateStatus('editor', info.fen);
+          return module;
+        },
       },
     ];
     const selected = controllers.find((ctrl) => ctrl.mode === mode);

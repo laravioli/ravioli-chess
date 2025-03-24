@@ -6,7 +6,6 @@ import { controller } from 'src/logic';
 
 export const FenInput = () => {
   const setFenFromInput = useMainStore((state) => state.setFenFromInput);
-  const mode = useMainStore((state) => state.mode);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export const FenInput = () => {
       variant="filled"
       radius="xs"
       onKeyDown={onKeyDown}
-      disabled={mode !== 'editor'}
+      disabled={controller.mode !== 'editor'}
       classNames={{ input: styles.input }}
     />
   );

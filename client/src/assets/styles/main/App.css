@@ -12,7 +12,7 @@
   height: 100%;
 }
 
-.editor {
+.main-wrap {
   display: grid;
   grid:
     '.            .                 tools' min-content
@@ -21,12 +21,12 @@
     / clamp(300px, 72vmin, 700px) 2vmin minmax(100px, 200px);
 }
 
-.editor-toolbar {
+.toolbar {
   grid-area: tools;
   align-self: center;
 }
 
-.editor-toolbar {
+.toolbar {
   display: flex;
   flex-flow: column;
 }

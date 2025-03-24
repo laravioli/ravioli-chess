@@ -1,10 +1,10 @@
 import { Checkbox } from '@mantine/core';
 import styles from './fen.module.css';
 import { useMainStore } from 'src/stores';
+import { controller } from 'src/logic';
 
 export const CastlingBoxes = () => {
-  const mode = useMainStore((state) => state.mode);
-  const disabled = mode !== 'editor';
+  const disabled = controller.mode !== 'editor';
 
   return (
     <>

@@ -1,3 +1,3 @@
 export const createSettingSlice = () => ({
-  mode: 'analyse',
+  mode: 'analysis',
 });

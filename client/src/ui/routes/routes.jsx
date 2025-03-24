@@ -6,7 +6,7 @@ export const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {['/', '/analysis'].map((path, index) => {
+        {['/', 'analysis'].map((path, index) => {
           return <Route path={path} element={<Analyse />} key={index} />;
         })}
         <Route path="editor" element={<Editor />} />
