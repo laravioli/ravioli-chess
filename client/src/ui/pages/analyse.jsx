@@ -8,6 +8,7 @@ import {
   Buttons,
   StartButton,
   FlipButton,
+  ToggleEval,
 } from '../components/toolbar/actions';
 import { History } from '../components/toolbar/history';
 
@@ -26,6 +27,7 @@ export function Analyse() {
         <Buttons>
           <StartButton />
           <FlipButton />
+          <ToggleEval />
         </Buttons>
         <History />
       </div>

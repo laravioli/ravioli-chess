@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { mainStore, useMainStore, useEvalStore } from 'src/stores';
@@ -11,26 +11,25 @@ import { DEFAULT_POSITION } from 'chess.js';
 //todo reorganise this file
 //for path: when user reload the page: init controller properly, when user navigate with client : use button to set the controller
 
+//---------Test-----------//
+const TestButton = ({ label, onTest, style = {} }) => {
+  return <EditorButton label={label} onClick={onTest} style={style} />;
+};
+
+const test = () => {
+  console.log('board ' + controller.getBoard().fen());
+  console.log('chess ' + controller.getGame()?.fen());
+  console.log('fen ' + mainStore.getState().fen());
+  console.log('current move', controller.getGame()?.currentMove);
+};
+//------------------------//
+
 export function Buttons({ children }) {
-  //test purpose
-  const toggle = useEvalStore((state) => state.toggle);
-
-  const test = () => {
-    console.log('board ' + controller.getBoard().fen());
-    console.log('chess ' + controller.getGame()?.fen());
-    console.log('fen ' + mainStore.getState().fen());
-    console.log('current move', controller.getGame()?.currentMove);
-  };
-
-  const testEval = () => toggle();
-  //end Test
-
   return (
     <>
       <Button.Group orientation="vertical" classNames={{ group: styles.group }}>
         {children}
-        <TestButton label="position" onTest={test} />
-        <TestButton label="eval" onTest={testEval} />
+        <TestButton label="test" onTest={test} />
       </Button.Group>
     </>
   );
@@ -59,7 +58,7 @@ const EditorButton = ({
 export const Position = () => {
   const position = useInitData();
   const [value, setValue] = useState('');
-  const setFen = useMainStore((state) => state.setFenFromInput);
+  const setFen = useMainStore((state) => state.setFen);
 
   const data = useMemo(
     () => [
@@ -145,62 +144,20 @@ export const FlipButton = () => {
   return <EditorButton label="flip board" onClick={onFlip} />;
 };
 
-export const SwitchModeButton = () => {
-  const [isEdit, setIsEdit] = useState(false);
-  const isLegalFen = useMainStore((state) => state.isLegalFen);
-  const setFenSliceAnalyse = useMainStore((state) => state.setFenSliceAnalyse);
-
-  const label = isEdit ? 'analysis board' : 'edit board';
-
-  const onClick = () => {
-    if (setFenSliceAnalyse()) {
-      controller.setMode(
-        isEdit ? 'analysis' : 'editor',
-        mainStore.getState().fen()
-      );
-
-      setIsEdit(!isEdit);
-    } else {
-      controller.getBoard().position(mainStore.getState().fen());
-    }
-  };
-
-  return (
-    <EditorButton
-      label={label}
-      onClick={onClick}
-      isDisabled={isEdit && !isLegalFen}
-    />
-  );
-};
-
-export const TestButton = ({ label, onTest, style = {} }) => {
-  return <EditorButton label={label} onClick={onTest} style={style} />;
-};
-
-export function NavAnalyse() {
-  return (
-    <p>
-      <Link to="/analysis">Analyse</Link>
-    </p>
-  );
-}
-
 export function Navigate({ path }) {
   const navigate = useNavigate();
   const isLegalFen = useMainStore((state) => state.isLegalFen);
-  const setFenSliceAnalyse = useMainStore((state) => state.setFenSliceAnalyse);
+  const isFenAnalysable = useMainStore((state) => state.isFenAnalysable);
 
   const isEdit = path !== '/editor';
   const label = isEdit ? 'analysis board' : 'edit board';
 
   const onClick = () => {
-    const fen = mainStore.getState().fen();
-    if (setFenSliceAnalyse()) {
-      controller.setMode(path.slice(1), fen);
+    if (isFenAnalysable()) {
+      controller.setMode(path.slice(1), mainStore.getState().fen());
       navigate(path, { replace: true });
     } else {
-      controller.getBoard().position(fen);
+      controller.getBoard().position(mainStore.getState().fen());
     }
   };
 
@@ -213,3 +170,10 @@ export function Navigate({ path }) {
     />
   );
 }
+
+export const ToggleEval = () => {
+  const toggle = useEvalStore((state) => state.toggle);
+  const onClick = () => toggle();
+
+  return <EditorButton label="eval" onClick={onClick} />;
+};

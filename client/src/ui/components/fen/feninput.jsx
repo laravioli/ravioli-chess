@@ -5,7 +5,7 @@ import { mainStore, useMainStore } from 'src/stores';
 import { controller } from 'src/logic';
 
 export const FenInput = () => {
-  const setFenFromInput = useMainStore((state) => state.setFenFromInput);
+  const setFen = useMainStore((state) => state.setFen);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export const FenInput = () => {
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
-      setFenFromInput(fen);
+      setFen(fen);
       controller.getBoard().position(mainStore.getState().fen(), true);
     }
   };

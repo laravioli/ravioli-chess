@@ -46,7 +46,7 @@ export const createFenSlice = (set, get) => ({
     set((state) => ({ castling: { ...state.castling, [id]: value } }));
   },
 
-  setFenFromInput(input) {
+  setFen(input) {
     const state = get();
     if (input !== state.fen() && state._isValidInput(input)) {
       const newstate = input.split(' ');
@@ -80,8 +80,8 @@ export const createFenSlice = (set, get) => ({
     }
   },
 
-  setFenSliceAnalyse() {
-    get().setFenFromInput(get().fenInputRef.current.value);
+  isFenAnalysable() {
+    get().setFen(get().fenInputRef.current.value);
     return get().isLegalFen;
   },
 
