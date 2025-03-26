@@ -1,8 +1,8 @@
 import { validateFen } from 'chess.js';
-import { Game } from '../../game/game';
-import { throttle, isEvalBetter } from '../../eval/util';
-import { CevalCtrl } from '../../eval/ctrl';
-import { engineSupported } from '../../eval/engine';
+import { Game } from '../lib/game/game';
+import { throttle, isEvalBetter } from 'src/logic/lib/eval/util';
+import { CevalCtrl } from 'src/logic/lib/eval/ctrl';
+import { engineSupported } from 'src/logic/lib/eval/engine';
 import { evalStore } from 'src/stores/';
 
 export class Analyse {

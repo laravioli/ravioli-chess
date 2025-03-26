@@ -1,6 +1,6 @@
-import { initSite } from './site/site';
-import { mainStore, evalStore } from '../stores';
-import { MainController } from './main/ctrl';
+import { initSite } from './modules/site/site';
+import { mainStore, evalStore } from 'src/stores';
+import { MainController } from './modules/main/ctrl';
 
 function getModuleUrl() {
   const url = new URL(window.location);
@@ -11,7 +11,6 @@ function getModuleUrl() {
 }
 
 function initModule() {
-  initSite();
   const storeApi = (store) => ({
     get: store.getState,
     set: store.setState,
@@ -22,4 +21,5 @@ function initModule() {
   return new MainController(moduleUrl, stores);
 }
 
+initSite();
 export const controller = initModule();

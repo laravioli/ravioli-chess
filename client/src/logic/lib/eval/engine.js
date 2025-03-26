@@ -70,7 +70,7 @@ export class StockfishWebEngine {
 
         req.open(
           'get',
-          `./static/frontend/src/logic/eval/stockfish/${nnueFilename}`,
+          `./static/frontend/src/logic/lib/eval/stockfish/${nnueFilename}`,
           true
         );
         req.responseType = 'arraybuffer';

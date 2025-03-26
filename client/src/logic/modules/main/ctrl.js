@@ -1,6 +1,6 @@
 import chessBoard from 'chessboard';
 import { DEFAULT_POSITION } from 'chess.js';
-import { Analyse } from './modules/analyse';
+import { Analyse } from '../analyse';
 
 export class MainController {
   constructor(mode, stores) {

@@ -29,4 +29,4 @@ eslint.config.js
 package-lock.json
 
 #stockfish
-src/logic/eval/stockfish/
+src/logic/lib/eval/stockfish/
