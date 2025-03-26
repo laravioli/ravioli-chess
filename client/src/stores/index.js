@@ -17,10 +17,38 @@ export const evalStore = createStore(
       }),
       {
         name: 'eval-storage',
+        onRehydrateStorage: (state) => {
+          console.log('hydration starts', state);
+
+          // optional
+          return (state, error) => {
+            if (error) {
+              console.log('an error happened during hydration', error);
+            } else {
+              console.log('hydration finished', state);
+            }
+          };
+        },
       }
     )
   )
 );
+
+export const withStorageDOMEvents = (store) => {
+  const storageEventCallback = (e) => {
+    if (e.key === store.persist.getOptions().name && e.newValue) {
+      store.persist.rehydrate();
+    }
+  };
+
+  window.addEventListener('storage', storageEventCallback);
+
+  return () => {
+    window.removeEventListener('storage', storageEventCallback);
+  };
+};
+
+withStorageDOMEvents(evalStore);
 
 export const mainStore = createStore(
   subscribeWithSelector((...a) => ({

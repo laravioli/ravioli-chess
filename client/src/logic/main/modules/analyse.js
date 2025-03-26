@@ -62,6 +62,9 @@ export class Analyse {
         (disable) => {
           this.ceval.enabled(!disable);
           this.restartCeval();
+        },
+        {
+          fireImmediately: true,
         }
       );
     }
