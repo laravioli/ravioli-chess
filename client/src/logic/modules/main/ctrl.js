@@ -3,74 +3,79 @@ import { DEFAULT_POSITION } from 'chess.js';
 import { Analyse } from '../analyse';
 
 export class MainController {
-  constructor(mode, stores) {
-    window.ctrl = this;
-    this.mode = mode;
+  constructor(moduleName, stores) {
+    //window.controller = this;
     this.stores = stores;
-    this.#selectCtrl(mode, { fen: DEFAULT_POSITION, stores: stores });
+    this.#selectModule({
+      name: moduleName,
+      fen: DEFAULT_POSITION,
+      stores: stores,
+    });
   }
 
-  setMode(mode, initalFen = DEFAULT_POSITION) {
-    if (this.mode !== mode) {
-      this.#activateCtrl(mode, { fen: initalFen, stores: this.stores });
-      this.mode = mode;
-      this.stores.ui.set({ mode: mode });
+  setModule(moduleName, fen = DEFAULT_POSITION) {
+    if (this.module.name !== moduleName) {
+      this.#activateModule(moduleName, {
+        name: moduleName,
+        fen: fen,
+        stores: this.stores,
+      });
     }
   }
 
   getGame() {
-    return this.ctrl?.game;
+    return this.module?.game;
   }
 
   newGame(fen) {
-    this.ctrl?.newGame(fen);
+    this.module?.newGame(fen);
   }
 
   getBoard() {
-    return this.ctrl?.board;
+    return this.module?.board;
   }
 
   setBoard(div) {
-    if (this.ctrl.board) this.destroyBoard();
-    this.ctrl.setBoard(chessBoard(div, this.ctrl.makeboardCfg()));
-    window.addEventListener('resize', this.ctrl.board.resize);
+    if (this.module.board) this.destroyBoard();
+    this.module.setBoard(chessBoard(div, this.module.makeboardCfg()));
+    window.addEventListener('resize', this.module.board.resize);
   }
 
   destroyBoard() {
-    window.removeEventListener('resize', this.ctrl.board.resize);
-    this.ctrl.board.destroy();
-    this.ctrl.setBoard(undefined);
+    window.removeEventListener('resize', this.module.board.resize);
+    this.module.board.destroy();
+    this.module.setBoard(undefined);
   }
 
   jump(action) {
-    this.ctrl?.jump(action);
+    this.module?.jump(action);
   }
 
-  #activateCtrl(mode, info) {
+  #activateModule(moduleName, info) {
     if (
-      (this.mode === 'editor' && mode === 'analysis') ||
-      (this.mode === 'analysis' && mode === 'editor')
+      (this.module.name === 'editor' && moduleName === 'analysis') ||
+      (this.module.name === 'analysis' && moduleName === 'editor')
     ) {
-      this.ctrl.updateStatus(mode, info.fen);
+      this.module.updateStatus(moduleName, info.fen);
     } else {
-      this.#selectCtrl(mode, info);
+      this.#selectModule(moduleName, info);
     }
   }
 
-  #selectCtrl(mode, info) {
-    this.ctrl?.destroyBoard();
-    const make = this.#makeCtrl(mode);
-    this.ctrl = make(info);
+  #selectModule({ name, fen, stores }) {
+    this.module?.destroyBoard();
+    const make = this.#makeModule(name);
+    this.module = make({ name, fen, stores });
   }
 
-  #makeCtrl(mode) {
+  #makeModule(name) {
     const controllers = [
       {
-        mode: 'analysis',
+        name: 'analysis',
         make: (info) => new Analyse(this, info),
       },
       {
-        mode: 'editor',
+        name: 'editor',
         make: (info) => {
           const module = new Analyse(this, info);
           module.updateStatus('editor', info.fen);
@@ -78,7 +83,7 @@ export class MainController {
         },
       },
     ];
-    const selected = controllers.find((ctrl) => ctrl.mode === mode);
+    const selected = controllers.find((module) => module.name === name);
     return selected.make;
   }
 }

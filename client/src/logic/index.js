@@ -10,7 +10,7 @@ function getModuleUrl() {
   );
 }
 
-function initModule() {
+function initController() {
   const storeApi = (store) => ({
     get: store.getState,
     set: store.setState,
@@ -18,8 +18,13 @@ function initModule() {
   });
   const stores = { ui: storeApi(mainStore), eval: storeApi(evalStore) };
   const moduleUrl = getModuleUrl();
-  return new MainController(moduleUrl, stores);
+  const controller = new MainController(moduleUrl, stores);
+  return {
+    getModule: () => controller.module,
+    setModule: (moduleName, fen) => controller.setModule(moduleName, fen),
+  };
 }
 
 initSite();
-export const controller = initModule();
+
+export const { getModule, setModule } = initController();

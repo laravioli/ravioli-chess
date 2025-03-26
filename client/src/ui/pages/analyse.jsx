@@ -8,8 +8,8 @@ import {
   Buttons,
   StartButton,
   FlipButton,
-  ToggleEval,
 } from '../components/toolbar/actions';
+import { ToggleEval } from '../components/toolbar/eval';
 import { History } from '../components/toolbar/history';
 
 export function Analyse() {
@@ -18,6 +18,7 @@ export function Analyse() {
       <Board />
       <FenInput />
       <div className="toolbar">
+        <ToggleEval />
         <div className="fen-controls">
           <TurnToPlay />
           <CastlingBoxes />
@@ -27,7 +28,6 @@ export function Analyse() {
         <Buttons>
           <StartButton />
           <FlipButton />
-          <ToggleEval />
         </Buttons>
         <History />
       </div>
