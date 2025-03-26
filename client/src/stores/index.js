@@ -7,34 +7,20 @@ import { recommendedThreads } from 'src/logic/eval/engine';
 export const evalStore = createStore(
   subscribeWithSelector(
     persist(
-      (set) => ({
-        disable: true,
+      () => ({
         multipv: 1,
         searchms: 3000,
         threads: recommendedThreads(),
         hashsize: 16,
-        toggle: () => set((state) => ({ disable: !state.disable })),
       }),
       {
         name: 'eval-storage',
-        onRehydrateStorage: (state) => {
-          console.log('hydration starts', state);
-
-          // optional
-          return (state, error) => {
-            if (error) {
-              console.log('an error happened during hydration', error);
-            } else {
-              console.log('hydration finished', state);
-            }
-          };
-        },
       }
     )
   )
 );
 
-export const withStorageDOMEvents = (store) => {
+const withStorageDOMEvents = (store) => {
   const storageEventCallback = (e) => {
     if (e.key === store.persist.getOptions().name && e.newValue) {
       store.persist.rehydrate();

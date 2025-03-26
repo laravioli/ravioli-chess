@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
-import { mainStore, useMainStore, useEvalStore } from 'src/stores';
+import { mainStore, useMainStore, evalStore } from 'src/stores';
 import { controller } from 'src/logic';
 import { useInitData } from 'src/ui/context';
 import { short_fen } from './utils';
@@ -172,8 +172,29 @@ export function Navigate({ path }) {
 }
 
 export const ToggleEval = () => {
-  const toggle = useEvalStore((state) => state.toggle);
-  const onClick = () => toggle();
+  const [enabled, setEnabled] = useState(controller.ctrl.ceval.enabled());
 
-  return <EditorButton label="eval" onClick={onClick} />;
+  const isTab = useCallback(() => {
+    const sri = evalStore.getState().sri;
+    return window.site.sri == sri;
+  }, []);
+
+  const onClick = () => {
+    controller.ctrl.toggleCeval?.();
+    setEnabled(controller.ctrl.ceval.enabled());
+  };
+
+  useEffect(() => {
+    const unsub = evalStore.subscribe(
+      (state) => state.disable,
+      () => {
+        if (enabled && !isTab()) {
+          onClick();
+        }
+      }
+    );
+    return unsub;
+  }, [enabled, isTab]);
+
+  return <EditorButton label={enabled.toString()} onClick={onClick} />;
 };

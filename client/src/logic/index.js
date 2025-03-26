@@ -1,3 +1,4 @@
+import { initSite } from './site/site';
 import { mainStore, evalStore } from '../stores';
 import { MainController } from './main/ctrl';
 
@@ -10,6 +11,7 @@ function getModuleUrl() {
 }
 
 function initModule() {
+  initSite();
   const storeApi = (store) => ({
     get: store.getState,
     set: store.setState,

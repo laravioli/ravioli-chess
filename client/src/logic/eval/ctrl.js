@@ -3,20 +3,19 @@ import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
 import { evalStore } from 'src/stores';
 
-/*const cevalDisabledSentinel = '1';
+const cevalDisabledSentinel = '1';
 
 function enabledAfterDisable() {
-  const enabledAfter = tempStorage.get('ceval.enabled-after');
-  const disable = storage.get('ceval.disable') || cevalDisabledSentinel;
-  return enabledAfter === disable;
-}*/
+  const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
+  const disable = evalStore.getState().disable || cevalDisabledSentinel;
+  return enabledAfter == disable;
+}
 
 //possible : does browser support engine
 //allowed : does engine is allowed to run
 //active : does engine is instanciate (worker)
 //enabled : does the button enabled is on or off (mainly to handle tabs)
 
-//todo add tabs handling with session storage and toggle
 export class CevalCtrl {
   storedPv = () => evalStore.getState().multipv;
   storedMovetime = () => evalStore.getState().searchms;
@@ -34,19 +33,23 @@ export class CevalCtrl {
   }
 
   init(opts) {
+    window.clienteval = this;
     this.opts = opts;
     this.possible = this.opts.possible;
     this.analysable = validateFen(this.opts.initialFen).ok;
     this.enabled = toggle(
-      this.possible && this.analysable && this.allowed() && false
-    ); //+tabs);
+      this.possible &&
+        this.analysable &&
+        this.allowed() &&
+        enabledAfterDisable()
+    );
   }
 
   onEmit = throttle(200, (ev, work) => {
     this.sortPvsInPlace(ev.pvs, work.ply % 2 ? 'white' : 'black');
 
     this.curEval = ev;
-    this.opts.emit(ev); //this is where i use ev to set ui => see note*
+    this.opts.emit(ev);
     /*if (ev.fen !== this.lastEmitFen && enabledAfterDisable()) {
       // amnesty while auto disable not processed
       this.lastEmitFen = ev.fen;
@@ -54,13 +57,16 @@ export class CevalCtrl {
     }*/
   });
 
-  //create a game with game id(undefined for analyse) and initial fen, attach history to it
-  //with a path(point to a stack, and step => the tab)
-  //path could be usefull with on emit(save analyse on right node)
-
   doStart = (steps, gameId) => {
-    if (!this.enabled() || !this.possible /*|| !enabledAfterDisable()*/) return;
+    if (!this.enabled() || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
+
+    evalStore.setState({ sri: window.site.sri, disable: Math.random() });
+    window.sessionStorage.setItem(
+      'ceval.enabled-after',
+      evalStore.getState().disable
+    );
+
     if (
       'movetime' in this.search.by &&
       (step.ceval?.millis ?? 0) >= this.search.by.movetime
@@ -90,10 +96,6 @@ export class CevalCtrl {
       const s = steps[i];
       work.moves.push(s.uci);
     }
-
-    // Notify all other tabs to disable ceval.
-    /*storage.fire('ceval.disable');
-      tempStorage.set('ceval.enabled-after', storage.get('ceval.disable')!);*/
 
     if (!this.worker) this.worker = makeEngine();
 
@@ -165,20 +167,15 @@ export class CevalCtrl {
   toggle = () => {
     if (!this.possible || !this.allowed()) return;
     this.stop();
-    if (!this.enabled()) {
+    if (!this.enabled() && !document.hidden) {
+      const disable = evalStore.getState().disable || cevalDisabledSentinel;
+      if (disable)
+        window.sessionStorage.setItem('ceval.enabled-after', disable);
       this.enabled(true);
     } else {
+      window.sessionStorage.setItem('ceval.enabled-after', '');
       this.enabled(false);
     }
-    /*if (!this.enabled() && !document.hidden) {
-      const disable = storage.get('ceval.disable') || cevalDisabledSentinel;
-      if (disable) tempStorage.set('ceval.enabled-after', disable);
-      this.enabled(true);
-    } else {
-      tempStorage.set('ceval.enabled-after', '');
-      this.enabled(false);
-      this.download = undefined;
-    }*/
   };
 
   lastEmitFen = null;

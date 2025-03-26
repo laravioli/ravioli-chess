@@ -59,10 +59,7 @@ export class Analyse {
       this.ceval = new CevalCtrl(opts);
       evalStore.subscribe(
         (state) => state.disable,
-        (disable) => {
-          this.ceval.enabled(!disable);
-          this.restartCeval();
-        },
+        () => {},
         {
           fireImmediately: true,
         }
