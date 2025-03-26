@@ -2,41 +2,6 @@ import { CevalState, toggle, throttle, clamp, povChances } from './util';
 import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
 import { evalStore } from 'src/stores';
-/*TYPESCRIPT TYPE
-type WinningChances = number;
-type SearchBy =
-  | { movetime: number }
-  | { depth: number }
-  | { nodes: number };
-type Search = { by: SearchBy; multiPv: number; indeterminate?: boolean };
-
-type interface Work {
-  variant: VariantKey;
-  threads: number;
-  hashSize: number | undefined;
-  gameId: string | undefined; // send ucinewgame when changed
-  stopRequested: boolean;
-
-  path: string;
-  search: SearchBy;
-  multiPv: number;
-  ply: number;
-  threatMode: boolean;
-  initialFen: string;
-  currentFen: string;
-  moves: string[];
-  emit: (ev: Tree.LocalEval) => void;
-  }
-
-  interface CevalOpts {
-    possible: boolean; => zustand possible(getter)
-    initialFen: string | undefined; => zustand get fen()
-    emit: (ev: Tree.LocalEval, meta: EvalMeta) => void;
-    search?: Search;
-  }
-*/
-//
-//Code
 
 /*const cevalDisabledSentinel = '1';
 
