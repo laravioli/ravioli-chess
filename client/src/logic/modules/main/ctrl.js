@@ -1,16 +1,18 @@
 import { DEFAULT_POSITION } from 'chess.js';
 import { Analyse } from '../analyse';
+import { Editor } from '../editor';
 
 //todo : check function arguments (change how function pass arguments)
 //explore how the controller api could be implemented
 //separe editor from analyse
 export class MainController {
-  constructor(name, stores) {
+  constructor(name, store) {
     window.controller = this;
-    this.stores = stores;
-    this.#selectModule(name, {
+    this.store = store;
+    this.loader = this.#makeLoader().bind(this);
+    this.loader(name, {
       fen: DEFAULT_POSITION,
-      stores: stores,
+      store: store,
     });
   }
 
@@ -18,47 +20,41 @@ export class MainController {
     console.log('try set module');
     if (this.module.name !== moduleName) {
       console.log('effectively change module');
-      this.#activateModule(moduleName, {
+      this.loader(moduleName, {
         fen: fen,
-        stores: this.stores,
+        store: this.store,
       });
     }
   }
 
-  #activateModule(name, info) {
-    if (
-      (this.module.name === 'editor' && name === 'analysis') ||
-      (this.module.name === 'analysis' && name === 'editor')
-    ) {
-      this.module.updateStatus(name, info.fen);
-    } else {
-      this.#selectModule(name, info);
-    }
-  }
-
-  #selectModule(name, info) {
-    if (!this.module) console.log('initial module settings');
-    this.module?.destroyBoard();
-    const make = this.#moduleMaker(name);
-    this.module = make({ name, ...info });
-  }
-
-  #moduleMaker(name) {
-    const controllers = [
+  #makeLoader() {
+    const modules = [
       {
         name: 'analysis',
-        make: (info) => new Analyse(this, info),
+        loaded: undefined,
+        make: (info) => new Analyse(info),
       },
       {
         name: 'editor',
-        make: (info) => {
-          const module = new Analyse(this, info);
-          module.updateStatus('editor', info.fen);
-          return module;
-        },
+        loaded: undefined,
+        make: (info) => new Editor(info),
       },
     ];
-    const selected = controllers.find((maker) => maker.name === name);
-    return selected.make;
+
+    return function (name, info) {
+      const module = modules.find((mod) => mod.name === name);
+      try {
+        if (!module.loaded) {
+          module.loaded = module.make({ name, ...info });
+        } else {
+          module.loaded.onLoad(info.fen);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        if (this.module) this.module.onUnLoad();
+        this.module = module.loaded;
+      }
+    };
   }
 }

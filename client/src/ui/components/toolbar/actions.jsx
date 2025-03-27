@@ -21,9 +21,9 @@ const TestButton = ({ label, style = {} }) => {
 
 const test = (module) => {
   console.log('board ' + module.getBoard().fen());
-  console.log('chess ' + module.getGame()?.fen());
+  console.log('chess ' + module.getGame?.().fen());
   console.log('fen ' + mainStore.getState().fen());
-  console.log('current move', module.getGame()?.currentMove);
+  console.log('current move', module.getGame?.().currentMove);
 };
 //------------------------//
 
@@ -95,7 +95,7 @@ export const Position = () => {
   const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen && fen != mainStore.getState().fen()) {
-      module.newGame(fen);
+      module.newGame?.(fen);
       module.getBoard().position(fen, true);
       setFen(fen);
     } else {
@@ -118,7 +118,7 @@ export const StartButton = () => {
   const resetFen = useMainStore((state) => state.resetFen);
 
   const onStart = () => {
-    module.newGame(DEFAULT_POSITION);
+    module.newGame?.(DEFAULT_POSITION);
     module.getBoard().start();
     resetFen(true);
   };

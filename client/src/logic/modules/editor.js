@@ -1,24 +1,43 @@
+import chessBoard from 'chessboard';
 import { validateFen } from 'chess.js';
 
 export class Editor {
-  constructor(opts) {
-    this.initialFen = opts.fen;
-    this.store = opts.store;
+  constructor(info) {
+    this.name = info.name;
+    this.initialFen = info.fen;
+    this.store = info.store;
   }
 
-  onLoad = (opts) => {
-    this.initialFen = opts.fen;
-    this.setBoardCfg();
-  };
+  onLoad(fen) {
+    this.initialFen = fen;
+  }
 
-  setBoardCfg = () => {
-    const config = {
+  onUnLoad() {}
+
+  getBoard() {
+    return this.board;
+  }
+
+  setBoard(div) {
+    if (this.board) this.destroyBoard();
+    this.board = chessBoard(div, this.makeBoardCfg());
+    window.addEventListener('resize', this.board.resize);
+  }
+
+  destroyBoard() {
+    window.removeEventListener('resize', this.board.resize);
+    this.board.destroy();
+    this.board = undefined;
+  }
+
+  makeBoardCfg = () => {
+    return {
+      pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
       position: this.initialFen,
       draggable: true,
       dropOffBoard: 'trash',
       sparePieces: true,
       hideSparePieces: false,
-      onDragStart: () => {},
       onDrop: (s, t, p, newPos) => {
         this.store.set({
           fenPosition: this.board.objToFen(newPos),
@@ -27,10 +46,6 @@ export class Editor {
           isLegalFen: validateFen(this.store.get().fen()).ok,
         });
       },
-      onSnapEnd: () => {},
     };
-    this.store.set((state) => ({
-      config: { ...state.config, ...config },
-    }));
   };
 }

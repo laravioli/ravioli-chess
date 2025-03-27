@@ -1,5 +1,5 @@
 import { initSite } from './modules/site/site';
-import { mainStore, evalStore } from 'src/stores';
+import { mainStore } from 'src/stores';
 import { MainController } from './modules/main/ctrl';
 
 function initController() {
@@ -14,9 +14,9 @@ function initController() {
     set: store.setState,
     subscribe: store.subscribe,
   });
-  const stores = { ui: storeApi(mainStore), eval: storeApi(evalStore) };
+  const store = storeApi(mainStore);
   const moduleUrl = getModuleUrl(new URL(window.location));
-  const controller = new MainController(moduleUrl, stores);
+  const controller = new MainController(moduleUrl, store);
   return {
     getModule: () => controller.module,
     setModule: (moduleName, fen) => controller.setModule(moduleName, fen),

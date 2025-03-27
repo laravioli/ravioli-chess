@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useLocation } from 'react-router';
 import { ModuleContext } from './hooks';
 import { controller } from 'src/logic';
@@ -10,15 +10,15 @@ export const ModuleProvider = ({ children }) => {
 
   if (!moduleRef.current) {
     moduleRef.current = controller.getModule();
-  }
-
-  useEffect(() => {
+    window.addEventListener('popstate', (event) => console.log(event));
+  } else {
     const moduleUrl = controller.getModuleUrl(location);
     if (moduleUrl !== controller.getModule().name) {
       controller.setModule(moduleUrl, mainStore.getState().fen());
       moduleRef.current = controller.getModule();
     }
-  }, [location]);
+  }
+
   return (
     <ModuleContext.Provider value={moduleRef.current}>
       {children}
