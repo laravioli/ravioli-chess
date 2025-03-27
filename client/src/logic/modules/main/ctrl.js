@@ -1,4 +1,3 @@
-import chessBoard from 'chessboard';
 import { DEFAULT_POSITION } from 'chess.js';
 import { Analyse } from '../analyse';
 
@@ -16,40 +15,14 @@ export class MainController {
   }
 
   setModule(moduleName, fen = DEFAULT_POSITION) {
+    console.log('try set module');
     if (this.module.name !== moduleName) {
+      console.log('effectively change module');
       this.#activateModule(moduleName, {
         fen: fen,
         stores: this.stores,
       });
     }
-  }
-
-  getGame() {
-    return this.module?.game;
-  }
-
-  newGame(fen) {
-    this.module?.newGame(fen);
-  }
-
-  getBoard() {
-    return this.module?.board;
-  }
-
-  setBoard(div) {
-    if (this.module.board) this.destroyBoard();
-    this.module.setBoard(chessBoard(div, this.module.makeboardCfg()));
-    window.addEventListener('resize', this.module.board.resize);
-  }
-
-  destroyBoard() {
-    window.removeEventListener('resize', this.module.board.resize);
-    this.module.board.destroy();
-    this.module.setBoard(undefined);
-  }
-
-  jump(action) {
-    this.module?.jump(action);
   }
 
   #activateModule(name, info) {
@@ -64,6 +37,7 @@ export class MainController {
   }
 
   #selectModule(name, info) {
+    if (!this.module) console.log('initial module settings');
     this.module?.destroyBoard();
     const make = this.#moduleMaker(name);
     this.module = make({ name, ...info });

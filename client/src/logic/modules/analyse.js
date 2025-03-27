@@ -19,6 +19,10 @@ export class Analyse {
 
   /*----------GAME----------*/
 
+  getGame() {
+    return this.game;
+  }
+
   clear() {
     this.game = undefined;
   }

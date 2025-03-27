@@ -2,9 +2,10 @@ import { TextInput } from '@mantine/core';
 import styles from './fen.module.css';
 import { useRef, useEffect } from 'react';
 import { mainStore, useMainStore } from 'src/stores';
-import { getModule } from 'src/logic';
+import { useModule } from 'src/ui/context/hooks.js';
 
 export const FenInput = () => {
+  const module = useModule();
   const setFen = useMainStore((state) => state.setFen);
   const inputRef = useRef(null);
 
@@ -26,7 +27,7 @@ export const FenInput = () => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
       setFen(fen);
-      getModule().getBoard().position(mainStore.getState().fen(), true);
+      module.getBoard().position(mainStore.getState().fen(), true);
     }
   };
 
@@ -39,7 +40,7 @@ export const FenInput = () => {
       variant="filled"
       radius="xs"
       onKeyDown={onKeyDown}
-      disabled={getModule().name !== 'editor'}
+      disabled={module.name !== 'editor'}
       classNames={{ input: styles.input }}
     />
   );

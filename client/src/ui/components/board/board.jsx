@@ -1,14 +1,15 @@
 import { useRef, useEffect } from 'react';
-import { getModule } from 'src/logic';
-
+import { useModule } from 'src/ui/context/hooks.js';
 export function Board() {
   const divRef = useRef(null);
+  const module = useModule();
+
   useEffect(() => {
-    getModule().setBoard(divRef.current);
+    module.setBoard(divRef.current);
     return () => {
-      getModule().destroyBoard();
+      module.destroyBoard();
     };
-  }, []);
+  }, [module]);
 
   return <div className="board" ref={divRef} />;
 }
