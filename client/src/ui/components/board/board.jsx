@@ -1,12 +1,12 @@
 import { useRef, useEffect } from 'react';
-import { controller } from 'src/logic';
+import { getModule } from 'src/logic';
 
 export function Board() {
   const divRef = useRef(null);
   useEffect(() => {
-    controller.setBoard(divRef.current);
+    getModule().setBoard(divRef.current);
     return () => {
-      controller.destroyBoard();
+      getModule().destroyBoard();
     };
   }, []);
 

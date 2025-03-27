@@ -1,7 +1,7 @@
 import { NativeSelect } from '@mantine/core';
 import styles from './fen.module.css';
 import { useMainStore } from 'src/stores';
-import { controller } from 'src/logic';
+import { getModule } from 'src/logic';
 
 export const TurnToPlay = () => {
   const turn = useMainStore((state) => state.turn);
@@ -21,7 +21,7 @@ export const TurnToPlay = () => {
       onChange={onChange}
       data={data}
       classNames={{ wrapper: styles.wrapper }}
-      disabled={controller.mode !== 'editor'}
+      disabled={getModule().mode !== 'editor'}
     />
   );
 };

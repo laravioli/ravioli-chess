@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router';
 import { Button, NativeSelect } from '@mantine/core';
 import styles from './toolbar.module.css';
 import { mainStore, useMainStore } from 'src/stores';
-import { controller } from 'src/logic';
-import { useInitData } from 'src/ui/context';
+import { getModule, setModule } from 'src/logic';
+import { useInitData } from 'src/ui/context/data.js';
 import { short_fen } from './utils';
 import { DEFAULT_POSITION } from 'chess.js';
 
@@ -17,10 +17,10 @@ const TestButton = ({ label, onTest, style = {} }) => {
 };
 
 const test = () => {
-  console.log('board ' + controller.getBoard().fen());
-  console.log('chess ' + controller.getGame()?.fen());
+  console.log('board ' + getModule().getBoard().fen());
+  console.log('chess ' + getModule().getGame()?.fen());
   console.log('fen ' + mainStore.getState().fen());
-  console.log('current move', controller.getGame()?.currentMove);
+  console.log('current move', getModule().getGame()?.currentMove);
 };
 //------------------------//
 
@@ -91,8 +91,8 @@ export const Position = () => {
   const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen && fen != mainStore.getState().fen()) {
-      controller.newGame(fen);
-      controller.getBoard().position(fen, true);
+      getModule().newGame(fen);
+      getModule().getBoard().position(fen, true);
       setFen(fen);
     } else {
       setValue(fen);
@@ -113,8 +113,8 @@ export const StartButton = () => {
   const resetFen = useMainStore((state) => state.resetFen);
 
   const onStart = () => {
-    controller.newGame(DEFAULT_POSITION);
-    controller.getBoard().start();
+    getModule().newGame(DEFAULT_POSITION);
+    getModule().getBoard().start();
     resetFen(true);
   };
 
@@ -125,7 +125,7 @@ export const ClearButton = () => {
   const resetFen = useMainStore((state) => state.resetFen);
 
   const onClear = () => {
-    controller.getBoard().clear();
+    getModule().getBoard().clear();
     resetFen(false);
   };
 
@@ -133,13 +133,13 @@ export const ClearButton = () => {
     <EditorButton
       label="clear board"
       onClick={onClear}
-      isDisabled={controller.mode !== 'editor'}
+      isDisabled={getModule().mode !== 'editor'}
     />
   );
 };
 
 export const FlipButton = () => {
-  const onFlip = () => controller.getBoard().flip();
+  const onFlip = () => getModule().getBoard().flip();
 
   return <EditorButton label="flip board" onClick={onFlip} />;
 };
@@ -154,10 +154,10 @@ export function Navigate({ path }) {
 
   const onClick = () => {
     if (isFenAnalysable()) {
-      controller.setMode(path.slice(1), mainStore.getState().fen());
+      setModule(path.slice(1), mainStore.getState().fen());
       navigate(path, { replace: true });
     } else {
-      controller.getBoard().position(mainStore.getState().fen());
+      getModule().getBoard().position(mainStore.getState().fen());
     }
   };
 

@@ -1,12 +1,13 @@
+import chessBoard from 'chessboard';
 import { validateFen } from 'chess.js';
 import { Game } from '../lib/game/game';
 import { throttle, isEvalBetter } from 'src/logic/lib/eval/util';
 import { CevalCtrl } from 'src/logic/lib/eval/ctrl';
 import { engineSupported } from 'src/logic/lib/eval/engine';
-import { evalStore } from 'src/stores/';
 
 export class Analyse {
   constructor(ctrl, info) {
+    this.name = info.name;
     this.controller = ctrl;
     this.initialFen = info.fen;
     this.stores = info.stores;
@@ -15,6 +16,8 @@ export class Analyse {
     this.initCeval();
     this.startCeval();
   }
+
+  /*----------GAME----------*/
 
   clear() {
     this.game = undefined;
@@ -31,6 +34,7 @@ export class Analyse {
 
   updateStatus(status, fen) {
     this.status = status;
+    this.name = status;
     status === 'analysis' ? this.newGame(fen) : this.clear();
     this.initialFen = fen;
   }
@@ -46,6 +50,8 @@ export class Analyse {
     this.setFen();
   }
 
+  /*----------EVAL----------*/
+
   initCeval() {
     const opts = {
       initialFen: this.initialFen,
@@ -57,13 +63,6 @@ export class Analyse {
     if (this.ceval) this.ceval.setOpts(opts);
     else {
       this.ceval = new CevalCtrl(opts);
-      evalStore.subscribe(
-        (state) => state.disable,
-        () => {},
-        {
-          fireImmediately: true,
-        }
-      );
     }
   }
 
@@ -95,9 +94,7 @@ export class Analyse {
 
   getCeval = () => this.ceval;
 
-  setBoard(board) {
-    this.board = board;
-  }
+  /*----------STORE----------*/
 
   setFen() {
     const castlingRights =
@@ -116,6 +113,25 @@ export class Analyse {
       fullmove: this.game.moveNumber(),
     }));
   }
+
+  /*----------BOARD----------*/
+
+  getBoard() {
+    return this.board;
+  }
+
+  setBoard(div) {
+    if (this.board) this.destroyBoard();
+    this.board = chessBoard(div, this.makeboardCfg());
+    window.addEventListener('resize', this.board.resize);
+  }
+
+  destroyBoard() {
+    window.removeEventListener('resize', this.board.resize);
+    this.board.destroy();
+    this.board = undefined;
+  }
+
   makeboardCfg = () => {
     const boardConfig = new Map([
       [

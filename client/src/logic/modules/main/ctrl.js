@@ -2,12 +2,14 @@ import chessBoard from 'chessboard';
 import { DEFAULT_POSITION } from 'chess.js';
 import { Analyse } from '../analyse';
 
+//todo : check function arguments (change how function pass arguments)
+//explore how the controller api could be implemented
+//separe editor from analyse
 export class MainController {
-  constructor(moduleName, stores) {
-    //window.controller = this;
+  constructor(name, stores) {
+    window.controller = this;
     this.stores = stores;
-    this.#selectModule({
-      name: moduleName,
+    this.#selectModule(name, {
       fen: DEFAULT_POSITION,
       stores: stores,
     });
@@ -16,7 +18,6 @@ export class MainController {
   setModule(moduleName, fen = DEFAULT_POSITION) {
     if (this.module.name !== moduleName) {
       this.#activateModule(moduleName, {
-        name: moduleName,
         fen: fen,
         stores: this.stores,
       });
@@ -51,24 +52,24 @@ export class MainController {
     this.module?.jump(action);
   }
 
-  #activateModule(moduleName, info) {
+  #activateModule(name, info) {
     if (
-      (this.module.name === 'editor' && moduleName === 'analysis') ||
-      (this.module.name === 'analysis' && moduleName === 'editor')
+      (this.module.name === 'editor' && name === 'analysis') ||
+      (this.module.name === 'analysis' && name === 'editor')
     ) {
-      this.module.updateStatus(moduleName, info.fen);
+      this.module.updateStatus(name, info.fen);
     } else {
-      this.#selectModule(moduleName, info);
+      this.#selectModule(name, info);
     }
   }
 
-  #selectModule({ name, fen, stores }) {
+  #selectModule(name, info) {
     this.module?.destroyBoard();
-    const make = this.#makeModule(name);
-    this.module = make({ name, fen, stores });
+    const make = this.#moduleMaker(name);
+    this.module = make({ name, ...info });
   }
 
-  #makeModule(name) {
+  #moduleMaker(name) {
     const controllers = [
       {
         name: 'analysis',
@@ -83,7 +84,7 @@ export class MainController {
         },
       },
     ];
-    const selected = controllers.find((module) => module.name === name);
+    const selected = controllers.find((maker) => maker.name === name);
     return selected.make;
   }
 }

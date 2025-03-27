@@ -5,7 +5,7 @@ import {
   IconChevronsRight,
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
-import { controller } from 'src/logic';
+import { getModule } from 'src/logic';
 
 export const History = () => {
   return (
@@ -13,28 +13,28 @@ export const History = () => {
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => controller.jump('start')}>
+        onClick={() => getModule().jump('start')}>
         <IconChevronsLeft size={40} stroke={1.5} />
       </ActionIcon>
 
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => controller.jump('undo')}>
+        onClick={() => getModule().jump('undo')}>
         <IconChevronLeft size={40} stroke={1.5} />
       </ActionIcon>
 
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => controller.jump('redo')}>
+        onClick={() => getModule().jump('redo')}>
         <IconChevronRight size={40} stroke={1.5} />
       </ActionIcon>
 
       <ActionIcon
         variant="default"
         size="lg"
-        onClick={() => controller.jump('end')}>
+        onClick={() => getModule().jump('end')}>
         <IconChevronsRight size={40} stroke={1.5} />
       </ActionIcon>
     </Group>

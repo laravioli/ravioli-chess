@@ -1,11 +1,11 @@
-import { controller } from 'src/logic';
+import { getModule } from 'src/logic';
 import { evalStore } from 'src/stores';
 import { useState, useEffect, useCallback } from 'react';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
 export const ToggleEval = () => {
-  const [checked, setChecked] = useState(controller.ctrl.ceval.enabled());
+  const [checked, setChecked] = useState(getModule().ceval.enabled());
 
   const isTab = useCallback(() => {
     const sri = evalStore.getState().sri;
@@ -13,8 +13,8 @@ export const ToggleEval = () => {
   }, []);
 
   const onClick = () => {
-    controller.ctrl.toggleCeval?.();
-    setChecked(controller.ctrl.ceval.enabled());
+    getModule().toggleCeval?.();
+    setChecked(getModule().ceval.enabled());
   };
 
   useEffect(() => {

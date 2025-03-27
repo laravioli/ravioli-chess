@@ -1,7 +1,7 @@
 import { Board } from '../components/board/board';
 import { FenInput } from '../components/fen/feninput';
 import { TurnToPlay } from '../components/fen/turn';
-import { CastlingBoxes } from '../components/fen/fencontrols';
+import { CastlingBoxes } from '../components/fen/castlings';
 import {
   Position,
   Navigate,
