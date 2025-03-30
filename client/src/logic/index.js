@@ -29,8 +29,8 @@ function makeController() {
   );
 
   return {
-    getModule: (url) => {
-      const id = match(url.pathname);
+    getModule: (path) => {
+      const id = match(path);
       return controller.getModule(id);
     },
     setModule: (path, fen) => {
