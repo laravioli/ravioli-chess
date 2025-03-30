@@ -5,7 +5,7 @@ import { useModule } from 'src/ui/context/hooks.js';
 
 export const CastlingBoxes = () => {
   const module = useModule();
-  const disabled = module.name !== 'editor';
+  const disabled = !!module.game;
 
   return (
     <>

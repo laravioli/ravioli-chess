@@ -40,7 +40,7 @@ export const FenInput = () => {
       variant="filled"
       radius="xs"
       onKeyDown={onKeyDown}
-      disabled={module.name !== 'editor'}
+      disabled={!!module.game}
       classNames={{ input: styles.input }}
     />
   );

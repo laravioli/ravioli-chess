@@ -5,11 +5,10 @@ import { CevalCtrl } from 'src/logic/lib/eval/ctrl';
 import { engineSupported } from 'src/logic/lib/eval/engine';
 
 export class Analyse {
-  constructor(info) {
-    this.name = info.name;
-    this.initialFen = info.fen;
-    this.store = info.store;
-    this.game = new Game(info.fen);
+  constructor(opts) {
+    this.initialFen = opts.fen;
+    this.store = opts.store;
+    this.game = new Game(opts.fen);
     this.initCeval();
     this.startCeval();
   }
@@ -80,7 +79,6 @@ export class Analyse {
 
   restartCeval() {
     this.ceval?.stop();
-    console.log('yo im eval');
     this.startCeval();
   }
 

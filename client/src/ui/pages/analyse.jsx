@@ -13,7 +13,6 @@ import { ToggleEval } from '../components/toolbar/eval';
 import { History } from '../components/toolbar/history';
 
 export function Analyse() {
-  console.log('start rendering analysis');
   return (
     <div className="main-wrap">
       <Board />

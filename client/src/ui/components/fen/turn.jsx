@@ -22,7 +22,7 @@ export const TurnToPlay = () => {
       onChange={onChange}
       data={data}
       classNames={{ wrapper: styles.wrapper }}
-      disabled={module.name !== 'editor'}
+      disabled={!!module.game}
     />
   );
 };

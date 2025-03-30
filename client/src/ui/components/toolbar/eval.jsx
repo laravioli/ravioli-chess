@@ -5,7 +5,6 @@ import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
 export const ToggleEval = () => {
-  console.log('render toggle eval : analyse only');
   const module = useModule();
   const [checked, setChecked] = useState(module.ceval.enabled());
 

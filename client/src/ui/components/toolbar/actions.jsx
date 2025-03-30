@@ -7,6 +7,7 @@ import { useModule } from 'src/ui/context/hooks.js';
 import { useInitData } from 'src/ui/context/data.js';
 import { short_fen } from './utils';
 import { DEFAULT_POSITION } from 'chess.js';
+import { controller } from 'src/logic';
 
 //todo reorganise this file
 //for path: when user reload the page: init controller properly, when user navigate with client : use button to set the controller
@@ -127,23 +128,15 @@ export const StartButton = () => {
 };
 
 export const ClearButton = () => {
-  console.log('render clear button : edit only');
   const module = useModule();
   const resetFen = useMainStore((state) => state.resetFen);
-  console.log(module.name);
 
   const onClear = () => {
     module.getBoard().clear();
     resetFen(false);
   };
 
-  return (
-    <EditorButton
-      label="clear board"
-      onClick={onClear}
-      isDisabled={module.name !== 'editor'}
-    />
-  );
+  return <EditorButton label={'clear board'} onClick={onClear} />;
 };
 
 export const FlipButton = () => {
@@ -164,6 +157,7 @@ export function Navigate({ path }) {
 
   const onClick = () => {
     if (isFenAnalysable()) {
+      controller.setModule(path, mainStore.getState().fen());
       navigate(path, { replace: true });
     } else {
       module.getBoard().position(mainStore.getState().fen());

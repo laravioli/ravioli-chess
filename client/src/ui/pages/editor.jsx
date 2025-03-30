@@ -12,7 +12,6 @@ import {
 } from '../components/toolbar/actions';
 
 export function Editor() {
-  console.log('start rendering editor');
   return (
     <div className="main-wrap">
       <Board />

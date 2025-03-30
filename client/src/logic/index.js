@@ -1,29 +1,43 @@
-import { initSite } from './modules/site/site';
 import { mainStore } from 'src/stores';
-import { MainController } from './modules/main/ctrl';
+import { Controller } from './modules/main/ctrl';
 
-function initController() {
-  const getModuleUrl = (url) => {
-    return (
-      url.pathname.split('/').filter((segment) => segment !== '')[0] ??
-      import.meta.env.VITE_DEFAULT_MODULE
-    );
-  };
+function makeController() {
+  const patterns = new Map([
+    [/^\/(analysis|play\/computer)?$/, 'analysis'],
+    [/^\/editor$/, 'editor'],
+  ]);
+
+  function match(path) {
+    for (const [regex, value] of patterns) {
+      if (regex.test(path)) {
+        return value;
+      }
+    }
+    return null;
+  }
+
   const storeApi = (store) => ({
     get: store.getState,
     set: store.setState,
     subscribe: store.subscribe,
   });
+
   const store = storeApi(mainStore);
-  const moduleUrl = getModuleUrl(new URL(window.location));
-  const controller = new MainController(moduleUrl, store);
+  const controller = new Controller(
+    match(new URL(window.location).pathname),
+    store
+  );
+
   return {
-    getModule: () => controller.module,
-    setModule: (moduleName, fen) => controller.setModule(moduleName, fen),
-    getModuleUrl,
+    getModule: (url) => {
+      const id = match(url.pathname);
+      return controller.getModule(id);
+    },
+    setModule: (path, fen) => {
+      const id = match(path);
+      controller.setModule(id, { fen, store });
+    },
   };
 }
 
-initSite();
-
-export const controller = initController();
+export const controller = makeController();

@@ -2,10 +2,9 @@ import chessBoard from 'chessboard';
 import { validateFen } from 'chess.js';
 
 export class Editor {
-  constructor(info) {
-    this.name = info.name;
-    this.initialFen = info.fen;
-    this.store = info.store;
+  constructor(opts) {
+    this.initialFen = opts.fen;
+    this.store = opts.store;
   }
 
   onLoad(fen) {
