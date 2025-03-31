@@ -5,8 +5,8 @@ import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
 export const ToggleEval = () => {
-  const module = useModule();
-  const [checked, setChecked] = useState(module.ceval.enabled());
+  const analyse = useModule();
+  const [checked, setChecked] = useState(analyse.ceval.enabled());
 
   const isTab = useCallback(() => {
     const sri = evalStore.getState().sri;
@@ -14,9 +14,9 @@ export const ToggleEval = () => {
   }, []);
 
   const onClick = useCallback(() => {
-    module.toggleCeval?.();
-    setChecked(module.ceval.enabled());
-  }, [module]);
+    analyse.toggleCeval?.();
+    setChecked(analyse.ceval.enabled());
+  }, [analyse]);
 
   useEffect(() => {
     const unsub = evalStore.subscribe(

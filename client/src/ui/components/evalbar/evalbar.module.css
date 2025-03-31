@@ -1,0 +1,23 @@
+.evalbar {
+  grid-area: evalbar;
+  width: 1em;
+  height: clamp(300px, 71.7vmin, 700px);
+  position: relative;
+}
+
+.black {
+  background-color: #313131;
+  width: 100%;
+}
+
+.white {
+  background-color: #f7f7ff;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  transition: 2s;
+  overflow: hidden;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  display: flex;
+}

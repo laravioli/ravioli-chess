@@ -11,10 +11,12 @@ import {
 } from '../components/toolbar/actions';
 import { ToggleEval } from '../components/toolbar/eval';
 import { History } from '../components/toolbar/history';
+import { EvalBar } from '../components/evalbar/evalbar';
 
 export function Analyse() {
   return (
     <div className="main-wrap">
+      <EvalBar />
       <Board />
       <FenInput />
       <div className="toolbar">

@@ -14,11 +14,12 @@
 
 .main-wrap {
   display: grid;
+  place-items: center;
   grid:
-    '.            .                 tools' min-content
-    'board        .                 tools' auto
-    'copyables    .                 tools' min-content
-    / clamp(300px, 72vmin, 700px) 2vmin minmax(100px, 200px);
+    'evalbar     board  .    tools' min-content
+    'evalbar     board  .    tools' auto
+    '.     copyables    .    tools' min-content
+    / 1em clamp(300px, 72vmin, 700px) 2vmin minmax(100px, 200px);
 }
 
 .toolbar {

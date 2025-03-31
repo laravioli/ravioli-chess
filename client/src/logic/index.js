@@ -1,5 +1,6 @@
 import { mainStore } from 'src/stores';
 import { Controller } from './modules/main/ctrl';
+import { initSite } from './modules/site/site';
 
 function makeController() {
   const patterns = new Map([
@@ -40,4 +41,5 @@ function makeController() {
   };
 }
 
+initSite();
 export const controller = makeController();
