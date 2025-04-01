@@ -1,5 +1,5 @@
 import { useModule } from 'src/ui/context/hooks.js';
-import { evalStore, useMainStore } from 'src/stores';
+import { localStore, useMainStore } from 'src/stores';
 import { useEffect, useCallback } from 'react';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
@@ -9,7 +9,7 @@ export const EvalToggle = () => {
   const enabled = useMainStore((state) => state.evalEnabled);
 
   const isTab = useCallback(() => {
-    const sri = evalStore.getState().sri;
+    const sri = localStore.getState().sri;
     return window.site.sri == sri;
   }, []);
 
@@ -18,7 +18,7 @@ export const EvalToggle = () => {
   }, [analyse]);
 
   useEffect(() => {
-    const unsub = evalStore.subscribe(
+    const unsub = localStore.subscribe(
       (state) => state.disable,
       () => {
         if (analyse.ceval.enabled() && !isTab()) {

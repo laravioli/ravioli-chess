@@ -1,6 +1,6 @@
 import chessBoard from 'chessboard';
 import { Game } from 'src/logic/lib/game/game';
-import { throttle, isEvalBetter } from 'src/logic/lib/eval/util';
+import { throttle, isEvalBetter, povChances } from 'src/logic/lib/eval/util';
 import { CevalCtrl } from 'src/logic/lib/eval/ctrl';
 import { engineSupported } from 'src/logic/lib/eval/engine';
 
@@ -40,8 +40,11 @@ export class Analyse {
     else if (action === 'redo') this.game.redoMove();
     else if (action === 'start') this.game.goStart();
     else if (action === 'end') this.game.goEnd();
+
+    const move = this.game.currentMove;
+    if (move.ceval) this.ui.set({ evalScore: povChances('white', move.ceval) });
     this.restartCeval();
-    this.board.position(this.game.currentMove.fen, true);
+    this.board.position(move.fen, true);
     this.setFen();
   }
 
@@ -63,9 +66,14 @@ export class Analyse {
   }
 
   onNewCeval(ev) {
-    let move = this.game.currentMove;
-    if (!move.ceval || isEvalBetter(ev, move.ceval)) move.ceval = ev;
     console.log(ev);
+    if (
+      !this.game.currentMove.ceval ||
+      isEvalBetter(ev, this.game.currentMove.ceval)
+    ) {
+      this.game.currentMove.ceval = ev;
+      this.ui.set({ evalScore: povChances('white', ev) });
+    }
   }
 
   startCeval = throttle(800, () => {

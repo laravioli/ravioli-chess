@@ -5,7 +5,7 @@ import { createFenSlice } from './slices/fenslice';
 import { createEvalSlice } from './slices/evalslice';
 import { recommendedThreads } from 'src/logic/lib/eval/engine';
 
-export const evalStore = createStore(
+export const localStore = createStore(
   subscribeWithSelector(
     persist(
       () => ({
@@ -35,7 +35,7 @@ const withStorageDOMEvents = (store) => {
   };
 };
 
-withStorageDOMEvents(evalStore);
+withStorageDOMEvents(localStore);
 
 export const mainStore = createStore(
   subscribeWithSelector((...a) => ({
@@ -46,4 +46,4 @@ export const mainStore = createStore(
 );
 
 export const useMainStore = (selector) => useStore(mainStore, selector);
-export const useEvalStore = (selector) => useStore(evalStore, selector);
+export const useLocalStore = (selector) => useStore(localStore, selector);

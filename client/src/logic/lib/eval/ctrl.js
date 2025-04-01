@@ -1,13 +1,13 @@
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
 import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
-import { evalStore } from 'src/stores';
+import { localStore } from 'src/stores';
 
 const cevalDisabledSentinel = '1';
 
 function enabledAfterDisable() {
   const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
-  const disable = evalStore.getState().disable || cevalDisabledSentinel;
+  const disable = localStore.getState().disable || cevalDisabledSentinel;
   return enabledAfter == disable;
 }
 
@@ -17,8 +17,8 @@ function enabledAfterDisable() {
 //enabled : does the button enabled is on or off (mainly to handle tabs)
 
 export class CevalCtrl {
-  storedPv = () => evalStore.getState().multipv;
-  storedMovetime = () => evalStore.getState().searchms;
+  storedPv = () => localStore.getState().multipv;
+  storedMovetime = () => localStore.getState().searchms;
   allowed = toggle(true);
   curEval = null;
   lastStarted = false;
@@ -61,10 +61,10 @@ export class CevalCtrl {
     if (!this.enabled() || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
 
-    evalStore.setState({ sri: window.site.sri, disable: Math.random() });
+    localStore.setState({ sri: window.site.sri, disable: Math.random() });
     window.sessionStorage.setItem(
       'ceval.enabled-after',
-      evalStore.getState().disable
+      localStore.getState().disable
     );
 
     if (
@@ -148,7 +148,7 @@ export class CevalCtrl {
   }
 
   get threads() {
-    const stored = evalStore.getState().threads;
+    const stored = localStore.getState().threads;
     return clamp(stored, {
       min: this.worker?.info.minThreads ?? 1,
       max: maxThreads(),
@@ -156,7 +156,7 @@ export class CevalCtrl {
   }
 
   get hashSize() {
-    const stored = evalStore.getState().hashsize;
+    const stored = localStore.getState().hashsize;
     return Math.min(this.maxHash, stored ?? 16);
   }
 
@@ -168,7 +168,7 @@ export class CevalCtrl {
     if (!this.possible || !this.allowed()) return;
     this.stop();
     if (!this.enabled() && !document.hidden) {
-      const disable = evalStore.getState().disable || cevalDisabledSentinel;
+      const disable = localStore.getState().disable || cevalDisabledSentinel;
       if (disable)
         window.sessionStorage.setItem('ceval.enabled-after', disable);
       this.enabled(true);
