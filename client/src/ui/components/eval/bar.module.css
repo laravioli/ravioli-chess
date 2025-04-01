@@ -1,16 +1,16 @@
-.evalbar {
+.bar {
   grid-area: evalbar;
   width: 1em;
   height: clamp(300px, 71.7vmin, 700px);
   position: relative;
 }
 
-.black {
+.barblack {
   background-color: #313131;
   width: 100%;
 }
 
-.white {
+.barwhite {
   background-color: #f7f7ff;
   position: absolute;
   bottom: 0;

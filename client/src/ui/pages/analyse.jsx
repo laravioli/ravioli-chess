@@ -9,9 +9,11 @@ import {
   StartButton,
   FlipButton,
 } from '../components/toolbar/actions';
-import { ToggleEval } from '../components/toolbar/eval';
+import { EvalToggle } from '../components/eval/toggle';
 import { History } from '../components/toolbar/history';
-import { EvalBar } from '../components/evalbar/evalbar';
+import { EvalBar } from '../components/eval/bar';
+
+//todo : find a way to not render all analyse (either eval component or zustand state or storage)
 
 export function Analyse() {
   return (
@@ -20,7 +22,7 @@ export function Analyse() {
       <Board />
       <FenInput />
       <div className="toolbar">
-        <ToggleEval />
+        <EvalToggle />
         <div className="fen-controls">
           <TurnToPlay />
           <CastlingBoxes />

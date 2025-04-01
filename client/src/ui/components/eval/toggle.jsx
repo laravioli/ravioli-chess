@@ -1,12 +1,12 @@
 import { useModule } from 'src/ui/context/hooks.js';
-import { evalStore } from 'src/stores';
-import { useState, useEffect, useCallback } from 'react';
+import { evalStore, useMainStore } from 'src/stores';
+import { useEffect, useCallback } from 'react';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
-export const ToggleEval = () => {
+export const EvalToggle = () => {
   const analyse = useModule();
-  const [checked, setChecked] = useState(analyse.ceval.enabled());
+  const enabled = useMainStore((state) => state.evalEnabled);
 
   const isTab = useCallback(() => {
     const sri = evalStore.getState().sri;
@@ -15,30 +15,29 @@ export const ToggleEval = () => {
 
   const onClick = useCallback(() => {
     analyse.toggleCeval?.();
-    setChecked(analyse.ceval.enabled());
   }, [analyse]);
 
   useEffect(() => {
     const unsub = evalStore.subscribe(
       (state) => state.disable,
       () => {
-        if (checked && !isTab()) {
+        if (analyse.ceval.enabled() && !isTab()) {
           onClick();
         }
       }
     );
     return unsub;
-  }, [checked, isTab, onClick]);
+  }, [analyse, isTab, onClick]);
 
   return (
     <Switch
-      checked={checked}
+      checked={enabled}
       onClick={onClick}
       color="teal"
       size="md"
       label="Stockfish 16"
       thumbIcon={
-        checked ? (
+        enabled ? (
           <IconCheck size={12} color="var(--mantine-color-teal-6)" stroke={3} />
         ) : (
           <IconX size={12} color="var(--mantine-color-red-6)" stroke={3} />
