@@ -1,18 +1,21 @@
-import styles from './bar.module.css';
+import styles from './eval.module.css';
 import { useMainStore } from 'src/stores';
+import { povChances } from 'src/logic/lib/eval/util';
 
 export const EvalBar = () => {
   const enabled = useMainStore((state) => state.evalEnabled);
-  const evaluation = useMainStore((state) => state.evalScore);
-  console.log(evaluation);
+  const outcome = useMainStore((state) => state.outcome);
+  const evaluation = useMainStore((state) => state.evaluation);
 
-  if (!enabled) return null;
+  if (!enabled || outcome) return null;
+
+  const progress = evaluation ? povChances('white', evaluation) : 0.0;
 
   return (
     <div className={[styles.bar, styles.barblack].join(' ')}>
       <div
         className={styles.barwhite}
-        style={{ height: `${100 - (evaluation + 1) * 50}%` }}></div>
+        style={{ height: `${(progress + 1) * 50}%` }}></div>
     </div>
   );
 };

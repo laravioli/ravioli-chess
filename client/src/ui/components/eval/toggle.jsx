@@ -35,7 +35,6 @@ export const EvalToggle = () => {
       onClick={onClick}
       color="teal"
       size="md"
-      label="Stockfish 16"
       thumbIcon={
         enabled ? (
           <IconCheck size={12} color="var(--mantine-color-teal-6)" stroke={3} />

@@ -1,6 +1,6 @@
 import chessBoard from 'chessboard';
 import { Game } from 'src/logic/lib/game/game';
-import { throttle, isEvalBetter, povChances } from 'src/logic/lib/eval/util';
+import { throttle, isEvalBetter } from 'src/logic/lib/eval/util';
 import { CevalCtrl } from 'src/logic/lib/eval/ctrl';
 import { engineSupported } from 'src/logic/lib/eval/engine';
 
@@ -8,7 +8,7 @@ export class Analyse {
   constructor(opts) {
     this.initialFen = opts.fen;
     this.store = opts.store;
-    this.game = new Game(opts.fen);
+    this.initGame(opts.fen);
     this.initCeval();
     this.startCeval();
   }
@@ -23,13 +23,17 @@ export class Analyse {
   }
 
   /*----------GAME----------*/
+  initGame(fen) {
+    this.game = new Game(fen);
+    this.store.set({ outcome: this.game.isGameOver() });
+  }
 
   getGame() {
     return this.game;
   }
 
   newGame(fen) {
-    if (!this.game) this.game = new Game(fen);
+    if (!this.game) this.initGame(fen);
     this.game.load(fen);
     this.restartCeval();
   }
@@ -42,9 +46,12 @@ export class Analyse {
     else if (action === 'end') this.game.goEnd();
 
     const move = this.game.currentMove;
-    if (move.ceval) this.ui.set({ evalScore: povChances('white', move.ceval) });
     this.restartCeval();
     this.board.position(move.fen, true);
+    this.store.set({
+      evaluation: move.ceval ?? null,
+      outcome: this.game.isGameOver(),
+    });
     this.setFen();
   }
 
@@ -66,13 +73,11 @@ export class Analyse {
   }
 
   onNewCeval(ev) {
-    console.log(ev);
-    if (
-      !this.game.currentMove.ceval ||
-      isEvalBetter(ev, this.game.currentMove.ceval)
-    ) {
-      this.game.currentMove.ceval = ev;
-      this.ui.set({ evalScore: povChances('white', ev) });
+    let move = this.game.currentMove;
+    if (ev.fen !== move.fen) return;
+    if (!move.ceval || isEvalBetter(ev, move.ceval)) {
+      move.ceval = ev;
+      this.store.set({ evaluation: ev });
     }
   }
 
@@ -87,7 +92,7 @@ export class Analyse {
   });
 
   restartCeval() {
-    this.ceval?.stop();
+    this.ceval.stop();
     this.startCeval();
   }
 

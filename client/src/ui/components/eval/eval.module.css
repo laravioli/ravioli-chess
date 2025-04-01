@@ -1,3 +1,20 @@
+.evaltool {
+  display: flex;
+  column-gap: 6px;
+  align-items: stretch;
+}
+
+.evalscore {
+  flex: 1 0 auto;
+  line-height: 25px;
+  font-size: 1.2em;
+  text-align: center;
+  font-weight: bold;
+}
+.evalname {
+  flex: 2 1 auto;
+}
+
 .bar {
   grid-area: evalbar;
   width: 1em;
@@ -15,7 +32,7 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  transition: 2s;
+  transition: height 1s;
   overflow: hidden;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;

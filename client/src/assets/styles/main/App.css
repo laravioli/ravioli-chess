@@ -39,6 +39,7 @@
 
 .copyables {
   grid-area: copyables;
+  width: 100%;
 }
 
 .fen-controls {

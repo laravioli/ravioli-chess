@@ -1,4 +1,5 @@
 export const createEvalSlice = () => ({
   evalEnabled: false,
-  evalScore: 0,
+  evaluation: null,
+  outcome: undefined,
 });
