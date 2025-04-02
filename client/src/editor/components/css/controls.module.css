@@ -1,0 +1,12 @@
+.castle {
+  display: grid;
+  grid:
+    '. .'
+    '. .'
+    / 1fr 1fr;
+}
+
+.wrapper {
+  --input-margin-bottom: 1rem;
+  --input-bd-focus: var(--input-bd) !important;
+}

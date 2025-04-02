@@ -1,6 +1,6 @@
 import { MantineProvider } from '@mantine/core';
-import { Shell } from './ui/components/appshell/appshell';
-import { Router } from './ui/routes/routes';
+import { Shell } from 'src/shared/components/appshell/appshell';
+import { Router } from 'src/main/components/routes/routes';
 
 function App() {
   return (

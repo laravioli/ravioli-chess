@@ -1,0 +1,3 @@
+.input {
+  padding-inline-start: calc(var(--input-padding-inline-start) + 0.25rem);
+}
