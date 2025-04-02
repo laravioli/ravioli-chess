@@ -9,7 +9,7 @@ import {
   StartButton,
   ClearButton,
   FlipButton,
-} from '../components/toolbar/actions';
+} from '../components/toolbar/buttons';
 
 export function Editor() {
   return (

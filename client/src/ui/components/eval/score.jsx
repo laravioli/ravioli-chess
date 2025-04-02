@@ -2,6 +2,8 @@ import styles from './eval.module.css';
 import { useMainStore } from '../../../stores';
 import { renderEval } from 'src/logic/lib/eval/util';
 
+//todo : case when analyse(on -> off) -> edit -> analyse
+
 export const EvalScore = () => {
   const evaluation = useMainStore((state) => state.evaluation);
   const outcome = useMainStore((state) => state.outcome);

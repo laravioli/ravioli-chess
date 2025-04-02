@@ -10,7 +10,7 @@ import { DEFAULT_POSITION } from 'chess.js';
 import { controller } from 'src/logic';
 
 //todo reorganise this file
-//for path: when user reload the page: init controller properly, when user navigate with client : use button to set the controller
+//maybe give module to buttons and pass as prop
 
 //---------Test-----------//
 const TestButton = ({ label, style = {} }) => {

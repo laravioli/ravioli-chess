@@ -8,7 +8,7 @@ export class Analyse {
   constructor(opts) {
     this.initialFen = opts.fen;
     this.store = opts.store;
-    this.initGame(opts.fen);
+    this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
   }
@@ -23,19 +23,22 @@ export class Analyse {
   }
 
   /*----------GAME----------*/
-  initGame(fen) {
-    this.game = new Game(fen);
-    this.store.set({ outcome: this.game.isGameOver() });
-  }
 
   getGame() {
     return this.game;
   }
 
   newGame(fen) {
-    if (!this.game) this.initGame(fen);
-    this.game.load(fen);
-    this.restartCeval();
+    if (!this.game) {
+      this.game = new Game(fen);
+    } else {
+      this.game.load(fen);
+      this.restartCeval();
+    }
+    this.store.set((state) => ({
+      outcome: this.game.isGameOver(),
+      evaluation: this.ceval?.enabled() ? state.evaluation : null,
+    }));
   }
 
   jump(action) {
@@ -48,11 +51,11 @@ export class Analyse {
     const move = this.game.currentMove;
     this.restartCeval();
     this.board.position(move.fen, true);
-    this.store.set({
+    this.store.set((state) => ({
       evaluation: move.ceval ?? null,
       outcome: this.game.isGameOver(),
-    });
-    this.setFen();
+      ...this.getFen(state),
+    }));
   }
 
   /*----------EVAL----------*/
@@ -106,7 +109,7 @@ export class Analyse {
 
   /*----------STORE----------*/
 
-  setFen() {
+  getFen = (state) => {
     const castlingRights =
       this.game.turn() === 'w'
         ? this.game.getCastlingRights('b')
@@ -115,14 +118,14 @@ export class Analyse {
               ([key, value]) => [key.toUpperCase(), value]
             )
           );
-    this.store.set((state) => ({
+    return {
       fenPosition: this.game.fen().split(' ')[0],
       turn: this.game.turn(),
       castling: { ...state.castling, ...castlingRights },
       halfmove: this.game.fen().split(' ')[4],
       fullmove: this.game.moveNumber(),
-    }));
-  }
+    };
+  };
 
   /*----------BOARD----------*/
 

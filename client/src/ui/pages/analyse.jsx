@@ -8,7 +8,7 @@ import {
   Buttons,
   StartButton,
   FlipButton,
-} from '../components/toolbar/actions';
+} from '../components/toolbar/buttons';
 import { History } from '../components/toolbar/history';
 import { EvalBar } from '../components/eval/bar';
 import { EvalTool } from '../components/eval/tool';

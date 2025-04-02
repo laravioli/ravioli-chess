@@ -40,10 +40,6 @@ export class Protocol {
       // Analyse without contempt.
       this.setOption('UCI_AnalyseMode', 'true');
 
-      // Affects notation only. Life would be easier if everyone would always
-      // unconditionally use this mode.
-      this.setOption('UCI_Chess960', 'true');
-
       this.send?.('ucinewgame');
       this.send?.('isready');
     } else if (parts[0] === 'readyok') {
