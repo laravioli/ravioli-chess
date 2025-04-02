@@ -1,7 +1,5 @@
 import { Board } from '../components/board/board';
 import { FenInput } from '../components/fen/feninput';
-import { TurnToPlay } from '../components/fen/turn';
-import { CastlingBoxes } from '../components/fen/castlings';
 import {
   Position,
   Navigate,
@@ -12,6 +10,7 @@ import {
 import { History } from '../components/toolbar/history';
 import { EvalBar } from '../components/eval/bar';
 import { EvalTool } from '../components/eval/tool';
+import { EvalBox } from '../components/eval/box';
 
 export function Analyse() {
   return (
@@ -22,8 +21,7 @@ export function Analyse() {
       <div className="toolbar">
         <EvalTool />
         <div className="fen-controls">
-          <TurnToPlay />
-          <CastlingBoxes />
+          <EvalBox />
         </div>
         <Position />
         <Navigate path="/editor" />

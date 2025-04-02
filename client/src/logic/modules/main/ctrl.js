@@ -1,5 +1,5 @@
 import { DEFAULT_POSITION } from 'chess.js';
-import { Analyse } from '../analyse';
+import { Analyse } from '../analyse/analyse';
 import { Editor } from '../editor';
 
 export class Controller {

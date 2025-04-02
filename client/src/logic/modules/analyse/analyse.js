@@ -1,6 +1,7 @@
 import chessBoard from 'chessboard';
 import { Game } from 'src/logic/lib/game/game';
 import { throttle, isEvalBetter } from 'src/logic/lib/eval/util';
+import { upperize } from './utils';
 import { CevalCtrl } from 'src/logic/lib/eval/ctrl';
 import { engineSupported } from 'src/logic/lib/eval/engine';
 
@@ -51,11 +52,11 @@ export class Analyse {
     const move = this.game.currentMove;
     this.restartCeval();
     this.board.position(move.fen, true);
-    this.store.set((state) => ({
+    this.store.set({
       evaluation: move.ceval ?? null,
       outcome: this.game.isGameOver(),
-      ...this.getFen(state),
-    }));
+      ...this.getFen(),
+    });
   }
 
   /*----------EVAL----------*/
@@ -109,19 +110,15 @@ export class Analyse {
 
   /*----------STORE----------*/
 
-  getFen = (state) => {
-    const castlingRights =
-      this.game.turn() === 'w'
-        ? this.game.getCastlingRights('b')
-        : Object.fromEntries(
-            Object.entries(this.game.getCastlingRights('w')).map(
-              ([key, value]) => [key.toUpperCase(), value]
-            )
-          );
+  getFen = () => {
+    const castlingRights = {
+      ...upperize(this.game.getCastlingRights('w')),
+      ...this.game.getCastlingRights('b'),
+    };
     return {
       fenPosition: this.game.fen().split(' ')[0],
       turn: this.game.turn(),
-      castling: { ...state.castling, ...castlingRights },
+      castling: castlingRights,
       halfmove: this.game.fen().split(' ')[4],
       fullmove: this.game.moveNumber(),
     };
