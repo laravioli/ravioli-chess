@@ -73,7 +73,7 @@ export class Analyse {
     else {
       this.ceval = new CevalCtrl(opts);
     }
-    this.store.set({ evalEnabled: this.ceval.enabled() });
+    //this.store.set({ evalEnabled: this.ceval.enabled() });
   }
 
   onNewCeval(ev) {
@@ -102,7 +102,7 @@ export class Analyse {
 
   toggleCeval() {
     this.ceval?.toggle();
-    this.store.set({ evalEnabled: this.ceval.enabled() });
+    //this.store.set({ evalEnabled: this.ceval.enabled() });
     this.startCeval();
   }
 

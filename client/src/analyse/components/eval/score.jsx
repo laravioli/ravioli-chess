@@ -6,6 +6,7 @@ export const EvalScore = () => {
   const evaluation = useMainStore((state) => state.evaluation);
   const outcome = useMainStore((state) => state.outcome);
   let score = '';
+  console.log(evaluation?.pvs[0].moves);
 
   if (evaluation) {
     if (evaluation.mate) {

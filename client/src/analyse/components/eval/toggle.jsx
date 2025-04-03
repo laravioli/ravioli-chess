@@ -8,8 +8,10 @@ export const EvalToggle = () => {
   const analyse = useModule();
   const enabled = useMainStore((state) => state.evalEnabled);
 
+  console.log(enabled);
+
   const isTab = useCallback(() => {
-    const sri = localStore.getState().sri;
+    const { sri } = localStore.getState();
     return window.site.sri == sri;
   }, []);
 

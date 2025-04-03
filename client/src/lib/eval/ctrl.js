@@ -1,6 +1,7 @@
 import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
 import { localStore } from 'src/main/store';
+import { mainStore } from 'src/main/store';
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
 
 const cevalDisabledSentinel = '1';
@@ -9,6 +10,17 @@ function enabledAfterDisable() {
   const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
   const disable = localStore.getState().disable || cevalDisabledSentinel;
   return enabledAfter == disable;
+}
+
+function reactive(obj, property) {
+  Object.defineProperty(obj, property, {
+    get() {
+      return mainStore.getState()[property];
+    },
+    set(value) {
+      mainStore.setState({ [property]: value });
+    },
+  });
 }
 
 //possible : does browser support engine
@@ -25,6 +37,7 @@ export class CevalCtrl {
   showEnginePrefs = toggle(false);
 
   constructor(opts) {
+    reactive(this, 'evalEnabled');
     this.init(opts);
   }
 
@@ -37,12 +50,17 @@ export class CevalCtrl {
     this.opts = opts;
     this.possible = this.opts.possible;
     this.analysable = validateFen(this.opts.initialFen).ok;
-    this.enabled = toggle(
+    /*this.enabled = toggle(
       this.possible &&
         this.analysable &&
         this.allowed() &&
         enabledAfterDisable()
-    );
+    );*/
+    this.evalEnabled =
+      this.possible &&
+      this.analysable &&
+      this.allowed() &&
+      enabledAfterDisable();
   }
 
   onEmit = throttle(200, (ev, work) => {
@@ -58,7 +76,7 @@ export class CevalCtrl {
   });
 
   doStart = (steps, gameId) => {
-    if (!this.enabled() || !this.possible || !enabledAfterDisable()) return;
+    if (!this.evalEnabled || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
 
     localStore.setState({ sri: window.site.sri, disable: Math.random() });
@@ -86,7 +104,7 @@ export class CevalCtrl {
       search: this.search.by,
       multiPv: this.search.multiPv,
       emit: (ev) => {
-        if (!this.enabled()) return;
+        if (!this.evalEnabled) return;
         this.onEmit(ev, work);
       },
     };
@@ -172,9 +190,13 @@ export class CevalCtrl {
       if (disable)
         window.sessionStorage.setItem('ceval.enabled-after', disable);
       this.enabled(true);
+      this.evalEnabled = true;
+      console.log(this.evalEnabled);
     } else {
       window.sessionStorage.setItem('ceval.enabled-after', '');
       this.enabled(false);
+      this.evalEnabled = false;
+      console.log(this.evalEnabled);
     }
   };
 
