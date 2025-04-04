@@ -1,10 +1,16 @@
 import { Chess } from 'chess.js';
+import { mainStore } from 'src/main/store';
+import { linkStateToStore, computed } from 'src/main/store/reactive';
+
+const makeObservable = linkStateToStore(mainStore, 'game');
 
 export class Game {
   constructor(fen) {
+    makeObservable(this, { outcome: computed });
     this._chess = new Chess(fen);
-    this.root = { parent: null, ply: 0, fen, children: [] };
-    this.currentMove = this.root;
+    this.initHistory(fen);
+    this.outcome = () => this._chess.isGameOver();
+
     return new Proxy(this, {
       get(target, prop) {
         if (prop in target) {
@@ -22,9 +28,19 @@ export class Game {
     });
   }
 
+  initHistory(fen) {
+    const ply = this._chess.turn() == 'w' ? 0 : 1;
+    this.currentMove = this.root = {
+      parent: null,
+      ply,
+      fen,
+      children: [],
+    };
+  }
+
   load(fen) {
-    this.currentMove = this.root = { parent: null, ply: 0, fen, children: [] };
     this._chess.load(fen);
+    this.initHistory(fen);
   }
 
   move(source, target) {

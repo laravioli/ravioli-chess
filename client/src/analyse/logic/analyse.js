@@ -4,9 +4,12 @@ import { CevalCtrl } from 'src/lib/eval/ctrl';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
 import { upperize } from './utils';
+import { observable } from 'src/main/store/reactive';
+import { makeObservable } from '../store/state';
 
 export class Analyse {
   constructor(opts) {
+    makeObservable(this, { evaluation: observable });
     this.initialFen = opts.fen;
     this.store = opts.store;
     this.newGame(opts.fen);
@@ -36,10 +39,7 @@ export class Analyse {
       this.game.load(fen);
       this.restartCeval();
     }
-    this.store.set((state) => ({
-      outcome: this.game.isGameOver(),
-      evaluation: this.ceval?.enabled() ? state.evaluation : null,
-    }));
+    if (!this.ceval || !this.ceval.evalEnabled) this.evaluation = null;
   }
 
   jump(action) {
@@ -52,9 +52,8 @@ export class Analyse {
     const move = this.game.currentMove;
     this.restartCeval();
     this.board.position(move.fen, true);
+    this.evaluation = move.ceval;
     this.store.set({
-      evaluation: move.ceval ?? null,
-      outcome: this.game.isGameOver(),
       ...this.getFen(),
     });
   }
@@ -81,12 +80,12 @@ export class Analyse {
     if (ev.fen !== move.fen) return;
     if (!move.ceval || isEvalBetter(ev, move.ceval)) {
       move.ceval = ev;
-      this.store.set({ evaluation: ev });
+      this.evaluation = ev;
     }
   }
 
   startCeval = throttle(800, () => {
-    if (this.ceval?.enabled()) {
+    if (this.ceval?.evalEnabled) {
       if (this.game && !this.game.isGameOver()) {
         this.ceval.start(this.game.moveList, undefined);
       } else {

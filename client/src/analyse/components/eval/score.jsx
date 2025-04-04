@@ -3,10 +3,10 @@ import styles from '../css/eval.module.css';
 import { renderEval } from 'src/lib/eval/util';
 
 export const EvalScore = () => {
-  const evaluation = useMainStore((state) => state.evaluation);
-  const outcome = useMainStore((state) => state.outcome);
+  const evaluation = useMainStore((state) => state.analyse.evaluation);
+  const outcome = useMainStore((state) => state.game.outcome());
   let score = '';
-  console.log(evaluation?.pvs[0].moves);
+  console.log(outcome);
 
   if (evaluation) {
     if (evaluation.mate) {

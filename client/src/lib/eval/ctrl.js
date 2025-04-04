@@ -4,6 +4,9 @@ import { localStore } from 'src/main/store';
 import { mainStore } from 'src/main/store';
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
 
+import { linkStateToStore, observable } from '../../main/store/reactive';
+const makeObservable = linkStateToStore(mainStore);
+
 const cevalDisabledSentinel = '1';
 
 function enabledAfterDisable() {
@@ -12,7 +15,7 @@ function enabledAfterDisable() {
   return enabledAfter == disable;
 }
 
-function reactive(obj, property) {
+/*function reactive(obj, property) {
   Object.defineProperty(obj, property, {
     get() {
       return mainStore.getState()[property];
@@ -21,7 +24,7 @@ function reactive(obj, property) {
       mainStore.setState({ [property]: value });
     },
   });
-}
+}*/
 
 //possible : does browser support engine
 //allowed : does engine is allowed to run
@@ -37,7 +40,7 @@ export class CevalCtrl {
   showEnginePrefs = toggle(false);
 
   constructor(opts) {
-    reactive(this, 'evalEnabled');
+    makeObservable(this, { evalEnabled: observable });
     this.init(opts);
   }
 
@@ -185,18 +188,14 @@ export class CevalCtrl {
   toggle = () => {
     if (!this.possible || !this.allowed()) return;
     this.stop();
-    if (!this.enabled() && !document.hidden) {
+    if (!this.evalEnabled && !document.hidden) {
       const disable = localStore.getState().disable || cevalDisabledSentinel;
       if (disable)
         window.sessionStorage.setItem('ceval.enabled-after', disable);
-      this.enabled(true);
       this.evalEnabled = true;
-      console.log(this.evalEnabled);
     } else {
       window.sessionStorage.setItem('ceval.enabled-after', '');
-      this.enabled(false);
       this.evalEnabled = false;
-      console.log(this.evalEnabled);
     }
   };
 

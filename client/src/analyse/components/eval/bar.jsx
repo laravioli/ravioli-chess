@@ -4,8 +4,8 @@ import { povChances } from 'src/lib/eval/util';
 
 export const EvalBar = () => {
   const enabled = useMainStore((state) => state.evalEnabled);
-  const outcome = useMainStore((state) => state.outcome);
-  const evaluation = useMainStore((state) => state.evaluation);
+  const outcome = useMainStore((state) => state.game.outcome());
+  const evaluation = useMainStore((state) => state.analyse.evaluation);
 
   if (!enabled || outcome) return null;
 

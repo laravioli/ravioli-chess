@@ -8,7 +8,7 @@ export const EvalToggle = () => {
   const analyse = useModule();
   const enabled = useMainStore((state) => state.evalEnabled);
 
-  console.log(enabled);
+  console.log(enabled, 'jean mich');
 
   const isTab = useCallback(() => {
     const { sri } = localStore.getState();
@@ -23,13 +23,13 @@ export const EvalToggle = () => {
     const unsub = localStore.subscribe(
       (state) => state.disable,
       () => {
-        if (analyse.ceval.enabled() && !isTab()) {
+        if (enabled && !isTab()) {
           onClick();
         }
       }
     );
     return unsub;
-  }, [analyse, isTab, onClick]);
+  }, [enabled, isTab, onClick]);
 
   return (
     <Switch

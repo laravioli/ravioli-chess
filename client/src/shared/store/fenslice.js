@@ -102,4 +102,10 @@ export const createFenSlice = (set, get) => ({
       isLegalFen: cr,
     });
   },
+
+  test: { a: 0, b: 0 },
+  setTesta: () =>
+    set((state) => ({ test: { ...state.test, a: state.test.a + 1 } })),
+  setTestb: () =>
+    set((state) => ({ test: { ...state.test, b: state.test.b + 1 } })),
 });
