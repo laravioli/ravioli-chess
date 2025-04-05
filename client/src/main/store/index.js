@@ -1,4 +1,5 @@
 import { createStore } from 'zustand';
+import { linkStateToStore } from './reactive';
 import { subscribeWithSelector, persist } from 'zustand/middleware';
 import { createFenSlice } from 'src/shared/store/fenslice';
 import { recommendedThreads } from 'src/lib/eval/engine';
@@ -40,3 +41,5 @@ export const mainStore = createStore(
     ...createFenSlice(...a),
   }))
 );
+
+export const makeObservable = linkStateToStore(mainStore);

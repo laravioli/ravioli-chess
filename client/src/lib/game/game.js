@@ -1,12 +1,24 @@
 import { Chess } from 'chess.js';
-import { mainStore } from 'src/main/store';
-import { linkStateToStore, computed } from 'src/main/store/reactive';
+import { computed } from 'src/main/store/reactive';
+import { makeObservable } from 'src/main/store';
+import { observable } from '../../main/store/reactive';
+import { upperize } from './utils';
 
-const makeObservable = linkStateToStore(mainStore, 'game');
+//todo : finish moving fen update to game (turn ovverride prb)
 
 export class Game {
   constructor(fen) {
-    makeObservable(this, { outcome: computed });
+    makeObservable(
+      this,
+      { outcome: computed, namespace: 'game' },
+      {
+        fenPosition: observable,
+        turn: observable,
+        castling: observable,
+        halfmove: observable,
+        fullmove: observable,
+      }
+    );
     this._chess = new Chess(fen);
     this.initHistory(fen);
     this.outcome = () => this._chess.isGameOver();
@@ -62,6 +74,26 @@ export class Game {
     return moves;
   }
 
+  jump = (action) => {
+    switch (action) {
+      case 'move':
+        this.appendMove();
+        break;
+      case 'undo':
+        this.undo();
+        break;
+      case 'redo':
+        this.redo();
+        break;
+      case 'start':
+        this.start();
+        break;
+      case 'end':
+        this.end();
+        break;
+    }
+  };
+
   appendMove() {
     const info = this._chess.history({ verbose: true }).at(-1);
     let move = this.currentMove.children.find((move) => move.uci === info.lan);
@@ -80,26 +112,26 @@ export class Game {
     this.currentMove = move;
   }
 
-  undoMove() {
+  undo() {
     if (this.currentMove.parent) {
       this.currentMove = this.currentMove.parent;
       this._chess.undo();
     }
   }
 
-  redoMove() {
+  redo() {
     if (this.currentMove.children.length > 0) {
       this.currentMove = this.currentMove.children[0];
       this._chess.move(this.currentMove.san);
     }
   }
 
-  goStart() {
+  start() {
     this.currentMove = this.root;
     this._chess.load(this.currentMove.fen);
   }
 
-  goEnd() {
+  end() {
     if (this.currentMove !== this.root) {
       this.currentMove = this.root;
       this._chess.load(this.root.fen);
@@ -108,5 +140,19 @@ export class Game {
       this.currentMove = this.currentMove.children[0];
       this._chess.move(this.currentMove.san);
     }
+  }
+
+  updateFen() {
+    const sfen = this._chess.fen().split(' ');
+    const castling = {
+      ...upperize(this._chess.getCastlingRights('w')),
+      ...this._chess.getCastlingRights('b'),
+    };
+
+    this.fenPosition = sfen[0];
+    this.turn = this._chess.turn();
+    this.castling = castling;
+    this.halfmove = sfen[4];
+    this.fullmove = this._chess.moveNumber();
   }
 }

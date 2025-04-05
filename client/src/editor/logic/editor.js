@@ -1,10 +1,11 @@
 import chessBoard from 'chessboard';
-import { validateFen } from 'chess.js';
+import { observable } from '../../main/store/reactive';
+import { makeObservable } from 'src/main/store';
 
 export class Editor {
   constructor(opts) {
+    makeObservable(this, { fenPosition: observable });
     this.initialFen = opts.fen;
-    this.store = opts.store;
   }
 
   onLoad(fen) {
@@ -37,14 +38,8 @@ export class Editor {
       dropOffBoard: 'trash',
       sparePieces: true,
       hideSparePieces: false,
-      onDrop: (s, t, p, newPos) => {
-        this.store.set({
-          fenPosition: this.board.objToFen(newPos),
-        });
-        this.store.set({
-          isLegalFen: validateFen(this.store.get().fen()).ok,
-        });
-      },
+      onDrop: (s, t, p, newPos) =>
+        (this.fenPosition = this.board.objToFen(newPos)),
     };
   };
 }

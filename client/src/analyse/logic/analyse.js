@@ -3,13 +3,15 @@ import { Game } from 'src/lib/game/game';
 import { CevalCtrl } from 'src/lib/eval/ctrl';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { upperize } from './utils';
+import { upperize } from 'src/lib/game/utils';
 import { observable } from 'src/main/store/reactive';
-import { makeObservable } from '../store/state';
+import { makeObservable } from 'src/main/store';
+
+//todo : finish moving fen update to game (turn ovverride prb)
 
 export class Analyse {
   constructor(opts) {
-    makeObservable(this, { evaluation: observable });
+    makeObservable(this, { evaluation: observable, namespace: 'analyse' });
     this.initialFen = opts.fen;
     this.store = opts.store;
     this.newGame(opts.fen);
@@ -43,11 +45,7 @@ export class Analyse {
   }
 
   jump(action) {
-    if (action === 'move') this.game.appendMove();
-    else if (action === 'undo') this.game.undoMove();
-    else if (action === 'redo') this.game.redoMove();
-    else if (action === 'start') this.game.goStart();
-    else if (action === 'end') this.game.goEnd();
+    this.game.jump(action);
 
     const move = this.game.currentMove;
     this.restartCeval();

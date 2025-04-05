@@ -47,11 +47,15 @@ export const computed = (store, namespace) => (property) => {
   };
 };
 
-export const linkStateToStore = (store, namespace = null) => {
-  return function (logic, stateDescriptors) {
-    Object.keys(stateDescriptors).forEach((property) => {
-      const descriptor = stateDescriptors[property](store, namespace);
-      Object.defineProperty(logic, property, descriptor(property));
+export const linkStateToStore = (store) => {
+  return function (logic, ...stateDescriptors) {
+    stateDescriptors.forEach((state) => {
+      Object.keys(state)
+        .filter((p) => p !== 'namespace')
+        .forEach((property) => {
+          const descriptor = state[property](store, state.namespace);
+          Object.defineProperty(logic, property, descriptor(property));
+        });
     });
   };
 };

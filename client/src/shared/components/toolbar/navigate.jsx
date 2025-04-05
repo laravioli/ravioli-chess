@@ -7,7 +7,7 @@ import { CButton } from './button';
 export function Navigate({ path }) {
   const module = useModule();
   const navigate = useNavigate();
-  const isLegalFen = useMainStore((state) => state.isLegalFen);
+  const isLegalFen = useMainStore((state) => state.isLegalFen());
   const isFenAnalysable = useMainStore((state) => state.isFenAnalysable);
 
   const isEdit = path !== '/editor';

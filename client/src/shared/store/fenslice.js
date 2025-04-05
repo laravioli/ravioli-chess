@@ -12,7 +12,7 @@ export const createFenSlice = (set, get) => ({
   halfmove: 0,
   fullmove: 1,
   fenInputRef: undefined,
-  isLegalFen: true,
+  isLegalFen: () => validateFen(get().fen()).ok,
 
   fen() {
     const state = get();
@@ -49,16 +49,16 @@ export const createFenSlice = (set, get) => ({
   setFen(input) {
     const state = get();
     if (input !== state.fen() && state._isValidInput(input)) {
-      const newstate = input.split(' ');
+      const newState = input.split(' ');
       set({
-        fenPosition: newstate[0],
-        turn: newstate[1],
+        fenPosition: newState[0],
+        turn: newState[1],
         castling: Object.keys(get().castling).reduce((acc, key) => {
-          acc[key] = newstate[2].includes(key);
+          acc[key] = newState[2].includes(key);
           return acc;
         }, {}),
-        halfmove: newstate[4],
-        fullmove: newstate[5],
+        halfmove: newState[4],
+        fullmove: newState[5],
       });
     } else {
       state.fenInputRef.current.value = state.fen();
@@ -73,7 +73,6 @@ export const createFenSlice = (set, get) => ({
       'Invalid FEN: missing black king',
     ];
     if (validation.ok || validErrors.includes(validation.error)) {
-      set({ isLegalFen: validation.ok });
       return true;
     } else {
       return false;
@@ -82,7 +81,7 @@ export const createFenSlice = (set, get) => ({
 
   isFenAnalysable() {
     get().setFen(get().fenInputRef.current.value);
-    return get().isLegalFen;
+    return get().isLegalFen();
   },
 
   resetFen(cr) {
@@ -99,13 +98,6 @@ export const createFenSlice = (set, get) => ({
       },
       halfmove: 0,
       fullmove: 1,
-      isLegalFen: cr,
     });
   },
-
-  test: { a: 0, b: 0 },
-  setTesta: () =>
-    set((state) => ({ test: { ...state.test, a: state.test.a + 1 } })),
-  setTestb: () =>
-    set((state) => ({ test: { ...state.test, b: state.test.b + 1 } })),
 });
