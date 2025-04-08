@@ -1,6 +1,6 @@
 import { mainStore } from 'src/main/store';
 import { useState, useMemo, useEffect } from 'react';
-import { useInitData, useModule, useMainStore } from 'src/shared/hooks/hooks';
+import { useInitData, useModule } from 'src/shared/hooks/hooks';
 import { NativeSelect } from '@mantine/core';
 import styles from '../css/toolbar.module.css';
 import { short_fen } from './utils';
@@ -9,7 +9,6 @@ export const Position = () => {
   const module = useModule();
   const position = useInitData();
   const [value, setValue] = useState('');
-  const setFen = useMainStore((state) => state.setFen);
 
   const data = useMemo(
     () => [
@@ -26,7 +25,7 @@ export const Position = () => {
 
   useEffect(() => {
     const unsub = mainStore.subscribe(
-      (state) => state.fen(),
+      (state) => state.fen.current(),
       (fen) => {
         const match = fens.findIndex((pos) => pos === short_fen(fen));
         if (match > 0) {
@@ -41,10 +40,10 @@ export const Position = () => {
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
-    if (fen && fen != mainStore.getState().fen()) {
+    if (fen && fen != module.fen.current()) {
       module.newGame?.(fen);
       module.getBoard().position(fen, true);
-      setFen(fen);
+      module.fen.setFen(fen);
     } else {
       setValue(fen);
     }

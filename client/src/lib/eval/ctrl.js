@@ -15,17 +15,6 @@ function enabledAfterDisable() {
   return enabledAfter == disable;
 }
 
-/*function reactive(obj, property) {
-  Object.defineProperty(obj, property, {
-    get() {
-      return mainStore.getState()[property];
-    },
-    set(value) {
-      mainStore.setState({ [property]: value });
-    },
-  });
-}*/
-
 //possible : does browser support engine
 //allowed : does engine is allowed to run
 //active : does engine is instanciate (worker)

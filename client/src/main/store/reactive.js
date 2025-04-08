@@ -1,46 +1,49 @@
-const accessor = (store, namespace, property) => {
-  const a =
-    typeof namespace === 'string'
-      ? {
-          get: () => store.getState()[namespace].property,
-          set: (newValue) =>
-            store.setState((state) => ({
-              [namespace]: { ...state[namespace], [property]: newValue },
-            })),
-        }
-      : {
-          get: () => store.geState()[property],
-          set: (newValue) => store.setState({ [property]: newValue }),
-        };
-  return a;
+//carefull : if i use setState in a react component, value wont be updated
+const withNamespace = (store, namespace, property) => {
+  if (typeof namespace === 'string') {
+    return (newValue) =>
+      store.setState((state) => ({
+        [namespace]: { ...state[namespace], [property]: newValue },
+      }));
+  } else {
+    return (newValue) => store.setState({ [property]: newValue });
+  }
 };
 
 export const observable = (store, namespace) => (property) => {
-  const { get, set } = accessor(store, namespace, property);
+  let value;
+  const setter = withNamespace(store, namespace, property);
 
   return {
-    get,
+    get() {
+      return value;
+    },
     set(newValue) {
       if (typeof newValue === 'function') {
         throw new Error('observable property must be flagged as computed');
       }
-      set(newValue);
+      value = newValue;
+      setter(newValue);
     },
   };
 };
 
 //note : no side effect function
 export const computed = (store, namespace) => (property) => {
-  const { get, set } = accessor(store, namespace, property);
+  let value;
+  const setter = withNamespace(store, namespace, property);
   return {
-    get,
+    get() {
+      return value;
+    },
     set(newValue) {
       if (typeof newValue !== 'function') {
         throw new Error('computed property must be callable');
-      } else if (get()) {
+      } else if (value) {
         throw new Error('computed property cant be reassigned');
       }
-      set(newValue);
+      value = newValue;
+      setter(newValue);
     },
   };
 };

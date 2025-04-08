@@ -3,28 +3,46 @@ import { makeObservable } from 'src/main/store';
 import { validateFen } from 'chess.js';
 
 export class Fen {
-  constructor() {
+  constructor(fen) {
     makeObservable(this, {
-      fen: computed,
-      isLegalFen: computed,
-      fenPosition: observable,
+      current: computed,
+      position: observable,
       turn: observable,
       castling: observable,
       halfmove: observable,
       fullmove: observable,
-      fenInputRef: observable,
+      inputRef: observable,
+      isLegal: computed,
+      namespace: 'fen',
     });
-    this.fenPosition = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-    this.turn = 'w';
-    this.castling = {
-      K: true,
-      Q: true,
-      k: true,
-      q: true,
+    this.inputRef = undefined;
+    this.current = () => {
+      const fen = [
+        this.position,
+        this.turn,
+        this._getCastlingRights(),
+        '-',
+        this.halfmove,
+        this.fullmove,
+      ].join(' ');
+      return fen;
     };
-    this.halfmove = 0;
-    this.fullmove = 1;
-    this.fenInputRef = undefined;
+    this.isLegal = () => validateFen(this.current()).ok;
+    this.setFen(fen);
+
+    console.log(this);
+  }
+
+  setFen(initialFen) {
+    const fen = initialFen.split(' ');
+    this.position = fen[0];
+    this.turn = fen[1];
+    this.castling = ['K', 'Q', 'k', 'q'].reduce((acc, key) => {
+      acc[key] = fen[2].includes(key);
+      return acc;
+    }, {});
+    this.halfmove = fen[4];
+    this.fullmove = fen[5];
   }
 
   _getCastlingRights() {
@@ -39,38 +57,16 @@ export class Fen {
     this.castling = { ...this.castling, [id]: value };
   }
 
-  fen() {
-    const fen = [
-      this.fenPosition,
-      this.turn,
-      this._getCastlingRights(),
-      '-',
-      this.halfmove,
-      this.fullmove,
-    ].join(' ');
-    return fen;
-  }
-
-  isLegalFen = () => validateFen(this.fen()).ok;
-
   setTurn(turn = undefined) {
     const newTurn = turn ?? (this.turn === 'w' ? 'b' : 'w');
     this.turn = newTurn;
   }
 
-  setFen(input) {
-    if (input !== this.fen() && this._isValidInput(input)) {
-      const newState = input.split(' ');
-      this.fenPosition = newState[0];
-      this.turn = newState[1];
-      this.castling = Object.keys(this.castling).reduce((acc, key) => {
-        acc[key] = newState[2].includes(key);
-        return acc;
-      }, {});
-      this.halfmove = newState[4];
-      this.fullmove = newState[5];
+  setFenFromInput(input) {
+    if (input !== this.current() && this._isValidInput(input)) {
+      this.setFen(input);
     } else {
-      this.fenInputRef.current.value = this.fen();
+      this.inputRef.current.value = this.current();
     }
   }
 
@@ -89,12 +85,12 @@ export class Fen {
   }
 
   isFenAnalysable() {
-    this.setFen(this.fenInputRef.current.value);
-    return this.isLegalFen();
+    this.setFenFromInput(this.inputRef.current.value);
+    return this.isLegal();
   }
 
   resetFen(cr) {
-    this.fenPosition = cr
+    this.position = cr
       ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
       : '8/8/8/8/8/8/8/8';
     this.turn = 'w';

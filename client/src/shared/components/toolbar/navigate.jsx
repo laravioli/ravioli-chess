@@ -1,5 +1,4 @@
 import { controller } from 'src/main/logic';
-import { mainStore } from 'src/main/store';
 import { useNavigate } from 'react-router';
 import { useModule, useMainStore } from 'src/shared/hooks/hooks';
 import { CButton } from './button';
@@ -7,18 +6,17 @@ import { CButton } from './button';
 export function Navigate({ path }) {
   const module = useModule();
   const navigate = useNavigate();
-  const isLegalFen = useMainStore((state) => state.isLegalFen());
-  const isFenAnalysable = useMainStore((state) => state.isFenAnalysable);
+  const isLegalFen = useMainStore((state) => state.fen.isLegal());
 
   const isEdit = path !== '/editor';
   const label = isEdit ? 'analysis board' : 'edit board';
 
   const onClick = () => {
-    if (isFenAnalysable()) {
-      controller.setModule(path, mainStore.getState().fen());
+    if (module.fen.isFenAnalysable()) {
+      controller.setModule(path, module.fen.current());
       navigate(path, { replace: true });
     } else {
-      module.getBoard().position(mainStore.getState().fen());
+      module.getBoard().position(module.fen.current());
     }
   };
 

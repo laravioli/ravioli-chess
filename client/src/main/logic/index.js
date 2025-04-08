@@ -1,4 +1,3 @@
-import { mainStore } from '../store';
 import { Controller } from './main';
 import { initSite } from 'src/lib/site/site';
 
@@ -17,17 +16,7 @@ function makeController() {
     return null;
   }
 
-  const storeApi = (store) => ({
-    get: store.getState,
-    set: store.setState,
-    subscribe: store.subscribe,
-  });
-
-  const store = storeApi(mainStore);
-  const controller = new Controller(
-    match(new URL(window.location).pathname),
-    store
-  );
+  const controller = new Controller(match(new URL(window.location).pathname));
 
   return {
     getModule: (path) => {
@@ -36,7 +25,7 @@ function makeController() {
     },
     setModule: (path, fen) => {
       const id = match(path);
-      controller.setModule(id, { fen, store });
+      controller.setModule(id, { fen });
     },
   };
 }

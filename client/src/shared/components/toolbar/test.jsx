@@ -5,7 +5,8 @@ import { CButton } from './button';
 const test = (module) => {
   console.log('board ' + module.getBoard().fen());
   console.log('chess ' + module.getGame?.().fen());
-  console.log('fen ' + mainStore.getState().fen());
+  console.log('fen ' + mainStore.getState().fen.current());
+  console.log('fen from module' + module.fen.current());
   console.log('current move', module.getGame?.().currentMove);
 };
 

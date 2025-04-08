@@ -3,26 +3,22 @@ import { Game } from 'src/lib/game/game';
 import { CevalCtrl } from 'src/lib/eval/ctrl';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { upperize } from 'src/lib/game/utils';
 import { observable } from 'src/main/store/reactive';
 import { makeObservable } from 'src/main/store';
 
-//todo : finish moving fen update to game (turn ovverride prb)
-
 export class Analyse {
-  constructor(opts) {
+  constructor(opts, deps) {
     window.analysis = this;
     makeObservable(this, { evaluation: observable, namespace: 'analyse' });
-    this.fen = opts.fen;
-    this.initialFen = opts.fen.fen();
-    this.store = opts.store;
-    this.newGame(opts.fen.fen());
+    this.initialFen = opts.fen;
+    this.fen = deps.fen;
+    this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
   }
 
   onLoad(fen) {
-    this.initialFen = fen.fen();
+    this.initialFen = fen;
     this.newGame(fen);
   }
 
@@ -36,10 +32,11 @@ export class Analyse {
     return this.game;
   }
 
-  newGame(fen) {
+  newGame(fen, deps) {
     if (!this.game) {
-      this.game = new Game(fen);
+      this.game = new Game(fen, deps);
     } else {
+      if (fen !== this.fen.current()) this.fen.setFen(fen);
       this.game.load(fen);
       this.restartCeval();
     }
@@ -51,11 +48,9 @@ export class Analyse {
 
     const move = this.game.currentMove;
     this.restartCeval();
-    this.board.position(move.fen, true);
     this.evaluation = move.ceval;
-    this.store.set({
-      ...this.getFen(),
-    });
+    this.board.position(move.fen, true);
+    this.fen.setFen(move.fen);
   }
 
   /*----------EVAL----------*/
@@ -106,22 +101,6 @@ export class Analyse {
   }
 
   getCeval = () => this.ceval;
-
-  /*----------STORE----------*/
-
-  getFen = () => {
-    const castlingRights = {
-      ...upperize(this.game.getCastlingRights('w')),
-      ...this.game.getCastlingRights('b'),
-    };
-    return {
-      fenPosition: this.game.fen().split(' ')[0],
-      turn: this.game.turn(),
-      castling: castlingRights,
-      halfmove: this.game.fen().split(' ')[4],
-      fullmove: this.game.moveNumber(),
-    };
-  };
 
   /*----------BOARD----------*/
 

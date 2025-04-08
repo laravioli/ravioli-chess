@@ -1,24 +1,10 @@
 import { Chess } from 'chess.js';
-import { computed } from 'src/main/store/reactive';
 import { makeObservable } from 'src/main/store';
-import { observable } from '../../main/store/reactive';
-import { upperize } from './utils';
-
-//todo : finish moving fen update to game (turn ovverride prb)
+import { computed } from 'src/main/store/reactive';
 
 export class Game {
   constructor(fen) {
-    makeObservable(
-      this,
-      { outcome: computed, namespace: 'game' },
-      {
-        fenPosition: observable,
-        turn: observable,
-        castling: observable,
-        halfmove: observable,
-        fullmove: observable,
-      }
-    );
+    makeObservable(this, { outcome: computed, namespace: 'game' });
     this._chess = new Chess(fen);
     this.initHistory(fen);
     this.outcome = () => this._chess.isGameOver();
@@ -140,19 +126,5 @@ export class Game {
       this.currentMove = this.currentMove.children[0];
       this._chess.move(this.currentMove.san);
     }
-  }
-
-  updateFen() {
-    const sfen = this._chess.fen().split(' ');
-    const castling = {
-      ...upperize(this._chess.getCastlingRights('w')),
-      ...this._chess.getCastlingRights('b'),
-    };
-
-    this.fenPosition = sfen[0];
-    this.turn = this._chess.turn();
-    this.castling = castling;
-    this.halfmove = sfen[4];
-    this.fullmove = this._chess.moveNumber();
   }
 }

@@ -1,14 +1,13 @@
 import chessBoard from 'chessboard';
-import { observable } from '../../main/store/reactive';
-import { makeObservable } from 'src/main/store';
 
 export class Editor {
-  constructor(opts) {
-    makeObservable(this, { fenPosition: observable });
+  constructor(opts, deps) {
     this.initialFen = opts.fen;
+    this.fen = deps.fen;
   }
 
   onLoad(fen) {
+    if (fen !== this.fen.current()) this.fen.setFen(fen);
     this.initialFen = fen;
   }
 
@@ -39,7 +38,7 @@ export class Editor {
       sparePieces: true,
       hideSparePieces: false,
       onDrop: (s, t, p, newPos) =>
-        (this.fenPosition = this.board.objToFen(newPos)),
+        (this.fen.position = this.board.objToFen(newPos)),
     };
   };
 }

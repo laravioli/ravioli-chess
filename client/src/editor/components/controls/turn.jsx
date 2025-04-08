@@ -3,16 +3,15 @@ import { NativeSelect } from '@mantine/core';
 import styles from '../css/controls.module.css';
 
 export const TurnToPlay = () => {
-  const module = useModule();
-  const turn = useMainStore((state) => state.turn);
-  const setTurn = useMainStore((state) => state.setTurn);
+  const editor = useModule();
+  const turn = useMainStore((state) => state.fen.turn);
   const data = [
     { label: 'White to play', value: 'w' },
     { label: 'Black to play', value: 'b' },
   ];
 
   const onChange = () => {
-    setTurn();
+    editor.fen.setTurn();
   };
 
   return (
@@ -21,7 +20,6 @@ export const TurnToPlay = () => {
       onChange={onChange}
       data={data}
       classNames={{ wrapper: styles.wrapper }}
-      disabled={!!module.game}
     />
   );
 };

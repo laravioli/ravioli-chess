@@ -1,18 +1,17 @@
 import { mainStore } from 'src/main/store';
 import { useRef, useEffect } from 'react';
-import { useModule, useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/shared/hooks/hooks';
 import { TextInput } from '@mantine/core';
 import styles from '../css/fen.module.css';
 
 export const FenInput = () => {
   const module = useModule();
-  const setFen = useMainStore((state) => state.setFen);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    mainStore.setState({ fenInputRef: inputRef });
+    module.fen.inputRef = inputRef;
     const unsub = mainStore.subscribe(
-      (state) => state.fen(),
+      (state) => state.fen.current(),
       (fen) => {
         inputRef.current.value = fen;
       },
@@ -21,13 +20,13 @@ export const FenInput = () => {
       }
     );
     return unsub;
-  }, []);
+  }, [module]);
 
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
-      setFen(fen);
-      module.getBoard().position(mainStore.getState().fen(), true);
+      module.fen.setFenFromInput(fen);
+      module.getBoard().position(module.fen.current(), true);
     }
   };
 
