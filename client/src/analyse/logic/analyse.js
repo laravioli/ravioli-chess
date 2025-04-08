@@ -11,16 +11,18 @@ import { makeObservable } from 'src/main/store';
 
 export class Analyse {
   constructor(opts) {
+    window.analysis = this;
     makeObservable(this, { evaluation: observable, namespace: 'analyse' });
-    this.initialFen = opts.fen;
+    this.fen = opts.fen;
+    this.initialFen = opts.fen.fen();
     this.store = opts.store;
-    this.newGame(opts.fen);
+    this.newGame(opts.fen.fen());
     this.initCeval();
     this.startCeval();
   }
 
   onLoad(fen) {
-    this.initialFen = fen;
+    this.initialFen = fen.fen();
     this.newGame(fen);
   }
 

@@ -1,6 +1,7 @@
-import { validateFen } from 'chess.js';
+//import { validateFen } from 'chess.js';
 
-export const createFenSlice = (set, get) => ({
+export const createFenSlice = (/*set, get*/) => ({
+  /*
   fenPosition: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
   turn: 'w',
   castling: {
@@ -100,4 +101,5 @@ export const createFenSlice = (set, get) => ({
       fullmove: 1,
     });
   },
+*/
 });
