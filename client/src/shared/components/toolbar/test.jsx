@@ -15,7 +15,7 @@ export const TestButton = () => {
   const module = useModule();
   return (
     <Action label="test" onClick={() => test(module)}>
-      <IconTestPipe size={40} stroke={1.5} />
+      <IconTestPipe size={40} stroke={1.2} />
     </Action>
   );
 };

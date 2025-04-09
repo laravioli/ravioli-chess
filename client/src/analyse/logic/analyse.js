@@ -52,7 +52,7 @@ export class Analyse {
     this.game.jump(action);
 
     const move = this.game.currentMove;
-    if (move.ceval) this.evaluation = move.ceval;
+    if (move.ceval || !this.ceval.enabled) this.evaluation = move.ceval;
     this.restartCeval();
     this.board.position(move.fen, true);
     this.fen.setFen(move.fen);

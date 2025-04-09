@@ -1,0 +1,8 @@
+.controls {
+  background: var(--mantine-color-dark-6);
+  border-top: 1px solid var(--mantine-color-dark-7);
+}
+
+.history {
+  padding-bottom: 1rem;
+}

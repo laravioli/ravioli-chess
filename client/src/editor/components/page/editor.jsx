@@ -25,8 +25,8 @@ export function Editor() {
           <StartButton />
           <ClearButton />
           <FlipButton />
-          <Navigate path="/analysis" />
           <TestButton />
+          <Navigate path="/analysis" />
         </Controls>
       </div>
     </div>

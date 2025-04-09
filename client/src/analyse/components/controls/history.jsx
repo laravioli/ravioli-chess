@@ -6,6 +6,7 @@ import {
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
 import { useModule } from 'src/shared/hooks/hooks';
+import classes from '../css/controls.module.css';
 
 export const History = () => {
   const module = useModule();
@@ -17,14 +18,17 @@ export const History = () => {
   ];
 
   return (
-    <Group justify="center">
+    <Group className={classes.history} justify="space-evenly">
       {actions.map(({ icon: Icon, action }) => (
         <ActionIcon
           key={action}
           variant="default"
-          size="lg"
-          onClick={() => module.jump(action)}>
-          <Icon size={40} stroke={1.5} />
+          size="xl"
+          onClick={() => module.jump(action)}
+          styles={{
+            root: { border: 0 },
+          }}>
+          <Icon size={50} stroke={1.5} />
         </ActionIcon>
       ))}
     </Group>

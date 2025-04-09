@@ -1,18 +1,17 @@
-import { Group, Stack } from '@mantine/core';
-import styles from '../css/toolbar.module.css';
+import { Flex } from '@mantine/core';
 
 export function Controls({ children }) {
   return (
     <>
-      <Stack
-        h={100}
+      <Flex
+        h={20}
         bg="var(--mantine-color-body)"
         align="flex-start"
         justify="flex-start"
-        gap="md">
-        {' '}
+        gap="sm"
+        direction={{ base: 'row', md: 'column' }}>
         {children}
-      </Stack>
+      </Flex>
     </>
   );
 }

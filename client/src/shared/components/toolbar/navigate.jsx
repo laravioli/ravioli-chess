@@ -24,7 +24,7 @@ export function Navigate({ path }) {
 
   return (
     <Action label={label} onClick={onClick} disabled={isEdit && !isLegalFen}>
-      <Icon size={30} stroke={1.5} />
+      <Icon size={30} stroke={1.2} />
     </Action>
   );
 }

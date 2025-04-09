@@ -1,6 +1,6 @@
-import styles from '../css/eval.module.css';
 import { useMainStore } from 'src/shared/hooks/hooks';
 import { povChances } from 'src/lib/eval/util';
+import styles from '../css/eval.module.css';
 
 export const EvalBar = () => {
   const enabled = useMainStore((state) => state.eval.enabled);
