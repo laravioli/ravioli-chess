@@ -9,9 +9,14 @@ import { makeObservable } from 'src/main/store';
 export class Analyse {
   constructor(opts, deps) {
     window.analysis = this;
-    makeObservable(this, { evaluation: observable, namespace: 'analyse' });
+    makeObservable(this, {
+      evaluation: observable,
+      side: observable,
+      namespace: 'analyse',
+    });
     this.initialFen = opts.fen;
     this.fen = deps.fen;
+    this.side = 'white';
     this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
@@ -75,7 +80,6 @@ export class Analyse {
     if (!move.ceval || isEvalBetter(ev, move.ceval)) {
       move.ceval = ev;
       this.evaluation = ev;
-      console.log(ev);
     }
   }
 

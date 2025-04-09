@@ -19,12 +19,13 @@
     'evalbar     board  .    tools' min-content
     'evalbar     board  .    tools' auto
     '.     copyables    .    tools' min-content
-    / 1em clamp(300px, 72vmin, 700px) 2vmin minmax(100px, 200px);
+    / 1em clamp(300px, 72vmin, 700px) 2vmin minmax(170px, 320px);
 }
 
 .toolbar {
   grid-area: tools;
-  align-self: center;
+  align-self: start;
+  margin-top: clamp(37px, 9vmin, 87.5px);
 }
 
 .toolbar {

@@ -1,6 +1,7 @@
 import { mainStore } from 'src/main/store';
 import { useModule } from 'src/shared/hooks/hooks';
-import { CButton } from './button';
+import { Action } from './action';
+import { IconTestPipe } from '@tabler/icons-react';
 
 const test = (module) => {
   console.log('board ' + module.getBoard().fen());
@@ -10,7 +11,11 @@ const test = (module) => {
   console.log('current move', module.getGame?.().currentMove);
 };
 
-export const TestButton = ({ label, style = {} }) => {
+export const TestButton = () => {
   const module = useModule();
-  return <CButton label={label} onClick={() => test(module)} style={style} />;
+  return (
+    <Action label="test" onClick={() => test(module)}>
+      <IconTestPipe size={40} stroke={1.5} />
+    </Action>
+  );
 };

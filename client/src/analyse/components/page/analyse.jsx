@@ -18,18 +18,18 @@ export function Analyse() {
       <Board />
       <FenInput />
       <div className="toolbar">
+        <Position />
         <EvalTool />
         <div className="fen-controls">
           <EvalBox />
         </div>
-        <Position />
-        <Navigate path="/editor" />
+        <History />
         <Controls>
           <StartButton />
           <FlipButton />
-          <TestButton label="test" />
+          <TestButton />
+          <Navigate path="/editor" />
         </Controls>
-        <History />
       </div>
     </div>
   );

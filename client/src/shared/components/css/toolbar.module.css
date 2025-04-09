@@ -1,5 +1,6 @@
-.group {
-  margin-bottom: 1rem;
+.controls {
+  align-self: start;
+  justify-content: flex-end;
 }
 
 .wrapper {

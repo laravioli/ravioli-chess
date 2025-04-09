@@ -1,7 +1,8 @@
 import { controller } from 'src/main/logic';
 import { useNavigate } from 'react-router';
 import { useModule, useMainStore } from 'src/shared/hooks/hooks';
-import { CButton } from './button';
+import { Action } from './action';
+import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
 
 export function Navigate({ path }) {
   const module = useModule();
@@ -10,6 +11,7 @@ export function Navigate({ path }) {
 
   const isEdit = path !== '/editor';
   const label = isEdit ? 'analysis board' : 'edit board';
+  const Icon = isEdit ? IconMathMaxMin : IconEdit;
 
   const onClick = () => {
     if (module.fen.isFenAnalysable()) {
@@ -21,11 +23,8 @@ export function Navigate({ path }) {
   };
 
   return (
-    <CButton
-      label={label}
-      onClick={onClick}
-      isDisabled={isEdit && !isLegalFen}
-      style={{ margin: '0px 0px 12px 0px' }}
-    />
+    <Action label={label} onClick={onClick} disabled={isEdit && !isLegalFen}>
+      <Icon size={30} stroke={1.5} />
+    </Action>
   );
 }

@@ -21,12 +21,12 @@ export function Editor() {
           <CastlingBoxes />
         </div>
         <Position />
-        <Navigate path="/analysis" />
         <Controls>
           <StartButton />
           <ClearButton />
           <FlipButton />
-          <TestButton label="test" />
+          <Navigate path="/analysis" />
+          <TestButton />
         </Controls>
       </div>
     </div>

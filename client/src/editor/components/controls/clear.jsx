@@ -1,5 +1,6 @@
 import { useModule } from 'src/shared/hooks/hooks';
-import { CButton } from 'src/shared/components/toolbar/button';
+import { Action } from 'src/shared/components/toolbar/action';
+import { IconTrash } from '@tabler/icons-react';
 
 export const ClearButton = () => {
   const editor = useModule();
@@ -9,5 +10,9 @@ export const ClearButton = () => {
     editor.fen.resetFen(false);
   };
 
-  return <CButton label={'clear board'} onClick={onClear} />;
+  return (
+    <Action label="clear board" onClick={onClear}>
+      <IconTrash size={40} stroke={1.5} />
+    </Action>
+  );
 };
