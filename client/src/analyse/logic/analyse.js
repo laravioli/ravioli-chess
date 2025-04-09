@@ -40,15 +40,15 @@ export class Analyse {
       this.game.load(fen);
       this.restartCeval();
     }
-    if (!this.ceval || !this.ceval.evalEnabled) this.evaluation = null;
+    if (!this.ceval || !this.ceval.enabled) this.evaluation = null;
   }
 
   jump(action) {
     this.game.jump(action);
 
     const move = this.game.currentMove;
+    if (move.ceval) this.evaluation = move.ceval;
     this.restartCeval();
-    this.evaluation = move.ceval;
     this.board.position(move.fen, true);
     this.fen.setFen(move.fen);
   }
@@ -67,7 +67,6 @@ export class Analyse {
     else {
       this.ceval = new CevalCtrl(opts);
     }
-    //this.store.set({ evalEnabled: this.ceval.enabled() });
   }
 
   onNewCeval(ev) {
@@ -76,11 +75,12 @@ export class Analyse {
     if (!move.ceval || isEvalBetter(ev, move.ceval)) {
       move.ceval = ev;
       this.evaluation = ev;
+      console.log(ev);
     }
   }
 
   startCeval = throttle(800, () => {
-    if (this.ceval?.evalEnabled) {
+    if (this.ceval?.enabled) {
       if (this.game && !this.game.isGameOver()) {
         this.ceval.start(this.game.moveList, undefined);
       } else {
@@ -96,7 +96,6 @@ export class Analyse {
 
   toggleCeval() {
     this.ceval?.toggle();
-    //this.store.set({ evalEnabled: this.ceval.enabled() });
     this.startCeval();
   }
 

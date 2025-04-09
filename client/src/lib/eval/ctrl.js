@@ -1,11 +1,9 @@
 import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
 import { localStore } from 'src/main/store';
-import { mainStore } from 'src/main/store';
+import { observable } from 'src/main/store/reactive';
+import { makeObservable } from 'src/main/store';
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
-
-import { linkStateToStore, observable } from '../../main/store/reactive';
-const makeObservable = linkStateToStore(mainStore);
 
 const cevalDisabledSentinel = '1';
 
@@ -29,7 +27,7 @@ export class CevalCtrl {
   showEnginePrefs = toggle(false);
 
   constructor(opts) {
-    makeObservable(this, { evalEnabled: observable });
+    makeObservable(this, { enabled: observable, namespace: 'eval' });
     this.init(opts);
   }
 
@@ -48,7 +46,7 @@ export class CevalCtrl {
         this.allowed() &&
         enabledAfterDisable()
     );*/
-    this.evalEnabled =
+    this.enabled =
       this.possible &&
       this.analysable &&
       this.allowed() &&
@@ -68,7 +66,7 @@ export class CevalCtrl {
   });
 
   doStart = (steps, gameId) => {
-    if (!this.evalEnabled || !this.possible || !enabledAfterDisable()) return;
+    if (!this.enabled || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
 
     localStore.setState({ sri: window.site.sri, disable: Math.random() });
@@ -96,7 +94,7 @@ export class CevalCtrl {
       search: this.search.by,
       multiPv: this.search.multiPv,
       emit: (ev) => {
-        if (!this.evalEnabled) return;
+        if (!this.enabled) return;
         this.onEmit(ev, work);
       },
     };
@@ -177,14 +175,14 @@ export class CevalCtrl {
   toggle = () => {
     if (!this.possible || !this.allowed()) return;
     this.stop();
-    if (!this.evalEnabled && !document.hidden) {
+    if (!this.enabled && !document.hidden) {
       const disable = localStore.getState().disable || cevalDisabledSentinel;
       if (disable)
         window.sessionStorage.setItem('ceval.enabled-after', disable);
-      this.evalEnabled = true;
+      this.enabled = true;
     } else {
       window.sessionStorage.setItem('ceval.enabled-after', '');
-      this.evalEnabled = false;
+      this.enabled = false;
     }
   };
 

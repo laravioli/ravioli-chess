@@ -1,7 +1,6 @@
 import { createStore } from 'zustand';
 import { linkStateToStore } from './reactive';
 import { subscribeWithSelector, persist } from 'zustand/middleware';
-import { createFenSlice } from 'src/shared/store/fenslice';
 import { recommendedThreads } from 'src/lib/eval/engine';
 
 export const localStore = createStore(
@@ -36,10 +35,6 @@ const withStorageDOMEvents = (store) => {
 
 withStorageDOMEvents(localStore);
 
-export const mainStore = createStore(
-  subscribeWithSelector((...a) => ({
-    ...createFenSlice(...a),
-  }))
-);
+export const mainStore = createStore(subscribeWithSelector(() => ({})));
 
 export const makeObservable = linkStateToStore(mainStore);

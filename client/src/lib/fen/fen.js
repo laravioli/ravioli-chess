@@ -2,6 +2,8 @@ import { observable, computed } from 'src/main/store/reactive';
 import { makeObservable } from 'src/main/store';
 import { validateFen } from 'chess.js';
 
+//todo: fix error on vite hmr
+
 export class Fen {
   constructor(fen) {
     makeObservable(this, {
@@ -16,6 +18,7 @@ export class Fen {
       namespace: 'fen',
     });
     this.inputRef = undefined;
+    this.setFen(fen);
     this.current = () => {
       const fen = [
         this.position,
@@ -28,9 +31,6 @@ export class Fen {
       return fen;
     };
     this.isLegal = () => validateFen(this.current()).ok;
-    this.setFen(fen);
-
-    console.log(this);
   }
 
   setFen(initialFen) {

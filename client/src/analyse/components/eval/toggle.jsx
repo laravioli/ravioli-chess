@@ -6,7 +6,7 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 
 export const EvalToggle = () => {
   const analyse = useModule();
-  const enabled = useMainStore((state) => state.evalEnabled);
+  const enabled = useMainStore((state) => state.eval.enabled);
 
   const isTab = useCallback(() => {
     const { sri } = localStore.getState();

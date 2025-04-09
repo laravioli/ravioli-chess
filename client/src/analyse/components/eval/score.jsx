@@ -6,7 +6,6 @@ export const EvalScore = () => {
   const evaluation = useMainStore((state) => state.analyse.evaluation);
   const outcome = useMainStore((state) => state.game.outcome());
   let score = '';
-  console.log(outcome);
 
   if (evaluation) {
     if (evaluation.mate) {
