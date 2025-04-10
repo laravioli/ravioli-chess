@@ -1,18 +1,18 @@
 import { Group } from '@mantine/core';
-import { StartButton } from 'src/shared/components/toolbar/start';
 import { FlipButton } from 'src/shared/components/toolbar/flip';
-import { Positions } from './positions';
+import { StartButton } from 'src/shared/components/toolbar/start';
+import { ClearButton } from './clear';
 import { TestButton } from 'src/shared/components/toolbar/test';
 import { Navigate } from 'src/shared/components/toolbar/navigate';
 
-export const AnalyseActions = () => {
+export const EditorActions = () => {
   return (
     <Group justify="center">
       <FlipButton />
       <StartButton />
-      <Positions />
+      <ClearButton />
       <TestButton />
-      <Navigate path="/editor" />
+      <Navigate path="/analysis" />
     </Group>
   );
 };

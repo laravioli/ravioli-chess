@@ -2,8 +2,3 @@
   align-self: start;
   justify-content: flex-end;
 }
-
-.wrapper {
-  --input-margin-bottom: 1rem;
-  --input-bd-focus: var(--input-bd) !important;
-}

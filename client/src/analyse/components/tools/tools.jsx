@@ -2,7 +2,7 @@ import { EvalTool } from '../eval/tool';
 import { AnalyseBox } from '../eval/box';
 import { AnalyseControls } from '../controls/controls';
 
-export function Tools() {
+export const Tools = () => {
   return (
     <div className="toolbar">
       <EvalTool />
@@ -10,4 +10,4 @@ export function Tools() {
       <AnalyseControls />
     </div>
   );
-}
+};

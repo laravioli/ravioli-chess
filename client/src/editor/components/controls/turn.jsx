@@ -1,6 +1,6 @@
 import { useModule, useMainStore } from 'src/shared/hooks/hooks';
 import { NativeSelect } from '@mantine/core';
-import styles from '../css/controls.module.css';
+import classes from '../css/controls.module.css';
 
 export const TurnToPlay = () => {
   const editor = useModule();
@@ -19,7 +19,7 @@ export const TurnToPlay = () => {
       value={turn}
       onChange={onChange}
       data={data}
-      classNames={{ wrapper: styles.wrapper }}
+      classNames={{ wrapper: classes.wrapper }}
     />
   );
 };

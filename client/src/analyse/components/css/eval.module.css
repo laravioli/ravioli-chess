@@ -12,6 +12,7 @@
 .evalbox {
   background: var(--mantine-color-dark-8);
   border: var(--mantine-color-dark-7);
+  height: clamp(240px, 60vmin, 640px);
 }
 
 .evalscore {

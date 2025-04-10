@@ -1,6 +1,6 @@
 import { useMainStore } from 'src/shared/hooks/hooks';
 import { povChances } from 'src/lib/eval/util';
-import styles from '../css/eval.module.css';
+import classes from '../css/eval.module.css';
 
 export const EvalBar = () => {
   const enabled = useMainStore((state) => state.eval.enabled);
@@ -14,10 +14,10 @@ export const EvalBar = () => {
 
   return (
     <div
-      className={[styles.bar, styles.barblack].join(' ')}
+      className={[classes.bar, classes.barblack].join(' ')}
       style={side === 'black' ? { transform: 'rotate(180deg)' } : {}}>
       <div
-        className={styles.barwhite}
+        className={classes.barwhite}
         style={{ height: `${(progress + 1) * 50}%` }}></div>
     </div>
   );

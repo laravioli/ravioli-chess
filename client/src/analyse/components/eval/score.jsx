@@ -1,6 +1,6 @@
 import { useMainStore } from 'src/shared/hooks/hooks';
-import styles from '../css/eval.module.css';
 import { renderEval } from 'src/lib/eval/util';
+import classes from '../css/eval.module.css';
 
 export const EvalScore = () => {
   const evaluation = useMainStore((state) => state.analyse.evaluation);
@@ -19,5 +19,5 @@ export const EvalScore = () => {
     score = '-';
   }
 
-  return <span className={styles.evalscore}>{score}</span>;
+  return <span className={classes.evalscore}>{score}</span>;
 };

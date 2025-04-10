@@ -4,6 +4,8 @@
     '. .'
     '. .'
     / 1fr 1fr;
+  justify-items: left;
+  padding-bottom: 1rem;
 }
 
 .wrapper {

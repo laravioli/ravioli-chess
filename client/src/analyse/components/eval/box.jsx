@@ -18,7 +18,6 @@ export function AnalyseBox() {
   return (
     <Paper
       className={classes.evalbox}
-      style={{ height: 'clamp(240px, 60vmin, 640px)' }}
       padding="sm"
       shadow="xl"
       radius=""

@@ -1,12 +1,12 @@
 import { useModule, useMainStore } from 'src/shared/hooks/hooks';
 import { Checkbox } from '@mantine/core';
-import styles from '../css/controls.module.css';
+import classes from '../css/controls.module.css';
 
 export const CastlingBoxes = () => {
   return (
     <>
       <strong>castling</strong>
-      <div className={styles.castle}>
+      <div className={classes.castle}>
         <CastlingBox id="K" label="O-O" />
         <CastlingBox id="Q" label="O-O-O" />
         <CastlingBox id="k" label="o-o" />

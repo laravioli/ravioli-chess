@@ -2,7 +2,7 @@ import { mainStore } from 'src/main/store';
 import { useRef, useEffect } from 'react';
 import { useModule } from 'src/shared/hooks/hooks';
 import { TextInput } from '@mantine/core';
-import styles from '../css/fen.module.css';
+import classes from '../css/fen.module.css';
 
 export const FenInput = () => {
   const module = useModule();
@@ -40,7 +40,7 @@ export const FenInput = () => {
       radius="xs"
       onKeyDown={onKeyDown}
       disabled={!!module.game}
-      classNames={{ input: styles.input }}
+      classNames={{ input: classes.input }}
     />
   );
 };

@@ -1,14 +1,14 @@
 import { mainStore } from 'src/main/store';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useInitData, useModule } from 'src/shared/hooks/hooks';
 import { NativeSelect } from '@mantine/core';
-import styles from '../css/toolbar.module.css';
 import { short_fen } from './utils';
+import classes from '../css/controls.module.css';
 
-export const Position = () => {
+export const Positions = () => {
   const module = useModule();
+
   const position = useInitData();
-  const [value, setValue] = useState('');
 
   const data = useMemo(
     () => [
@@ -20,23 +20,29 @@ export const Position = () => {
     ],
     [position]
   );
-
   const fens = useMemo(() => data.map((obj) => short_fen(obj.value)), [data]);
+
+  const matcher = useCallback(
+    (fen) => {
+      const match = fens.findIndex((pos) => pos === short_fen(fen));
+      if (match > 0) {
+        return data[match].value;
+      } else {
+        return data[0].value;
+      }
+    },
+    [data, fens]
+  );
+
+  const [value, setValue] = useState(matcher(module.fen.current()));
 
   useEffect(() => {
     const unsub = mainStore.subscribe(
       (state) => state.fen.current(),
-      (fen) => {
-        const match = fens.findIndex((pos) => pos === short_fen(fen));
-        if (match > 0) {
-          setValue(data[match].value);
-        } else {
-          setValue(data[0].value);
-        }
-      }
+      (fen) => setValue(matcher(fen))
     );
     return unsub;
-  }, [fens, data]);
+  }, [matcher]);
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
@@ -54,7 +60,7 @@ export const Position = () => {
       value={value}
       onChange={onChange}
       data={data}
-      classNames={{ wrapper: styles.wrapper }}
+      classNames={{ wrapper: classes.wrapper }}
     />
   );
 };
