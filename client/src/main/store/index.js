@@ -35,6 +35,12 @@ const withStorageDOMEvents = (store) => {
 
 withStorageDOMEvents(localStore);
 
-export const mainStore = createStore(subscribeWithSelector(() => ({})));
+export const mainStore = createStore(
+  subscribeWithSelector((set) => ({
+    side: 'white',
+    changeSide: () =>
+      set((state) => ({ side: state.side === 'white' ? 'black' : 'white' })),
+  }))
+);
 
 export const makeObservable = linkStateToStore(mainStore);

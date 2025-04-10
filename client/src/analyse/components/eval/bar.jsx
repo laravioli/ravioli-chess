@@ -6,7 +6,7 @@ export const EvalBar = () => {
   const enabled = useMainStore((state) => state.eval.enabled);
   const outcome = useMainStore((state) => state.game.outcome());
   const evaluation = useMainStore((state) => state.analyse.evaluation);
-  const side = useMainStore((state) => state.analyse.side);
+  const side = useMainStore((state) => state.side);
 
   if (!enabled || outcome) return null;
 

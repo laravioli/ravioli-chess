@@ -10,7 +10,9 @@ export function AnalyseBox() {
   const pvsSection = enabled && (
     <>
       {' '}
-      <Text>{pvsData} </Text>
+      <Text size="sm" lineClamp={1}>
+        {pvsData}{' '}
+      </Text>
       <Divider my="xs" />
     </>
   );

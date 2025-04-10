@@ -11,12 +11,10 @@ export class Analyse {
     window.analysis = this;
     makeObservable(this, {
       evaluation: observable,
-      side: observable,
       namespace: 'analyse',
     });
     this.initialFen = opts.fen;
     this.fen = deps.fen;
-    this.side = 'white';
     this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
