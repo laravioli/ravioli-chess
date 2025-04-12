@@ -1,13 +1,13 @@
 import { EvalTool } from '../eval/tool';
-import { AnalyseBox } from '../eval/box';
-import { AnalyseControls } from '../controls/controls';
+import { Moves } from '../move/move';
+import { Controls } from '../controls/controls';
 
 export const Tools = () => {
   return (
     <div className="toolbar">
       <EvalTool />
-      <AnalyseBox />
-      <AnalyseControls />
+      <Moves />
+      <Controls />
     </div>
   );
 };

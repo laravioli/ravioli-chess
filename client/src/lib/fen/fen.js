@@ -2,7 +2,7 @@ import { observable, computed } from 'src/main/store/reactive';
 import { makeObservable } from 'src/main/store';
 import { validateFen } from 'chess.js';
 
-//todo: fix error on vite hmr
+//todo: fix akward double use of current in component (via module or store)
 
 export class Fen {
   constructor(fen) {
@@ -15,22 +15,25 @@ export class Fen {
       fullmove: observable,
       inputRef: observable,
       isLegal: computed,
-      namespace: 'fen',
     });
     this.inputRef = undefined;
     this.setFen(fen);
-    this.current = () => {
-      const fen = [
-        this.position,
-        this.turn,
-        this._getCastlingRights(),
-        '-',
-        this.halfmove,
-        this.fullmove,
-      ].join(' ');
-      return fen;
-    };
-    this.isLegal = () => validateFen(this.current()).ok;
+  }
+
+  get current() {
+    const fen = [
+      this.position,
+      this.turn,
+      this._getCastlingRights(),
+      '-',
+      this.halfmove,
+      this.fullmove,
+    ].join(' ');
+    return fen;
+  }
+
+  get isLegal() {
+    return validateFen(this.current).ok;
   }
 
   setFen(initialFen) {
@@ -63,10 +66,10 @@ export class Fen {
   }
 
   setFenFromInput(input) {
-    if (input !== this.current() && this._isValidInput(input)) {
+    if (input !== this.current && this._isValidInput(input)) {
       this.setFen(input);
     } else {
-      this.inputRef.current.value = this.current();
+      this.inputRef.current.value = this.current;
     }
   }
 
@@ -86,7 +89,7 @@ export class Fen {
 
   isFenAnalysable() {
     this.setFenFromInput(this.inputRef.current.value);
-    return this.isLegal();
+    return this.isLegal;
   }
 
   resetFen(cr) {

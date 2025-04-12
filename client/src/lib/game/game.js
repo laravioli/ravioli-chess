@@ -4,10 +4,12 @@ import { computed } from 'src/main/store/reactive';
 
 export class Game {
   constructor(fen) {
-    makeObservable(this, { outcome: computed, namespace: 'game' });
+    makeObservable(this, {
+      outcome: computed,
+      Moves: computed,
+    });
     this._chess = new Chess(fen);
     this.initHistory(fen);
-    this.outcome = () => this._chess.isGameOver();
 
     return new Proxy(this, {
       get(target, prop) {
@@ -25,9 +27,24 @@ export class Game {
       },
     });
   }
+  get outcome() {
+    return this._chess.isGameOver();
+  }
+
+  get Moves() {
+    let move = this.currentMove;
+    const moves = [];
+    while (move.parent) {
+      moves.unshift(move);
+      move = move.parent;
+    }
+    moves.unshift(move);
+    return moves;
+  }
 
   initHistory(fen) {
-    const ply = this._chess.turn() == 'w' ? 0 : 1;
+    const ply =
+      (this._chess.turn() == 'w' ? 0 : 1) + (this._chess.moveNumber() - 1) * 2;
     this.currentMove = this.root = {
       parent: null,
       ply,
@@ -47,17 +64,6 @@ export class Game {
       to: target,
       promotion: 'q',
     });
-  }
-
-  get moveList() {
-    let move = this.currentMove;
-    const moves = [];
-    while (move.parent) {
-      moves.unshift(move);
-      move = move.parent;
-    }
-    moves.unshift(move);
-    return moves;
   }
 
   jump = (action) => {

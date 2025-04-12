@@ -7,7 +7,7 @@ export class Editor {
   }
 
   onLoad(fen) {
-    if (fen !== this.fen.current()) this.fen.setFen(fen);
+    if (fen !== this.fen.current) this.fen.setFen(fen);
     this.initialFen = fen;
   }
 

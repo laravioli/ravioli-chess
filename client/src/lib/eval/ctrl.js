@@ -18,7 +18,7 @@ function enabledAfterDisable() {
 //active : does engine is instanciate (worker)
 //enabled : does the button enabled is on or off (mainly to handle tabs)
 
-export class CevalCtrl {
+export class Eval {
   storedPv = () => localStore.getState().multipv;
   storedMovetime = () => localStore.getState().searchms;
   allowed = toggle(true);
@@ -27,7 +27,7 @@ export class CevalCtrl {
   showEnginePrefs = toggle(false);
 
   constructor(opts) {
-    makeObservable(this, { enabled: observable, namespace: 'eval' });
+    makeObservable(this, { enabled: observable });
     this.init(opts);
   }
 
@@ -40,12 +40,6 @@ export class CevalCtrl {
     this.opts = opts;
     this.possible = this.opts.possible;
     this.analysable = validateFen(this.opts.initialFen).ok;
-    /*this.enabled = toggle(
-      this.possible &&
-        this.analysable &&
-        this.allowed() &&
-        enabledAfterDisable()
-    );*/
     this.enabled =
       this.possible &&
       this.analysable &&

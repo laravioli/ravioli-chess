@@ -5,14 +5,7 @@
   position: relative;
   flex: 0 0 30px;
   background: var(--mantine-color-dark-6);
-  border-top: 1px solid var(--mantine-color-dark-6);
-  border-bottom: 1px solid var(--mantine-color-dark-7);
-}
-
-.evalbox {
-  background: var(--mantine-color-dark-8);
-  border: var(--mantine-color-dark-7);
-  height: clamp(240px, 60vmin, 640px);
+  border-bottom: 1px solid var(--mantine-color-dark-5);
 }
 
 .evalscore {

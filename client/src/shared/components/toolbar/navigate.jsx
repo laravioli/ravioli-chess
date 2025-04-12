@@ -15,10 +15,10 @@ export function Navigate({ path }) {
 
   const onClick = () => {
     if (module.fen.isFenAnalysable()) {
-      controller.setModule(path, module.fen.current());
+      controller.setModule(path, module.fen.current);
       navigate(path, { replace: true });
     } else {
-      module.getBoard().position(module.fen.current());
+      module.getBoard().position(module.fen.current);
     }
   };
 

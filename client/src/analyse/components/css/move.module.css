@@ -1,0 +1,5 @@
+.move {
+  background: var(--mantine-color-dark-8);
+  border: none;
+  height: clamp(240px, 60vmin, 640px);
+}

@@ -1,6 +1,6 @@
 import chessBoard from 'chessboard';
 import { Game } from 'src/lib/game/game';
-import { CevalCtrl } from 'src/lib/eval/ctrl';
+import { Eval } from 'src/lib/eval/ctrl';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
 import { observable } from 'src/main/store/reactive';
@@ -11,7 +11,6 @@ export class Analyse {
     window.analysis = this;
     makeObservable(this, {
       evaluation: observable,
-      namespace: 'analyse',
     });
     this.initialFen = opts.fen;
     this.fen = deps.fen;
@@ -39,7 +38,7 @@ export class Analyse {
     if (!this.game) {
       this.game = new Game(fen, deps);
     } else {
-      if (fen !== this.fen.current()) this.fen.setFen(fen);
+      if (fen !== this.fen.current) this.fen.setFen(fen);
       this.game.load(fen);
       this.restartCeval();
     }
@@ -68,7 +67,7 @@ export class Analyse {
     };
     if (this.ceval) this.ceval.setOpts(opts);
     else {
-      this.ceval = new CevalCtrl(opts);
+      this.ceval = new Eval(opts);
     }
   }
 
@@ -84,7 +83,7 @@ export class Analyse {
   startCeval = throttle(800, () => {
     if (this.ceval?.enabled) {
       if (this.game && !this.game.isGameOver()) {
-        this.ceval.start(this.game.moveList, undefined);
+        this.ceval.start(this.game.Moves, undefined);
       } else {
         this.ceval.stop();
       }

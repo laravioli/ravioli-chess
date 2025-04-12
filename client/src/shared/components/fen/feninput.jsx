@@ -26,7 +26,7 @@ export const FenInput = () => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
       module.fen.setFenFromInput(fen);
-      module.getBoard().position(module.fen.current(), true);
+      module.getBoard().position(module.fen.current, true);
     }
   };
 

@@ -5,7 +5,7 @@ import { Positions } from './positions';
 import { TestButton } from 'src/shared/components/toolbar/test';
 import { Navigate } from 'src/shared/components/toolbar/navigate';
 
-export const AnalyseActions = () => {
+export const Actions = () => {
   return (
     <Group justify="center">
       <FlipButton />

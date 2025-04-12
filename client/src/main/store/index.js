@@ -1,5 +1,5 @@
 import { createStore } from 'zustand';
-import { linkStateToStore } from './reactive';
+import { makeModuleReactive } from './reactive';
 import { subscribeWithSelector, persist } from 'zustand/middleware';
 import { recommendedThreads } from 'src/lib/eval/engine';
 
@@ -43,4 +43,4 @@ export const mainStore = createStore(
   }))
 );
 
-export const makeObservable = linkStateToStore(mainStore);
+export const makeObservable = makeModuleReactive(mainStore);

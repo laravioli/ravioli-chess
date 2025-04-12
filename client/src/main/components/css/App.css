@@ -21,8 +21,8 @@
     '. copyables . .';
   grid-template-rows: auto 1fr min-content;
   grid-template-columns: 1em clamp(300px, 72vmin, 700px) 1rem minmax(
-      170px,
-      300px
+      160px,
+      350px
     );
 }
 
@@ -31,6 +31,7 @@
   display: flex;
   flex-flow: column;
   align-self: center;
+  width: 100%;
   overflow: hidden;
   border-radius: 6px;
 }

@@ -1,62 +1,42 @@
-//carefull : if i use setState in a react component, value wont be updated
-const withNamespace = (store, namespace, property) => {
-  if (typeof namespace === 'string') {
-    return (newValue) =>
+export const observable = (store, module) => (property) => {
+  const namespace = module.constructor.name.toLowerCase();
+  let value = null;
+  return {
+    get() {
+      return value;
+    },
+    set(newVal) {
+      value = newVal;
       store.setState((state) => ({
-        [namespace]: { ...state[namespace], [property]: newValue },
+        [namespace]: { ...state[namespace], [property]: newVal },
       }));
-  } else {
-    return (newValue) => store.setState({ [property]: newValue });
-  }
-};
-
-export const observable = (store, namespace) => (property) => {
-  let value;
-  const setter = withNamespace(store, namespace, property);
-
-  return {
-    get() {
-      return value;
-    },
-    set(newValue) {
-      if (typeof newValue === 'function') {
-        throw new Error('observable property must be flagged as computed');
-      }
-      value = newValue;
-      setter(newValue);
     },
   };
 };
 
-//note : no side effect function
-export const computed = (store, namespace) => (property) => {
-  let value;
-  const setter = withNamespace(store, namespace, property);
-  return {
-    get() {
-      return value;
+export const computed = (store, module) => (property) => {
+  if (
+    !Object.getOwnPropertyDescriptor(module.__proto__, property).get ||
+    Object.getOwnPropertyDescriptor(module.__proto__, property).set
+  )
+    throw new Error('Computed property must be getter function');
+
+  const namespace = module.constructor.name.toLowerCase();
+  store.setState((state) => ({
+    [namespace]: {
+      ...state[namespace],
+      [property]: () => module[property],
     },
-    set(newValue) {
-      if (typeof newValue !== 'function') {
-        throw new Error('computed property must be callable');
-      } else if (value) {
-        throw new Error('computed property cant be reassigned');
-      }
-      value = newValue;
-      setter(newValue);
-    },
-  };
+  }));
 };
 
-export const linkStateToStore = (store) => {
-  return function (logic, ...stateDescriptors) {
-    stateDescriptors.forEach((state) => {
-      Object.keys(state)
-        .filter((p) => p !== 'namespace')
-        .forEach((property) => {
-          const descriptor = state[property](store, state.namespace);
-          Object.defineProperty(logic, property, descriptor(property));
-        });
+export const makeModuleReactive = (store) => {
+  return function (module, links) {
+    Object.keys(links).forEach((property) => {
+      const link = links[property];
+      if (link.name === 'observable')
+        Object.defineProperty(module, property, link(store, module)(property));
+      else if (link.name === 'computed') link(store, module)(property);
     });
   };
 };

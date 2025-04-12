@@ -30,7 +30,7 @@ export function Positions() {
         position="top"
         withinPortal={false}
         onOptionSubmit={(fen) => {
-          if (fen != module.fen.current()) {
+          if (fen != module.fen.current) {
             module.newGame?.(fen);
             module.getBoard().position(fen, true);
             module.fen.setFen(fen);

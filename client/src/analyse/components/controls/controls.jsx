@@ -1,12 +1,12 @@
 import { History } from './history';
-import { AnalyseActions } from './actions';
+import { Actions } from './actions';
 import classes from '../css/controls.module.css';
 
-export const AnalyseControls = () => {
+export const Controls = () => {
   return (
     <div className={classes.controls}>
       <History />
-      <AnalyseActions />
+      <Actions />
     </div>
   );
 };
