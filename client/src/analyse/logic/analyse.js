@@ -34,9 +34,9 @@ export class Analyse {
     return this.game;
   }
 
-  newGame(fen, deps) {
+  newGame(fen) {
     if (!this.game) {
-      this.game = new Game(fen, deps);
+      this.game = new Game(fen);
     } else {
       if (fen !== this.fen.current) this.fen.setFen(fen);
       this.game.load(fen);
@@ -83,7 +83,7 @@ export class Analyse {
   startCeval = throttle(800, () => {
     if (this.ceval?.enabled) {
       if (this.game && !this.game.isGameOver()) {
-        this.ceval.start(this.game.Moves, undefined);
+        this.ceval.start(this.game.line, undefined);
       } else {
         this.ceval.stop();
       }

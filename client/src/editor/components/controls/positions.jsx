@@ -6,7 +6,7 @@ import { short_fen } from './utils';
 import classes from '../css/controls.module.css';
 
 export const Positions = () => {
-  const module = useModule();
+  const editor = useModule();
 
   const position = useInitData();
 
@@ -34,7 +34,7 @@ export const Positions = () => {
     [data, fens]
   );
 
-  const [value, setValue] = useState(matcher(module.fen.current));
+  const [value, setValue] = useState(matcher(editor.fen.current));
 
   useEffect(() => {
     const unsub = mainStore.subscribe(
@@ -46,10 +46,9 @@ export const Positions = () => {
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
-    if (fen && fen != module.fen.current) {
-      module.newGame?.(fen);
-      module.getBoard().position(fen, true);
-      module.fen.setFen(fen);
+    if (fen) {
+      editor.getBoard().position(fen, true);
+      editor.fen.setFen(fen);
     } else {
       setValue(fen);
     }

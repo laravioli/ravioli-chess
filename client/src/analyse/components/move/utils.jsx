@@ -4,6 +4,7 @@ import { makeSanAndPlay } from 'chessops/san';
 import { parseUci } from 'chessops/util';
 import { parseFen } from 'chessops/fen';
 import { Text, Divider } from '@mantine/core';
+import classes from '../css/move.module.css';
 
 const MAX_NUM_MOVES = 12;
 
@@ -39,6 +40,27 @@ export function renderPvs(evaluation) {
   );
 }
 
-const plyToTurn = (ply) => Math.floor((ply - 1) / 2) + 1;
+export const renderLine = (line) => {
+  let turn, moves;
+  const color = (ply) => ((ply - 1) % 2 === 0 ? 'white' : 'black');
+  return line
+    .map((move, index) => {
+      turn = plyToTurn(move.ply);
+      if (index == 0 && color(move.ply) === 'black') {
+        moves = '... ' + move.san;
+      } else if (color(move.ply) === 'white') {
+        moves = move.san + ' ' + (line[index + 1]?.san ?? '');
+      } else {
+        return null;
+      }
+      return (
+        <div className={classes.row} key={turn}>
+          {turn + '. '}
+          <Text className={classes.text}> {moves} </Text>
+        </div>
+      );
+    })
+    .filter((value) => value);
+};
 
-export function renderMoves(moves) {}
+const plyToTurn = (ply) => Math.floor((ply - 1) / 2) + 1;

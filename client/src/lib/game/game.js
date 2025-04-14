@@ -6,7 +6,7 @@ export class Game {
   constructor(fen) {
     makeObservable(this, {
       outcome: computed,
-      Moves: computed,
+      line: computed,
     });
     this._chess = new Chess(fen);
     this.initHistory(fen);
@@ -31,7 +31,7 @@ export class Game {
     return this._chess.isGameOver();
   }
 
-  get Moves() {
+  get line() {
     let move = this.currentMove;
     const moves = [];
     while (move.parent) {

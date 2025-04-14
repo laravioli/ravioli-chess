@@ -1,5 +1,6 @@
 import { useMainStore } from 'src/shared/hooks/hooks';
-import { Text, Paper } from '@mantine/core';
+import { Paper } from '@mantine/core';
+import { Line } from './line.jsx';
 import { renderPvs } from './utils.jsx';
 import classes from '../css/move.module.css';
 
@@ -16,17 +17,7 @@ export function Moves() {
       radius=""
       withBorder>
       {enabled && !outcome && renderPvs(evaluation)}
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
-
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
-      <Text>Use it to createeaezaezaez</Text>
+      <Line />
     </Paper>
   );
 }
