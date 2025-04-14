@@ -3,6 +3,8 @@ import { lichessRules } from 'chessops/compat';
 import { makeSanAndPlay } from 'chessops/san';
 import { parseUci } from 'chessops/util';
 import { parseFen } from 'chessops/fen';
+import { renderEval } from 'src/lib/eval/util';
+
 import { Text, Divider } from '@mantine/core';
 import classes from '../css/move.module.css';
 
@@ -22,19 +24,32 @@ function parsePv(pos, pv) {
   return result.join(' ');
 }
 
-export function renderPvs(evaluation) {
+export function renderPvs(evaluation, multipv) {
   if (!evaluation) return '';
   const setup = parseFen(evaluation.fen).unwrap();
   const pos = setupPosition(lichessRules('standard'), setup);
-  const pv = pos
-    ? parsePv(pos.isOk ? pos.value.clone() : undefined, evaluation.pvs[0].moves)
-    : '';
+  const pvs = Array.from({ length: multipv }, (_, i) => {
+    const index = multipv - 1 - i;
+    const pvData = evaluation.pvs?.[index];
+    if (!pvData || !pos) return '';
+    return {
+      moves: parsePv(pos.isOk ? pos.value.clone() : undefined, pvData.moves),
+      eval: pvData,
+    };
+  });
 
   return (
     <>
-      <Text size="sm" lineClamp={1}>
-        {pv}
-      </Text>
+      {pvs.map((pv, index) => (
+        <Text size="sm" lineClamp={1} key={index}>
+          {multipv > 1 && (
+            <span style={{ opacity: 0.6, marginRight: 6 }}>
+              {getEval(pv.eval)}
+            </span>
+          )}
+          {pv.moves}
+        </Text>
+      ))}
       <Divider my="xs" />
     </>
   );
@@ -64,3 +79,13 @@ export const renderLine = (line) => {
 };
 
 const plyToTurn = (ply) => Math.floor((ply - 1) / 2) + 1;
+
+export const getEval = (evaluation) => {
+  if (evaluation) {
+    if (evaluation.mate) {
+      return '#' + evaluation.mate;
+    } else {
+      return renderEval(evaluation.cp);
+    }
+  }
+};

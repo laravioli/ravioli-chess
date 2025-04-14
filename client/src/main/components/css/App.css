@@ -22,7 +22,7 @@
   grid-template-rows: auto 1fr min-content;
   grid-template-columns: 1em clamp(300px, 72vmin, 700px) 1rem minmax(
       160px,
-      350px
+      370px
     );
 }
 
