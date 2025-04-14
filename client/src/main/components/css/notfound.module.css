@@ -11,7 +11,7 @@
   margin-bottom: calc(1.5 * var(--mantine-spacing-xl));
   color: var(--mantine-color-gray-2);
 
-  @media (max-width: $mantine-breakpoint-sm) {
+  @media (max-width: 48em) {
     font-size: 32px;
   }
 }
@@ -29,7 +29,7 @@
   font-weight: 900;
   font-size: 38px;
 
-  @media (max-width: $mantine-breakpoint-sm) {
+  @media (max-width: 48em) {
     font-size: 32px;
   }
 }
