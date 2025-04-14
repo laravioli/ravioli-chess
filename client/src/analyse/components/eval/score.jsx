@@ -1,5 +1,5 @@
 import { useMainStore } from 'src/shared/hooks/hooks';
-import { renderEval } from 'src/lib/eval/util';
+import { getEval } from '../move/utils';
 import classes from '../css/eval.module.css';
 
 export const EvalScore = () => {
@@ -11,7 +11,7 @@ export const EvalScore = () => {
     if (evaluation.mate) {
       score = '#' + evaluation.mate;
     } else {
-      score = renderEval(evaluation.cp);
+      score = getEval(evaluation);
     }
   }
 

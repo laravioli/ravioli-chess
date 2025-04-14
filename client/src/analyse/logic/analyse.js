@@ -102,6 +102,12 @@ export class Analyse {
 
   getCeval = () => this.ceval;
 
+  clearEvals = () => {
+    this.game.line.forEach((move) => {
+      if (move.ceval) move.ceval = null;
+    });
+  };
+
   /*----------BOARD----------*/
 
   getBoard() {

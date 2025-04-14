@@ -10,14 +10,11 @@ export const Action = ({ children, label, onClick, disabled = false }) => {
   return (
     <Tooltip label={label}>
       <ActionIcon
-        bg={'inherit'}
         data-disabled={disabled}
-        variant="default"
+        bg="inherit"
         size="sm"
         onClick={handler}
-        styles={{
-          root: { border: 0 },
-        }}>
+        bd={0}>
         {children}
       </ActionIcon>
     </Tooltip>

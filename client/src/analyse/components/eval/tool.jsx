@@ -1,5 +1,6 @@
 import { EvalToggle } from './toggle';
 import { EvalScore } from './score';
+import { Settings } from './settings';
 import classes from '../css/eval.module.css';
 
 export const EvalTool = () => {
@@ -8,6 +9,7 @@ export const EvalTool = () => {
       <EvalToggle />
       <EvalScore />
       <span className={classes.evalname}>SF 16</span>
+      <Settings />
     </div>
   );
 };

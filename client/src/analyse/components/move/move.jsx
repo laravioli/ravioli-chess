@@ -1,4 +1,4 @@
-import { useMainStore } from 'src/shared/hooks/hooks';
+import { useMainStore, useLocalStore } from 'src/shared/hooks/hooks';
 import { Paper } from '@mantine/core';
 import { Line } from './line.jsx';
 import { renderPvs } from './utils.jsx';
@@ -8,6 +8,7 @@ export function Moves() {
   const evaluation = useMainStore((state) => state.analyse.evaluation);
   const enabled = useMainStore((state) => state.eval.enabled);
   const outcome = useMainStore((state) => state.game.outcome());
+  const multipv = useLocalStore((state) => state.multipv);
 
   return (
     <Paper
@@ -16,7 +17,7 @@ export function Moves() {
       shadow="xl"
       radius=""
       withBorder>
-      {enabled && !outcome && renderPvs(evaluation)}
+      {enabled && !outcome && renderPvs(evaluation, multipv)}
       <Line />
     </Paper>
   );
