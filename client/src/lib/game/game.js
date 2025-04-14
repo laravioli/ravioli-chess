@@ -124,13 +124,13 @@ export class Game {
   }
 
   end() {
-    if (this.currentMove !== this.root) {
-      this.currentMove = this.root;
-      this._chess.load(this.root.fen);
+    let move = this.root;
+    this._chess.load(move.fen);
+
+    while (move.children.length > 0) {
+      move = move.children[0];
+      this._chess.move(move.san);
     }
-    while (this.currentMove.children.length > 0) {
-      this.currentMove = this.currentMove.children[0];
-      this._chess.move(this.currentMove.san);
-    }
+    this.currentMove = move;
   }
 }
