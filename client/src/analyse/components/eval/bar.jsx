@@ -2,11 +2,17 @@ import { useMainStore } from 'src/shared/hooks/hooks';
 import { povChances } from 'src/lib/eval/util';
 import classes from '../css/eval.module.css';
 
+import { useProxy } from '../../../shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
+
 export const EvalBar = () => {
   const enabled = useMainStore((state) => state.eval.enabled);
   const outcome = useMainStore((state) => state.game.outcome());
-  const evaluation = useMainStore((state) => state.analyse.evaluation);
   const side = useMainStore((state) => state.side);
+
+  const state = useProxy();
+  console.log(state);
+  const { evaluation } = useSnapshot(state);
 
   if (!enabled || outcome) return null;
 

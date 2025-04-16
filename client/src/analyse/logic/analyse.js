@@ -3,15 +3,11 @@ import { Game } from 'src/lib/game/game';
 import { Eval } from 'src/lib/eval/ctrl';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { observable } from 'src/main/store/reactive';
-import { makeObservable } from 'src/main/store';
 
 export class Analyse {
   constructor(opts, deps) {
     window.analysis = this;
-    makeObservable(this, {
-      evaluation: observable,
-    });
+
     this.initialFen = opts.fen;
     this.fen = deps.fen;
     this.newGame(opts.fen);

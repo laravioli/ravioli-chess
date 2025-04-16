@@ -4,8 +4,13 @@ import { Line } from './line.jsx';
 import { renderPvs } from './utils.jsx';
 import classes from '../css/move.module.css';
 
+import { useProxy } from '../../../shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
+
 export function Moves() {
-  const evaluation = useMainStore((state) => state.analyse.evaluation);
+  const state = useProxy();
+  const { evaluation } = useSnapshot(state);
+
   const enabled = useMainStore((state) => state.eval.enabled);
   const outcome = useMainStore((state) => state.game.outcome());
   const multipv = useLocalStore((state) => state.multipv);
