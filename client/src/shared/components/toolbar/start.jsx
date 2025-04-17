@@ -8,7 +8,7 @@ export const StartButton = () => {
 
   const onStart = () => {
     module.newGame?.(DEFAULT_POSITION);
-    module.getBoard().start();
+    module.board.start();
     module.fen.resetFen(true);
   };
 

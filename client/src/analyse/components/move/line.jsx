@@ -1,9 +1,10 @@
-import { useMainStore } from 'src/shared/hooks/hooks';
-import { useShallow } from 'zustand/shallow';
+import { useModule } from 'src/shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
 import { renderLine } from './utils';
 
 export const Line = () => {
-  const line = useMainStore(useShallow((state) => state.game.line()));
+  const analyse = useModule();
+  const snap = useSnapshot(analyse);
 
-  return <>{renderLine(line.slice(1))}</>;
+  return <>{renderLine(snap.line.slice(1))}</>;
 };

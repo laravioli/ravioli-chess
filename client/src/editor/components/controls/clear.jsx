@@ -6,7 +6,7 @@ export const ClearButton = () => {
   const editor = useModule();
 
   const onClear = () => {
-    editor.getBoard().clear();
+    editor.board.clear();
     editor.fen.resetFen(false);
   };
 

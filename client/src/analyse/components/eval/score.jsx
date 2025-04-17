@@ -1,17 +1,14 @@
-import { useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
 import { getEval } from '../move/utils';
 import classes from '../css/eval.module.css';
 
-import { useProxy } from '../../../shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
-
 export const EvalScore = () => {
-  const state = useProxy();
-  console.log(state);
-  const { evaluation } = useSnapshot(state);
+  const analyse = useModule();
+  const snap = useSnapshot(analyse);
 
-  const outcome = useMainStore((state) => state.game.outcome());
   let score = '';
+  const evaluation = snap.evaluation;
 
   if (evaluation) {
     if (evaluation.mate) {
@@ -21,7 +18,7 @@ export const EvalScore = () => {
     }
   }
 
-  if (outcome) {
+  if (snap.game.outcome) {
     score = '-';
   }
 

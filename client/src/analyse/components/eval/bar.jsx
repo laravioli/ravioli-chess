@@ -1,27 +1,20 @@
-import { useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from '../../../shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
 import { povChances } from 'src/lib/eval/util';
 import classes from '../css/eval.module.css';
 
-import { useProxy } from '../../../shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
-
 export const EvalBar = () => {
-  const enabled = useMainStore((state) => state.eval.enabled);
-  const outcome = useMainStore((state) => state.game.outcome());
-  const side = useMainStore((state) => state.side);
+  const analyse = useModule();
+  const snap = useSnapshot(analyse);
 
-  const state = useProxy();
-  console.log(state);
-  const { evaluation } = useSnapshot(state);
+  console.log(snap.outcome);
 
-  if (!enabled || outcome) return null;
+  if (!snap.enabled || snap.outcome) return null;
 
-  const progress = evaluation ? povChances('white', evaluation) : 0.0;
+  const progress = snap.evaluation ? povChances('white', snap.evaluation) : 0.0;
 
   return (
-    <div
-      className={[classes.bar, classes.barblack].join(' ')}
-      style={side === 'black' ? { transform: 'rotate(180deg)' } : {}}>
+    <div className={[classes.bar, classes.barblack].join(' ')}>
       <div
         className={classes.barwhite}
         style={{ height: `${(progress + 1) * 50}%` }}></div>

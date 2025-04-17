@@ -1,5 +1,4 @@
 import { createStore } from 'zustand';
-import { makeModuleReactive } from './reactive';
 import { subscribeWithSelector, persist } from 'zustand/middleware';
 import { recommendedThreads } from 'src/lib/eval/engine';
 
@@ -34,13 +33,3 @@ const withStorageDOMEvents = (store) => {
 };
 
 withStorageDOMEvents(localStore);
-
-export const mainStore = createStore(
-  subscribeWithSelector((set) => ({
-    side: 'white',
-    changeSide: () =>
-      set((state) => ({ side: state.side === 'white' ? 'black' : 'white' })),
-  }))
-);
-
-export const makeObservable = makeModuleReactive(mainStore);

@@ -1,13 +1,12 @@
-import { mainStore } from 'src/main/store';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useInitData, useModule } from 'src/shared/hooks/hooks';
+import { subscribe } from 'valtio';
 import { NativeSelect } from '@mantine/core';
 import { short_fen } from './utils';
 import classes from '../css/controls.module.css';
 
 export const Positions = () => {
   const editor = useModule();
-
   const position = useInitData();
 
   const data = useMemo(
@@ -37,17 +36,16 @@ export const Positions = () => {
   const [value, setValue] = useState(matcher(editor.fen.current));
 
   useEffect(() => {
-    const unsub = mainStore.subscribe(
-      (state) => state.fen.current(),
-      (fen) => setValue(matcher(fen))
+    const unsub = subscribe(editor.fen, () =>
+      setValue(matcher(editor.fen.current))
     );
     return unsub;
-  }, [matcher]);
+  }, [editor, matcher]);
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen) {
-      editor.getBoard().position(fen, true);
+      editor.board.position(fen, true);
       editor.fen.setFen(fen);
     } else {
       setValue(fen);

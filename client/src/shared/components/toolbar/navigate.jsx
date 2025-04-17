@@ -1,13 +1,14 @@
 import { controller } from 'src/main/logic';
 import { useNavigate } from 'react-router';
-import { useModule, useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
 import { Action } from './action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
 
 export function Navigate({ path }) {
   const module = useModule();
+  const snap = useSnapshot(module);
   const navigate = useNavigate();
-  const isLegalFen = useMainStore((state) => state.fen.isLegal());
 
   const isEdit = path !== '/editor';
   const label = isEdit ? 'analysis board' : 'edit board';
@@ -18,12 +19,15 @@ export function Navigate({ path }) {
       controller.setModule(path, module.fen.current);
       navigate(path, { replace: true });
     } else {
-      module.getBoard().position(module.fen.current);
+      module.board.position(module.fen.current);
     }
   };
 
   return (
-    <Action label={label} onClick={onClick} disabled={isEdit && !isLegalFen}>
+    <Action
+      label={label}
+      onClick={onClick}
+      disabled={isEdit && !snap.fen.isLegal}>
       <Icon size={30} stroke={1.2} />
     </Action>
   );

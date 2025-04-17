@@ -1,22 +1,9 @@
-import { observable, computed } from 'src/main/store/reactive';
-import { makeObservable } from 'src/main/store';
 import { validateFen } from 'chess.js';
-
-//todo: fix akward double use of current in component (via module or store)
+import { ref } from 'valtio';
 
 export class Fen {
   constructor(fen) {
-    makeObservable(this, {
-      current: computed,
-      position: observable,
-      turn: observable,
-      castling: observable,
-      halfmove: observable,
-      fullmove: observable,
-      inputRef: observable,
-      isLegal: computed,
-    });
-    this.inputRef = undefined;
+    this.inputRef = ref({ current: null });
     this.setFen(fen);
   }
 

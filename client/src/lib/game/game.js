@@ -1,20 +1,14 @@
 import { Chess } from 'chess.js';
-import { makeObservable } from 'src/main/store';
-import { computed } from 'src/main/store/reactive';
 
 export class Game {
   constructor(fen) {
-    makeObservable(this, {
-      outcome: computed,
-      line: computed,
-    });
     this._chess = new Chess(fen);
     this.initHistory(fen);
 
     return new Proxy(this, {
-      get(target, prop) {
+      get(target, prop, receiver) {
         if (prop in target) {
-          return target[prop];
+          return Reflect.get(target, prop, receiver);
         }
         if (prop in target._chess) {
           const chessProp = target._chess[prop];
@@ -26,9 +20,6 @@ export class Game {
         return undefined;
       },
     });
-  }
-  get outcome() {
-    return this._chess.isGameOver();
   }
 
   get line() {
@@ -66,7 +57,7 @@ export class Game {
     });
   }
 
-  jump = (action) => {
+  jump(action) {
     switch (action) {
       case 'move':
         this.appendMove();
@@ -84,7 +75,7 @@ export class Game {
         this.end();
         break;
     }
-  };
+  }
 
   appendMove() {
     const info = this._chess.history({ verbose: true }).at(-1);

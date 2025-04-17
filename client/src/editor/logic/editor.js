@@ -13,10 +13,6 @@ export class Editor {
 
   onUnLoad() {}
 
-  getBoard() {
-    return this.board;
-  }
-
   setBoard(div) {
     if (this.board) this.destroyBoard();
     this.board = chessBoard(div, this.makeBoardCfg());

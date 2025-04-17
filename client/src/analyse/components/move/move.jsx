@@ -1,18 +1,14 @@
-import { useMainStore, useLocalStore } from 'src/shared/hooks/hooks';
+import { useLocalStore } from 'src/shared/hooks/hooks';
+import { useModule } from '../../../shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
 import { Paper } from '@mantine/core';
 import { Line } from './line.jsx';
 import { renderPvs } from './utils.jsx';
 import classes from '../css/move.module.css';
 
-import { useProxy } from '../../../shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
-
 export function Moves() {
-  const state = useProxy();
-  const { evaluation } = useSnapshot(state);
-
-  const enabled = useMainStore((state) => state.eval.enabled);
-  const outcome = useMainStore((state) => state.game.outcome());
+  const analyse = useModule();
+  const snap = useSnapshot(analyse);
   const multipv = useLocalStore((state) => state.multipv);
 
   return (
@@ -22,7 +18,9 @@ export function Moves() {
       shadow="xl"
       radius=""
       withBorder>
-      {enabled && !outcome && renderPvs(evaluation, multipv)}
+      {snap.enabled &&
+        !snap.game.outcome &&
+        renderPvs(snap.evaluation, multipv)}
       <Line />
     </Paper>
   );

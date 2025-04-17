@@ -32,7 +32,7 @@ export function Positions() {
         onOptionSubmit={(fen) => {
           if (fen != module.fen.current) {
             module.newGame?.(fen);
-            module.getBoard().position(fen, true);
+            module.board.position(fen, true);
             module.fen.setFen(fen);
           }
           combobox.closeDropdown();

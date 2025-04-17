@@ -1,6 +1,6 @@
-import { mainStore } from 'src/main/store';
 import { useRef, useEffect } from 'react';
 import { useModule } from 'src/shared/hooks/hooks';
+import { subscribe } from 'valtio';
 import { TextInput } from '@mantine/core';
 import classes from '../css/fen.module.css';
 
@@ -9,16 +9,12 @@ export const FenInput = () => {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    module.fen.inputRef = inputRef;
-    const unsub = mainStore.subscribe(
-      (state) => state.fen.current(),
-      (fen) => {
-        inputRef.current.value = fen;
-      },
-      {
-        fireImmediately: true,
-      }
-    );
+    module.fen.inputRef.current = inputRef.current;
+    inputRef.current.value = module.fen.current;
+
+    const unsub = subscribe(module.fen, () => {
+      inputRef.current.value = module.fen.current;
+    });
     return unsub;
   }, [module]);
 
@@ -26,7 +22,7 @@ export const FenInput = () => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
       module.fen.setFenFromInput(fen);
-      module.getBoard().position(module.fen.current, true);
+      module.board.position(module.fen.current, true);
     }
   };
 

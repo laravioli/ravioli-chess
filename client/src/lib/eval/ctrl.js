@@ -1,9 +1,8 @@
 import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
 import { localStore } from 'src/main/store';
-import { observable } from 'src/main/store/reactive';
-import { makeObservable } from 'src/main/store';
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
+import { ref } from 'valtio';
 
 const cevalDisabledSentinel = '1';
 
@@ -18,16 +17,13 @@ function enabledAfterDisable() {
 //active : does engine is instanciate (worker)
 //enabled : does the button enabled is on or off (mainly to handle tabs)
 
-export class Eval {
+export class Ceval {
   storedPv = () => localStore.getState().multipv;
   storedMovetime = () => localStore.getState().searchms;
   allowed = toggle(true);
-  curEval = null;
   lastStarted = false;
-  showEnginePrefs = toggle(false);
 
   constructor(opts) {
-    makeObservable(this, { enabled: observable });
     this.init(opts);
   }
 
@@ -36,7 +32,6 @@ export class Eval {
   }
 
   init(opts) {
-    window.clienteval = this;
     this.opts = opts;
     this.possible = this.opts.possible;
     this.analysable = validateFen(this.opts.initialFen).ok;
@@ -49,8 +44,6 @@ export class Eval {
 
   onEmit = throttle(200, (ev, work) => {
     this.sortPvsInPlace(ev.pvs, work.ply % 2 ? 'white' : 'black');
-
-    this.curEval = ev;
     this.opts.emit(ev);
     /*if (ev.fen !== this.lastEmitFen && enabledAfterDisable()) {
       // amnesty while auto disable not processed
@@ -59,7 +52,7 @@ export class Eval {
     }*/
   });
 
-  doStart = (steps, gameId) => {
+  doStart(steps, gameId) {
     if (!this.enabled || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
 
@@ -99,7 +92,7 @@ export class Eval {
       work.moves.push(s.uci);
     }
 
-    if (!this.worker) this.worker = makeEngine();
+    if (!this.worker) this.worker = ref(makeEngine());
 
     this.worker.start(work);
 
@@ -107,20 +100,20 @@ export class Eval {
       steps,
       gameId,
     };
-  };
+  }
 
-  start = (steps, gameId) => {
+  start(steps, gameId) {
     this.doStart(steps, gameId);
-  };
+  }
 
-  stop = () => {
+  stop() {
     this.worker?.stop();
-  };
+  }
 
-  destroy = () => {
+  destroy() {
     this.worker?.destroy();
     this.worker = undefined;
-  };
+  }
 
   get state() {
     return this.worker?.getState() ?? CevalState.Initial;
@@ -166,7 +159,7 @@ export class Eval {
     return this.worker?.info.maxHash ?? 16;
   }
 
-  toggle = () => {
+  toggle() {
     if (!this.possible || !this.allowed()) return;
     this.stop();
     if (!this.enabled && !document.hidden) {
@@ -178,7 +171,7 @@ export class Eval {
       window.sessionStorage.setItem('ceval.enabled-after', '');
       this.enabled = false;
     }
-  };
+  }
 
   lastEmitFen = null;
   sortPvsInPlace = (pvs, color) =>

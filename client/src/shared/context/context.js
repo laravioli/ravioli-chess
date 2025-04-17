@@ -9,4 +9,3 @@ function loadData() {
 
 export const DataContext = createContext(loadData());
 export const ModuleContext = createContext(null);
-export const ProxyContext = createContext(null);

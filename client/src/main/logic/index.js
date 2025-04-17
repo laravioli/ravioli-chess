@@ -1,5 +1,5 @@
-import { Controller } from './main';
 import { initSite } from 'src/lib/site/site';
+import { Controller } from './main';
 
 function makeController() {
   const patterns = new Map([

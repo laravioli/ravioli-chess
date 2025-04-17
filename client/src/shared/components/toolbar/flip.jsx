@@ -1,12 +1,11 @@
 import { Action } from './action';
 import { IconRepeat } from '@tabler/icons-react';
-import { useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from '../../hooks/hooks';
 
 export const FlipButton = () => {
-  const changeSide = useMainStore((state) => state.changeSide);
-
+  const module = useModule();
   const onFlip = () => {
-    changeSide();
+    module.board.flip();
   };
 
   return (

@@ -1,10 +1,12 @@
-import { useModule, useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
 import { NativeSelect } from '@mantine/core';
 import classes from '../css/controls.module.css';
 
 export const TurnToPlay = () => {
   const editor = useModule();
-  const turn = useMainStore((state) => state.fen.turn);
+  const snap = useSnapshot(editor);
+
   const data = [
     { label: 'White to play', value: 'w' },
     { label: 'Black to play', value: 'b' },
@@ -16,7 +18,7 @@ export const TurnToPlay = () => {
 
   return (
     <NativeSelect
-      value={turn}
+      value={snap.fen.turn}
       onChange={onChange}
       data={data}
       classNames={{ wrapper: classes.wrapper }}

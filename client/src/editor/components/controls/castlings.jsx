@@ -1,4 +1,5 @@
-import { useModule, useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/shared/hooks/hooks';
+import { useSnapshot } from 'valtio';
 import { Checkbox } from '@mantine/core';
 import classes from '../css/controls.module.css';
 
@@ -18,7 +19,8 @@ export const CastlingBoxes = () => {
 
 const CastlingBox = ({ id, label }) => {
   const editor = useModule();
-  const castlingRight = useMainStore((state) => state.fen.castling[id]);
+  const snap = useSnapshot(editor);
+  const castlingRight = snap.fen.castling[id];
 
   const onChange = () => {
     editor.fen.setCastlingRight(id, !castlingRight);
