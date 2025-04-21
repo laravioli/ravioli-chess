@@ -1,8 +1,9 @@
 import { Chess } from 'chess.js';
+import { ref } from 'valtio';
 
 export class Game {
   constructor(fen) {
-    this._chess = new Chess(fen);
+    this._chess = ref(new Chess(fen));
     this.initHistory(fen);
 
     return new Proxy(this, {
@@ -20,6 +21,10 @@ export class Game {
         return undefined;
       },
     });
+  }
+
+  get outcome() {
+    return this._chess.isGameOver();
   }
 
   get line() {

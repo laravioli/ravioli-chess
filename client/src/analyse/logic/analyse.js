@@ -35,13 +35,9 @@ export class Analyse {
     return this.game?.line;
   }
 
-  get outcome() {
-    return this.game.isGameOver();
-  }
-
   newGame(fen) {
     if (!this.game) {
-      this.game = ref(new Game(fen));
+      this.game = new Game(fen);
     } else {
       if (fen !== this.fen.current) this.fen.setFen(fen);
       this.game.load(fen);

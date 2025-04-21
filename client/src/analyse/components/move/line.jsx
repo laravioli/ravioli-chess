@@ -6,5 +6,7 @@ export const Line = () => {
   const analyse = useModule();
   const snap = useSnapshot(analyse);
 
+  console.log(snap.line, analyse.line);
+
   return <>{renderLine(snap.line.slice(1))}</>;
 };
