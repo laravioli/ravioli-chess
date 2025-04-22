@@ -1,4 +1,7 @@
 {
+  "eslint.options": {
+    "experimentalDecorators": true
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "cssVariables.lookupFiles": [

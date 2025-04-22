@@ -1,28 +1,37 @@
 import { Chess } from 'chess.js';
-import { ref } from 'valtio';
+import { observable, computed } from 'mobx';
+
+export function createGame(instance) {
+  return new Proxy(instance, {
+    get(target, prop, receiver) {
+      if (prop in target) return Reflect.get(target, prop, receiver);
+      if (prop in target._chess) {
+        const chessProp = target._chess[prop];
+        if (typeof chessProp === 'function') {
+          return (...args) => chessProp.apply(target._chess, args);
+        }
+        return chessProp;
+      }
+      return undefined;
+    },
+  });
+}
 
 export class Game {
-  constructor(fen) {
-    this._chess = ref(new Chess(fen));
-    this.initHistory(fen);
+  @observable accessor currentMove;
 
-    return new Proxy(this, {
-      get(target, prop, receiver) {
-        if (prop in target) {
-          return Reflect.get(target, prop, receiver);
-        }
-        if (prop in target._chess) {
-          const chessProp = target._chess[prop];
-          if (typeof chessProp === 'function') {
-            return (...args) => chessProp.apply(target._chess, args);
-          }
-          return chessProp;
-        }
-        return undefined;
-      },
+  constructor(fen) {
+    this._chess = new Chess(fen);
+    Object.getOwnPropertyNames(Chess.prototype).forEach((key) => {
+      if (key !== 'constructor' && !(key in this)) {
+        // Forward the method from Chess if not already defined in Game
+        this[key] = (...args) => this._chess[key](...args);
+      }
     });
+    this.initHistory(fen);
   }
 
+  @computed
   get line() {
     let move = this.currentMove;
     const moves = [];

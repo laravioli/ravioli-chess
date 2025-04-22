@@ -1,15 +1,16 @@
 import { useModule } from '../../../shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
+import { observer } from 'mobx-react-lite';
 import { povChances } from 'src/lib/eval/util';
 import classes from '../css/eval.module.css';
 
-export const EvalBar = () => {
+export const EvalBar = observer(() => {
   const analyse = useModule();
-  const snap = useSnapshot(analyse);
 
-  if (!snap.ceval.enabled || snap.game.currentMove.outcome) return null;
+  if (!analyse.ceval.enabled || analyse.game.currentMove.outcome) return null;
 
-  const progress = snap.evaluation ? povChances('white', snap.evaluation) : 0.0;
+  const progress = analyse.evaluation
+    ? povChances('white', analyse.evaluation)
+    : 0.0;
 
   return (
     <div className={[classes.bar, classes.barblack].join(' ')}>
@@ -18,4 +19,4 @@ export const EvalBar = () => {
         style={{ height: `${(progress + 1) * 50}%` }}></div>
     </div>
   );
-};
+});

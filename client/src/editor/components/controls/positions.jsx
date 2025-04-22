@@ -1,11 +1,12 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useInitData, useModule } from 'src/shared/hooks/hooks';
-import { subscribe } from 'valtio';
+import { observer } from 'mobx-react-lite';
+import { autorun } from 'mobx';
 import { NativeSelect } from '@mantine/core';
 import { short_fen } from './utils';
 import classes from '../css/controls.module.css';
 
-export const Positions = () => {
+export const Positions = observer(() => {
   const editor = useModule();
   const position = useInitData();
 
@@ -36,10 +37,11 @@ export const Positions = () => {
   const [value, setValue] = useState(matcher(editor.fen.current));
 
   useEffect(() => {
-    const unsub = subscribe(editor.fen, () =>
-      setValue(matcher(editor.fen.current))
-    );
-    return unsub;
+    const disposer = autorun(() => {
+      setValue(matcher(editor.fen.current));
+    });
+
+    return disposer;
   }, [editor, matcher]);
 
   const onChange = (event) => {
@@ -60,4 +62,4 @@ export const Positions = () => {
       classNames={{ wrapper: classes.wrapper }}
     />
   );
-};
+});

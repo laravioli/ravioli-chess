@@ -1,10 +1,11 @@
 import { useRef, useEffect } from 'react';
 import { useModule } from 'src/shared/hooks/hooks';
-import { subscribe } from 'valtio';
+import { observer } from 'mobx-react-lite';
+import { autorun } from 'mobx';
 import { TextInput } from '@mantine/core';
 import classes from '../css/fen.module.css';
 
-export const FenInput = () => {
+export const FenInput = observer(() => {
   const module = useModule();
   const inputRef = useRef(null);
 
@@ -12,10 +13,12 @@ export const FenInput = () => {
     module.fen.inputRef.current = inputRef.current;
     inputRef.current.value = module.fen.current;
 
-    const unsub = subscribe(module.fen, () => {
-      inputRef.current.value = module.fen.current;
+    const disposer = autorun(() => {
+      if (inputRef.current) {
+        inputRef.current.value = module.fen.current;
+      }
     });
-    return unsub;
+    return disposer;
   }, [module]);
 
   const onKeyDown = (event) => {
@@ -39,4 +42,4 @@ export const FenInput = () => {
       classNames={{ input: classes.input }}
     />
   );
-};
+});

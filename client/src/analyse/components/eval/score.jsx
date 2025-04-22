@@ -1,14 +1,13 @@
 import { useModule } from 'src/shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
+import { observer } from 'mobx-react-lite';
 import { getEval } from '../move/utils';
 import classes from '../css/eval.module.css';
 
-export const EvalScore = () => {
+export const EvalScore = observer(() => {
   const analyse = useModule();
-  const snap = useSnapshot(analyse);
 
   let score = '';
-  const evaluation = snap.evaluation;
+  const evaluation = analyse.evaluation;
 
   if (evaluation) {
     if (evaluation.mate) {
@@ -18,9 +17,9 @@ export const EvalScore = () => {
     }
   }
 
-  if (snap.game.currentMove.outcome && snap.ceval.enabled) {
+  if (analyse.game.currentMove.outcome && analyse.ceval.enabled) {
     score = '-';
   }
 
   return <span className={classes.evalscore}>{score}</span>;
-};
+});

@@ -1,5 +1,5 @@
 import { useModule } from 'src/shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
+import { observer } from 'mobx-react-lite';
 import { Checkbox } from '@mantine/core';
 import classes from '../css/controls.module.css';
 
@@ -17,10 +17,9 @@ export const CastlingBoxes = () => {
   );
 };
 
-const CastlingBox = ({ id, label }) => {
+const CastlingBox = observer(({ id, label }) => {
   const editor = useModule();
-  const snap = useSnapshot(editor);
-  const castlingRight = snap.fen.castling[id];
+  const castlingRight = editor.fen.castling[id];
 
   const onChange = () => {
     editor.fen.setCastlingRight(id, !castlingRight);
@@ -36,4 +35,4 @@ const CastlingBox = ({ id, label }) => {
       onChange={onChange}
     />
   );
-};
+});

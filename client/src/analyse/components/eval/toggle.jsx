@@ -1,15 +1,12 @@
 import { localStore } from 'src/main/store';
 import { useEffect, useCallback } from 'react';
 import { useModule } from 'src/shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
+import { observer } from 'mobx-react-lite';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
-//todo : find out this bug with useSnapshot dont update
-
-export const EvalToggle = () => {
+export const EvalToggle = observer(() => {
   const analyse = useModule();
-  const snap = useSnapshot(analyse);
 
   const isTab = useCallback(() => {
     const { sri } = localStore.getState();
@@ -34,12 +31,12 @@ export const EvalToggle = () => {
 
   return (
     <Switch
-      checked={snap.ceval.enabled}
+      checked={analyse.ceval.enabled}
       onClick={onClick}
       color="teal"
       size="md"
       thumbIcon={
-        snap.ceval.enabled ? (
+        analyse.ceval.enabled ? (
           <IconCheck size={12} color="var(--mantine-color-teal-6)" stroke={3} />
         ) : (
           <IconX size={12} color="var(--mantine-color-red-6)" stroke={3} />
@@ -47,4 +44,4 @@ export const EvalToggle = () => {
       }
     />
   );
-};
+});

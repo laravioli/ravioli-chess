@@ -1,9 +1,11 @@
 import chessBoard from 'chessboard';
+import { makeAutoObservable } from 'mobx';
 
 export class Editor {
   constructor(opts, deps) {
     this.initialFen = opts.fen;
     this.fen = deps.fen;
+    makeAutoObservable(this);
   }
 
   onLoad(fen) {

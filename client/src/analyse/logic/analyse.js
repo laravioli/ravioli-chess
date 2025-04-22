@@ -1,8 +1,9 @@
 import chessBoard from 'chessboard';
 import { Game } from 'src/lib/game/game';
-import { Ceval } from 'src/lib/eval/ctrl';
+import { Ceval } from 'src/lib/eval/ceval';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
+import { makeAutoObservable } from 'mobx';
 
 //fix me : proxy eval make things laggy
 //find a way to proxy only analyse but still get reactivity from eval(enabled)
@@ -17,6 +18,7 @@ export class Analyse {
     this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
+    makeAutoObservable(this);
   }
 
   onLoad(fen) {

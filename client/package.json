@@ -17,6 +17,7 @@
     "chessground": "^9.1.1",
     "chessops": "^0.14.2",
     "immer": "^10.1.1",
+    "mobx-react-lite": "^4.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.4.0",
@@ -24,6 +25,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.25.9",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

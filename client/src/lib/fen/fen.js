@@ -1,10 +1,11 @@
 import { validateFen } from 'chess.js';
-import { ref } from 'valtio';
+import { makeAutoObservable } from 'mobx';
 
 export class Fen {
   constructor(fen) {
-    this.inputRef = ref({ current: null });
+    this.inputRef = { current: null };
     this.setFen(fen);
+    makeAutoObservable(this, { inputRef: false });
   }
 
   get current() {

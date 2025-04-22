@@ -6,7 +6,20 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     base: env.BASE,
-    plugins: [react()],
+    plugins: [
+      react({
+        babel: {
+          plugins: [
+            [
+              '@babel/plugin-proposal-decorators',
+              {
+                version: '2023-05',
+              },
+            ],
+          ],
+        },
+      }),
+    ],
     resolve: {
       alias: {
         src: resolve('src'),

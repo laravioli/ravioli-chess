@@ -1,13 +1,12 @@
 import { controller } from 'src/main/logic';
 import { useNavigate } from 'react-router';
 import { useModule } from 'src/shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
+import { observer } from 'mobx-react-lite';
 import { Action } from './action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
 
-export function Navigate({ path }) {
+export const Navigate = observer(({ path }) => {
   const module = useModule();
-  const snap = useSnapshot(module);
   const navigate = useNavigate();
 
   const isEdit = path !== '/editor';
@@ -27,8 +26,8 @@ export function Navigate({ path }) {
     <Action
       label={label}
       onClick={onClick}
-      disabled={isEdit && !snap.fen.isLegal}>
+      disabled={isEdit && !module.fen.isLegal}>
       <Icon size={30} stroke={1.2} />
     </Action>
   );
-}
+});

@@ -1,12 +1,12 @@
 import { useLocalStore } from 'src/shared/hooks/hooks';
 import { useModule } from '../../../shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
+import { observer } from 'mobx-react-lite';
 import { Paper } from '@mantine/core';
 import { renderPvs } from './utils.jsx';
 import { renderLine } from './utils';
 import classes from '../css/move.module.css';
 
-export function Moves() {
+export const Moves = () => {
   return (
     <Paper
       className={classes.move}
@@ -18,25 +18,23 @@ export function Moves() {
       <Line />
     </Paper>
   );
-}
+};
 
-const Pvs = () => {
+const Pvs = observer(() => {
   const analyse = useModule();
-  const snap = useSnapshot(analyse);
   const multipv = useLocalStore((state) => state.multipv);
 
   return (
     <>
-      {snap.ceval.enabled &&
-        !snap.game.currentMove.outcome &&
-        renderPvs(snap.evaluation, multipv)}
+      {analyse.ceval.enabled &&
+        !analyse.game.currentMove.outcome &&
+        renderPvs(analyse.evaluation, multipv)}
     </>
   );
-};
+});
 
-const Line = () => {
+const Line = observer(() => {
   const analyse = useModule();
-  const snap = useSnapshot(analyse);
 
-  return <>{renderLine(snap.game.line)}</>;
-};
+  return <>{renderLine(analyse.game.line)}</>;
+});

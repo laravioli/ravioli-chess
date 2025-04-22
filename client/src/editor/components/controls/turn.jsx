@@ -1,11 +1,10 @@
 import { useModule } from 'src/shared/hooks/hooks';
-import { useSnapshot } from 'valtio';
+import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
 import classes from '../css/controls.module.css';
 
-export const TurnToPlay = () => {
+export const TurnToPlay = observer(() => {
   const editor = useModule();
-  const snap = useSnapshot(editor);
 
   const data = [
     { label: 'White to play', value: 'w' },
@@ -18,10 +17,10 @@ export const TurnToPlay = () => {
 
   return (
     <NativeSelect
-      value={snap.fen.turn}
+      value={editor.fen.turn}
       onChange={onChange}
       data={data}
       classNames={{ wrapper: classes.wrapper }}
     />
   );
-};
+});

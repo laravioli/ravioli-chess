@@ -2,7 +2,7 @@ import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
 import { localStore } from 'src/main/store';
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
-import { ref } from 'valtio';
+import { observable } from 'mobx';
 
 const cevalDisabledSentinel = '1';
 
@@ -18,6 +18,8 @@ function enabledAfterDisable() {
 //enabled : does the button enabled is on or off (mainly to handle tabs)
 
 export class Ceval {
+  @observable accessor enabled;
+
   storedPv = () => localStore.getState().multipv;
   storedMovetime = () => localStore.getState().searchms;
   allowed = toggle(true);
@@ -92,7 +94,7 @@ export class Ceval {
       work.moves.push(s.uci);
     }
 
-    if (!this.worker) this.worker = ref(makeEngine());
+    if (!this.worker) this.worker = makeEngine();
 
     this.worker.start(work);
 

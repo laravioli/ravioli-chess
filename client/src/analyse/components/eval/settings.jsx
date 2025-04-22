@@ -1,11 +1,12 @@
 import { localStore } from 'src/main/store';
 import { useModule, useLocalStore } from 'src/shared/hooks/hooks';
+import { observer } from 'mobx-react-lite';
 import { useState, useCallback } from 'react';
 import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { recommendedThreads } from 'src/lib/eval/engine';
 
-export const Settings = () => {
+export const Settings = observer(() => {
   const analyse = useModule();
   const multipv = useLocalStore((state) => state.multipv);
   const threads = useLocalStore((state) => state.threads);
@@ -85,4 +86,4 @@ export const Settings = () => {
       </Popover.Dropdown>
     </Popover>
   );
-};
+});
