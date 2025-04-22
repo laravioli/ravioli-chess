@@ -18,7 +18,7 @@ export class Analyse {
     this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
-    makeAutoObservable(this);
+    makeAutoObservable(this, { ceval: false, game: false });
   }
 
   onLoad(fen) {
@@ -47,6 +47,7 @@ export class Analyse {
     this.game.jump(action);
 
     const move = this.game.currentMove;
+    console.log(move.fen);
     if (move.ceval || !this.ceval.enabled) this.evaluation = move.ceval;
     this.restartCeval();
     this.board.position(move.fen, true);

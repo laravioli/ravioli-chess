@@ -1,21 +1,5 @@
 import { Chess } from 'chess.js';
-import { observable, computed } from 'mobx';
-
-export function createGame(instance) {
-  return new Proxy(instance, {
-    get(target, prop, receiver) {
-      if (prop in target) return Reflect.get(target, prop, receiver);
-      if (prop in target._chess) {
-        const chessProp = target._chess[prop];
-        if (typeof chessProp === 'function') {
-          return (...args) => chessProp.apply(target._chess, args);
-        }
-        return chessProp;
-      }
-      return undefined;
-    },
-  });
-}
+import { observable, computed, action } from 'mobx';
 
 export class Game {
   @observable accessor currentMove;
@@ -28,7 +12,7 @@ export class Game {
         this[key] = (...args) => this._chess[key](...args);
       }
     });
-    this.initHistory(fen);
+    this.setRoot(fen);
   }
 
   @computed
@@ -43,7 +27,7 @@ export class Game {
     return moves;
   }
 
-  initHistory(fen) {
+  setRoot(fen) {
     const ply =
       (this._chess.turn() == 'w' ? 0 : 1) + (this._chess.moveNumber() - 1) * 2;
     this.currentMove = this.root = {
@@ -55,11 +39,13 @@ export class Game {
     };
   }
 
+  @action
   load(fen) {
     this._chess.load(fen);
-    this.initHistory(fen);
+    this.setRoot(fen);
   }
 
+  @action
   move(source, target) {
     this._chess.move({
       from: source,
@@ -68,6 +54,7 @@ export class Game {
     });
   }
 
+  @action
   jump(action) {
     switch (action) {
       case 'move':
@@ -88,6 +75,7 @@ export class Game {
     }
   }
 
+  @action
   appendMove() {
     const info = this._chess.history({ verbose: true }).at(-1);
     let move = this.currentMove.children.find((move) => move.uci === info.lan);
@@ -107,6 +95,7 @@ export class Game {
     this.currentMove = move;
   }
 
+  @action
   undo() {
     if (this.currentMove.parent) {
       this.currentMove = this.currentMove.parent;
@@ -114,6 +103,7 @@ export class Game {
     }
   }
 
+  @action
   redo() {
     if (this.currentMove.children.length > 0) {
       this.currentMove = this.currentMove.children[0];
@@ -121,11 +111,13 @@ export class Game {
     }
   }
 
+  @action
   start() {
     this.currentMove = this.root;
     this._chess.load(this.currentMove.fen);
   }
 
+  @action
   end() {
     let move = this.root;
     this._chess.load(move.fen);

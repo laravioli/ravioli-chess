@@ -25,7 +25,9 @@ export const History = observer(() => {
           key={action}
           variant="default"
           size="xl"
-          onClick={() => module.jump(action)}
+          onClick={() => {
+            module.jump(action);
+          }}
           styles={{
             root: { border: 0 },
           }}>
