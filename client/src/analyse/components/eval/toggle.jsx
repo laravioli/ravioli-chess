@@ -24,7 +24,7 @@ export const EvalToggle = () => {
     const unsub = localStore.subscribe(
       (state) => state.disable,
       () => {
-        if (analyse.enabled && !isTab()) {
+        if (analyse.ceval.enabled && !isTab()) {
           onClick();
         }
       }
@@ -34,12 +34,12 @@ export const EvalToggle = () => {
 
   return (
     <Switch
-      checked={snap.enabled}
+      checked={snap.ceval.enabled}
       onClick={onClick}
       color="teal"
       size="md"
       thumbIcon={
-        snap.enabled ? (
+        snap.ceval.enabled ? (
           <IconCheck size={12} color="var(--mantine-color-teal-6)" stroke={3} />
         ) : (
           <IconX size={12} color="var(--mantine-color-red-6)" stroke={3} />

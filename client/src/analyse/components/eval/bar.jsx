@@ -7,11 +7,7 @@ export const EvalBar = () => {
   const analyse = useModule();
   const snap = useSnapshot(analyse);
 
-  console.log(snap.game.outcome);
-
-  const isVisible = snap.enabled || !snap.game.outcome;
-
-  if (!isVisible) return null;
+  if (!snap.ceval.enabled || snap.game.currentMove.outcome) return null;
 
   const progress = snap.evaluation ? povChances('white', snap.evaluation) : 0.0;
 

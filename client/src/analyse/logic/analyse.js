@@ -3,7 +3,6 @@ import { Game } from 'src/lib/game/game';
 import { Ceval } from 'src/lib/eval/ctrl';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { ref } from 'valtio';
 
 //fix me : proxy eval make things laggy
 //find a way to proxy only analyse but still get reactivity from eval(enabled)
@@ -31,10 +30,6 @@ export class Analyse {
 
   /*----------GAME----------*/
 
-  get line() {
-    return this.game?.line;
-  }
-
   newGame(fen) {
     if (!this.game) {
       this.game = new Game(fen);
@@ -43,14 +38,14 @@ export class Analyse {
       this.game.load(fen);
       this.restartCeval();
     }
-    if (!this.ceval || !this.enabled) this.evaluation = null;
+    if (!this.ceval || !this.ceval.enabled) this.evaluation = null;
   }
 
   jump(action) {
     this.game.jump(action);
 
     const move = this.game.currentMove;
-    if (move.ceval || !this.enabled) this.evaluation = move.ceval;
+    if (move.ceval || !this.ceval.enabled) this.evaluation = move.ceval;
     this.restartCeval();
     this.board.position(move.fen, true);
     this.fen.setFen(move.fen);
@@ -68,7 +63,7 @@ export class Analyse {
     };
     if (this.ceval) this.ceval.setOpts(opts);
     else {
-      this.ceval = ref(new Ceval(opts));
+      this.ceval = new Ceval(opts);
     }
   }
 
@@ -98,7 +93,6 @@ export class Analyse {
 
   toggleCeval() {
     this.ceval?.toggle();
-    this.enabled = this.ceval.enabled;
     this.startCeval();
   }
 

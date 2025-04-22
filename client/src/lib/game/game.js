@@ -23,10 +23,6 @@ export class Game {
     });
   }
 
-  get outcome() {
-    return this._chess.isGameOver();
-  }
-
   get line() {
     let move = this.currentMove;
     const moves = [];
@@ -45,6 +41,7 @@ export class Game {
       parent: null,
       ply,
       fen,
+      outcome: this._chess.isGameOver(),
       children: [],
     };
   }
@@ -93,6 +90,7 @@ export class Game {
         fen: this._chess.fen(),
         san: info.san,
         uci: info.lan,
+        outcome: this._chess.isGameOver(),
         children: [],
       };
       this.currentMove.children.push(move);

@@ -18,7 +18,7 @@ export const EvalScore = () => {
     }
   }
 
-  if (snap.game.outcome) {
+  if (snap.game.currentMove.outcome && snap.ceval.enabled) {
     score = '-';
   }
 
