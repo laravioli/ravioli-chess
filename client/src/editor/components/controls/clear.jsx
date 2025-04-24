@@ -1,12 +1,13 @@
-import { useModule } from 'src/shared/hooks/hooks';
-import { Action } from 'src/shared/components/toolbar/action';
+import { useModule } from 'src/common/hooks/hooks';
+import { observer } from 'mobx-react-lite';
+import { Action } from 'src/common/components/toolbar/action';
 import { IconTrash } from '@tabler/icons-react';
 
-export const ClearButton = () => {
+export const ClearButton = observer(() => {
   const editor = useModule();
 
   const onClear = () => {
-    editor.getBoard().clear();
+    editor.board.clear();
     editor.fen.resetFen(false);
   };
 
@@ -15,4 +16,4 @@ export const ClearButton = () => {
       <IconTrash size={40} stroke={1.5} />
     </Action>
   );
-};
+});

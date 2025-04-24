@@ -1,22 +1,22 @@
 import chessBoard from 'chessboard';
 import { Game } from 'src/lib/game/game';
-import { Eval } from 'src/lib/eval/ctrl';
+import { Ceval } from 'src/lib/eval/ceval';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { observable } from 'src/main/store/reactive';
-import { makeObservable } from 'src/main/store';
+import { makeAutoObservable, observable } from 'mobx';
 
 export class Analyse {
   constructor(opts, deps) {
     window.analysis = this;
-    makeObservable(this, {
-      evaluation: observable,
-    });
+
     this.initialFen = opts.fen;
     this.fen = deps.fen;
     this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
+    makeAutoObservable(this, {
+      evaluation: observable.ref,
+    });
   }
 
   onLoad(fen) {
@@ -29,10 +29,6 @@ export class Analyse {
   }
 
   /*----------GAME----------*/
-
-  getGame() {
-    return this.game;
-  }
 
   newGame(fen) {
     if (!this.game) {
@@ -49,7 +45,8 @@ export class Analyse {
     this.game.jump(action);
 
     const move = this.game.currentMove;
-    if (move.ceval || !this.ceval.enabled) this.evaluation = move.ceval;
+    if (!this.ceval.enabled || move.ceval || move.outcome)
+      this.evaluation = move.ceval;
     this.restartCeval();
     this.board.position(move.fen, true);
     this.fen.setFen(move.fen);
@@ -67,7 +64,7 @@ export class Analyse {
     };
     if (this.ceval) this.ceval.setOpts(opts);
     else {
-      this.ceval = new Eval(opts);
+      this.ceval = new Ceval(opts);
     }
   }
 
@@ -75,8 +72,7 @@ export class Analyse {
     let move = this.game.currentMove;
     if (ev.fen !== move.fen) return;
     if (!move.ceval || isEvalBetter(ev, move.ceval)) {
-      move.ceval = ev;
-      this.evaluation = ev;
+      move.ceval = this.evaluation = ev;
     }
   }
 
@@ -102,17 +98,13 @@ export class Analyse {
 
   getCeval = () => this.ceval;
 
-  clearEvals = () => {
+  clearEvals() {
     this.game.line.forEach((move) => {
       if (move.ceval) move.ceval = null;
     });
-  };
+  }
 
   /*----------BOARD----------*/
-
-  getBoard() {
-    return this.board;
-  }
 
   setBoard(div) {
     if (this.board) this.destroyBoard();

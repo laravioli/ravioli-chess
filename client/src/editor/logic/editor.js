@@ -1,9 +1,11 @@
 import chessBoard from 'chessboard';
+import { makeAutoObservable } from 'mobx';
 
 export class Editor {
   constructor(opts, deps) {
     this.initialFen = opts.fen;
     this.fen = deps.fen;
+    makeAutoObservable(this);
   }
 
   onLoad(fen) {
@@ -12,10 +14,6 @@ export class Editor {
   }
 
   onUnLoad() {}
-
-  getBoard() {
-    return this.board;
-  }
 
   setBoard(div) {
     if (this.board) this.destroyBoard();

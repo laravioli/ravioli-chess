@@ -1,15 +1,11 @@
-import { useMainStore, useLocalStore } from 'src/shared/hooks/hooks';
+import { useLocalStore, useModule } from 'src/common/hooks/hooks';
+import { observer } from 'mobx-react-lite';
 import { Paper } from '@mantine/core';
-import { Line } from './line.jsx';
 import { renderPvs } from './utils.jsx';
+import { renderLine } from './utils';
 import classes from '../css/move.module.css';
 
-export function Moves() {
-  const evaluation = useMainStore((state) => state.analyse.evaluation);
-  const enabled = useMainStore((state) => state.eval.enabled);
-  const outcome = useMainStore((state) => state.game.outcome());
-  const multipv = useLocalStore((state) => state.multipv);
-
+export const Moves = () => {
   return (
     <Paper
       className={classes.move}
@@ -17,8 +13,27 @@ export function Moves() {
       shadow="xl"
       radius=""
       withBorder>
-      {enabled && !outcome && renderPvs(evaluation, multipv)}
+      <Pvs />
       <Line />
     </Paper>
   );
-}
+};
+
+const Pvs = observer(() => {
+  const analyse = useModule();
+  const multipv = useLocalStore((state) => state.multipv);
+
+  return (
+    <>
+      {analyse.ceval.enabled &&
+        !analyse.game.currentMove.outcome &&
+        renderPvs(analyse.evaluation, multipv)}
+    </>
+  );
+});
+
+const Line = observer(() => {
+  const analyse = useModule();
+
+  return <>{renderLine(analyse.game.line)}</>;
+});

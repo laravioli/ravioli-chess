@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
-import { ModuleProvider } from 'src/shared/context/provider';
+import { ModuleProvider } from 'src/common/context/provider';
 import { Analyse } from 'src/analyse/components/page/analyse';
 import { Editor } from 'src/editor/components/page/editor';
 import { NotFound } from './notfound';

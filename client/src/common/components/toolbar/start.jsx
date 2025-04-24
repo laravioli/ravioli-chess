@@ -1,5 +1,5 @@
 import { DEFAULT_POSITION } from 'chess.js';
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { Action } from './action';
 import { IconReload } from '@tabler/icons-react';
 
@@ -8,7 +8,7 @@ export const StartButton = () => {
 
   const onStart = () => {
     module.newGame?.(DEFAULT_POSITION);
-    module.getBoard().start();
+    module.board.start();
     module.fen.resetFen(true);
   };
 

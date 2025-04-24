@@ -1,10 +1,11 @@
-import { useModule, useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
+import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
 import classes from '../css/controls.module.css';
 
-export const TurnToPlay = () => {
+export const TurnToPlay = observer(() => {
   const editor = useModule();
-  const turn = useMainStore((state) => state.fen.turn);
+
   const data = [
     { label: 'White to play', value: 'w' },
     { label: 'Black to play', value: 'b' },
@@ -16,10 +17,10 @@ export const TurnToPlay = () => {
 
   return (
     <NativeSelect
-      value={turn}
+      value={editor.fen.turn}
       onChange={onChange}
       data={data}
       classNames={{ wrapper: classes.wrapper }}
     />
   );
-};
+});

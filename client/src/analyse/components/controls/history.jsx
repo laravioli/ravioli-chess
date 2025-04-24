@@ -5,10 +5,11 @@ import {
   IconChevronsRight,
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
+import { observer } from 'mobx-react-lite';
 import classes from '../css/controls.module.css';
 
-export const History = () => {
+export const History = observer(() => {
   const module = useModule();
   const actions = [
     { icon: IconChevronsLeft, action: 'start' },
@@ -24,7 +25,9 @@ export const History = () => {
           key={action}
           variant="default"
           size="xl"
-          onClick={() => module.jump(action)}
+          onClick={() => {
+            module.jump(action);
+          }}
           styles={{
             root: { border: 0 },
           }}>
@@ -33,4 +36,4 @@ export const History = () => {
       ))}
     </Group>
   );
-};
+});

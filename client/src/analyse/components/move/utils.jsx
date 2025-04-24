@@ -57,6 +57,7 @@ export function renderPvs(evaluation, multipv) {
 
 export const renderLine = (line) => {
   let turn, moves;
+  line = line.slice(1);
   const color = (ply) => ((ply - 1) % 2 === 0 ? 'white' : 'black');
   return line
     .map((move, index) => {

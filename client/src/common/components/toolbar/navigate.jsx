@@ -1,13 +1,13 @@
 import { controller } from 'src/main/logic';
 import { useNavigate } from 'react-router';
-import { useModule, useMainStore } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
+import { observer } from 'mobx-react-lite';
 import { Action } from './action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
 
-export function Navigate({ path }) {
+export const Navigate = observer(({ path }) => {
   const module = useModule();
   const navigate = useNavigate();
-  const isLegalFen = useMainStore((state) => state.fen.isLegal());
 
   const isEdit = path !== '/editor';
   const label = isEdit ? 'analysis board' : 'edit board';
@@ -18,13 +18,16 @@ export function Navigate({ path }) {
       controller.setModule(path, module.fen.current);
       navigate(path, { replace: true });
     } else {
-      module.getBoard().position(module.fen.current);
+      module.board.position(module.fen.current);
     }
   };
 
   return (
-    <Action label={label} onClick={onClick} disabled={isEdit && !isLegalFen}>
+    <Action
+      label={label}
+      onClick={onClick}
+      disabled={isEdit && !module.fen.isLegal}>
       <Icon size={30} stroke={1.2} />
     </Action>
   );
-}
+});

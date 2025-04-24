@@ -1,13 +1,13 @@
-import { mainStore } from 'src/main/store';
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useInitData, useModule } from 'src/shared/hooks/hooks';
+import { useInitData, useModule } from 'src/common/hooks/hooks';
+import { observer } from 'mobx-react-lite';
+import { autorun } from 'mobx';
 import { NativeSelect } from '@mantine/core';
 import { short_fen } from './utils';
 import classes from '../css/controls.module.css';
 
-export const Positions = () => {
+export const Positions = observer(() => {
   const editor = useModule();
-
   const position = useInitData();
 
   const data = useMemo(
@@ -37,17 +37,17 @@ export const Positions = () => {
   const [value, setValue] = useState(matcher(editor.fen.current));
 
   useEffect(() => {
-    const unsub = mainStore.subscribe(
-      (state) => state.fen.current(),
-      (fen) => setValue(matcher(fen))
-    );
-    return unsub;
-  }, [matcher]);
+    const disposer = autorun(() => {
+      setValue(matcher(editor.fen.current));
+    });
+
+    return disposer;
+  }, [editor, matcher]);
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen) {
-      editor.getBoard().position(fen, true);
+      editor.board.position(fen, true);
       editor.fen.setFen(fen);
     } else {
       setValue(fen);
@@ -62,4 +62,4 @@ export const Positions = () => {
       classNames={{ wrapper: classes.wrapper }}
     />
   );
-};
+});
