@@ -1,7 +1,8 @@
-import { getCastlingRights, isValidInput, validateFen } from './utils';
+import { DEFAULT_POSITION } from 'chess.js';
 import { observable, computed, action } from 'mobx';
+import { getCastlingRights, isValidInput, validateFen } from './utils';
 
-export class Fen {
+export class FenStore {
   @observable accessor position;
   @observable accessor turn;
   @observable accessor castling;
@@ -9,8 +10,9 @@ export class Fen {
   @observable accessor fullmove;
   inputRef = { current: null };
 
-  constructor(fen) {
-    this.setFen(fen);
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+    this.setFen(DEFAULT_POSITION);
   }
 
   @computed

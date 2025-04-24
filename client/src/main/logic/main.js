@@ -1,6 +1,6 @@
 import { Analyse } from 'src/analyse/logic/analyse';
 import { Editor } from 'src/editor/logic/editor';
-import { Fen } from 'src/common/store/fen';
+import { FenStore } from 'src/common/stores/fenstore.js';
 import { DEFAULT_POSITION } from 'chess.js';
 
 export class Controller {
@@ -22,7 +22,7 @@ export class Controller {
   ]);
 
   globals = new Map([
-    ['fen', { make: (fen) => new Fen(fen), instance: undefined }],
+    ['fen', { make: (fen) => new FenStore(fen), instance: undefined }],
   ]);
 
   constructor(id) {
