@@ -1,6 +1,6 @@
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
-import { Action } from 'src/shared/components/toolbar/action';
+import { Action } from 'src/common/components/toolbar/action';
 import { IconTrash } from '@tabler/icons-react';
 
 export const ClearButton = observer(() => {

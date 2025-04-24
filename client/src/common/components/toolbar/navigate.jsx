@@ -1,6 +1,6 @@
 import { controller } from 'src/main/logic';
 import { useNavigate } from 'react-router';
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Action } from './action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';

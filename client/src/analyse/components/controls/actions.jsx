@@ -1,9 +1,9 @@
 import { Group } from '@mantine/core';
-import { StartButton } from 'src/shared/components/toolbar/start';
-import { FlipButton } from 'src/shared/components/toolbar/flip';
+import { StartButton } from 'src/common/components/toolbar/start';
+import { FlipButton } from 'src/common/components/toolbar/flip';
 import { Positions } from './positions';
-import { TestButton } from 'src/shared/components/toolbar/test';
-import { Navigate } from 'src/shared/components/toolbar/navigate';
+import { TestButton } from 'src/common/components/toolbar/test';
+import { Navigate } from 'src/common/components/toolbar/navigate';
 
 export const Actions = () => {
   return (

@@ -1,4 +1,4 @@
-import { useModule } from '../../../shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { povChances } from 'src/lib/eval/util';
 import classes from '../css/eval.module.css';

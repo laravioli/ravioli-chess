@@ -1,4 +1,4 @@
-import { useInitData, useModule } from 'src/shared/hooks/hooks';
+import { useInitData, useModule } from 'src/common/hooks/hooks';
 import { Combobox, useCombobox } from '@mantine/core';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconChessRook } from '@tabler/icons-react';

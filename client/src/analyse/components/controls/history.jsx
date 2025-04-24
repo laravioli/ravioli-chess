@@ -5,7 +5,7 @@ import {
   IconChevronsRight,
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import classes from '../css/controls.module.css';
 

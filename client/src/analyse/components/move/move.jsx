@@ -1,5 +1,4 @@
-import { useLocalStore } from 'src/shared/hooks/hooks';
-import { useModule } from '../../../shared/hooks/hooks';
+import { useLocalStore, useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Paper } from '@mantine/core';
 import { renderPvs } from './utils.jsx';

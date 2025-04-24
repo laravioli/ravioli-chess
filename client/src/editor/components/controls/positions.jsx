@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useInitData, useModule } from 'src/shared/hooks/hooks';
+import { useInitData, useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { NativeSelect } from '@mantine/core';

@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 
 export function Board() {
   const divRef = useRef(null);

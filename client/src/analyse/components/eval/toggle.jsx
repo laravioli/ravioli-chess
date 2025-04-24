@@ -1,6 +1,6 @@
 import { localStore } from 'src/main/store';
 import { useEffect, useCallback } from 'react';
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';

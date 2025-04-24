@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { TextInput } from '@mantine/core';

@@ -1,4 +1,4 @@
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Checkbox } from '@mantine/core';
 import classes from '../css/controls.module.css';

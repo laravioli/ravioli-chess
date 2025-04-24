@@ -1,5 +1,5 @@
 import { localStore } from 'src/main/store';
-import { useModule, useLocalStore } from 'src/shared/hooks/hooks';
+import { useModule, useLocalStore } from 'src/common/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { useState, useCallback } from 'react';
 import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';

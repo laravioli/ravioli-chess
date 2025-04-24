@@ -7,7 +7,7 @@ export class Game {
   constructor(fen) {
     this._chess = new Chess(fen);
     Object.getOwnPropertyNames(Chess.prototype).forEach((key) => {
-      if (key !== 'constructor' && !(key in this)) {
+      if (key !== 'constructor' && !this[key]) {
         // Forward the method from Chess if not already defined in Game
         this[key] = (...args) => this._chess[key](...args);
       }
@@ -30,13 +30,15 @@ export class Game {
   setRoot(fen) {
     const ply =
       (this._chess.turn() == 'w' ? 0 : 1) + (this._chess.moveNumber() - 1) * 2;
-    this.currentMove = this.root = {
+    this.root = new Move({
       parent: null,
       ply,
       fen,
+      san: null,
+      uci: null,
       outcome: this._chess.isGameOver(),
-      children: [],
-    };
+    });
+    this.currentMove = this.root;
   }
 
   @action
@@ -81,7 +83,7 @@ export class Game {
     let move = this.currentMove.children.find((move) => move.uci === info.lan);
 
     if (!move) {
-      move = {
+      move = new Move({
         parent: this.currentMove, //circular ref
         ply: this.currentMove.ply + 1,
         fen: this._chess.fen(),
@@ -89,7 +91,7 @@ export class Game {
         uci: info.lan,
         outcome: this._chess.isGameOver(),
         children: [],
-      };
+      });
       this.currentMove.children.push(move);
     }
     this.currentMove = move;
@@ -124,8 +126,33 @@ export class Game {
 
     while (move.children.length > 0) {
       move = move.children[0];
+
       this._chess.move(move.san);
     }
     this.currentMove = move;
+  }
+}
+
+class Move {
+  parent;
+  ply;
+  fen;
+  san;
+  uci;
+  outcome;
+  children = [];
+
+  constructor({ parent, ply, fen, san, uci, outcome }) {
+    this.parent = parent;
+    this.ply = ply;
+    this.fen = fen;
+    this.san = san;
+    this.uci = uci;
+    this.outcome = outcome;
+    this.children = [];
+
+    makeAutoObservable(this, {
+      parent: false,
+    });
   }
 }

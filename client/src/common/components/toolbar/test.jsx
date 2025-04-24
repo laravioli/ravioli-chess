@@ -1,4 +1,4 @@
-import { useModule } from 'src/shared/hooks/hooks';
+import { useModule } from 'src/common/hooks/hooks';
 import { Action } from './action';
 import { IconTestPipe } from '@tabler/icons-react';
 
