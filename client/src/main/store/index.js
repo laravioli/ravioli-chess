@@ -18,7 +18,7 @@ export const localStore = createStore(
   )
 );
 
-const withStorageDOMEvents = (store) => {
+(function (store) {
   const storageEventCallback = (e) => {
     if (e.key === store.persist.getOptions().name && e.newValue) {
       store.persist.rehydrate();
@@ -30,6 +30,4 @@ const withStorageDOMEvents = (store) => {
   return () => {
     window.removeEventListener('storage', storageEventCallback);
   };
-};
-
-withStorageDOMEvents(localStore);
+})(localStore);

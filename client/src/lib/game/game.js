@@ -144,6 +144,7 @@ class Move {
 
   constructor({ parent, ply, fen, san, uci, outcome }) {
     this.parent = parent;
+    this.ceval = null;
     this.ply = ply;
     this.fen = fen;
     this.san = san;
@@ -153,6 +154,7 @@ class Move {
 
     makeAutoObservable(this, {
       parent: false,
+      ceval: false,
     });
   }
 }

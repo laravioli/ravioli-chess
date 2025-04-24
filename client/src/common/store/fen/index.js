@@ -1,18 +1,24 @@
-import { validateFen } from 'chess.js';
-import { makeAutoObservable } from 'mobx';
+import { getCastlingRights, isValidInput, validateFen } from './utils';
+import { observable, computed, action } from 'mobx';
 
 export class Fen {
+  @observable accessor position;
+  @observable accessor turn;
+  @observable accessor castling;
+  @observable accessor halfmove;
+  @observable accessor fullmove;
+  inputRef = { current: null };
+
   constructor(fen) {
-    this.inputRef = { current: null };
     this.setFen(fen);
-    makeAutoObservable(this, { inputRef: false });
   }
 
+  @computed
   get current() {
     const fen = [
       this.position,
       this.turn,
-      this._getCastlingRights(),
+      getCastlingRights(this.castling),
       '-',
       this.halfmove,
       this.fullmove,
@@ -20,10 +26,12 @@ export class Fen {
     return fen;
   }
 
+  @computed
   get isLegal() {
     return validateFen(this.current).ok;
   }
 
+  @action
   setFen(initialFen) {
     const fen = initialFen.split(' ');
     this.position = fen[0];
@@ -36,50 +44,33 @@ export class Fen {
     this.fullmove = fen[5];
   }
 
-  _getCastlingRights() {
-    const cr = Object.entries(this.castling)
-      .filter(([, value]) => value)
-      .map(([key]) => key)
-      .join('');
-    return cr === '' ? '-' : cr;
-  }
-
+  @action
   setCastlingRight(id, value) {
     this.castling = { ...this.castling, [id]: value };
   }
 
+  @action
   setTurn(turn = undefined) {
     const newTurn = turn ?? (this.turn === 'w' ? 'b' : 'w');
     this.turn = newTurn;
   }
 
+  @action
   setFenFromInput(input) {
-    if (input !== this.current && this._isValidInput(input)) {
+    if (input !== this.current && isValidInput(input)) {
       this.setFen(input);
     } else {
       this.inputRef.current.value = this.current;
     }
   }
 
-  _isValidInput(input) {
-    const validation = validateFen(input);
-    const validErrors = [
-      'Invalid FEN: some pawns are on the edge rows',
-      'Invalid FEN: missing white king',
-      'Invalid FEN: missing black king',
-    ];
-    if (validation.ok || validErrors.includes(validation.error)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
+  @action
   isFenAnalysable() {
     this.setFenFromInput(this.inputRef.current.value);
     return this.isLegal;
   }
 
+  @action
   resetFen(cr) {
     this.position = cr
       ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'

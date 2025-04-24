@@ -1,6 +1,6 @@
 import { Analyse } from 'src/analyse/logic/analyse';
 import { Editor } from 'src/editor/logic/editor';
-import { Fen } from 'src/lib/fen/fen';
+import { Fen } from 'src/common/store/fen';
 import { DEFAULT_POSITION } from 'chess.js';
 
 export class Controller {

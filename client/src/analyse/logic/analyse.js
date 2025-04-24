@@ -3,7 +3,7 @@ import { Game } from 'src/lib/game/game';
 import { Ceval } from 'src/lib/eval/ceval';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, observable } from 'mobx';
 
 //fix me : proxy eval make things laggy
 //find a way to proxy only analyse but still get reactivity from eval(enabled)
@@ -18,7 +18,9 @@ export class Analyse {
     this.newGame(opts.fen);
     this.initCeval();
     this.startCeval();
-    makeAutoObservable(this, { ceval: false, game: false });
+    makeAutoObservable(this, {
+      evaluation: observable.ref,
+    });
   }
 
   onLoad(fen) {
@@ -74,8 +76,7 @@ export class Analyse {
     let move = this.game.currentMove;
     if (ev.fen !== move.fen) return;
     if (!move.ceval || isEvalBetter(ev, move.ceval)) {
-      move.ceval = ev;
-      this.evaluation = ev;
+      move.ceval = this.evaluation = ev;
     }
   }
 
