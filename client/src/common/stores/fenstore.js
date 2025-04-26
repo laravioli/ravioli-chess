@@ -2,6 +2,8 @@ import { DEFAULT_POSITION } from 'chess.js';
 import { observable, computed, action } from 'mobx';
 import { getCastlingRights, isValidInput, validateFen } from './utils';
 
+//note : setFen -> set , setFenFrom.. -> setFrom, isFenAna -> isAna resetFen -> reset
+
 export class FenStore {
   @observable accessor position;
   @observable accessor turn;
@@ -12,12 +14,12 @@ export class FenStore {
 
   constructor(rootStore) {
     this.rootStore = rootStore;
-    this.setFen(DEFAULT_POSITION);
+    this.set(DEFAULT_POSITION);
   }
 
   @computed
   get current() {
-    const fen = [
+    return [
       this.position,
       this.turn,
       getCastlingRights(this.castling),
@@ -25,7 +27,6 @@ export class FenStore {
       this.halfmove,
       this.fullmove,
     ].join(' ');
-    return fen;
   }
 
   @computed
@@ -34,7 +35,7 @@ export class FenStore {
   }
 
   @action
-  setFen(initialFen) {
+  set(initialFen) {
     const fen = initialFen.split(' ');
     this.position = fen[0];
     this.turn = fen[1];
@@ -58,22 +59,22 @@ export class FenStore {
   }
 
   @action
-  setFenFromInput(input) {
+  setFromInput(input) {
     if (input !== this.current && isValidInput(input)) {
-      this.setFen(input);
+      this.set(input);
     } else {
       this.inputRef.current.value = this.current;
     }
   }
 
   @action
-  isFenAnalysable() {
-    this.setFenFromInput(this.inputRef.current.value);
+  isAnalysable() {
+    this.setFromInput(this.inputRef.current.value);
     return this.isLegal;
   }
 
   @action
-  resetFen(cr) {
+  reset(cr) {
     this.position = cr
       ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
       : '8/8/8/8/8/8/8/8';

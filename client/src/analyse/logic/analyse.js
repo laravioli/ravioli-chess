@@ -1,46 +1,50 @@
 import chessBoard from 'chessboard';
 import { Game } from 'src/lib/game/game';
 import { Ceval } from 'src/lib/eval/ceval';
+import { Board } from 'src/lib/board/board';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { makeAutoObservable, observable } from 'mobx';
+import { observable, action } from 'mobx';
 
-export class Analyse {
-  constructor(opts, deps) {
-    window.analysis = this;
+export class AnalyseStore {
+  game = undefined;
+  ceval = undefined;
+  @observable.ref accessor evaluation = undefined;
 
-    this.initialFen = opts.fen;
-    this.fen = deps.fen;
-    this.newGame(opts.fen);
-    this.initCeval();
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+  }
+
+  /* loader */
+
+  @action
+  onLoad() {
+    const fen = this.rootStore.fenStore.current;
+    this.game ? this.game.load(fen) : (this.game = new Game(fen));
+    this.initCeval(fen);
     this.startCeval();
-    makeAutoObservable(this, {
-      evaluation: observable.ref,
-    });
   }
 
-  onLoad(fen) {
-    this.initialFen = fen;
-    this.newGame(fen);
-  }
-
+  @action
   onUnLoad() {
+    this.game.clear();
     this.ceval.stop();
+    this.evaluation = undefined;
   }
 
-  /*----------GAME----------*/
+  /* game */
 
+  @action
   newGame(fen) {
-    if (!this.game) {
-      this.game = new Game(fen);
-    } else {
-      if (fen !== this.fen.current) this.fen.setFen(fen);
-      this.game.load(fen);
-      this.restartCeval();
-    }
+    if (fen !== this.rootStore.fenStore.current)
+      this.rootStore.fenStore.set(fen);
+    this.game.load(fen);
+    this.restartCeval();
+
     if (!this.ceval || !this.ceval.enabled) this.evaluation = null;
   }
 
+  @action
   jump(action) {
     this.game.jump(action);
 
@@ -49,14 +53,14 @@ export class Analyse {
       this.evaluation = move.ceval;
     this.restartCeval();
     this.board.position(move.fen, true);
-    this.fen.setFen(move.fen);
+    this.rootStore.fenStore.set(move.fen);
   }
 
-  /*----------EVAL----------*/
+  /* ceval */
 
-  initCeval() {
+  initCeval(fen) {
     const opts = {
-      initialFen: this.initialFen,
+      initialFen: fen,
       possible: engineSupported(),
       emit: (ev) => {
         this.onNewCeval(ev);
@@ -86,66 +90,53 @@ export class Analyse {
     }
   });
 
+  @action
   restartCeval() {
     this.ceval.stop();
     this.startCeval();
   }
 
+  @action
   toggleCeval() {
     this.ceval?.toggle();
     this.startCeval();
   }
 
-  getCeval = () => this.ceval;
-
+  @action
   clearEvals() {
     this.game.line.forEach((move) => {
       if (move.ceval) move.ceval = null;
     });
   }
 
-  /*----------BOARD----------*/
+  /* board */
 
-  setBoard(div) {
-    if (this.board) this.destroyBoard();
-    this.board = chessBoard(div, this.makeBoardCfg());
-    window.addEventListener('resize', this.board.resize);
-  }
-
-  destroyBoard() {
-    window.removeEventListener('resize', this.board.resize);
-    this.board.destroy();
-    this.board = undefined;
-  }
-
-  makeBoardCfg = () => {
-    return {
-      pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
-      position: this.initialFen,
-      draggable: true,
-      dropOffBoard: 'snapback',
-      sparePieces: true,
-      hideSparePieces: true,
-      onDragStart: (source, piece) => {
-        if (this.game?.isGameOver()) return false;
-        if (
-          (this.game?.turn() === 'w' && piece.search(/^b/) !== -1) ||
-          (this.game?.turn() === 'b' && piece.search(/^w/) !== -1)
-        ) {
-          return false;
-        }
-      },
-      onDrop: (source, target) => {
-        try {
-          this.game.move(source, target);
-          // eslint-disable-next-line no-unused-vars
-        } catch (error) {
-          return 'snapback';
-        }
-      },
-      onSnapEnd: () => {
-        this.jump('move');
-      },
-    };
-  };
+  makeBoardCfg = () => ({
+    pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
+    position: this.rootStore.fenStore.current,
+    draggable: true,
+    dropOffBoard: 'snapback',
+    sparePieces: true,
+    hideSparePieces: true,
+    onDragStart: (source, piece) => {
+      if (this.game?.isGameOver()) return false;
+      if (
+        (this.game?.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (this.game?.turn() === 'b' && piece.search(/^w/) !== -1)
+      ) {
+        return false;
+      }
+    },
+    onDrop: (source, target) => {
+      try {
+        this.game.move(source, target);
+        // eslint-disable-next-line no-unused-vars
+      } catch (error) {
+        return 'snapback';
+      }
+    },
+    onSnapEnd: () => {
+      this.jump('move');
+    },
+  });
 }
