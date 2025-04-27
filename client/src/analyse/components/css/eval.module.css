@@ -16,8 +16,8 @@
   text-align: center;
   font-weight: bold;
 }
-.evalname {
-  flex: 2 1 auto;
+.evalinfo {
+  flex: 2 1;
 }
 
 .bar {

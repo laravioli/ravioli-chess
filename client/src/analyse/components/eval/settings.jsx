@@ -8,9 +8,20 @@ import { recommendedThreads } from 'src/lib/eval/engine';
 
 export const Settings = observer(() => {
   const { analyseStore } = useStore();
+  const searchms = useLocalStore((state) => state.searchms);
   const multipv = useLocalStore((state) => state.multipv);
   const threads = useLocalStore((state) => state.threads);
   const [opened, setOpened] = useState(false);
+
+  const setSearchTime = useCallback(
+    (value) => {
+      if (value != searchms / 1000) {
+        localStore.setState({ searchms: value * 1000 });
+        analyseStore.restartCeval();
+      }
+    },
+    [searchms]
+  );
 
   const setMultipv = useCallback(
     (value) => {
@@ -51,6 +62,19 @@ export const Settings = observer(() => {
 
       <Popover.Dropdown>
         <Stack gap="sm">
+          <Group align="center" justify="space-between">
+            <Text size="sm" w={60}>
+              Search time
+            </Text>
+            <Slider
+              value={searchms / 1000}
+              min={1}
+              max={10}
+              step={1}
+              onChange={setSearchTime}
+              style={{ flex: 1 }}
+            />
+          </Group>
           <Group align="center" justify="space-between">
             <Text size="sm" w={60}>
               Lines

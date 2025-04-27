@@ -103,7 +103,6 @@ export class AnalyseStore {
     this.startCeval();
   }
 
-  //fixme : multipv
   @action
   clearEvals() {
     this.game.line.forEach((move) => {
@@ -116,6 +115,7 @@ export class AnalyseStore {
   makeBoardCfg = () => ({
     pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
     position: this.rootStore.fenStore.current,
+    orientation: this.rootStore.uiStore.orientation,
     draggable: true,
     dropOffBoard: 'snapback',
     sparePieces: true,

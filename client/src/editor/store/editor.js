@@ -18,12 +18,15 @@ export class EditorStore {
     return {
       pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
       position: this.rootStore.fenStore.current,
+      orientation: this.rootStore.uiStore.orientation,
       draggable: true,
       dropOffBoard: 'trash',
       sparePieces: true,
       hideSparePieces: false,
-      onDrop: (s, t, p, newPos) =>
-        (this.rootStore.fenStore.position = this.board.objToFen(newPos)),
+      onDrop: action(
+        (s, t, p, newPos) =>
+          (this.rootStore.fenStore.position = this.board.objToFen(newPos))
+      ),
     };
   };
 }

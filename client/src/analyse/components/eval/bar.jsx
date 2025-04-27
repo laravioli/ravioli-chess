@@ -4,7 +4,7 @@ import { povChances } from 'src/lib/eval/util';
 import classes from '../css/eval.module.css';
 
 export const EvalBar = observer(() => {
-  const { analyseStore } = useStore();
+  const { analyseStore, uiStore } = useStore();
 
   if (!analyseStore.ceval.enabled || analyseStore.game.currentMove.outcome)
     return null;
@@ -14,10 +14,16 @@ export const EvalBar = observer(() => {
     : 0.0;
 
   return (
-    <div className={[classes.bar, classes.barblack].join(' ')}>
+    <div
+      className={[classes.bar, classes.barblack].join(' ')}
+      style={{
+        transform: uiStore.orientation === 'black' ? 'rotate(180deg)' : '',
+      }}>
       <div
         className={classes.barwhite}
-        style={{ height: `${(progress + 1) * 50}%` }}></div>
+        style={{
+          height: `${(progress + 1) * 50}%`,
+        }}></div>
     </div>
   );
 });

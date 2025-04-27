@@ -14,4 +14,5 @@ export const StoreContext = createContext({
   analyseStore: rootStore.analyseStore,
   editorStore: rootStore.editorStore,
   fenStore: rootStore.fenStore,
+  uiStore: rootStore.uiStore,
 });

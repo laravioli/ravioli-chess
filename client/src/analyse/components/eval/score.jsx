@@ -6,8 +6,8 @@ import classes from '../css/eval.module.css';
 export const EvalScore = observer(() => {
   const { analyseStore } = useStore();
 
-  let score = '';
   const evaluation = analyseStore.evaluation;
+  let score = '';
 
   if (evaluation) {
     if (evaluation.mate) {

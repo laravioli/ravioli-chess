@@ -9,7 +9,8 @@ export class Game {
     Object.getOwnPropertyNames(Chess.prototype).forEach((key) => {
       if (key !== 'constructor' && !this[key]) {
         // Forward the method from Chess if not already defined in Game
-        this[key] = (...args) => this._chess[key](...args);
+        Object.getPrototypeOf(this)[key] = (...args) =>
+          this._chess[key](...args);
       }
     });
     this.setRoot(fen);
