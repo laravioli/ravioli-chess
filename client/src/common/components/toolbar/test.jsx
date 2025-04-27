@@ -1,18 +1,17 @@
-import { useModule } from 'src/common/hooks/hooks';
+import { useStore } from 'src/main/hooks/hooks';
 import { Action } from './action';
 import { IconTestPipe } from '@tabler/icons-react';
 
-const test = (module) => {
-  console.log('board ' + module.board.fen());
-  console.log('chess ' + module.game?.fen());
-  console.log('fen from module' + module.fen.current);
-  console.log('current move', module.game?.currentMove);
-};
-
-export const TestButton = () => {
-  const module = useModule();
+export const TestButton = ({ store }) => {
+  const { fenStore } = useStore();
+  const test = () => {
+    console.log('board ' + store.board.fen());
+    console.log('chess ' + store.game?.fen());
+    console.log('fen from module' + fenStore.current);
+    console.log('current move', store.game?.currentMove);
+  };
   return (
-    <Action label="test" onClick={() => test(module)}>
+    <Action label="test" onClick={() => test()}>
       <IconTestPipe size={40} stroke={1.2} />
     </Action>
   );

@@ -1,12 +1,12 @@
-import chessBoard from 'chessboard';
+import { Board } from 'src/lib/board/board';
 import { Game } from 'src/lib/game/game';
 import { Ceval } from 'src/lib/eval/ceval';
-import { Board } from 'src/lib/board/board';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
 import { observable, action } from 'mobx';
 
 export class AnalyseStore {
+  board = new Board();
   game = undefined;
   ceval = undefined;
   @observable.ref accessor evaluation = undefined;
@@ -72,6 +72,7 @@ export class AnalyseStore {
     }
   }
 
+  @action
   onNewCeval(ev) {
     let move = this.game.currentMove;
     if (ev.fen !== move.fen) return;
@@ -102,6 +103,7 @@ export class AnalyseStore {
     this.startCeval();
   }
 
+  //fixme : multipv
   @action
   clearEvals() {
     this.game.line.forEach((move) => {

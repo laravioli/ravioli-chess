@@ -2,9 +2,10 @@ import 'vite/modulepreload-polyfill';
 import 'src/main/components/css/index.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { boot } from 'src/main/boot';
 import App from './App.jsx';
 
-//todo : get rid of zustand "action" -> full OO with my implementation
+boot();
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

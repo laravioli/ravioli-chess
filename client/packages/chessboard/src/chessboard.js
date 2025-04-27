@@ -1909,11 +1909,13 @@ function constructor(containerElOrString, config) {
   Object.defineProperty(widget, 'fenToObj', {
     value: fenToObj,
     writable: false,
+    enumerable: true,
   });
 
   Object.defineProperty(widget, 'objToFen', {
     value: objToFen,
     writable: false,
+    enumerable: true,
   });
   // return the widget object
   return widget;

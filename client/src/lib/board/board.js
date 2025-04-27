@@ -1,38 +1,21 @@
 import chessBoard from 'chessboard';
 import { action } from 'mobx';
+import { objectMap } from './utils';
 
 export class Board {
-  widget = undefined;
-
   @action
-  set(div, fnConfig) {
-    this.widget?.destroyBoard();
-    this.widget = chessBoard(div, fnConfig);
-    window.addEventListener('resize', this.widget.resize);
+  mount(div, fnConfig) {
+    const board = chessBoard(div, fnConfig);
+    Object.assign(
+      this,
+      objectMap(board, (fn) => action(fn))
+    );
+    window.addEventListener('resize', this.resize);
   }
 
   @action
-  destroy() {
-    window.removeEventListener('resize', this.widget.resize);
-    this.widget.destroy();
-    this.widget = null;
+  unMount() {
+    window.removeEventListener('resize', this.resize);
+    this.destroy();
   }
-
-  @action
-  clear = (useAnimation) => this.widget.clear(useAnimation);
-
-  @action
-  fen = () => this.widget.fen();
-
-  @action
-  flip = () => this.widget.flip();
-
-  @action
-  position = (newPosition, useAnimation) =>
-    this.widget.position(newPosition, useAnimation);
-
-  @action
-  start = (useAnimation) => this.widget.start(useAnimation);
-
-  objToFen = (pos) => this.widget.objToFen(pos);
 }

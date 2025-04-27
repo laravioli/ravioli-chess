@@ -1,16 +1,14 @@
 import { useRef, useEffect } from 'react';
-import { useModule } from 'src/common/hooks/hooks';
 
-export function Board() {
+export function Board({ store }) {
   const divRef = useRef(null);
-  const module = useModule();
 
   useEffect(() => {
-    module.setBoard(divRef.current);
+    store.board.mount(divRef.current, store.makeBoardCfg());
     return () => {
-      module.destroyBoard();
+      store.board.unMount();
     };
-  }, [module]);
+  }, [store]);
 
   return <div className="board" ref={divRef} />;
 }

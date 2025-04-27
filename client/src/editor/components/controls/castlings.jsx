@@ -1,4 +1,4 @@
-import { useModule } from 'src/common/hooks/hooks';
+import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Checkbox } from '@mantine/core';
 import classes from '../css/controls.module.css';
@@ -18,11 +18,11 @@ export const CastlingBoxes = () => {
 };
 
 const CastlingBox = observer(({ id, label }) => {
-  const editor = useModule();
-  const castlingRight = editor.fen.castling[id];
+  const { fenStore } = useStore();
+  const castlingRight = fenStore.castling[id];
 
   const onChange = () => {
-    editor.fen.setCastlingRight(id, !castlingRight);
+    fenStore.setCastlingRight(id, !castlingRight);
   };
 
   return (

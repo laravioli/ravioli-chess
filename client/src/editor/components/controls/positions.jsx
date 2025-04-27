@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useInitData, useModule } from 'src/common/hooks/hooks';
+import { useInitData, useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { NativeSelect } from '@mantine/core';
@@ -7,7 +7,7 @@ import { short_fen } from './utils';
 import classes from '../css/controls.module.css';
 
 export const Positions = observer(() => {
-  const editor = useModule();
+  const { editorStore, fenStore } = useStore();
   const position = useInitData();
 
   const data = useMemo(
@@ -34,21 +34,21 @@ export const Positions = observer(() => {
     [data, fens]
   );
 
-  const [value, setValue] = useState(matcher(editor.fen.current));
+  const [value, setValue] = useState(matcher(fenStore.current));
 
   useEffect(() => {
     const disposer = autorun(() => {
-      setValue(matcher(editor.fen.current));
+      setValue(matcher(fenStore.current));
     });
 
     return disposer;
-  }, [editor, matcher]);
+  }, []);
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen) {
-      editor.board.position(fen, true);
-      editor.fen.setFen(fen);
+      editorStore.board.position(fen, true);
+      fenStore.set(fen);
     } else {
       setValue(fen);
     }

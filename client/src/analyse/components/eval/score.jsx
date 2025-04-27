@@ -1,13 +1,13 @@
-import { useModule } from 'src/common/hooks/hooks';
+import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { getEval } from '../move/utils';
 import classes from '../css/eval.module.css';
 
 export const EvalScore = observer(() => {
-  const analyse = useModule();
+  const { analyseStore } = useStore();
 
   let score = '';
-  const evaluation = analyse.evaluation;
+  const evaluation = analyseStore.evaluation;
 
   if (evaluation) {
     if (evaluation.mate) {
@@ -17,7 +17,7 @@ export const EvalScore = observer(() => {
     }
   }
 
-  if (analyse.game.currentMove.outcome && analyse.ceval.enabled) {
+  if (analyseStore.game.currentMove.outcome && analyseStore.ceval.enabled) {
     score = '-';
   }
 

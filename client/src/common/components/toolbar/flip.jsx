@@ -1,11 +1,9 @@
 import { Action } from './action';
 import { IconRepeat } from '@tabler/icons-react';
-import { useModule } from '../../hooks/hooks';
 
-export const FlipButton = () => {
-  const module = useModule();
+export const FlipButton = ({ store }) => {
   const onFlip = () => {
-    module.board.flip();
+    store.board.flip();
   };
 
   return (

@@ -1,5 +1,5 @@
 import { localStore } from 'src/main/store';
-import { useModule, useLocalStore } from 'src/common/hooks/hooks';
+import { useStore, useLocalStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { useState, useCallback } from 'react';
 import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
@@ -7,7 +7,7 @@ import { IconSettings } from '@tabler/icons-react';
 import { recommendedThreads } from 'src/lib/eval/engine';
 
 export const Settings = observer(() => {
-  const analyse = useModule();
+  const { analyseStore } = useStore();
   const multipv = useLocalStore((state) => state.multipv);
   const threads = useLocalStore((state) => state.threads);
   const [opened, setOpened] = useState(false);
@@ -16,21 +16,21 @@ export const Settings = observer(() => {
     (value) => {
       if (value !== multipv) {
         localStore.setState({ multipv: value });
-        analyse.clearEvals();
-        analyse.restartCeval();
+        analyseStore.clearEvals();
+        analyseStore.restartCeval();
       }
     },
-    [analyse, multipv]
+    [multipv]
   );
 
   const setThreads = useCallback(
     (value) => {
       if (value != threads) {
         localStore.setState({ threads: value });
-        analyse.restartCeval();
+        analyseStore.restartCeval();
       }
     },
-    [analyse, threads]
+    [threads]
   );
 
   return (

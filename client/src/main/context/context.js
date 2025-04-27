@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import { rootStore } from '../store/rootstore';
 
 function loadData() {
   const dataScript = document.getElementById('page-init-data');
@@ -8,4 +9,9 @@ function loadData() {
 }
 
 export const DataContext = createContext(loadData());
-export const ModuleContext = createContext(null);
+
+export const StoreContext = createContext({
+  analyseStore: rootStore.analyseStore,
+  editorStore: rootStore.editorStore,
+  fenStore: rootStore.fenStore,
+});

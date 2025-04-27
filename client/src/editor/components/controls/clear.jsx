@@ -1,14 +1,14 @@
-import { useModule } from 'src/common/hooks/hooks';
+import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Action } from 'src/common/components/toolbar/action';
 import { IconTrash } from '@tabler/icons-react';
 
 export const ClearButton = observer(() => {
-  const editor = useModule();
+  const { editorStore, fenStore } = useStore();
 
   const onClear = () => {
-    editor.board.clear();
-    editor.fen.resetFen(false);
+    editorStore.board.clear();
+    fenStore.reset(false);
   };
 
   return (

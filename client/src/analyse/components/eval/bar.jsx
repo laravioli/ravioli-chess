@@ -1,15 +1,16 @@
-import { useModule } from 'src/common/hooks/hooks';
+import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { povChances } from 'src/lib/eval/util';
 import classes from '../css/eval.module.css';
 
 export const EvalBar = observer(() => {
-  const analyse = useModule();
+  const { analyseStore } = useStore();
 
-  if (!analyse.ceval.enabled || analyse.game.currentMove.outcome) return null;
+  if (!analyseStore.ceval.enabled || analyseStore.game.currentMove.outcome)
+    return null;
 
-  const progress = analyse.evaluation
-    ? povChances('white', analyse.evaluation)
+  const progress = analyseStore.evaluation
+    ? povChances('white', analyseStore.evaluation)
     : 0.0;
 
   return (

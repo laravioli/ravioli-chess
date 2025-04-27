@@ -1,12 +1,14 @@
+import { useStore } from 'src/main/hooks/hooks';
 import { Board } from 'src/common/components/board/board';
 import { FenInput } from 'src/common/components/fen/feninput';
 import { Tools } from '../tools/tools';
 
 export function Editor() {
+  const { editorStore } = useStore();
   return (
     <div className="main-wrap">
-      <Board />
-      <FenInput />
+      <Board store={editorStore} />
+      <FenInput store={editorStore} />
       <Tools />
     </div>
   );

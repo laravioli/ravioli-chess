@@ -1,15 +1,15 @@
+import { useStore } from 'src/main/hooks/hooks';
 import { DEFAULT_POSITION } from 'chess.js';
-import { useModule } from 'src/common/hooks/hooks';
 import { Action } from './action';
 import { IconReload } from '@tabler/icons-react';
 
-export const StartButton = () => {
-  const module = useModule();
+export const StartButton = ({ store }) => {
+  const { fenStore } = useStore();
 
   const onStart = () => {
-    module.newGame?.(DEFAULT_POSITION);
-    module.board.start();
-    module.fen.resetFen(true);
+    store.newGame?.(DEFAULT_POSITION);
+    store.board.start();
+    fenStore.reset(true);
   };
 
   return (

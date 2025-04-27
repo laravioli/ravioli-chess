@@ -1,4 +1,4 @@
-import { useInitData, useModule } from 'src/common/hooks/hooks';
+import { useInitData, useStore } from 'src/main/hooks/hooks';
 import { Combobox, useCombobox } from '@mantine/core';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconChessRook } from '@tabler/icons-react';
@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 
 export const Positions = observer(() => {
-  const module = useModule();
+  const { analyseStore, fenStore } = useStore();
   const positions = useInitData();
 
   const options = useMemo(
@@ -31,10 +31,10 @@ export const Positions = observer(() => {
         position="top"
         withinPortal={false}
         onOptionSubmit={(fen) => {
-          if (fen != module.fen.current) {
-            module.newGame?.(fen);
-            module.board.position(fen, true);
-            module.fen.setFen(fen);
+          if (fen != fenStore.current) {
+            analyseStore.newGame?.(fen);
+            analyseStore.board.position(fen, true);
+            fenStore.set(fen);
           }
           combobox.closeDropdown();
         }}>

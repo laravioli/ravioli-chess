@@ -1,31 +1,31 @@
 import { useRef, useEffect } from 'react';
-import { useModule } from 'src/common/hooks/hooks';
+import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { TextInput } from '@mantine/core';
 import classes from '../css/fen.module.css';
 
-export const FenInput = observer(() => {
-  const module = useModule();
+export const FenInput = observer(({ store }) => {
+  const { fenStore } = useStore();
   const inputRef = useRef(null);
 
   useEffect(() => {
-    module.fen.inputRef.current = inputRef.current;
-    inputRef.current.value = module.fen.current;
+    fenStore.inputRef.current = inputRef.current;
+    inputRef.current.value = fenStore.current;
 
     const disposer = autorun(() => {
       if (inputRef.current) {
-        inputRef.current.value = module.fen.current;
+        inputRef.current.value = fenStore.current;
       }
     });
     return disposer;
-  }, [module]);
+  }, []);
 
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
-      module.fen.setFenFromInput(fen);
-      module.board.position(module.fen.current, true);
+      fenStore.setFromInput(fen);
+      store.board.position(fenStore.current, true);
     }
   };
 
@@ -38,7 +38,7 @@ export const FenInput = observer(() => {
       variant="filled"
       radius="xs"
       onKeyDown={onKeyDown}
-      disabled={!!module.game}
+      disabled={!!store.game}
       classNames={{ input: classes.input }}
     />
   );
