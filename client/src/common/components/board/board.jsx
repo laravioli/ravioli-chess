@@ -1,14 +1,14 @@
 import { useRef, useEffect } from 'react';
 
-export function Board({ store }) {
+export function Board({ board, config }) {
   const divRef = useRef(null);
 
   useEffect(() => {
-    store.board.mount(divRef.current, store.makeBoardCfg());
+    board.mount(divRef.current, config);
     return () => {
-      store.board.unMount();
+      board.unMount();
     };
-  }, [store]);
+  }, [board, config]);
 
   return <div className="board" ref={divRef} />;
 }

@@ -34,7 +34,7 @@ export const Positions = observer(() => {
     [data, fens]
   );
 
-  const [value, setValue] = useState(matcher(fenStore.current));
+  const [value, setValue] = useState(() => matcher(fenStore.current));
 
   useEffect(() => {
     const disposer = autorun(() => {

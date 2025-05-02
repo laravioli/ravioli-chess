@@ -1,8 +1,7 @@
 import { DEFAULT_POSITION } from 'chess.js';
 import { observable, computed, action } from 'mobx';
-import { getCastlingRights, isValidInput, validateFen } from './utils';
-
-//note : setFen -> set , setFenFrom.. -> setFrom, isFenAna -> isAna resetFen -> reset
+import { getCastlingRights, isValidInput } from './utils';
+import { validateFen } from 'chess.js';
 
 export class FenStore {
   @observable accessor position;
@@ -49,7 +48,7 @@ export class FenStore {
 
   @action
   setCastlingRight(id, value) {
-    this.castling = { ...this.castling, [id]: value };
+    this.castling[id] = value;
   }
 
   @action

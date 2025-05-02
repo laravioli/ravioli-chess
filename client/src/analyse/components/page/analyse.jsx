@@ -9,7 +9,7 @@ export function Analyse() {
   return (
     <div className="main-wrap">
       <EvalBar />
-      <Board store={analyseStore} />
+      <Board board={analyseStore.board} config={analyseStore.makeBoardCfg()} />
       <FenInput store={analyseStore} />
       <Tools />
     </div>

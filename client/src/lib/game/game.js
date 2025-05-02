@@ -20,12 +20,11 @@ export class Game {
   get line() {
     let move = this.currentMove;
     const moves = [];
-    while (move.parent) {
-      moves.unshift(move);
+    while (move) {
+      moves.push(move);
       move = move.parent;
     }
-    moves.unshift(move);
-    return moves;
+    return moves.reverse();
   }
 
   setRoot(fen) {
@@ -61,7 +60,7 @@ export class Game {
   jump(action) {
     switch (action) {
       case 'move':
-        this.appendMove();
+        this.addMove();
         break;
       case 'undo':
         this.undo();
@@ -79,7 +78,7 @@ export class Game {
   }
 
   @action
-  appendMove() {
+  addMove() {
     const info = this._chess.history({ verbose: true }).at(-1);
     let move = this.currentMove.children.find((move) => move.uci === info.lan);
 

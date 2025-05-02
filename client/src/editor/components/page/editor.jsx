@@ -7,7 +7,7 @@ export function Editor() {
   const { editorStore } = useStore();
   return (
     <div className="main-wrap">
-      <Board store={editorStore} />
+      <Board board={editorStore.board} config={editorStore.makeBoardCfg()} />
       <FenInput store={editorStore} />
       <Tools />
     </div>

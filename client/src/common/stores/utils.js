@@ -1,4 +1,4 @@
-export { validateFen } from 'chess.js';
+import { validateFen } from 'chess.js';
 
 export const getCastlingRights = (castling) => {
   const cr = Object.entries(castling)

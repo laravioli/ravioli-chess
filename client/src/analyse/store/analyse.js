@@ -110,6 +110,21 @@ export class AnalyseStore {
     });
   }
 
+  getBestEval(node) {
+    return node.ceval && node.ceval.pvs[0].moves[0];
+  }
+
+  async playUci() {
+    const best = await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(this.getBestEval(this.game.currentMove));
+      }, 1000);
+    });
+    console.log('best');
+    this.game._chess.move(best);
+    this.jump('move');
+  }
+
   /* board */
 
   makeBoardCfg = () => ({
