@@ -29,10 +29,12 @@ export default defineConfig(({ mode }) => {
     server: {
       origin: 'http://localhost:5173',
       open: '/',
+
       headers: {
-        'cross-origin-opener-policy': 'same-origin',
-        'cross-origin-embedder-policy': 'credentialless',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'credentialless',
       },
+
       proxy: {
         '^/(\\w+)?$': {
           target: env.BACKEND_URL,
@@ -42,11 +44,23 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+
     build: {
       manifest: 'manifest.json',
       rollupOptions: {
         input: 'src/main.jsx',
+        output: {
+          manualChunks(id) {
+            if (id.includes('mantine')) {
+              return 'mantine';
+            }
+          },
+        },
       },
+      cssCodeSplit: false,
+    },
+    esbuild: {
+      legalComments: 'eof',
     },
   };
 });

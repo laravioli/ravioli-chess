@@ -120,8 +120,7 @@ export class AnalyseStore {
         resolve(this.getBestEval(this.game.currentMove));
       }, 1000);
     });
-    console.log('best');
-    this.game._chess.move(best);
+    this.game.move(best);
     this.jump('move');
   }
 
@@ -146,7 +145,11 @@ export class AnalyseStore {
     },
     onDrop: (source, target) => {
       try {
-        this.game.move(source, target);
+        this.game.move({
+          from: source,
+          to: target,
+          promotion: 'q',
+        });
         // eslint-disable-next-line no-unused-vars
       } catch (error) {
         return 'snapback';

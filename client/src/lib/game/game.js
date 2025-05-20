@@ -48,15 +48,6 @@ export class Game {
   }
 
   @action
-  move(source, target) {
-    this._chess.move({
-      from: source,
-      to: target,
-      promotion: 'q',
-    });
-  }
-
-  @action
   jump(action) {
     switch (action) {
       case 'move':

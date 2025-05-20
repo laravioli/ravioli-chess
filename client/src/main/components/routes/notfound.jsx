@@ -2,7 +2,7 @@ import { Container, Group, Text, Title } from '@mantine/core';
 import { Link } from 'react-router';
 import classes from '../css/notfound.module.css';
 
-export function NotFound() {
+export default function NotFound() {
   return (
     <Container className={classes.root}>
       <div className={classes.label}>404</div>
