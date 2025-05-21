@@ -1,4 +1,4 @@
 {
-    "terminal.integrated.cwd": "/home/victor/Bureau/Code/ravioli-chess/server/src",    
+    "python.terminal.activateEnvironment": true,
 }
 

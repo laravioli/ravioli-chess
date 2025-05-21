@@ -10,6 +10,8 @@ SECRET_KEY = env.str("SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
+print(DEBUG)
+
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 # Application definition

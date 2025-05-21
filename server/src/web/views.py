@@ -9,8 +9,4 @@ def index(request):
 
     response = render(request, "web/index.html", context)
 
-    if DEBUG:
-        response.headers["cross-origin-embedder-policy"] = "credentialless"
-        response.headers["cross-origin-opener-policy"] = "same-origin"
-
     return response

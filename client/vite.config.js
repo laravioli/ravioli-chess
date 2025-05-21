@@ -31,8 +31,8 @@ export default defineConfig(({ mode }) => {
       open: '/',
 
       headers: {
-        'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Embedder-Policy': 'credentialless',
+        'cross-origin-opener-policy': 'same-origin',
+        'cross-origin-embedder-policy': 'credentialless',
       },
 
       proxy: {
@@ -41,6 +41,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(path, ''),
+          configure: (proxy, _options) => {
+            proxy.on('proxyRes', (proxyRes, req, _res) => {
+              _res.setHeader('cross-origin-embedder-Policy', 'credentialless');
+            });
+          },
         },
       },
     },
@@ -57,7 +62,6 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      cssCodeSplit: false,
     },
     esbuild: {
       legalComments: 'eof',
