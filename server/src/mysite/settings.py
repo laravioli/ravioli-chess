@@ -10,8 +10,6 @@ SECRET_KEY = env.str("SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
-print(DEBUG)
-
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 # Application definition
@@ -67,7 +65,11 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": env.str("DB_ENGINE"),
-        "NAME": BASE_DIR / env.str("DB_NAME"),
+        "NAME": env.str("DB_NAME"),
+        "USER": env.str("DB_USER"),
+        "PASSWORD": env.str("DB_PASSWORD"),
+        "HOST": env.str("DB_HOST"),
+        "PORT": env.str("DB_PORT"),
     }
 }
 
@@ -112,9 +114,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 STATIC_URL = "/static/"
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static", "collected_static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static/collected_static")
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "static", "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "static/media")
 
 VITE_APP_DIR = os.path.abspath(os.path.join(BASE_DIR, "../../client"))
 
