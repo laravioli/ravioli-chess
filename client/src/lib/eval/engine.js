@@ -128,7 +128,7 @@ export class StockfishWebEngine {
   };
 }
 
-const info = {
+const sf16 = {
   id: '__sf16nnue7',
   name: 'Stockfish 16 NNUE · 7MB',
   short: 'SF 16 · 7MB',
@@ -146,7 +146,7 @@ const info = {
 };
 
 export const makeEngine = () => {
-  return new StockfishWebEngine(info);
+  return new StockfishWebEngine(sf16);
 };
 
 export const engineSupported = () =>
