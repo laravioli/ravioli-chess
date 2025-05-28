@@ -150,13 +150,13 @@ export const makeEngine = () => {
 };
 
 export const engineSupported = () =>
-  info.requires.every((req) => browserSupport().includes(req));
+  sf16.requires.every((req) => browserSupport().includes(req));
 
 export const recommendedThreads = () => {
   return clamp(
     navigator.hardwareConcurrency - (navigator.hardwareConcurrency % 2 ? 0 : 1),
     {
-      min: info.minThreads ?? 1,
+      min: sf16.minThreads ?? 1,
       max: maxThreads(),
     }
   );
@@ -164,6 +164,6 @@ export const recommendedThreads = () => {
 
 export const maxThreads = () => {
   return fewerCores()
-    ? Math.min(info.maxThreads ?? 32, navigator.hardwareConcurrency)
-    : info.maxThreads ?? 2;
+    ? Math.min(sf16.maxThreads ?? 32, navigator.hardwareConcurrency)
+    : sf16.maxThreads ?? 2;
 };

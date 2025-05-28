@@ -6,8 +6,8 @@
     {
       "label": "Client Build",
       "type": "shell",
-      "command": "npm",
-      "args": ["run", "build"],
+      "command": "yarn",
+      "args": ["build"],
       "options": {
         "cwd": "${workspaceFolder}/../client"
       }
