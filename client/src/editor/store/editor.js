@@ -1,5 +1,6 @@
 import { Board } from 'src/lib/board/board';
 import { action } from 'mobx';
+import { pieceTheme } from 'src/lib/board/utils';
 
 export class EditorStore {
   board = new Board();
@@ -16,7 +17,7 @@ export class EditorStore {
 
   makeBoardCfg = () => {
     return {
-      pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
+      pieceTheme: pieceTheme('wiki'),
       position: this.rootStore.fenStore.current,
       orientation: this.rootStore.uiStore.orientation,
       draggable: true,

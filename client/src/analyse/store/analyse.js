@@ -4,6 +4,7 @@ import { Ceval } from 'src/lib/eval/ceval';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
 import { observable, action } from 'mobx';
+import { pieceTheme } from 'src/lib/board/utils';
 
 export class AnalyseStore {
   board = new Board();
@@ -127,7 +128,7 @@ export class AnalyseStore {
   /* board */
 
   makeBoardCfg = () => ({
-    pieceTheme: '/static/frontend/images/pieces/wiki/{piece}.png',
+    pieceTheme: pieceTheme('wiki'),
     position: this.rootStore.fenStore.current,
     orientation: this.rootStore.uiStore.orientation,
     draggable: true,
