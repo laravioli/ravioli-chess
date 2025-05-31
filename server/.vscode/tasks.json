@@ -1,5 +1,3 @@
-//fixme : vscode fail to run this task (happened when moving to zsh)
-
 {
   "version": "2.0.0",
   "tasks": [
