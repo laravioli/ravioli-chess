@@ -10,7 +10,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-*production.local
+
+.env.development
+.env.production.local
 
 # Editor directories and files
 !.vscode/extensions.json
@@ -22,8 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# config
-eslint.config.js
 
 # misc
 package-lock.json
