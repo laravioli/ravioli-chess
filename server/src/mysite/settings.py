@@ -113,13 +113,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 STATIC_URL = "/static/"
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static/collected_static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "static/media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 VITE_APP_DIR = os.path.abspath(os.path.join(BASE_DIR, "../../client"))
 
-STATICFILES_DIRS = [("frontend", os.path.join(VITE_APP_DIR, "dist"))]
+STATICFILES_DIRS = [("web", os.path.join(VITE_APP_DIR, "dist"))]
 
 # Django-vite
 # https://github.com/MrBin99/django-vite
@@ -127,7 +127,7 @@ STATICFILES_DIRS = [("frontend", os.path.join(VITE_APP_DIR, "dist"))]
 DJANGO_VITE = {
     "default": {
         "dev_mode": DEBUG,
-        "static_url_prefix": "frontend",
+        "static_url_prefix": "web",
     }
 }
 

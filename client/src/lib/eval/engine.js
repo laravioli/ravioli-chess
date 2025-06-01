@@ -68,7 +68,7 @@ export class StockfishWebEngine {
           return storedBuffer;
         const req = new XMLHttpRequest();
 
-        req.open('get', `./static/frontend/nnue/${nnueFilename}`, true);
+        req.open('get', `./static/web/nnue/${nnueFilename}`, true);
         req.responseType = 'arraybuffer';
         req.onprogress = (e) =>
           this.status?.({ download: { bytes: e.loaded, total: e.total } });

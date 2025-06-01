@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 
+
+# Environments
 .env.docker
 .env.development
 .env.production.local

@@ -14,7 +14,7 @@ services:
       context: ./server
       target: backend-dev
     volumes:
-        - ./server/src/:/usr/local/app/src/
+        - ./server/src/:/usr/local/app/
     env_file:
       - ./server/.env.docker
     depends_on:

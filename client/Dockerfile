@@ -8,7 +8,6 @@ RUN --mount=type=cache,id=yarn,target=/usr/local/share/.cache/yarn \
     yarn install
 COPY eslint.config.js vite.config.js postcss.config.cjs ./
 COPY public ./public
-COPY src ./src
 
 FROM client-base AS client-dev
 EXPOSE 5173

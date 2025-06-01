@@ -38,7 +38,9 @@ pip3-autoremove==1.2.2
 platformdirs==4.3.6
 prompt_toolkit==3.0.50
 psutil==6.1.1
-psycopg[binary]==3.2.9
+psycopg==3.2.9
+psycopg-binary==3.2.9
+psycopg-pool==3.2.6
 ptyprocess==0.7.0
 pure_eval==0.2.3
 pyasn1==0.6.1
