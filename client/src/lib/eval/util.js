@@ -50,18 +50,24 @@ function maxHashMB() {
 export const maxHash = maxHashMB();
 
 function sharedMemoryTest() {
+  console.log('sharedtest', typeof Atomics !== 'object');
+  console.log('sharedtest', typeof SharedArrayBuffer !== 'function');
+
   if (typeof Atomics !== 'object') return false;
   if (typeof SharedArrayBuffer !== 'function') return false;
 
   let mem;
   try {
     mem = new WebAssembly.Memory({ shared: true, initial: 1, maximum: 2 });
+    console.log('sharedtest', !(mem.buffer instanceof SharedArrayBuffer));
+
     if (!(mem.buffer instanceof SharedArrayBuffer)) return false;
 
     window.postMessage(mem.buffer, '*');
   } catch {
     return false;
   }
+  console.log('sharedtest', mem.buffer instanceof SharedArrayBuffer);
   return mem.buffer instanceof SharedArrayBuffer;
 }
 
