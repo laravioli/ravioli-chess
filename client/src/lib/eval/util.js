@@ -51,7 +51,7 @@ export const maxHash = maxHashMB();
 
 function sharedMemoryTest() {
   console.log('sharedtest', typeof Atomics !== 'object');
-  console.log('sharedtest', typeof SharedArrayBuffer !== 'function');
+  console.log('sharedtest', typeof SharedArrayBuffer);
 
   if (typeof Atomics !== 'object') return false;
   if (typeof SharedArrayBuffer !== 'function') return false;
