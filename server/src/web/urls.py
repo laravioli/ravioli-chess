@@ -4,6 +4,8 @@ from django.urls import re_path
 
 from . import views
 
+app_name = "web"
 urlpatterns = [
     path("", views.index, name="index"),
+    re_path(r"^(?:[-\w]+)$", views.index, name="generic_page"),
 ]

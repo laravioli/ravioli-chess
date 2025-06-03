@@ -117,9 +117,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-VITE_APP_DIR = os.path.abspath(os.path.join(BASE_DIR, "../../client"))
+CLIENT_APP_DIR = os.path.abspath(os.path.join(BASE_DIR, "../../client"))
 
-STATICFILES_DIRS = [("web", os.path.join(VITE_APP_DIR, "dist"))]
+STATICFILES_DIRS = [("web", os.path.join(CLIENT_APP_DIR, "dist"))]
 
 # Django-vite
 # https://github.com/MrBin99/django-vite
@@ -128,6 +128,7 @@ DJANGO_VITE = {
     "default": {
         "dev_mode": DEBUG,
         "static_url_prefix": "web",
+        "manifest_path": os.path.join(CLIENT_APP_DIR, "dist", "manifest.json"),
     }
 }
 
