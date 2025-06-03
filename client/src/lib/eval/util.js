@@ -94,6 +94,8 @@ export const browserSupport = memoize(() => {
   } catch (error) {
     console.error('Worker creation failed:', error);
   }
+
+  console.log(features);
   return Object.freeze(features);
 });
 
