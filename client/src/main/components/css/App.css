@@ -37,6 +37,7 @@
 }
 
 .board {
+  cursor: grab;
   grid-area: board;
   width: 100%;
 }

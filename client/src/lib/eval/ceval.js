@@ -42,17 +42,6 @@ export class Ceval {
       this.analysable &&
       this.allowed() &&
       enabledAfterDisable();
-
-    console.log(
-      'possible',
-      this.possible,
-      'analysable',
-      this.analysable,
-      'allowed',
-      this.allowed(),
-      'enabledafterdisable',
-      enabledAfterDisable()
-    );
   }
 
   onEmit = throttle(200, (ev, work) => {
@@ -173,7 +162,6 @@ export class Ceval {
   }
 
   toggle() {
-    console.log('possible', this.possible, 'allowed', this.allowed());
     if (!this.possible || !this.allowed()) return;
     this.stop();
     if (!this.enabled && !document.hidden) {

@@ -1380,6 +1380,7 @@ function constructor(containerElOrString, config) {
       position: 'absolute',
       left: x - squareSize / 2,
       top: y - squareSize / 2,
+      cursor: 'grabbing',
     });
 
     if (source !== 'spare') {

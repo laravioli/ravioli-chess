@@ -24,10 +24,9 @@ export class EditorStore {
       dropOffBoard: 'trash',
       sparePieces: true,
       hideSparePieces: false,
-      onDrop: action(
-        (s, t, p, newPos) =>
-          (this.rootStore.fenStore.position = this.board.objToFen(newPos))
-      ),
+      onDrop: action((s, t, p, newPos) => {
+        this.rootStore.fenStore.position = this.board.objToFen(newPos);
+      }),
     };
   };
 }
