@@ -53,7 +53,8 @@ export default defineConfig(({ mode }) => {
     build: {
       manifest: 'manifest.json',
       rollupOptions: {
-        input: 'src/main.jsx',
+        input: { main: 'src/main.jsx', theme: 'public/css/index.css' },
+
         output: {
           manualChunks(id) {
             if (id.includes('mantine')) {

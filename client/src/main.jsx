@@ -1,4 +1,3 @@
-import '@mantine/core/styles.css';
 import 'chessboard/styles.css';
 import 'src/main/components/css/App.css';
 import 'vite/modulepreload-polyfill';

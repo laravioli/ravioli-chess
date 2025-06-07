@@ -8,7 +8,10 @@
       content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no" />
     <title>raviolichess</title>
     {% load static %}
-    <link rel="icon" href={% vite_asset_url 'favicon.ico' %} type="image/x-icon" />
+    <link rel="icon" href={% static 'web/favicon.ico' %} type="image/x-icon" />
+    <link rel="stylesheet" href={% vite_asset_url 'public/css/index.css' %} />
+ 
+
     <script src={% static 'web/js/scripts.js'%}></script>
     {% vite_hmr_client %}
     {% vite_react_refresh %}
