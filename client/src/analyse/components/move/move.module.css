@@ -3,6 +3,10 @@
   border: none;
   height: clamp(240px, 60vmin, 640px);
   overflow: hidden;
+
+  @mixin light {
+    background: var(--mantine-color-gray-2);
+  }
 }
 
 .row {

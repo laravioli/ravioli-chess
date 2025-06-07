@@ -7,7 +7,7 @@ import {
 import { ActionIcon, Group } from '@mantine/core';
 import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
-import classes from '../css/controls.module.css';
+import classes from './controls.module.css';
 
 export const History = observer(() => {
   const { analyseStore } = useStore();

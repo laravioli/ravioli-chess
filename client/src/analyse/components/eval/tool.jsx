@@ -2,7 +2,7 @@ import { EvalToggle } from './toggle';
 import { EvalScore } from './score';
 import { Depth } from './depth';
 import { Settings } from './settings';
-import classes from '../css/eval.module.css';
+import classes from './eval.module.css';
 
 export const EvalTool = () => {
   return (

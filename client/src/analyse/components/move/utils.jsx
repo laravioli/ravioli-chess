@@ -6,7 +6,7 @@ import { parseFen } from 'chessops/fen';
 import { renderEval } from 'src/lib/eval/util';
 
 import { Text, Divider } from '@mantine/core';
-import classes from '../css/move.module.css';
+import classes from './move.module.css';
 
 const MAX_NUM_MOVES = 12;
 

@@ -5,13 +5,15 @@ import { Router } from 'src/main/components/routes/routes';
 
 function App() {
   return (
-    <MantineProvider {...MantineSettings}>
-      <>
-        <Shell>
-          <Router />
-        </Shell>
-      </>
-    </MantineProvider>
+    <>
+      <MantineProvider {...MantineSettings}>
+        <>
+          <Shell>
+            <Router />
+          </Shell>
+        </>
+      </MantineProvider>
+    </>
   );
 }
 

@@ -2,9 +2,17 @@
   "name": "chessboard",
   "version": "1.0.0",
   "description": "chessboardjs compatible with ESmodule",
-  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "require": "./src/index.js"
+    },
+    "./styles.css": "./src/chessboard.css"
   },
   "author": "Chris Oakman",
   "license": "MIT",

@@ -1,5 +1,7 @@
+import '@mantine/core/styles.css';
+import 'chessboard/styles.css';
+import 'src/main/components/css/App.css';
 import 'vite/modulepreload-polyfill';
-import 'src/main/components/css/index.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { boot } from 'src/main/boot';

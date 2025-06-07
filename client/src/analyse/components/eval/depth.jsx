@@ -1,6 +1,6 @@
 import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
-import classes from '../css/eval.module.css';
+import classes from './eval.module.css';
 
 export const Depth = observer(() => {
   const { analyseStore } = useStore();

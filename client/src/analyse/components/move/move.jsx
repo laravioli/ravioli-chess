@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { Paper } from '@mantine/core';
 import { renderPvs } from './utils.jsx';
 import { renderLine } from './utils';
-import classes from '../css/move.module.css';
+import classes from './move.module.css';
 
 export const Moves = () => {
   return (

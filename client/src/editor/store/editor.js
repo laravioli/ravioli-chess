@@ -17,7 +17,7 @@ export class EditorStore {
 
   makeBoardCfg = () => {
     return {
-      pieceTheme: pieceTheme('wiki'),
+      pieceTheme: pieceTheme('bases'),
       position: this.rootStore.fenStore.current,
       orientation: this.rootStore.uiStore.orientation,
       draggable: true,

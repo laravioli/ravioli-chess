@@ -1,7 +1,7 @@
 import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { getEval } from '../move/utils';
-import classes from '../css/eval.module.css';
+import classes from './eval.module.css';
 
 export const EvalScore = observer(() => {
   const { analyseStore } = useStore();

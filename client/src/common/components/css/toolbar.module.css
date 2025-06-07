@@ -2,3 +2,16 @@
   align-self: start;
   justify-content: flex-end;
 }
+
+.action {
+  background-color: inherit;
+  border: none;
+  --ai-size: var(--ai-size-sm);
+
+  &:hover {
+    --ai-hover: var(--mantine-color-default-hover);
+    :global(.page-editor) & {
+      --ai-hover: none;
+    }
+  }
+}

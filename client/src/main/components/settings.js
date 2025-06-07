@@ -1,5 +1,9 @@
 import { localStorageColorSchemeManager, createTheme } from '@mantine/core';
 
+const localstorageScheme = localStorageColorSchemeManager({
+  key: 'color-scheme',
+});
+
 export const MantineSettings = {
   theme: createTheme({
     fontFamily: 'Arial',
@@ -14,8 +18,8 @@ export const MantineSettings = {
     cursorType: 'pointer',
   }),
   withStaticClasses: false,
-  colorSchemeManager: localStorageColorSchemeManager({
-    key: 'color-scheme',
-  }),
-  defaultColorScheme: 'dark',
+  colorSchemeManager: localstorageScheme,
+  defaultColorScheme: 'light',
 };
+
+localstorageScheme.set('light');

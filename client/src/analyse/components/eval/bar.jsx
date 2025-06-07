@@ -1,7 +1,7 @@
 import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { povChances } from 'src/lib/eval/util';
-import classes from '../css/eval.module.css';
+import classes from './eval.module.css';
 
 export const EvalBar = observer(() => {
   const { analyseStore, uiStore } = useStore();
