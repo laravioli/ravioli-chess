@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { PageContext } from 'src/main/context/context';
 import { useStore } from 'src/main/hooks/hooks';
 import { Board } from 'src/common/components/board/board';
 import { FenInput } from 'src/common/components/fen/feninput';
@@ -7,10 +8,12 @@ import { Tools } from '../tools/tools';
 export default function Editor() {
   const { editorStore } = useStore();
   return (
-    <div className={clsx('main-wrap', 'page-editor')}>
-      <Board board={editorStore.board} config={editorStore.makeBoardCfg()} />
-      <FenInput store={editorStore} />
-      <Tools />
-    </div>
+    <PageContext.Provider value={editorStore}>
+      <div className={clsx('main-wrap', 'page-editor')}>
+        <Board />
+        <FenInput />
+        <Tools />
+      </div>
+    </PageContext.Provider>
   );
 }

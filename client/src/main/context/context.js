@@ -16,3 +16,5 @@ export const StoreContext = createContext({
   fenStore: rootStore.fenStore,
   uiStore: rootStore.uiStore,
 });
+
+export const PageContext = createContext(null);

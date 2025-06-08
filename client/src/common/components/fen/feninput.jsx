@@ -1,11 +1,13 @@
 import { useRef, useEffect } from 'react';
+import { usePageStore } from 'src/main/hooks/hooks';
 import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { TextInput } from '@mantine/core';
 import classes from './fen.module.css';
 
-export const FenInput = observer(({ store }) => {
+export const FenInput = observer(() => {
+  const store = usePageStore();
   const { fenStore } = useStore();
   const inputRef = useRef(null);
 

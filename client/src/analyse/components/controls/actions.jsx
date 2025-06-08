@@ -10,11 +10,11 @@ export const Actions = () => {
   const { analyseStore, editorStore } = useStore();
   return (
     <Group justify="center">
-      <FlipButton store={analyseStore} />
-      <StartButton store={analyseStore} />
+      <FlipButton />
+      <StartButton />
       <Positions />
-      <TestButton store={analyseStore} />
-      <Navigate path="/editor" prev={analyseStore} next={editorStore} />
+      <TestButton />
+      <Navigate path="/editor" />
     </Group>
   );
 };

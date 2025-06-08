@@ -1,8 +1,9 @@
-import { useStore } from 'src/main/hooks/hooks';
+import { useStore, usePageStore } from 'src/main/hooks/hooks';
 import { Action } from './action';
 import { IconRepeat } from '@tabler/icons-react';
 
-export const FlipButton = ({ store }) => {
+export const FlipButton = () => {
+  const store = usePageStore();
   const { uiStore } = useStore();
   const onFlip = () => {
     uiStore.toggleOrientation(store.board);

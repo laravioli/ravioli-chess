@@ -1,14 +1,16 @@
 import { useRef, useEffect } from 'react';
+import { usePageStore } from 'src/main/hooks/hooks';
 
-export function Board({ board, config }) {
+export function Board() {
   const divRef = useRef(null);
+  const store = usePageStore();
 
   useEffect(() => {
-    board.mount(divRef.current, config);
+    store.board.mount(divRef.current, store.makeBoardCfg());
     return () => {
-      board.unMount();
+      store.board.unMount();
     };
-  }, [board, config]);
+  }, [store]);
 
   return <div className="board" ref={divRef} />;
 }

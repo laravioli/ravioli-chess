@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
     build: {
       manifest: 'manifest.json',
       rollupOptions: {
-        input: { main: 'src/main.jsx', theme: 'public/css/index.css' },
+        input: { main: 'src/main.jsx', theme: 'src/main/boot/theme.css' },
 
         output: {
           manualChunks(id) {

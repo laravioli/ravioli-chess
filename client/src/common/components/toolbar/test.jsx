@@ -1,8 +1,9 @@
-import { useStore } from 'src/main/hooks/hooks';
+import { useStore, usePageStore } from 'src/main/hooks/hooks';
 import { Action } from './action';
 import { IconTestPipe } from '@tabler/icons-react';
 
-export const TestButton = ({ store }) => {
+export const TestButton = () => {
+  const store = usePageStore();
   const { fenStore } = useStore();
   const test = async () => {
     console.log('board ' + store.board.fen());

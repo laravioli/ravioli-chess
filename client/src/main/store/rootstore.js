@@ -13,4 +13,7 @@ class RootStore {
 }
 
 export const rootStore = new RootStore();
-window.root = rootStore;
+export const storeRouter = {
+  '/analysis': rootStore.analyseStore,
+  '/editor': rootStore.editorStore,
+};

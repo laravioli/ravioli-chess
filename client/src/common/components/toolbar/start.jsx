@@ -1,9 +1,10 @@
-import { useStore } from 'src/main/hooks/hooks';
+import { useStore, usePageStore } from 'src/main/hooks/hooks';
 import { DEFAULT_POSITION } from 'chess.js';
 import { Action } from './action';
 import { IconReload } from '@tabler/icons-react';
 
-export const StartButton = ({ store }) => {
+export const StartButton = () => {
+  const store = usePageStore();
   const { fenStore } = useStore();
 
   const onStart = () => {
