@@ -1,5 +1,5 @@
 import { ActionIcon, Tooltip } from '@mantine/core';
-import classes from '../css/toolbar.module.css';
+import classes from './toolbar.module.css';
 
 export const Action = ({ children, label, onClick, disabled = false }) => {
   const handler = disabled

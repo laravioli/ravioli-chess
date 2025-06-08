@@ -19,7 +19,5 @@ export const MantineSettings = {
   }),
   withStaticClasses: false,
   colorSchemeManager: localstorageScheme,
-  defaultColorScheme: 'light',
+  defaultColorScheme: 'dark',
 };
-
-localstorageScheme.set('light');

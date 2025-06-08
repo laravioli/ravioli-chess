@@ -7,7 +7,7 @@
 .board-b72b1 {
   box-sizing: content-box;
   @mixin light {
-    border: 2px solid #404040;
+    border: 1px solid var(--mantine-color-gray-3);
   }
 }
 

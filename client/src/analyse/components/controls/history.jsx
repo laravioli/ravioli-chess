@@ -23,7 +23,7 @@ export const History = observer(() => {
       {actions.map(({ icon: Icon, action }) => (
         <ActionIcon
           key={action}
-          variant="default"
+          className={classes.icon}
           size="xl"
           onClick={() => {
             analyseStore.jump(action);

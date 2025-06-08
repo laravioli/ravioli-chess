@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { recommendedThreads } from 'src/lib/eval/engine';
+import classes from './eval.module.css';
 
 export const Settings = observer(() => {
   const { analyseStore } = useStore();
@@ -46,6 +47,7 @@ export const Settings = observer(() => {
 
   return (
     <Popover
+      className={classes.settings}
       opened={opened}
       onChange={setOpened}
       position="bottom-start"

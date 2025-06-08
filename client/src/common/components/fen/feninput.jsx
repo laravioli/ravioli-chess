@@ -3,7 +3,7 @@ import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { TextInput } from '@mantine/core';
-import classes from '../css/fen.module.css';
+import classes from './fen.module.css';
 
 export const FenInput = observer(({ store }) => {
   const { fenStore } = useStore();
@@ -39,7 +39,7 @@ export const FenInput = observer(({ store }) => {
       radius="xs"
       onKeyDown={onKeyDown}
       disabled={!!store.game}
-      classNames={{ input: classes.input }}
+      classNames={{ root: classes.root, input: classes.input }}
     />
   );
 });

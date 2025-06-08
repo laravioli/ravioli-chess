@@ -4,6 +4,7 @@ import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconChessRook } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
+import classes from './controls.module.css';
 
 export const Positions = observer(() => {
   const { analyseStore, fenStore } = useStore();
@@ -41,7 +42,7 @@ export const Positions = observer(() => {
         <Combobox.Target>
           <Tooltip label="select position" position="bottom">
             <ActionIcon
-              variant="default"
+              className={classes.icon}
               size="sm"
               onClick={() => combobox.toggleDropdown()}
               styles={{

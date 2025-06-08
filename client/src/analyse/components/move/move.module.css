@@ -5,7 +5,7 @@
   overflow: hidden;
 
   @mixin light {
-    background: var(--mantine-color-gray-2);
+    background: var(--mantine-color-gray-3);
   }
 }
 

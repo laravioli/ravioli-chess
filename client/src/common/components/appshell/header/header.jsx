@@ -25,6 +25,7 @@ import {
   UnstyledButton,
   useMantineTheme,
 } from '@mantine/core';
+import { ToggleColorScheme } from './colorscheme.jsx';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './header.module.css';
 
@@ -92,19 +93,20 @@ export function Header() {
           Raviolichess
           <Group h="100%" gap={0} visibleFrom="sm">
             <a href="#" className={classes.link}>
-              Home
+              Play
             </a>
 
             <a href="#" className={classes.link}>
-              Learn
+              Analyse
             </a>
             <a href="#" className={classes.link}>
-              Academy
+              Edit
             </a>
           </Group>
           <Group visibleFrom="sm">
             <Button variant="default">Log in</Button>
             <Button>Sign up</Button>
+            <ToggleColorScheme />
           </Group>
           <Burger
             opened={drawerOpened}

@@ -4,9 +4,17 @@
   align-items: stretch;
   position: relative;
   flex: 0 0 30px;
-  background: var(--mantine-color-dark-6);
+  background: light-dark(
+    var(--mantine-color-gray-5),
+    var(--mantine-color-dark-6)
+  );
   border-top: 1px solid var(--mantine-color-dark-5);
   border-bottom: 1px solid var(--mantine-color-dark-5);
+
+  @mixin light {
+    border-top: none;
+    border-bottom: none;
+  }
 }
 
 .evalscore {
@@ -25,6 +33,9 @@
   width: 1em;
   height: clamp(300px, 71.7vmin, 700px);
   position: relative;
+  @mixin light {
+    border: 1px solid var(--mantine-color-gray-4);
+  }
 }
 
 .barblack {
@@ -42,4 +53,22 @@
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
   display: flex;
+}
+
+.settings {
+  background-color: inherit;
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-4),
+      var(--mantine-color-dark-4)
+    );
+  }
+}
+
+.toggle {
+  background-color: light-dark(
+    var(--mantine-color-gray-3),
+    var(--mantine-color-dark-4)
+  );
+  border: none;
 }

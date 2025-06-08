@@ -4,6 +4,7 @@ import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
+import classes from './eval.module.css';
 
 export const EvalToggle = observer(() => {
   const { analyseStore } = useStore();
@@ -31,6 +32,7 @@ export const EvalToggle = observer(() => {
 
   return (
     <Switch
+      classNames={{ track: classes.toggle }}
       checked={analyseStore.ceval.enabled}
       onClick={onClick}
       color="teal"
