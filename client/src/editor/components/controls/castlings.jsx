@@ -1,7 +1,7 @@
 import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Checkbox } from '@mantine/core';
-import classes from '../css/controls.module.css';
+import classes from './controls.module.css';
 
 export const CastlingBoxes = () => {
   return (

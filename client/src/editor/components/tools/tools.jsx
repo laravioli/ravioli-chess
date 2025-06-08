@@ -2,7 +2,7 @@ import { TurnToPlay } from '../controls/turn';
 import { CastlingBoxes } from '../controls/castlings';
 import { Positions } from '../controls/positions';
 import { EditorActions } from '../controls/actions';
-import classes from '../css/tools.module.css';
+import classes from './tools.module.css';
 
 export const Tools = () => {
   return (
