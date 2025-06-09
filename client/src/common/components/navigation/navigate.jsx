@@ -2,7 +2,7 @@ import { storeRouter } from 'src/main/store/rootstore';
 import { useStore, usePageStore } from 'src/main/hooks/hooks';
 import { useNavigate } from 'react-router';
 import { observer } from 'mobx-react-lite';
-import { Action } from './action';
+import { Action } from '../toolbar/action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
 
 export const Navigate = observer(({ path }) => {
@@ -16,7 +16,7 @@ export const Navigate = observer(({ path }) => {
 
   const onClick = () => {
     if (fenStore.isAnalysable()) {
-      current.onUnLoad();
+      current?.onUnLoad();
       next.onLoad();
       navigate(path, { replace: true });
     } else {
