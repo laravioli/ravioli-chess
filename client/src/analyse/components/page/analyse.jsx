@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { PageContext } from 'src/main/context/context';
 import { useStore } from 'src/main/hooks/hooks';
 import { EvalBar } from '../eval/bar';
@@ -10,7 +9,7 @@ export default function Analyse() {
   const { analyseStore } = useStore();
   return (
     <PageContext.Provider value={analyseStore}>
-      <div className={clsx('main-wrap', 'page-analyse')}>
+      <div className={'page-analyse'}>
         <EvalBar />
         <Board />
         <FenInput />

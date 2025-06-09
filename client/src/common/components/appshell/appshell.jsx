@@ -7,7 +7,7 @@ export const Shell = ({ children }) => {
       <AppShell.Header>
         <Header />
       </AppShell.Header>
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main className="main-wrap">{children}</AppShell.Main>
     </AppShell>
   );
 };

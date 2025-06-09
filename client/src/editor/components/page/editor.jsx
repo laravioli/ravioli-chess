@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { PageContext } from 'src/main/context/context';
 import { useStore } from 'src/main/hooks/hooks';
 import { Board } from 'src/common/components/board/board';
@@ -9,7 +8,7 @@ export default function Editor() {
   const { editorStore } = useStore();
   return (
     <PageContext.Provider value={editorStore}>
-      <div className={clsx('main-wrap', 'page-editor')}>
+      <div className={'page-editor'}>
         <Board />
         <FenInput />
         <Tools />

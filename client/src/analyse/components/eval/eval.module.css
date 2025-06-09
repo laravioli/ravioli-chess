@@ -31,10 +31,10 @@
 .bar {
   grid-area: evalbar;
   width: 1em;
-  height: clamp(300px, 71.7vmin, 700px);
+  height: 100%;
   position: relative;
   @mixin light {
-    border: 1px solid var(--mantine-color-gray-4);
+    border: 1px solid var(--mantine-color-dark-2);
   }
 }
 
@@ -50,9 +50,8 @@
   width: 100%;
   transition: height 1s;
   overflow: hidden;
-  border-bottom-left-radius: inherit;
-  border-bottom-right-radius: inherit;
   display: flex;
+  z-index: 2;
 }
 
 .settings {
