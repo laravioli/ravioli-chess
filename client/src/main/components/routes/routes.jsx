@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 
 const Analyse = lazy(() => import('src/analyse/components/page/analyse'));
 const Editor = lazy(() => import('src/editor/components/page/editor'));
+const Play = lazy(() => import('src/play/components/page/play'));
 const NotFound = lazy(() => import('./notfound'));
 
 export const Router = () => {
@@ -14,6 +15,7 @@ export const Router = () => {
             return <Route path={path} element={<Analyse />} key={index} />;
           })}
           <Route path="editor" element={<Editor />} />
+          <Route path="play" element={<Play />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

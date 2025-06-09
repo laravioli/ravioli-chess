@@ -8,8 +8,9 @@ export function boot() {
 }
 
 const patterns = new Map([
-  [/^\/(analysis|play\/computer)?$/, rootStore.analyseStore],
+  [/^\/(analysis)?$/, rootStore.analyseStore],
   [/^\/editor$/, rootStore.editorStore],
+  [/^\/play$/, rootStore.playStore],
 ]);
 
 function match(path) {

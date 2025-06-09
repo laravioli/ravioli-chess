@@ -30,7 +30,7 @@ export function Header() {
         <Group justify="space-between" h="100%">
           Raviolichess
           <Group h="100%" gap={0} visibleFrom="sm">
-            <a href="#" className={classes.link}>
+            <a href="/play" className={classes.link}>
               Play
             </a>
 
