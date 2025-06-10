@@ -8,8 +8,8 @@ html {
 }
 
 :root {
-  --board-min-width: 300px;
-  --board-max-width: 690px;
+  --board-min-width: 19rem;
+  --board-max-width: 43rem;
   --board-scale: clamp(var(--board-min-width), 72vmin, var(--board-max-width));
 }
 
@@ -31,16 +31,15 @@ html {
     'evalbar board . tools'
     '. copyables . .';
   grid-template-rows: auto 1fr min-content;
-  grid-template-columns: 1rem var(--board-scale) 1rem minmax(160px, 350px);
+  grid-template-columns: 1rem var(--board-scale) 1rem minmax(10rem, 21rem);
 }
 
 .page-play {
   grid-area: main;
   display: grid;
-  place-items: start;
   grid-template-areas: ' board ';
   grid-template-rows: 1fr;
-  grid-template-columns: clamp(var(--board-min-width), 100vmin, 800px);
+  grid-template-columns: clamp(var(--board-min-width), 100vmin, 50rem);
 }
 
 .toolbar {
