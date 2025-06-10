@@ -1,4 +1,5 @@
 .root {
+  border-radius: 4px;
   background-color: light-dark(
     var(--mantine-color-gray-4),
     var(--mantine-color-dark-6)
@@ -6,5 +7,6 @@
 }
 
 .input {
+  border-radius: 4px;
   padding-inline-start: calc(var(--input-padding-inline-start) + 0.25rem);
 }

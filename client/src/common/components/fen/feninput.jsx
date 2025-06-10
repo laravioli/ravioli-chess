@@ -38,7 +38,6 @@ export const FenInput = observer(() => {
       leftSectionPointerEvents="none"
       leftSection="FEN"
       variant="filled"
-      radius="xs"
       onKeyDown={onKeyDown}
       disabled={!!store.game}
       classNames={{ root: classes.root, input: classes.input }}

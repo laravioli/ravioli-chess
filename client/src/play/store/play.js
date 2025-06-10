@@ -22,7 +22,6 @@ export class PlayStore {
       orientation: this.rootStore.uiStore.orientation,
       draggable: true,
       dropOffBoard: 'trash',
-      sparePieces: false,
     };
   };
 }

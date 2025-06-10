@@ -133,8 +133,8 @@ export class AnalyseStore {
     orientation: this.rootStore.uiStore.orientation,
     draggable: true,
     dropOffBoard: 'snapback',
-    sparePieces: false,
-    hideSparePieces: false,
+    sparePieces: true,
+    hideSparePieces: true,
     onDragStart: (source, piece) => {
       if (this.game?.isGameOver()) return false;
       if (

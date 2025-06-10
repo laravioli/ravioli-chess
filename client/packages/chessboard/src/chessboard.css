@@ -24,6 +24,26 @@
   user-select: none;
 }
 
+.board[data-side='white'] .square-a1,
+.board[data-side='black'] .square-h8 {
+  border-bottom-left-radius: 4px;
+}
+
+.board[data-side='white'] .square-h1,
+.board[data-side='black'] .square-a8 {
+  border-bottom-right-radius: 4px;
+}
+
+.board[data-side='white'] .square-a8,
+.board[data-side='black'] .square-h1 {
+  border-top-left-radius: 4px;
+}
+
+.board[data-side='white'] .square-h8,
+.board[data-side='black'] .square-a1 {
+  border-top-right-radius: 4px;
+}
+
 .white-1e1d7 {
   background-color: #f0d9b5;
   color: #b58863;

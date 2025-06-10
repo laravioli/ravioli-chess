@@ -12,5 +12,5 @@ export function Board() {
     };
   }, [store]);
 
-  return <div className="board" ref={divRef} />;
+  return <div className="board" data-side="white" ref={divRef} />;
 }

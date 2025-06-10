@@ -25,7 +25,7 @@ export function Header() {
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   return (
-    <Box pb={10}>
+    <Box pb={6}>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
           Raviolichess

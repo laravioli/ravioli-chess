@@ -31,7 +31,7 @@
 .bar {
   grid-area: evalbar;
   width: 1em;
-  height: 100%;
+  height: calc(var(--board-scale) * 0.996);
   position: relative;
   @mixin light {
     border: 1px solid var(--mantine-color-dark-2);
