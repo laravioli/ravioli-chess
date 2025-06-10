@@ -13,7 +13,7 @@ const patterns = new Map([
   [/^\/play$/, rootStore.playStore],
 ]);
 
-function match(path) {
+export function match(path) {
   for (const [regex, value] of patterns) {
     if (regex.test(path)) {
       return value;

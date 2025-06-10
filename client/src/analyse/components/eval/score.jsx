@@ -1,12 +1,13 @@
-import { useStore } from 'src/main/hooks/hooks';
+import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { getEval } from '../move/utils';
 import classes from './eval.module.css';
 
 export const EvalScore = observer(() => {
-  const { analyseStore } = useStore();
+  console.log('i render too much');
+  const store = usePageStore();
 
-  const evaluation = analyseStore.evaluation;
+  const evaluation = store.evaluation;
   let score = '';
 
   if (evaluation) {
@@ -17,7 +18,7 @@ export const EvalScore = observer(() => {
     }
   }
 
-  if (analyseStore.game.currentMove.outcome && analyseStore.ceval.enabled) {
+  if (store.game.currentMove.outcome && store.ceval.enabled) {
     score = '-';
   }
 

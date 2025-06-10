@@ -14,6 +14,7 @@ export class Game {
       }
     });
     this.setRoot(fen);
+    window.game = this;
   }
 
   @computed

@@ -1,3 +1,4 @@
+import { Shell } from 'src/common/components/appshell/appshell';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { lazy, Suspense } from 'react';
 
@@ -11,12 +12,13 @@ export const Router = () => {
     <BrowserRouter>
       <Suspense>
         <Routes>
-          {['/', 'analysis'].map((path, index) => {
-            return <Route path={path} element={<Analyse />} key={index} />;
-          })}
-          <Route path="editor" element={<Editor />} />
-          <Route path="play" element={<Play />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="/" element={<Shell />}>
+            <Route index element={<Analyse />} />
+            <Route path="analysis" element={<Analyse />} />
+            <Route path="editor" element={<Editor />} />
+            <Route path="play" element={<Play />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Routes>
       </Suspense>
     </BrowserRouter>

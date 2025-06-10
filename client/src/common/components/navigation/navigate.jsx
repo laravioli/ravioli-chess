@@ -16,9 +16,15 @@ export const Navigate = observer(({ path }) => {
 
   const onClick = () => {
     if (fenStore.isAnalysable()) {
-      current?.onUnLoad();
-      next.onLoad();
-      navigate(path, { replace: true });
+      console.log('----just before navigate------');
+      setTimeout(() => {
+        console.log('a sync function');
+        next.onLoad();
+      }, 0);
+      navigate(path, {
+        replace: false,
+        state: { lastPath: window.location.pathname },
+      });
     } else {
       current.board.position(fenStore.current);
     }

@@ -33,7 +33,6 @@ export function Header() {
             <a href="/play" className={classes.link}>
               Play
             </a>
-
             <a href="/analysis" className={classes.link}>
               Analyse
             </a>

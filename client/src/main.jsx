@@ -7,8 +7,4 @@ import { boot } from 'src/main/boot';
 import App from './App.jsx';
 
 boot();
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+createRoot(document.getElementById('root')).render(<App />);
