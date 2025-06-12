@@ -1,21 +1,4 @@
-import {
-  Anchor,
-  Box,
-  Burger,
-  Button,
-  Center,
-  Collapse,
-  Divider,
-  Drawer,
-  Group,
-  HoverCard,
-  ScrollArea,
-  SimpleGrid,
-  Text,
-  ThemeIcon,
-  UnstyledButton,
-  useMantineTheme,
-} from '@mantine/core';
+import { Box, Button, Drawer, Group } from '@mantine/core';
 import { AuthenticationForm } from './authentification.jsx';
 import { ToggleColorScheme } from './colorscheme.jsx';
 import { useDisclosure } from '@mantine/hooks';

@@ -6,6 +6,8 @@ import { throttle, isEvalBetter } from 'src/lib/eval/util';
 import { observable, action, runInAction } from 'mobx';
 import { pieceTheme } from 'src/lib/board/utils';
 
+//probleme this
+
 export class AnalyseStore {
   board = new Board();
   game = undefined;
@@ -20,11 +22,15 @@ export class AnalyseStore {
       this.game = new Game(fen);
       this.fen = new Fen(fen);
       this.initCeval(fen);
-      this.startCeval();
     });
   }
 
   /* loader */
+
+  @action
+  onLoad() {
+    this.startCeval();
+  }
 
   @action
   onUnLoad() {
@@ -123,7 +129,7 @@ export class AnalyseStore {
 
   makeBoardCfg = () => ({
     pieceTheme: pieceTheme('bases'),
-    position: this.rootStore.fenStore.current,
+    position: this.fen.current,
     orientation: this.rootStore.uiStore.orientation,
     draggable: true,
     dropOffBoard: 'snapback',

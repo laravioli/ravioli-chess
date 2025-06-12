@@ -3,14 +3,14 @@ import { usePageStore } from 'src/main/hooks/hooks';
 
 export function Board() {
   const divRef = useRef(null);
-  const store = usePageStore();
+  const pageStore = usePageStore();
 
   useEffect(() => {
-    store.board.mount(divRef.current, store.makeBoardCfg());
+    pageStore.board.mount(divRef.current, pageStore.makeBoardCfg());
     return () => {
-      store.board.unMount();
+      pageStore.board.unMount();
     };
-  }, [store]);
+  }, []);
 
   return <div className="board" data-side="white" ref={divRef} />;
 }

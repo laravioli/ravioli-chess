@@ -5,12 +5,12 @@ import {
   IconChevronsRight,
 } from '@tabler/icons-react';
 import { ActionIcon, Group } from '@mantine/core';
-import { useStore } from 'src/main/hooks/hooks';
+import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import classes from './controls.module.css';
 
 export const History = observer(() => {
-  const { analyseStore } = useStore();
+  const pageStore = usePageStore();
   const actions = [
     { icon: IconChevronsLeft, action: 'start' },
     { icon: IconChevronLeft, action: 'undo' },
@@ -26,7 +26,7 @@ export const History = observer(() => {
           className={classes.icon}
           size="xl"
           onClick={() => {
-            analyseStore.jump(action);
+            pageStore.jump(action);
           }}
           styles={{
             root: { border: 0 },

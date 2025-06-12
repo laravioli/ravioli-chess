@@ -1,23 +1,21 @@
 import { useRef, useEffect } from 'react';
 import { usePageStore } from 'src/main/hooks/hooks';
-import { useStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { TextInput } from '@mantine/core';
 import classes from './fen.module.css';
 
 export const FenInput = observer(() => {
-  const store = usePageStore();
-  const { fenStore } = useStore();
+  const pageStore = usePageStore();
   const inputRef = useRef(null);
 
   useEffect(() => {
-    fenStore.inputRef.current = inputRef.current;
-    inputRef.current.value = fenStore.current;
+    pageStore.fen.inputRef.current = inputRef.current;
+    inputRef.current.value = pageStore.fen.current;
 
     return autorun(() => {
       if (inputRef.current) {
-        inputRef.current.value = fenStore.current;
+        inputRef.current.value = pageStore.fen.current;
       }
     });
   }, []);
@@ -25,8 +23,8 @@ export const FenInput = observer(() => {
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
-      fenStore.setFromInput(fen);
-      store.board.position(fenStore.current, true);
+      pageStore.fen.setFromInput(fen);
+      pageStore.board.position(pageStore.fen.current, true);
     }
   };
 
@@ -38,7 +36,7 @@ export const FenInput = observer(() => {
       leftSection="FEN"
       variant="filled"
       onKeyDown={onKeyDown}
-      disabled={!!store.game}
+      disabled={!!pageStore.game}
       classNames={{ root: classes.root, input: classes.input }}
     />
   );

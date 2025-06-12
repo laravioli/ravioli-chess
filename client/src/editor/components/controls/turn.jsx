@@ -1,10 +1,10 @@
-import { useStore } from 'src/main/hooks/hooks';
+import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
 import classes from './controls.module.css';
 
 export const TurnToPlay = observer(() => {
-  const { fenStore } = useStore();
+  const pageStore = usePageStore();
 
   const data = [
     { label: 'White to play', value: 'w' },
@@ -12,12 +12,12 @@ export const TurnToPlay = observer(() => {
   ];
 
   const onChange = () => {
-    fenStore.setTurn();
+    pageStore.fen.setTurn();
   };
 
   return (
     <NativeSelect
-      value={fenStore.turn}
+      value={pageStore.fen.turn}
       onChange={onChange}
       data={data}
       classNames={{ wrapper: classes.wrapper }}

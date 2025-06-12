@@ -1,5 +1,5 @@
 import { localStore } from 'src/main/store';
-import { useStore, useLocalStore } from 'src/main/hooks/hooks';
+import { usePageStore, useLocalStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { useState, useCallback } from 'react';
 import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
@@ -8,7 +8,7 @@ import { recommendedThreads } from 'src/lib/eval/engine';
 import classes from './eval.module.css';
 
 export const Settings = observer(() => {
-  const { analyseStore } = useStore();
+  const pageStore = usePageStore();
   const searchms = useLocalStore((state) => state.searchms);
   const multipv = useLocalStore((state) => state.multipv);
   const threads = useLocalStore((state) => state.threads);
@@ -18,7 +18,7 @@ export const Settings = observer(() => {
     (value) => {
       if (value != searchms / 1000) {
         localStore.setState({ searchms: value * 1000 });
-        analyseStore.restartCeval();
+        pageStore.restartCeval();
       }
     },
     [searchms]
@@ -28,8 +28,8 @@ export const Settings = observer(() => {
     (value) => {
       if (value !== multipv) {
         localStore.setState({ multipv: value });
-        analyseStore.clearEvals();
-        analyseStore.restartCeval();
+        pageStore.clearEvals();
+        pageStore.restartCeval();
       }
     },
     [multipv]
@@ -39,7 +39,7 @@ export const Settings = observer(() => {
     (value) => {
       if (value != threads) {
         localStore.setState({ threads: value });
-        analyseStore.restartCeval();
+        pageStore.restartCeval();
       }
     },
     [threads]

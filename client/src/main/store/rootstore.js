@@ -5,6 +5,8 @@ import { EditorStore } from 'src/editor/store/editor';
 import { PlayStore } from 'src/play/store/play';
 import { DEFAULT_POSITION } from 'chess.js';
 
+//Global Store
+
 class RootStore {
   constructor() {
     this.uiStore = new UiStore(this);
@@ -16,8 +18,20 @@ class RootStore {
 }
 
 export const rootStore = new RootStore();
-export const PageStoreRouter = {
-  '/analysis': AnalyseStore,
-  '/editor': EditorStore,
-  '/play': PlayStore,
-};
+
+//Page Store
+
+const patterns = new Map([
+  [/^\/(analysis)?$/, AnalyseStore],
+  [/^\/editor$/, EditorStore],
+  [/^\/play$/, PlayStore],
+]);
+
+export function pageStoreRouter(path) {
+  for (const [regex, value] of patterns) {
+    if (regex.test(path)) {
+      return value;
+    }
+  }
+  return null;
+}

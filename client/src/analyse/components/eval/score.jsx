@@ -4,9 +4,9 @@ import { getEval } from '../move/utils';
 import classes from './eval.module.css';
 
 export const EvalScore = observer(() => {
-  const store = usePageStore();
+  const pageStore = usePageStore();
 
-  const evaluation = store.evaluation;
+  const evaluation = pageStore.evaluation;
   let score = '';
 
   if (evaluation) {
@@ -17,7 +17,7 @@ export const EvalScore = observer(() => {
     }
   }
 
-  if (store.game.currentMove.outcome && store.ceval.enabled) {
+  if (pageStore.game.currentMove.outcome && pageStore.ceval.enabled) {
     score = '-';
   }
 

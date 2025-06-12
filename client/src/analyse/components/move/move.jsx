@@ -1,4 +1,4 @@
-import { useLocalStore, useStore } from 'src/main/hooks/hooks';
+import { useLocalStore, usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Paper } from '@mantine/core';
 import { renderPvs } from './utils.jsx';
@@ -20,20 +20,20 @@ export const Moves = () => {
 };
 
 const Pvs = observer(() => {
-  const { analyseStore } = useStore();
+  const pageStore = usePageStore();
   const multipv = useLocalStore((state) => state.multipv);
 
   return (
     <>
-      {analyseStore.ceval.enabled &&
-        !analyseStore.game.currentMove.outcome &&
-        renderPvs(analyseStore.evaluation, multipv)}
+      {pageStore.ceval.enabled &&
+        !pageStore.game.currentMove.outcome &&
+        renderPvs(pageStore.evaluation, multipv)}
     </>
   );
 });
 
 const Line = observer(() => {
-  const { analyseStore } = useStore();
+  const pageStore = usePageStore();
 
-  return <>{renderLine(analyseStore.game.line)}</>;
+  return <>{renderLine(pageStore.game.line)}</>;
 });

@@ -4,7 +4,6 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { IconSun, IconMoon } from '@tabler/icons-react';
-import classes from './header.module.css';
 
 export function ToggleColorScheme() {
   const { toggleColorScheme } = useMantineColorScheme();

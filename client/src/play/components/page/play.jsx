@@ -1,14 +1,12 @@
-import { PageContext } from 'src/main/context/context';
-import { useStore } from 'src/main/hooks/hooks';
+import { PageStoreProvider } from 'src/main/context/provider';
 import { Board } from 'src/common/components/board/board';
 
 export default function Play() {
-  const { playStore } = useStore();
   return (
-    <PageContext.Provider value={playStore}>
+    <PageStoreProvider>
       <div className={'page-play'}>
         <Board />
       </div>
-    </PageContext.Provider>
+    </PageStoreProvider>
   );
 }
