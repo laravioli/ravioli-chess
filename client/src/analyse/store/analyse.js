@@ -6,8 +6,6 @@ import { throttle, isEvalBetter } from 'src/lib/eval/util';
 import { observable, action, runInAction } from 'mobx';
 import { pieceTheme } from 'src/lib/board/utils';
 
-//probleme this
-
 export class AnalyseStore {
   board = new Board();
   game = undefined;
