@@ -4,14 +4,13 @@ import { Checkbox } from '@mantine/core';
 import classes from './controls.module.css';
 
 export const CastlingBoxes = () => {
+  const labels = ['O-O', 'O-O-O', 'o-o', 'o-o-o'];
   return (
     <>
-      <strong>castling</strong>
       <div className={classes.castle}>
-        <CastlingBox id="K" label="O-O" />
-        <CastlingBox id="Q" label="O-O-O" />
-        <CastlingBox id="k" label="o-o" />
-        <CastlingBox id="q" label="o-o-o" />
+        {['K', 'Q', 'k', 'q'].map((item, index) => (
+          <CastlingBox key={item} id={item} label={labels[index]} />
+        ))}
       </div>
     </>
   );

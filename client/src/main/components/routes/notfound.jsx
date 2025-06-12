@@ -1,6 +1,6 @@
 import { Container, Group, Text, Title } from '@mantine/core';
 import { Link } from 'react-router';
-import classes from '../css/notfound.module.css';
+import classes from './notfound.module.css';
 
 export default function NotFound() {
   return (

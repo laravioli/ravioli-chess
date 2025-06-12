@@ -15,12 +15,11 @@ export const FenInput = observer(() => {
     fenStore.inputRef.current = inputRef.current;
     inputRef.current.value = fenStore.current;
 
-    const disposer = autorun(() => {
+    return autorun(() => {
       if (inputRef.current) {
         inputRef.current.value = fenStore.current;
       }
     });
-    return disposer;
   }, []);
 
   const onKeyDown = (event) => {

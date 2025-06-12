@@ -3,14 +3,9 @@ import { EvalScore } from './score';
 import { Depth } from './depth';
 import { Settings } from './settings';
 import classes from './eval.module.css';
-import { useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
 
-export const EvalTool = () => {
-  console.log('start rendering eval');
-  useEffect(() => {
-    console.log('eval mounted finish');
-    return () => console.log('eval unmoutned finish');
-  });
+export const EvalTool = observer(() => {
   return (
     <div className={classes.evaltool}>
       <EvalToggle />
@@ -20,4 +15,4 @@ export const EvalTool = () => {
       <Settings />
     </div>
   );
-};
+});

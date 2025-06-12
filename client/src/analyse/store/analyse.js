@@ -28,9 +28,9 @@ export class AnalyseStore {
 
   @action
   onUnLoad() {
-    this.evaluation = undefined;
     this.game.clear();
     this.ceval.stop();
+    this.evaluation = undefined;
   }
 
   /* game */

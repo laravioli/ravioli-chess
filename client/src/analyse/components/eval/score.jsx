@@ -4,7 +4,6 @@ import { getEval } from '../move/utils';
 import classes from './eval.module.css';
 
 export const EvalScore = observer(() => {
-  console.log('i render too much');
   const store = usePageStore();
 
   const evaluation = store.evaluation;

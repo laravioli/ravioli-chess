@@ -37,11 +37,9 @@ export const Positions = observer(() => {
   const [value, setValue] = useState(() => matcher(fenStore.current));
 
   useEffect(() => {
-    const disposer = autorun(() => {
+    return autorun(() => {
       setValue(matcher(fenStore.current));
     });
-
-    return disposer;
   }, []);
 
   const onChange = (event) => {

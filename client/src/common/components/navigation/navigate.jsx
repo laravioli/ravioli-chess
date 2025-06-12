@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router';
 import { observer } from 'mobx-react-lite';
 import { Action } from '../toolbar/action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
+import { useEffect } from 'react';
+import { action } from 'mobx';
 
 export const Navigate = observer(({ path }) => {
   const current = usePageStore();
@@ -14,21 +16,18 @@ export const Navigate = observer(({ path }) => {
   const label = isEdit ? 'analysis board' : 'edit board';
   const Icon = isEdit ? IconMathMaxMin : IconEdit;
 
-  const onClick = () => {
+  const onClick = action(() => {
     if (fenStore.isAnalysable()) {
-      console.log('----just before navigate------');
-      setTimeout(() => {
-        console.log('a sync function');
-        next.onLoad();
-      }, 0);
       navigate(path, {
-        replace: false,
-        state: { lastPath: window.location.pathname },
+        replace: true,
       });
+
+      current.onUnLoad();
+      next.onLoad();
     } else {
       current.board.position(fenStore.current);
     }
-  };
+  });
 
   return (
     <Action
