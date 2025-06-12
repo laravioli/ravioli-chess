@@ -1,44 +1,41 @@
 import { Board } from 'src/lib/board/board';
 import { Game } from 'src/lib/game/game';
-import { Ceval } from 'src/lib/eval/ceval';
+import { Fen } from 'src/lib/fen/fen';
 import { engineSupported } from 'src/lib/eval/engine';
 import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { observable, action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import { pieceTheme } from 'src/lib/board/utils';
 
 export class AnalyseStore {
   board = new Board();
   game = undefined;
+  fen = undefined;
   ceval = undefined;
   @observable.ref accessor evaluation = undefined;
 
-  constructor(rootStore) {
-    this.rootStore = rootStore;
+  constructor(rootStore, { fen }) {
+    runInAction(() => {
+      this.rootStore = rootStore;
+      this.ceval = this.rootStore.cevalStore;
+      this.game = new Game(fen);
+      this.fen = new Fen(fen);
+      this.initCeval(fen);
+      this.startCeval();
+    });
   }
 
   /* loader */
 
   @action
-  onLoad() {
-    const fen = this.rootStore.fenStore.current;
-    this.game ? this.game.load(fen) : (this.game = new Game(fen));
-    this.initCeval(fen);
-    this.startCeval();
-  }
-
-  @action
   onUnLoad() {
-    this.game.clear();
     this.ceval.stop();
-    this.evaluation = undefined;
   }
 
   /* game */
 
   @action
   newGame(fen) {
-    if (fen !== this.rootStore.fenStore.current)
-      this.rootStore.fenStore.set(fen);
+    if (fen !== this.fen.current) this.fen.set(fen);
     this.game.load(fen);
     this.restartCeval();
 
@@ -54,7 +51,7 @@ export class AnalyseStore {
       this.evaluation = move.ceval;
     this.restartCeval();
     this.board.position(move.fen, true);
-    this.rootStore.fenStore.set(move.fen);
+    this.fen.set(move.fen);
   }
 
   /* ceval */
@@ -67,10 +64,7 @@ export class AnalyseStore {
         this.onNewCeval(ev);
       },
     };
-    if (this.ceval) this.ceval.setOpts(opts);
-    else {
-      this.ceval = new Ceval(opts);
-    }
+    this.ceval.setOpts(opts);
   }
 
   @action

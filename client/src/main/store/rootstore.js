@@ -1,22 +1,23 @@
-import { FenStore } from 'src/common/stores/fenstore';
+import { Ceval } from 'src/lib/eval/ceval';
 import { UiStore } from 'src/common/stores/uistore';
 import { AnalyseStore } from 'src/analyse/store/analyse';
 import { EditorStore } from 'src/editor/store/editor';
 import { PlayStore } from 'src/play/store/play';
+import { DEFAULT_POSITION } from 'chess.js';
 
 class RootStore {
   constructor() {
-    this.fenStore = new FenStore(this);
-    this.analyseStore = new AnalyseStore(this);
-    this.editorStore = new EditorStore(this);
-    this.playStore = new PlayStore(this);
     this.uiStore = new UiStore(this);
+    this.cevalStore = new Ceval({
+      possible: true,
+      initialFen: DEFAULT_POSITION,
+    });
   }
 }
 
 export const rootStore = new RootStore();
-export const storeRouter = {
-  '/analysis': rootStore.analyseStore,
-  '/editor': rootStore.editorStore,
-  '/play': rootStore.playStore,
+export const PageStoreRouter = {
+  '/analysis': AnalyseStore,
+  '/editor': EditorStore,
+  '/play': PlayStore,
 };

@@ -11,11 +11,7 @@ function loadData() {
 export const DataContext = createContext(loadData());
 
 export const StoreContext = createContext({
-  analyseStore: rootStore.analyseStore,
-  editorStore: rootStore.editorStore,
-  playStore: rootStore.playStore,
-  fenStore: rootStore.fenStore,
   uiStore: rootStore.uiStore,
 });
 
-export const PageContext = createContext(null);
+export const PageStoreContext = createContext(null);

@@ -47,11 +47,6 @@ export class Ceval {
   onEmit = throttle(200, (ev, work) => {
     this.sortPvsInPlace(ev.pvs, work.ply % 2 ? 'white' : 'black');
     this.opts.emit(ev);
-    /*if (ev.fen !== this.lastEmitFen && enabledAfterDisable()) {
-      // amnesty while auto disable not processed
-      this.lastEmitFen = ev.fen;
-      storage.fire('ceval.fen', ev.fen);
-    }*/
   });
 
   doStart(steps, gameId) {

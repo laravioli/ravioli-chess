@@ -9,7 +9,6 @@ import { action } from 'mobx';
 
 export const Navigate = observer(({ path }) => {
   const current = usePageStore();
-  const next = storeRouter[path];
   const { fenStore } = useStore();
   const navigate = useNavigate();
   const isEdit = path !== '/editor';
@@ -20,10 +19,8 @@ export const Navigate = observer(({ path }) => {
     if (fenStore.isAnalysable()) {
       navigate(path, {
         replace: true,
+        state : {fen : }
       });
-
-      current.onUnLoad();
-      next.onLoad();
     } else {
       current.board.position(fenStore.current);
     }
