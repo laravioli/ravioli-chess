@@ -3,9 +3,8 @@ import { EvalScore } from './score';
 import { Depth } from './depth';
 import { Settings } from './settings';
 import classes from './eval.module.css';
-import { observer } from 'mobx-react-lite';
 
-export const EvalTool = observer(() => {
+export const EvalTool = () => {
   return (
     <div className={classes.evaltool}>
       <EvalToggle />
@@ -15,4 +14,4 @@ export const EvalTool = observer(() => {
       <Settings />
     </div>
   );
-});
+};

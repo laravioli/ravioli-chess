@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
 import { TextInput } from '@mantine/core';
 import classes from './fen.module.css';
+import { action } from 'mobx';
 
 export const FenInput = observer(() => {
   const pageStore = usePageStore();
@@ -20,13 +21,13 @@ export const FenInput = observer(() => {
     });
   }, []);
 
-  const onKeyDown = (event) => {
+  const onKeyDown = action((event) => {
     if (event.key === 'Enter') {
       const fen = inputRef.current.value;
       pageStore.fen.setFromInput(fen);
       pageStore.board.position(pageStore.fen.current, true);
     }
-  };
+  });
 
   return (
     <TextInput

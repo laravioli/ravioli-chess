@@ -3,7 +3,7 @@ import { Board } from 'src/common/components/board/board';
 import { FenInput } from 'src/common/components/fen/feninput';
 import { Tools } from '../tools/tools';
 
-export default function Editor() {
+const Editor = () => {
   return (
     <PageStoreProvider>
       <div className={'page-editor'}>
@@ -13,4 +13,6 @@ export default function Editor() {
       </div>
     </PageStoreProvider>
   );
-}
+};
+
+export default Editor;

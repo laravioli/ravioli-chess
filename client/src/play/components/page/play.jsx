@@ -1,7 +1,7 @@
 import { PageStoreProvider } from 'src/main/context/provider';
 import { Board } from 'src/common/components/board/board';
 
-export default function Play() {
+const Play = () => {
   return (
     <PageStoreProvider>
       <div className={'page-play'}>
@@ -9,4 +9,6 @@ export default function Play() {
       </div>
     </PageStoreProvider>
   );
-}
+};
+
+export default Play;

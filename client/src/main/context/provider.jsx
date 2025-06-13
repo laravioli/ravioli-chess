@@ -29,16 +29,17 @@ export const PageStoreProvider = ({ children }) => {
 
 export const DataProvider = ({ children }) => {
   const dataRef = useRef(null);
+  const dataScript = document.getElementById('page-init-data');
   const loadData = () => {
-    const dataScript = document.getElementById('page-init-data');
     const data = dataScript && JSON.parse(dataScript.innerHTML);
-    dataScript?.remove();
     return data;
   };
 
   if (!dataRef.current) {
     dataRef.current = loadData();
   }
+
+  useEffect(() => () => dataScript?.remove(), []);
 
   return (
     <DataContext.Provider value={dataRef.current}>
