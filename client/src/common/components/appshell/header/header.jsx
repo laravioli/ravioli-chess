@@ -1,5 +1,7 @@
 import { Box, Button, Drawer, Group } from '@mantine/core';
 import { AuthenticationForm } from './authentification.jsx';
+import { PlayModal } from './modal.jsx';
+import { Link } from 'react-router';
 import { ToggleColorScheme } from './colorscheme.jsx';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './header.module.css';
@@ -13,15 +15,13 @@ export function Header() {
         <Group justify="space-between" h="100%">
           Raviolichess
           <Group h="100%" gap={0} visibleFrom="sm">
-            <a href="/play" className={classes.link}>
-              Play
-            </a>
-            <a href="/analysis" className={classes.link}>
+            <PlayModal />
+            <Link to="/analysis" className={classes.link} replace>
               Analyse
-            </a>
-            <a href="/editor" className={classes.link}>
+            </Link>
+            <Link to="/editor" className={classes.link} replace>
               Edit
-            </a>
+            </Link>
           </Group>
           <Group visibleFrom="sm">
             <Button onClick={openDrawer}>Log in</Button>

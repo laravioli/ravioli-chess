@@ -1,4 +1,8 @@
-import { localStorageColorSchemeManager, createTheme } from '@mantine/core';
+import {
+  localStorageColorSchemeManager,
+  createTheme,
+  NativeSelect,
+} from '@mantine/core';
 
 const localstorageScheme = localStorageColorSchemeManager({
   key: 'color-scheme',
@@ -16,6 +20,15 @@ export const MantineSettings = {
     primaryColor: 'cyan',
     defaultRadius: 'lg',
     cursorType: 'pointer',
+    components: {
+      NativeSelect: NativeSelect.extend({
+        vars: (theme, prop) => ({
+          wrapper: {
+            '--input-bd-focus': 'var(--input-bd)',
+          },
+        }),
+      }),
+    },
   }),
   withStaticClasses: false,
   colorSchemeManager: localstorageScheme,

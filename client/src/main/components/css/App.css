@@ -44,12 +44,11 @@ html {
 
 .toolbar {
   grid-area: tools;
-  display: flex;
-  flex-flow: column;
-  align-self: center;
-  width: 100%;
-  overflow: hidden;
   border-radius: 6px;
+
+  .page-analyse & {
+    width: 100%;
+  }
 }
 
 .board {

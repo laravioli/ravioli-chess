@@ -7,8 +7,3 @@
   justify-items: left;
   padding-bottom: 1rem;
 }
-
-.wrapper {
-  --input-margin-bottom: 1rem;
-  --input-bd-focus: var(--input-bd) !important;
-}

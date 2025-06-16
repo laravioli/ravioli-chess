@@ -1,13 +1,9 @@
 import {
   Anchor,
   Button,
-  Checkbox,
-  Divider,
   Group,
-  Paper,
   PasswordInput,
   Stack,
-  Text,
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';

@@ -26,6 +26,10 @@
     width: 100%;
   }
 
+  div& {
+    cursor: pointer;
+  }
+
   @mixin hover {
     background-color: light-dark(
       var(--mantine-color-gray-0),
@@ -58,4 +62,17 @@
   padding-bottom: var(--mantine-spacing-xl);
   border-top: 1px solid
     light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+}
+
+.mark {
+  width: 6px;
+  height: 6px;
+  transform: translateX(1px) translateY(1px);
+
+  &[data-filled] {
+    border-color: light-dark(
+      var(--mantine-color-blue-6),
+      var(--mantine-color-gray-6)
+    );
+  }
 }
