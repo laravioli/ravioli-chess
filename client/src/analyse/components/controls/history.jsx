@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import classes from './controls.module.css';
 
 export const History = observer(() => {
-  const pageStore = usePageStore();
+  const analyseStore = usePageStore();
   const actions = [
     { icon: IconChevronsLeft, action: 'start' },
     { icon: IconChevronLeft, action: 'undo' },
@@ -26,7 +26,7 @@ export const History = observer(() => {
           className={classes.icon}
           size="xl"
           onClick={() => {
-            pageStore.jump(action);
+            analyseStore.jump(action);
           }}
           styles={{
             root: { border: 0 },

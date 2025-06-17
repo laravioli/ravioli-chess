@@ -17,11 +17,11 @@ export const CastlingBoxes = () => {
 };
 
 const CastlingBox = observer(({ id, label }) => {
-  const pageStore = usePageStore();
-  const castlingRight = pageStore.fen.castling[id];
+  const editorStore = usePageStore();
+  const castlingRight = editorStore.fen.castling[id];
 
   const onChange = () => {
-    pageStore.fen.setCastlingRight(id, !castlingRight);
+    editorStore.fen.setCastlingRight(id, !castlingRight);
   };
 
   return (

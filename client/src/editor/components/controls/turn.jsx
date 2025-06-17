@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
 
 export const TurnToPlay = observer(() => {
-  const pageStore = usePageStore();
+  const editorStore = usePageStore();
 
   const data = [
     { label: 'White to play', value: 'w' },
@@ -11,10 +11,14 @@ export const TurnToPlay = observer(() => {
   ];
 
   const onChange = () => {
-    pageStore.fen.setTurn();
+    editorStore.fen.setTurn();
   };
 
   return (
-    <NativeSelect value={pageStore.fen.turn} onChange={onChange} data={data} />
+    <NativeSelect
+      value={editorStore.fen.turn}
+      onChange={onChange}
+      data={data}
+    />
   );
 });

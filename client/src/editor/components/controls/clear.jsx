@@ -4,11 +4,11 @@ import { Action } from 'src/common/components/toolbar/action';
 import { IconTrash } from '@tabler/icons-react';
 
 export const ClearButton = observer(() => {
-  const pageStore = usePageStore();
+  const editorStore = usePageStore();
 
   const onClear = () => {
-    pageStore.board.clear();
-    pageStore.fen.reset(false);
+    editorStore.board.clear();
+    editorStore.fen.reset(false);
   };
 
   return (

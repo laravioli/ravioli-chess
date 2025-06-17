@@ -7,7 +7,7 @@ import { short_fen } from './utils';
 import classes from './controls.module.css';
 
 export const Positions = observer(() => {
-  const pageStore = usePageStore();
+  const editorStore = usePageStore();
   const position = useInitData();
 
   const data = useMemo(
@@ -34,19 +34,19 @@ export const Positions = observer(() => {
     [data, fens]
   );
 
-  const [value, setValue] = useState(() => matcher(pageStore.fen.current));
+  const [value, setValue] = useState(() => matcher(editorStore.fen.current));
 
   useEffect(() => {
     return autorun(() => {
-      setValue(matcher(pageStore.fen.current));
+      setValue(matcher(editorStore.fen.current));
     });
   }, []);
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen) {
-      pageStore.board.position(fen, true);
-      pageStore.fen.set(fen);
+      editorStore.board.position(fen, true);
+      editorStore.fen.set(fen);
     } else {
       setValue(fen);
     }

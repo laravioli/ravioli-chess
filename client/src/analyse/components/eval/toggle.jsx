@@ -7,18 +7,18 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import classes from './eval.module.css';
 
 export const EvalToggle = observer(() => {
-  const pageStore = usePageStore();
+  const analyseStore = usePageStore();
   const { evalStorage } = useLocalStorage();
 
   const onClick = useCallback(() => {
-    pageStore.toggleCeval();
+    analyseStore.toggleCeval();
   }, []);
 
   useEffect(() => {
     const unsub = reaction(
       () => evalStorage.disable,
       () => {
-        if (pageStore.ceval.enabled && !evalStorage.isTab) onClick();
+        if (analyseStore.ceval.enabled && !evalStorage.isTab) onClick();
       }
     );
     return unsub;
@@ -27,12 +27,12 @@ export const EvalToggle = observer(() => {
   return (
     <Switch
       classNames={{ track: classes.toggle }}
-      checked={pageStore.ceval.enabled}
+      checked={analyseStore.ceval.enabled}
       onClick={onClick}
       color="teal"
       size="md"
       thumbIcon={
-        pageStore.ceval.enabled ? (
+        analyseStore.ceval.enabled ? (
           <IconCheck size={12} color="var(--mantine-color-teal-6)" stroke={3} />
         ) : (
           <IconX size={12} color="var(--mantine-color-red-6)" stroke={3} />

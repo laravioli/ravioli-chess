@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 import classes from './controls.module.css';
 
 export const Positions = observer(() => {
-  const pageStore = usePageStore();
+  const analyseStore = usePageStore();
   const positions = useInitData();
 
   const options = useMemo(
@@ -33,10 +33,10 @@ export const Positions = observer(() => {
         position="top"
         withinPortal={false}
         onOptionSubmit={action((fen) => {
-          if (fen != pageStore.fen.current) {
-            pageStore.newGame?.(fen);
-            pageStore.board.position(fen, true);
-            pageStore.fen.set(fen);
+          if (fen != analyseStore.fen.current) {
+            analyseStore.newGame?.(fen);
+            analyseStore.board.position(fen, true);
+            analyseStore.fen.set(fen);
           }
           combobox.closeDropdown();
         })}>

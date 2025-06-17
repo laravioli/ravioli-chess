@@ -5,13 +5,13 @@ import classes from './eval.module.css';
 
 export const EvalBar = observer(() => {
   const { uiStore } = useStore();
-  const pageStore = usePageStore();
+  const analyseStore = usePageStore();
 
-  if (!pageStore.ceval.enabled || pageStore.game.currentMove.outcome)
+  if (!analyseStore.ceval.enabled || analyseStore.game.currentMove.outcome)
     return null;
 
-  const progress = pageStore.evaluation
-    ? povChances('white', pageStore.evaluation)
+  const progress = analyseStore.evaluation
+    ? povChances('white', analyseStore.evaluation)
     : 0.0;
 
   return (

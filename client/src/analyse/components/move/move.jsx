@@ -20,19 +20,19 @@ export const Moves = () => {
 };
 
 const Pvs = observer(() => {
-  const pageStore = usePageStore();
+  const analyseStore = usePageStore();
   const multipv = useLocalStorage().evalStorage.multipv;
   return (
     <>
-      {pageStore.ceval.enabled &&
-        !pageStore.game.currentMove.outcome &&
-        renderPvs(pageStore.evaluation, multipv)}
+      {analyseStore.ceval.enabled &&
+        !analyseStore.game.currentMove.outcome &&
+        renderPvs(analyseStore.evaluation, multipv)}
     </>
   );
 });
 
 const Line = observer(() => {
-  const pageStore = usePageStore();
+  const analyseStore = usePageStore();
 
-  return <>{renderLine(pageStore.game.line)}</>;
+  return <>{renderLine(analyseStore.game.line)}</>;
 });
