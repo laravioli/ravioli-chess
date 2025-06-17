@@ -12,22 +12,18 @@ export class LocalEvalStorage {
 
   constructor() {
     makeAutoObservable(this);
-    makePersistable(
-      this,
-      {
-        name: 'eval-storage',
-        properties: [
-          'multipv',
-          'searchms',
-          'threads',
-          'hashsize',
-          'sri',
-          'disable',
-        ],
-        storage: window.localStorage,
-      },
-      { fireImmediately: true }
-    );
+    makePersistable(this, {
+      name: 'eval-storage',
+      properties: [
+        'multipv',
+        'searchms',
+        'threads',
+        'hashsize',
+        'sri',
+        'disable',
+      ],
+      storage: window.localStorage,
+    });
   }
 
   setMultiPv(number) {

@@ -1,17 +1,19 @@
 import { LocalEvalStorage } from 'src/lib/eval/localstorage';
+import { LocalLobbyStorage } from 'src/lib/lobby/localstorage';
 import { hydrateStore } from 'mobx-persist-store';
 
 class LocalStorage {
   constructor() {
     this.evalStorage = new LocalEvalStorage();
+    this.lobbyStorage = new LocalLobbyStorage();
   }
 }
 
 export const localStorage = new LocalStorage();
 
-(function (store) {
+function autoHydrate(key, store) {
   const storageEventCallback = (e) => {
-    if (e.key === 'eval-storage' && e.newValue) {
+    if (e.key === key && e.newValue) {
       hydrateStore(store);
     }
   };
@@ -21,4 +23,7 @@ export const localStorage = new LocalStorage();
   return () => {
     window.removeEventListener('storage', storageEventCallback);
   };
-})(localStorage.evalStorage);
+}
+
+autoHydrate('eval-storage', localStorage.evalStorage);
+autoHydrate('lobby-storage', localStorage.lobbyStorage);
