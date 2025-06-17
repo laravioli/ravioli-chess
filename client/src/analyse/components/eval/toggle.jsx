@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { usePageStore, useLocalStorage } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
-import { autorun } from 'mobx';
+import { reaction } from 'mobx';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import classes from './eval.module.css';
@@ -14,11 +14,13 @@ export const EvalToggle = observer(() => {
     pageStore.toggleCeval();
   }, []);
 
-  //this is the problem xD
   useEffect(() => {
-    const unsub = autorun(() => {
-      if (pageStore.ceval.enabled && !evalStorage.isTab) onClick();
-    });
+    const unsub = reaction(
+      () => evalStorage.disable,
+      () => {
+        if (pageStore.ceval.enabled && !evalStorage.isTab) onClick();
+      }
+    );
     return unsub;
   }, []);
 

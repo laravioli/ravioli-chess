@@ -26,7 +26,7 @@ export class LocalEvalStorage {
         ],
         storage: window.localStorage,
       },
-      { delay: 0, fireImmediately: true }
+      { fireImmediately: true }
     );
   }
 
