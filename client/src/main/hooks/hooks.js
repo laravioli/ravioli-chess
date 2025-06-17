@@ -1,13 +1,12 @@
 import { useContext } from 'react';
-import { useStore as u } from 'zustand';
 import {
   DataContext,
+  LocalStorageContext,
   StoreContext,
   PageStoreContext,
 } from '../context/context';
-import { localStore } from 'src/main/store';
 
 export const useInitData = () => useContext(DataContext);
-export const useLocalStore = (selector) => u(localStore, selector);
+export const useLocalStorage = () => useContext(LocalStorageContext);
 export const useStore = () => useContext(StoreContext);
 export const usePageStore = () => useContext(PageStoreContext);

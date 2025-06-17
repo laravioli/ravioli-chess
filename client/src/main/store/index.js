@@ -1,2 +1,2 @@
-export { localStore } from './localstore';
+export { localStorage } from './localstorage';
 export { rootStore } from './rootstore';

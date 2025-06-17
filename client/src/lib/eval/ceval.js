@@ -1,16 +1,16 @@
 import { validateFen } from 'chess.js';
 import { makeEngine, maxThreads } from './engine';
-import { localStore } from 'src/main/store';
+import { localStorage } from 'src/main/store';
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
-import { observable } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 
 const cevalDisabledSentinel = '1';
 
-function enabledAfterDisable() {
+const enabledAfterDisable = action(() => {
   const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
-  const disable = localStore.getState().disable || cevalDisabledSentinel;
+  const disable = localStorage.evalStorage.disable || cevalDisabledSentinel;
   return enabledAfter == disable;
-}
+});
 
 //possible : does browser support engine
 //allowed : does engine is allowed to run
@@ -19,11 +19,9 @@ function enabledAfterDisable() {
 
 export class Ceval {
   @observable accessor enabled;
-
-  storedPv = () => localStore.getState().multipv;
-  storedMovetime = () => localStore.getState().searchms;
   allowed = toggle(true);
   lastStarted = false;
+  evalStorage = localStorage.evalStorage;
 
   constructor(opts) {
     this.init(opts);
@@ -53,10 +51,14 @@ export class Ceval {
     if (!this.enabled || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
 
-    localStore.setState({ sri: window.site.sri, disable: Math.random() });
+    runInAction(() => {
+      this.evalStorage.setSri(window.site.sri);
+      this.evalStorage.setDisable(Math.random());
+    });
+
     window.sessionStorage.setItem(
       'ceval.enabled-after',
-      localStore.getState().disable
+      this.evalStorage.disable
     );
 
     if (
@@ -118,9 +120,9 @@ export class Ceval {
 
   get search() {
     const s = {
-      multiPv: this.storedPv(),
+      multiPv: this.evalStorage.multipv,
       by: {
-        movetime: Math.min(this.storedMovetime(), Number.POSITIVE_INFINITY),
+        movetime: Math.min(this.evalStorage.searchms, Number.POSITIVE_INFINITY),
       },
     };
     if (this.isInfinite) s.by = { depth: 99 };
@@ -128,7 +130,7 @@ export class Ceval {
   }
 
   get safeMovetime() {
-    return Math.min(this.storedMovetime(), Number.POSITIVE_INFINITY);
+    return Math.min(this.evalStorage.searchms, Number.POSITIVE_INFINITY);
   }
 
   get isInfinite() {
@@ -140,7 +142,7 @@ export class Ceval {
   }
 
   get threads() {
-    const stored = localStore.getState().threads;
+    const stored = this.evalStorage.threads;
     return clamp(stored, {
       min: this.worker?.info.minThreads ?? 1,
       max: maxThreads(),
@@ -148,7 +150,7 @@ export class Ceval {
   }
 
   get hashSize() {
-    const stored = localStore.getState().hashsize;
+    const stored = this.evalStorage.hashsize;
     return Math.min(this.maxHash, stored ?? 16);
   }
 
@@ -160,7 +162,7 @@ export class Ceval {
     if (!this.possible || !this.allowed()) return;
     this.stop();
     if (!this.enabled && !document.hidden) {
-      const disable = localStore.getState().disable || cevalDisabledSentinel;
+      const disable = this.evalStorage.disable || cevalDisabledSentinel;
       if (disable)
         window.sessionStorage.setItem('ceval.enabled-after', disable);
       this.enabled = true;

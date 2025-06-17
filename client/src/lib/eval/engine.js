@@ -152,7 +152,7 @@ export const makeEngine = () => {
 export const engineSupported = () =>
   sf16.requires.every((req) => browserSupport().includes(req));
 
-export const recommendedThreads = () => {
+export const getRecommendedThreads = () => {
   return clamp(
     navigator.hardwareConcurrency - (navigator.hardwareConcurrency % 2 ? 0 : 1),
     {

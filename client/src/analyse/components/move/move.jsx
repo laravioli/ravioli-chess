@@ -1,4 +1,4 @@
-import { useLocalStore, usePageStore } from 'src/main/hooks/hooks';
+import { useLocalStorage, usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { Paper } from '@mantine/core';
 import { renderPvs } from './utils.jsx';
@@ -21,8 +21,7 @@ export const Moves = () => {
 
 const Pvs = observer(() => {
   const pageStore = usePageStore();
-  const multipv = useLocalStore((state) => state.multipv);
-
+  const multipv = useLocalStorage().evalStorage.multipv;
   return (
     <>
       {pageStore.ceval.enabled &&
