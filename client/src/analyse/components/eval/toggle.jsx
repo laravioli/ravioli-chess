@@ -14,10 +14,12 @@ export const EvalToggle = observer(() => {
     pageStore.toggleCeval();
   }, []);
 
+  //this is the problem xD
   useEffect(() => {
-    return autorun(() => {
+    const unsub = autorun(() => {
       if (pageStore.ceval.enabled && !evalStorage.isTab) onClick();
     });
+    return unsub;
   }, []);
 
   return (

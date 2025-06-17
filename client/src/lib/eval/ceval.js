@@ -3,6 +3,7 @@ import { makeEngine, maxThreads } from './engine';
 import { localStorage } from 'src/main/store';
 import { CevalState, toggle, throttle, clamp, povChances } from './util';
 import { observable, action, runInAction } from 'mobx';
+import { isHydrated } from 'mobx-persist-store';
 
 const cevalDisabledSentinel = '1';
 
