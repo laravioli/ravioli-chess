@@ -1,0 +1,17 @@
+.tools {
+  background-color: light-dark(
+    var(--mantine-color-gray-4),
+    var(--mantine-color-dark-6)
+  );
+}
+
+.history {
+  gap: 2rem;
+  & button {
+    width: 70px;
+  }
+}
+
+.space {
+  width: 20px;
+}

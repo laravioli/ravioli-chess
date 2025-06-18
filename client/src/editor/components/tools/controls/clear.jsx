@@ -1,6 +1,6 @@
 import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
-import { Action } from 'src/common/components/toolbar/action';
+import { Action } from 'src/common/components/tools/action';
 import { IconTrash } from '@tabler/icons-react';
 
 export const ClearButton = observer(() => {

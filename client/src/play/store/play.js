@@ -20,6 +20,9 @@ export class PlayStore {
   @action
   onUnLoad() {}
 
+  @action
+  jump() {}
+
   makeBoardCfg = () => {
     return {
       pieceTheme: pieceTheme('bases'),

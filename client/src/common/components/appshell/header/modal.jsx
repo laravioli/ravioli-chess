@@ -12,6 +12,7 @@ import {
   Group,
   Stack,
 } from '@mantine/core';
+import { Link } from 'react-router';
 import classes from './header.module.css';
 
 export const PlayModal = () => {
@@ -28,7 +29,9 @@ export const PlayModal = () => {
           <GameClock />
           <Side />
           <Group justify="center">
-            <Button>Play</Button>
+            <Button component={Link} onClick={close} to="/play">
+              Play
+            </Button>
           </Group>
         </Stack>
       </Modal>

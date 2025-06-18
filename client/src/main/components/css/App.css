@@ -37,9 +37,12 @@ html {
 .page-play {
   grid-area: main;
   display: grid;
-  grid-template-areas: ' board ';
-  grid-template-rows: 1fr;
-  grid-template-columns: clamp(var(--board-min-width), 100vmin, 50rem);
+  place-items: center;
+  grid-template-areas: 'chat board . tools ';
+  grid-template-rows: auto auto auto;
+  grid-template-columns:
+    max-content clamp(var(--board-min-width), 100vmin, 50rem)
+    1rem max-content;
 }
 
 .toolbar {
@@ -60,4 +63,18 @@ html {
 .copyables {
   grid-area: copyables;
   width: 100%;
+}
+
+.icon {
+  border: 0;
+  background-color: light-dark(
+    var(--mantine-color-gray-5),
+    var(--mantine-color-dark-6)
+  );
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-4),
+      var(--mantine-color-dark-4)
+    );
+  }
 }

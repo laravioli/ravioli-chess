@@ -12,17 +12,3 @@
 .history {
   padding-bottom: 1rem;
 }
-
-.icon {
-  border: 0;
-  background-color: light-dark(
-    var(--mantine-color-gray-5),
-    var(--mantine-color-dark-6)
-  );
-  &:hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-4),
-      var(--mantine-color-dark-4)
-    );
-  }
-}

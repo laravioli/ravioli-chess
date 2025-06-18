@@ -5,7 +5,6 @@ import { IconChessRook } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import classes from './controls.module.css';
 
 export const Positions = observer(() => {
   const analyseStore = usePageStore();
@@ -43,7 +42,7 @@ export const Positions = observer(() => {
         <Combobox.Target>
           <Tooltip label="select position" position="bottom">
             <ActionIcon
-              className={classes.icon}
+              className="icon"
               size="sm"
               onClick={() => combobox.toggleDropdown()}
               styles={{

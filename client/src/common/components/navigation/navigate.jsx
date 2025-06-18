@@ -1,7 +1,7 @@
 import { usePageStore } from 'src/main/hooks/hooks';
 import { useNavigate } from 'react-router';
 import { observer } from 'mobx-react-lite';
-import { Action } from '../toolbar/action';
+import { Action } from '../tools/action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
 import { action } from 'mobx';
 
