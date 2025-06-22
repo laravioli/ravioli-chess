@@ -36,6 +36,10 @@ export default defineConfig(({ mode }) => {
       },
 
       proxy: {
+        '/api': {
+          target: env.BACKEND_URL,
+          changeOrigin: true,
+        },
         '^/(\\w+)?$': {
           target: env.BACKEND_URL,
           changeOrigin: true,

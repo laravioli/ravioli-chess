@@ -1,0 +1,49 @@
+from rest_framework import generics
+from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth import authenticate, login, logout
+from rest_framework import status
+from api.serializers import RegisterSerializer
+
+
+class UserRegister(generics.CreateAPIView):
+
+    permission_classes = [permissions.AllowAny]
+    serializer_class = RegisterSerializer
+
+
+class UserLogin(APIView):
+
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        username = request.data["username"]
+        password = request.data["password"]
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return Response(
+                {"success": "Successfully logged in"}, status=status.HTTP_200_OK
+            )
+        return Response(
+            {"error": "Invalid Credentials"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+def user_logout(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"error": "You're not logged in."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    logout(request)
+    return Response({"success": "Successfully logged out."})
+
+
+def whoami_view(request):
+    if not request.user.is_authenticated:
+        return Response({"isAuthenticated": False})
+
+    return Response({"username": request.user.username})
