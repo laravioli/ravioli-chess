@@ -8,49 +8,55 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
+import { useStore } from 'src/main/hooks/hooks';
 
 export function AuthenticationForm() {
+  const { userStore } = useStore();
   const [type, toggle] = useToggle(['login', 'register']);
   const form = useForm({
     initialValues: {
-      email: '',
-      pseudo: '',
+      username: '',
       password: '',
+      email: '',
     },
 
     validate: {
       email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
       password: (val) =>
-        val.length <= 6
-          ? 'Password should include at least 6 characters'
+        val.length <= 4
+          ? 'Password should include at least 4 characters'
           : null,
     },
   });
 
   return (
-    <form onSubmit={form.onSubmit(() => {})}>
+    <form
+      onSubmit={form.onSubmit((values) => {
+        console.log(values);
+        userStore.login(values);
+      })}>
       <Stack>
         {type === 'register' && (
           <TextInput
-            label="Pseudo"
-            placeholder="Your pseudo"
-            value={form.values.pseudo}
+            required
+            label="Email"
+            placeholder="ravioli@chess.com"
+            value={form.values.email}
             onChange={(event) =>
-              form.setFieldValue('pseudo', event.currentTarget.value)
+              form.setFieldValue('email', event.currentTarget.value)
             }
+            error={form.errors.email && 'Invalid email'}
             radius="md"
           />
         )}
 
         <TextInput
-          required
-          label="Email"
-          placeholder="ravioli@chess.com"
-          value={form.values.email}
+          label="Username"
+          placeholder="Your username"
+          value={form.values.username}
           onChange={(event) =>
-            form.setFieldValue('email', event.currentTarget.value)
+            form.setFieldValue('username', event.currentTarget.value)
           }
-          error={form.errors.email && 'Invalid email'}
           radius="md"
         />
 

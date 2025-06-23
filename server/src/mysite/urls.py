@@ -19,14 +19,9 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from mysite.settings import DEBUG
 
-if DEBUG:
-    urlpatterns = [
-        path("admin/", admin.site.urls),
-        path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-        path("api/", include("api.urls")),
-        path("", include("web.urls")),
-    ]
-else:
-    urlpatterns = [
-        path("", include("web.urls")),
-    ]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("api/", include("api.urls")),
+    path("", include("web.urls")),
+]

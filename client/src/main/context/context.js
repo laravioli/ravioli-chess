@@ -9,5 +9,6 @@ export const LocalStorageContext = createContext({
 });
 export const StoreContext = createContext({
   uiStore: rootStore.uiStore,
+  userStore: rootStore.userStore,
 });
 export const PageStoreContext = createContext(null);

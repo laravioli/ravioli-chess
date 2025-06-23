@@ -35,14 +35,15 @@ export default defineConfig(({ mode }) => {
         'cross-origin-embedder-policy': 'credentialless',
       },
 
+      //change origin is to avoid cors
       proxy: {
         '/api': {
           target: env.BACKEND_URL,
-          changeOrigin: true,
+          changeOrigin: false,
         },
         '^/(\\w+)?$': {
           target: env.BACKEND_URL,
-          changeOrigin: true,
+          changeOrigin: false,
           secure: false,
           rewrite: (path) => path.replace(path, ''),
           configure: (proxy, _options) => {
