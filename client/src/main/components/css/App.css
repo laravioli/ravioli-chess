@@ -13,6 +13,11 @@ html {
   --board-scale: clamp(var(--board-min-width), 72vmin, var(--board-max-width));
 }
 
+input:-webkit-autofill {
+  background-color: rgb(250, 255, 189) !important;
+  background-image: none !important;
+}
+
 .main-wrap {
   display: grid;
   grid-template-areas: '. . main . .';

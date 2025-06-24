@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import { apiJSON } from 'src/lib/api/json';
 
 export class UserStore {
@@ -6,6 +6,7 @@ export class UserStore {
 
   constructor(rootStore) {
     this.rootStore = rootStore;
+    window.userstore = this;
   }
 
   @action
@@ -20,9 +21,10 @@ export class UserStore {
         username: credential.username,
         password: credential.password,
       });
-      return response;
+      this.setName(credential.username);
+      return { logged: true, message: response.data.success };
     } catch (err) {
-      if (err.status) return err;
+      if (err.data) return { logged: false, message: err.data.error };
       console.log(err);
     }
   }
@@ -30,23 +32,18 @@ export class UserStore {
   @action
   async register(credential) {
     try {
-      const response = await fetch('/api/register/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': Cookies.get('csrftoken'),
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify({
-          username: credential.username,
-          password: credential.password,
-          email: credential.email,
-        }),
+      await apiJSON.post('register', {
+        username: credential.username,
+        password: credential.password,
+        email: credential.email,
       });
 
-      const data = await response.json();
-      return { ok: response.ok, ...data };
+      return {
+        registered: true,
+        message: 'account created',
+      };
     } catch (err) {
+      if (err.data) return { registered: false, message: err.data };
       console.log(err);
     }
   }

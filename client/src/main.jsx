@@ -1,4 +1,5 @@
 import 'chessboard/styles.css';
+import '@mantine/notifications/styles.css';
 import 'src/main/components/css/App.css';
 import 'vite/modulepreload-polyfill';
 import { StrictMode } from 'react';

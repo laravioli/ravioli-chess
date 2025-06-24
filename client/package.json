@@ -13,6 +13,7 @@
     "@mantine/core": "^7.15.3",
     "@mantine/form": "^8.0.2",
     "@mantine/hooks": "^7.15.3",
+    "@mantine/notifications": "^8.1.1",
     "@tabler/icons-react": "^3.29.0",
     "chess.js": "^1.0.0-beta.8",
     "chessops": "^0.14.2",

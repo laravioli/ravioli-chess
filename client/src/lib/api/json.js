@@ -14,13 +14,8 @@ export const apiJSON = {
       });
 
       const data = await response.json();
-      if (!response.ok) {
-        const error = new Error('Post request Failed');
-        error.data = data;
-        error.status = response.status;
-        throw error;
-      }
-      return { status: response.status, ...data };
+      if (!response.ok) throw { status: response.status, data: data };
+      return { status: response.status, data: data };
     } catch (err) {
       throw err;
     }

@@ -33,7 +33,8 @@ class UserLogin(APIView):
                 {"success": "Successfully logged in"}, status=status.HTTP_200_OK
             )
         return Response(
-            {"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            {"error": "Invalid username or password"},
+            status=status.HTTP_401_UNAUTHORIZED,
         )
 
 

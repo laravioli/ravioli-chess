@@ -35,7 +35,7 @@ export function Header() {
         opened={openedDrawer}
         onClose={closeDrawer}
         title="Authentication">
-        <AuthenticationForm />
+        <AuthenticationForm close={closeDrawer} />
       </Drawer>
     </Box>
   );

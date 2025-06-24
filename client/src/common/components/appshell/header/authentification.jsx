@@ -6,22 +6,16 @@ import {
   Stack,
   TextInput,
 } from '@mantine/core';
+import { useState, useMemo } from 'react';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
 import { useStore } from 'src/main/hooks/hooks';
 
-export function AuthenticationForm() {
+export function AuthenticationForm({ close }) {
   const { userStore } = useStore();
+  const [loading, setLoading] = useState(false);
   const [type, toggle] = useToggle(['login', 'register']);
 
-  const onSubmit = async (values) => {
-    const handlers = new Map([
-      ['login', userStore.login.bind(userStore)],
-      ['register', userStore.register.bind(userStore)],
-    ]);
-    const message = await handlers.get(type)(values);
-    console.log(message);
-  };
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -31,6 +25,7 @@ export function AuthenticationForm() {
     },
 
     validate: {
+      username: (val) => null,
       email: (val) =>
         /^\S+@\S+$/.test(val) || type === 'login' ? null : 'Invalid email',
       password: (val) =>
@@ -39,6 +34,43 @@ export function AuthenticationForm() {
           : null,
     },
   });
+
+  const handlers = useMemo(
+    () =>
+      new Map([
+        ['login', userStore.login.bind(userStore)],
+        ['register', userStore.register.bind(userStore)],
+      ]),
+    []
+  );
+
+  const onSubmit = async (values) => {
+    setLoading(true);
+    try {
+      const response = await handlers.get(type)(values);
+      if (type === 'register') {
+        if (!response.registered)
+          form.setErrors({
+            username: response.message.username?.[0] ?? null,
+            email: response.message.email?.[0] ?? null,
+          });
+        else toggle();
+      }
+
+      if (type === 'login') {
+        if (!response.logged)
+          form.setErrors({
+            username: response.message,
+            password: response.message,
+          });
+        else close();
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
@@ -77,13 +109,16 @@ export function AuthenticationForm() {
           component="button"
           type="button"
           c="dimmed"
-          onClick={() => toggle()}
+          onClick={() => {
+            form.clearErrors();
+            toggle();
+          }}
           size="xs">
           {type === 'register'
             ? 'Already have an account? Login'
             : "Don't have an account? Register"}
         </Anchor>
-        <Button type="submit" radius="xl">
+        <Button type="submit" radius="xl" loading={loading}>
           {upperFirst(type)}
         </Button>
       </Group>
