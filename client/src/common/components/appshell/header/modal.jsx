@@ -67,24 +67,23 @@ const AiLevel = observer(() => {
     []
   );
 
-  if (lobbyStorage.anon === 'computer')
-    return (
-      <>
-        <Text size="sm">
-          ai level : <b>{lobbyStorage.aiLevel}</b>
-        </Text>
-        <Slider
-          pb="1.5rem"
-          value={(lobbyStorage.aiLevel - 1) * 14}
-          onChange={(event) => lobbyStorage.setAiLevel(event / 14 + 1)}
-          step={Math.round(100 / 7)}
-          label={null}
-          marks={marks}
-          classNames={{ mark: classes.mark }}
-        />
-      </>
-    );
-  return null;
+  return (
+    <>
+      <Text size="sm">
+        ai level : <b>{lobbyStorage.aiLevel}</b>
+      </Text>
+      <Slider
+        pb="1.5rem"
+        value={(lobbyStorage.aiLevel - 1) * 14}
+        onChange={(event) => lobbyStorage.setAiLevel(event / 14 + 1)}
+        step={Math.round(100 / 7)}
+        label={null}
+        marks={marks}
+        classNames={{ mark: classes.mark }}
+        disabled={lobbyStorage.anon !== 'computer'}
+      />
+    </>
+  );
 });
 
 const TimeMode = observer(() => {
@@ -117,38 +116,38 @@ const GameClock = observer(() => {
     return (y + 330) / 15;
   }, []);
 
-  if (lobbyStorage.timeMode === 'realTime')
-    return (
-      <>
-        <Text size="sm">
-          Minutes per sides : <b>{lobbyStorage.time}</b>
-        </Text>
-        <Slider
-          value={inverseScale(lobbyStorage.time)}
-          min={1}
-          max={34}
-          label={null}
-          onChange={(event) => {
-            lobbyStorage.setTime(scale(event));
-          }}
-          scale={scale}
-        />
-        <Text size="sm">
-          Increment in secondes : <b>{lobbyStorage.increment}</b>
-        </Text>
-        <Slider
-          value={inverseScale(lobbyStorage.increment)}
-          min={0}
-          max={34}
-          onChange={(event) => {
-            lobbyStorage.setIncrement(scale(event));
-          }}
-          label={null}
-          scale={scale}
-        />
-      </>
-    );
-  return null;
+  return (
+    <>
+      <Text size="sm">
+        Minutes per sides : <b>{lobbyStorage.time}</b>
+      </Text>
+      <Slider
+        value={inverseScale(lobbyStorage.time)}
+        min={1}
+        max={34}
+        label={null}
+        onChange={(event) => {
+          lobbyStorage.setTime(scale(event));
+        }}
+        scale={scale}
+        disabled={lobbyStorage.timeMode !== 'realTime'}
+      />
+      <Text size="sm">
+        Increment in secondes : <b>{lobbyStorage.increment}</b>
+      </Text>
+      <Slider
+        value={inverseScale(lobbyStorage.increment)}
+        min={0}
+        max={34}
+        onChange={(event) => {
+          lobbyStorage.setIncrement(scale(event));
+        }}
+        label={null}
+        scale={scale}
+        disabled={lobbyStorage.timeMode !== 'realTime'}
+      />
+    </>
+  );
 });
 
 const Side = observer(() => {

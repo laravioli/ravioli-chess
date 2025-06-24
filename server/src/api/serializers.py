@@ -7,7 +7,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True)
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="Email address invalid or already taken",
+            )
+        ]
     )
 
     def create(self, validated_data):

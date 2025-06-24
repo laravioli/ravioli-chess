@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx';
-import Cookies from 'js-cookie';
+import { apiJSON } from 'src/lib/api/json';
 
 export class UserStore {
   @observable accessor username = 'Anonymous';
@@ -16,7 +16,21 @@ export class UserStore {
   @action
   async login(credential) {
     try {
-      const response = await fetch('/api/login/', {
+      const response = await apiJSON.post('login', {
+        username: credential.username,
+        password: credential.password,
+      });
+      return response;
+    } catch (err) {
+      if (err.status) return err;
+      console.log(err);
+    }
+  }
+
+  @action
+  async register(credential) {
+    try {
+      const response = await fetch('/api/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,11 +40,12 @@ export class UserStore {
         body: JSON.stringify({
           username: credential.username,
           password: credential.password,
+          email: credential.email,
         }),
       });
 
-      const data = await response.data;
-      console.log(data);
+      const data = await response.json();
+      return { ok: response.ok, ...data };
     } catch (err) {
       console.log(err);
     }

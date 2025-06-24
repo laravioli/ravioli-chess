@@ -13,7 +13,17 @@ import { useStore } from 'src/main/hooks/hooks';
 export function AuthenticationForm() {
   const { userStore } = useStore();
   const [type, toggle] = useToggle(['login', 'register']);
+
+  const onSubmit = async (values) => {
+    const handlers = new Map([
+      ['login', userStore.login.bind(userStore)],
+      ['register', userStore.register.bind(userStore)],
+    ]);
+    const message = await handlers.get(type)(values);
+    console.log(message);
+  };
   const form = useForm({
+    mode: 'uncontrolled',
     initialValues: {
       username: '',
       password: '',
@@ -21,7 +31,8 @@ export function AuthenticationForm() {
     },
 
     validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
+      email: (val) =>
+        /^\S+@\S+$/.test(val) || type === 'login' ? null : 'Invalid email',
       password: (val) =>
         val.length <= 4
           ? 'Password should include at least 4 characters'
@@ -30,22 +41,15 @@ export function AuthenticationForm() {
   });
 
   return (
-    <form
-      onSubmit={form.onSubmit((values) => {
-        console.log(values);
-        userStore.login(values);
-      })}>
+    <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack>
         {type === 'register' && (
           <TextInput
             required
             label="Email"
             placeholder="ravioli@chess.com"
-            value={form.values.email}
-            onChange={(event) =>
-              form.setFieldValue('email', event.currentTarget.value)
-            }
-            error={form.errors.email && 'Invalid email'}
+            key={form.key('email')}
+            {...form.getInputProps('email')}
             radius="md"
           />
         )}
@@ -53,10 +57,8 @@ export function AuthenticationForm() {
         <TextInput
           label="Username"
           placeholder="Your username"
-          value={form.values.username}
-          onChange={(event) =>
-            form.setFieldValue('username', event.currentTarget.value)
-          }
+          key={form.key('username')}
+          {...form.getInputProps('username')}
           radius="md"
         />
 
@@ -64,14 +66,8 @@ export function AuthenticationForm() {
           required
           label="Password"
           placeholder="Your password"
-          value={form.values.password}
-          onChange={(event) =>
-            form.setFieldValue('password', event.currentTarget.value)
-          }
-          error={
-            form.errors.password &&
-            'Password should include at least 6 characters'
-          }
+          key={form.key('password')}
+          {...form.getInputProps('password')}
           radius="md"
         />
       </Stack>
