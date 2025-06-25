@@ -1,12 +1,16 @@
-import { Box, Button, Drawer, Group } from '@mantine/core';
+import { Box, Button, Drawer, Group, Text } from '@mantine/core';
 import { AuthenticationForm } from './authentification.jsx';
 import { PlayModal } from './modal.jsx';
 import { Link } from 'react-router';
 import { ToggleColorScheme } from './colorscheme.jsx';
+import { useStore } from 'src/main/hooks/hooks';
 import { useDisclosure } from '@mantine/hooks';
+import { observer } from 'mobx-react-lite';
+import { notifications } from '@mantine/notifications';
 import classes from './header.module.css';
 
-export function Header() {
+export const Header = observer(() => {
+  const { userStore } = useStore();
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   return (
@@ -24,7 +28,25 @@ export function Header() {
             </Link>
           </Group>
           <Group visibleFrom="sm">
-            <Button onClick={openDrawer}>Log in</Button>
+            {userStore.logged && <Text>{userStore.username}</Text>}
+            {!userStore.logged && <Button onClick={openDrawer}>Log in</Button>}
+            {userStore.logged && (
+              <Button
+                color="red"
+                onClick={async () => {
+                  const response = await userStore.logout();
+                  if (response?.data.success)
+                    notifications.show({
+                      id: 'logout',
+                      position: 'bottom-right',
+                      message: response.data.success,
+                      color: 'red',
+                      autoClose: 2000,
+                    });
+                }}>
+                Logout
+              </Button>
+            )}
             <ToggleColorScheme />
           </Group>
         </Group>
@@ -39,4 +61,4 @@ export function Header() {
       </Drawer>
     </Box>
   );
-}
+});

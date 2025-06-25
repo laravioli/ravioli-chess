@@ -3,6 +3,7 @@ import { apiJSON } from 'src/lib/api/json';
 
 export class UserStore {
   @observable accessor username = 'Anonymous';
+  @observable accessor logged = false;
 
   constructor(rootStore) {
     this.rootStore = rootStore;
@@ -21,10 +22,40 @@ export class UserStore {
         username: credential.username,
         password: credential.password,
       });
-      this.setName(credential.username);
+      runInAction(() => {
+        this.username = credential.username;
+        this.logged = true;
+      });
       return { logged: true, message: response.data.success };
     } catch (err) {
       if (err.data) return { logged: false, message: err.data.error };
+      console.log(err);
+    }
+  }
+
+  @action
+  async logout() {
+    try {
+      const response = await apiJSON.post('logout', {});
+      runInAction(() => {
+        this.username = 'Anonymous';
+        this.logged = false;
+      });
+      return response;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  @action
+  async getSession() {
+    try {
+      const response = await apiJSON.get('session');
+      runInAction(() => {
+        this.username = response.data.username;
+        this.logged = true;
+      });
+    } catch (err) {
       console.log(err);
     }
   }

@@ -6,6 +6,7 @@ import {
   Stack,
   TextInput,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useState, useMemo } from 'react';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
@@ -54,7 +55,16 @@ export function AuthenticationForm({ close }) {
             username: response.message.username?.[0] ?? null,
             email: response.message.email?.[0] ?? null,
           });
-        else toggle();
+        else {
+          toggle();
+          notifications.show({
+            id: 'register',
+            position: 'bottom-right',
+            message: "Welcome to Raviolichess — you're in!",
+            color: 'cyan.4',
+            autoClose: 4000,
+          });
+        }
       }
 
       if (type === 'login') {
@@ -63,7 +73,16 @@ export function AuthenticationForm({ close }) {
             username: response.message,
             password: response.message,
           });
-        else close();
+        else {
+          close();
+          notifications.show({
+            id: 'login',
+            position: 'bottom-right',
+            message: `Welcome back ${userStore.username}!`,
+            color: 'cyan.4',
+            autoClose: 2000,
+          });
+        }
       }
     } catch (err) {
       console.log(err);

@@ -9,14 +9,12 @@ from rest_framework import status
 from api.serializers import RegisterSerializer
 
 
-@method_decorator(csrf_protect, name="post")
 class UserRegister(generics.CreateAPIView):
 
     permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
 
-@method_decorator(csrf_protect, name="post")
 class UserLogin(APIView):
 
     permission_classes = [permissions.AllowAny]
@@ -38,15 +36,30 @@ class UserLogin(APIView):
         )
 
 
-def user_logout(request):
-    if request.method == "POST":
+class UserLogout(APIView):
+
+    def post(self, request):
         if not request.user.is_authenticated:
             return Response(
-                {"error": "You're not logged in."}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "You're not logged in."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         logout(request)
-        return Response({"success": "Successfully logged out."})
+        return Response(
+            {"success": "Successfully logged out."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class UserSession(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        return Response(
+            {"isAuthenticated": True, "username": request.user.username},
+            status=status.HTTP_200_OK,
+        )
 
 
 def whoami_view(request):
