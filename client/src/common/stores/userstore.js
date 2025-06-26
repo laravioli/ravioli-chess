@@ -4,10 +4,10 @@ import { apiJSON } from 'src/lib/api/json';
 export class UserStore {
   @observable accessor username = 'Anonymous';
   @observable accessor logged = false;
+  @observable accessor errorLog = undefined;
 
   constructor(rootStore) {
     this.rootStore = rootStore;
-    window.userstore = this;
   }
 
   @action
@@ -18,7 +18,7 @@ export class UserStore {
   @action
   async login(credential) {
     try {
-      const response = await apiJSON.post('login', {
+      await apiJSON.post('login', {
         username: credential.username,
         password: credential.password,
       });
@@ -26,10 +26,8 @@ export class UserStore {
         this.username = credential.username;
         this.logged = true;
       });
-      return { logged: true, message: response.data.success };
-    } catch (err) {
-      if (err.data) return { logged: false, message: err.data.error };
-      console.log(err);
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -41,9 +39,9 @@ export class UserStore {
         this.username = 'Anonymous';
         this.logged = false;
       });
-      return response;
-    } catch (err) {
-      console.log(err);
+      return response.data.detail;
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -55,9 +53,7 @@ export class UserStore {
         this.username = response.data.username;
         this.logged = true;
       });
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (error) {}
   }
 
   @action
@@ -68,14 +64,8 @@ export class UserStore {
         password: credential.password,
         email: credential.email,
       });
-
-      return {
-        registered: true,
-        message: 'account created',
-      };
-    } catch (err) {
-      if (err.data) return { registered: false, message: err.data };
-      console.log(err);
+    } catch (error) {
+      throw error;
     }
   }
 }

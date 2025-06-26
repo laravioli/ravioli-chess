@@ -48,44 +48,33 @@ export function AuthenticationForm({ close }) {
   const onSubmit = async (values) => {
     setLoading(true);
     try {
-      const response = await handlers.get(type)(values);
+      await handlers.get(type)(values);
       if (type === 'register') {
-        if (!response.registered)
-          form.setErrors({
-            username: response.message.username?.[0] ?? null,
-            email: response.message.email?.[0] ?? null,
-          });
-        else {
-          toggle();
-          notifications.show({
-            id: 'register',
-            position: 'bottom-right',
-            message: "Welcome to Raviolichess — you're in!",
-            color: 'cyan.4',
-            autoClose: 4000,
-          });
-        }
+        toggle();
+        notifications.show({
+          id: 'register',
+          position: 'bottom-right',
+          message: "Welcome to Raviolichess — you're in!",
+          color: 'cyan.4',
+          autoClose: 4000,
+        });
       }
+      if (type === 'login') close();
+    } catch (error) {
+      if (error.data) {
+        if (type == 'register')
+          form.setErrors({
+            username: error.data.username?.[0] ?? null,
+            email: error.data.email?.[0] ?? null,
+          });
 
-      if (type === 'login') {
-        if (!response.logged)
+        if (type === 'login') {
           form.setErrors({
-            username: response.message,
-            password: response.message,
-          });
-        else {
-          close();
-          notifications.show({
-            id: 'login',
-            position: 'bottom-right',
-            message: `Welcome back ${userStore.username}!`,
-            color: 'cyan.4',
-            autoClose: 2000,
+            username: error.data.detail,
+            password: error.data.detail,
           });
         }
       }
-    } catch (err) {
-      console.log(err);
     } finally {
       setLoading(false);
     }

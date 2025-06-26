@@ -34,15 +34,16 @@ export const Header = observer(() => {
               <Button
                 color="red"
                 onClick={async () => {
-                  const response = await userStore.logout();
-                  if (response?.data.success)
+                  try {
+                    const response = await userStore.logout();
                     notifications.show({
                       id: 'logout',
                       position: 'bottom-right',
-                      message: response.data.success,
+                      message: response,
                       color: 'red',
                       autoClose: 2000,
                     });
+                  } catch (error) {}
                 }}>
                 Logout
               </Button>

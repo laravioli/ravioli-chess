@@ -28,10 +28,10 @@ class UserLogin(APIView):
         if user is not None:
             login(request, user)
             return Response(
-                {"success": "Successfully logged in"}, status=status.HTTP_200_OK
+                {"detail": "Successfully logged in"}, status=status.HTTP_200_OK
             )
         return Response(
-            {"error": "Invalid username or password"},
+            {"detail": "Invalid username or password"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
@@ -41,13 +41,13 @@ class UserLogout(APIView):
     def post(self, request):
         if not request.user.is_authenticated:
             return Response(
-                {"error": "You're not logged in."},
+                {"detail": "You're not logged in."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         logout(request)
         return Response(
-            {"success": "Successfully logged out."},
+            {"detail": "Successfully logged out."},
             status=status.HTTP_200_OK,
         )
 

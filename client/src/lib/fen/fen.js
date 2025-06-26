@@ -1,5 +1,5 @@
 import { observable, computed, action } from 'mobx';
-import { getCastlingRights, isValidInput } from '../../common/stores/utils';
+import { getCastlingRights, isValidInput } from './utils';
 import { validateFen } from 'chess.js';
 
 export class Fen {

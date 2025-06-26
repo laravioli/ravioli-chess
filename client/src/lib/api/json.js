@@ -10,10 +10,11 @@ export const apiJSON = {
         credentials: 'same-origin',
       });
       const data = await response.json();
-      if (!response.ok) throw { status: response.status, data: data };
-      return { status: response.status, data: data };
-    } catch (err) {
-      throw err;
+      const message = { ok: response.ok, status: response.status, data: data };
+      if (response.ok) return message;
+      else throw message;
+    } catch (error) {
+      throw error;
     }
   },
 
@@ -28,12 +29,12 @@ export const apiJSON = {
         credentials: 'same-origin',
         body: JSON.stringify(body),
       });
-
       const data = await response.json();
-      if (!response.ok) throw { status: response.status, data: data };
-      return { status: response.status, data: data };
-    } catch (err) {
-      throw err;
+      const message = { ok: response.ok, status: response.status, data: data };
+      if (response.ok) return message;
+      else throw message;
+    } catch (error) {
+      throw error;
     }
   },
 };
