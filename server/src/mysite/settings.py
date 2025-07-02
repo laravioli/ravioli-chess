@@ -80,6 +80,9 @@ DATABASES = {
         "PASSWORD": env.str("DB_PASSWORD"),
         "HOST": env.str("DB_HOST"),
         "PORT": env.str("DB_PORT"),
+        "OPTIONS": {
+            "pool": True,
+        },
     }
 }
 
@@ -107,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
 
