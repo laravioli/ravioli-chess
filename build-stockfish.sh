@@ -22,3 +22,4 @@ mkdir -p $DEST
 mv "./stockfish-web/$VERSION.js" "./stockfish-web/$VERSION.wasm" $DEST
 
 rm -rf stockfish-web
+docker image rm emscripten/emsdk:4.0.7
