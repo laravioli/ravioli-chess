@@ -1,5 +1,5 @@
 """
-ASGI config for mysite project.
+ASGI config for raviolichess project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -12,7 +12,7 @@ import os
 from channels.routing import ProtocolTypeRouter
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "raviolichess.settings")
 # Initialize Django ASGI application early to ensure the AppRegistry
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()

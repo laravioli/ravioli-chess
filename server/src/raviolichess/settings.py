@@ -47,7 +47,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "mysite.urls"
+ROOT_URLCONF = "raviolichess.urls"
 
 TEMPLATES = [
     {
@@ -65,8 +65,16 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = "mysite.asgi.application"
-WSGI_APPLICATION = "mysite.wsgi.application"
+ASGI_APPLICATION = "raviolichess.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+WSGI_APPLICATION = "raviolichess.wsgi.application"
 
 
 # Database
