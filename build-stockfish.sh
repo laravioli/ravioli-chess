@@ -7,6 +7,7 @@ DEST="./client/src/lib/eval/stockfish"
 
 if [[ -f "$DEST/$VERSION.js" && -f "$DEST/$VERSION.wasm" ]]; then
   echo "Files $VERSION.js and $VERSION.wasm already exist in $DEST. Skipping build."
+  rm -rf stockfish-web
   exit 0
 fi
 
