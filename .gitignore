@@ -1,4 +1,5 @@
 /nginx
+/production
 compose.yaml
 *.prod*
 .dockerignore

@@ -79,11 +79,16 @@ WSGI_APPLICATION = "raviolichess.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+default_engine = env.str("DB_ENGINE", default="django.db.backends.sqlite3")
 DATABASES = {
     "default": {
-        "ENGINE": env.str("DB_ENGINE", default="django.db.backends.sqlite3"),
+        "ENGINE": default_engine,
         "NAME": env.str("DB_NAME", default=BASE_DIR / "db.sqlite3"),
+    }
+}
+
+if default_engine != "django.db.backends.sqlite3":
+    DATABASES["default"].update({
         "USER": env.str("DB_USER"),
         "PASSWORD": env.str("DB_PASSWORD"),
         "HOST": env.str("DB_HOST"),
@@ -91,8 +96,7 @@ DATABASES = {
         "OPTIONS": {
             "pool": True,
         },
-    }
-}
+    })
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
