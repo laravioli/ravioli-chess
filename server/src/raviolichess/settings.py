@@ -24,7 +24,6 @@ SESSION_COOKIE_HTTPONLY = True
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -65,7 +64,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = "raviolichess.asgi.application"
+ASGI_APPLICATION = "raviolichess.asgi.app"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
