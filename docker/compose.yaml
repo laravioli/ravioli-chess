@@ -37,6 +37,10 @@ services:
       interval: 4s
       timeout: 2s
       retries: 5
+  redis:
+    image: redis:7
+    expose:
+      - 6379
       
 volumes:
   postgres_data:

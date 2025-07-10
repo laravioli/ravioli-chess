@@ -4,13 +4,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 
-async def index(request):
-    return HttpResponse("h")
-
-
-def index(request):
-    return HttpResponse("hello")
-
+'''def index(request):
+    return HttpResponse("h")'''
 
 @ensure_csrf_cookie
 def index(request):

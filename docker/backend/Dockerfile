@@ -11,5 +11,5 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements.txt
 
-ENTRYPOINT ["python3"] 
-CMD ["manage.py", "runserver", "0.0.0.0:8000"]
+ENTRYPOINT ["uvicorn"] 
+CMD ["raviolichess.asgi:app", "--reload", "--host", "backend", "--port", "8000"]

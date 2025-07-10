@@ -1,5 +1,6 @@
 import os
 from environs import env
+from environs.exceptions import EnvError
 from pathlib import Path
 
 env.read_env()
@@ -64,20 +65,26 @@ TEMPLATES = [
     },
 ]
 
+# Web application
 ASGI_APPLICATION = "raviolichess.asgi.app"
+WSGI_APPLICATION = "raviolichess.wsgi.application"
+
+# Channels config
+try:
+    REDIS_HOST = ['unix://' + env.str("REDIS_SOCKET_PATH")]
+except EnvError:
+    REDIS_HOST = [(env.str('REDIS_HOST'), env.str('REDIS_PORT'))]
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": REDIS_HOST,
         },
     },
 }
-WSGI_APPLICATION = "raviolichess.wsgi.application"
-
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 default_engine = env.str("DB_ENGINE", default="django.db.backends.sqlite3")
 DATABASES = {
     "default": {
