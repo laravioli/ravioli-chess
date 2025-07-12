@@ -1,1 +1,0 @@
-finish compose (docker and production) , change host port on redis

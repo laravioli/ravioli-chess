@@ -43,6 +43,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "web.middleware.CookieMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -67,7 +68,7 @@ TEMPLATES = [
 
 # Web application
 ASGI_APPLICATION = "raviolichess.asgi.app"
-WSGI_APPLICATION = "raviolichess.wsgi.application"
+WSGI_APPLICATION = "raviolichess.wsgi.app"
 
 # Channels config
 try:

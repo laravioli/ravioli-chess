@@ -1,11 +1,6 @@
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import ChessOpeningPosition as c
 from django.shortcuts import render
-from django.http import HttpResponse
-
-
-'''def index(request):
-    return HttpResponse("h")'''
 
 @ensure_csrf_cookie
 def index(request):
