@@ -1,6 +1,6 @@
-import { makeAutoObservable } from 'mobx';
-import { makePersistable } from 'mobx-persist-store';
-import { getRecommendedThreads } from './engine';
+import { makeAutoObservable } from "mobx";
+import { makePersistable } from "mobx-persist-store";
+import { getRecommendedThreads } from "./engine";
 
 export class LocalEvalStorage {
   multipv = 1;
@@ -13,14 +13,14 @@ export class LocalEvalStorage {
   constructor() {
     makeAutoObservable(this);
     makePersistable(this, {
-      name: 'eval-storage',
+      name: "eval-storage",
       properties: [
-        'multipv',
-        'searchms',
-        'threads',
-        'hashsize',
-        'sri',
-        'disable',
+        "multipv",
+        "searchms",
+        "threads",
+        "hashsize",
+        "sri",
+        "disable",
       ],
       storage: window.localStorage,
     });

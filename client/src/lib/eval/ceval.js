@@ -1,14 +1,13 @@
-import { validateFen } from 'chess.js';
-import { makeEngine, maxThreads } from './engine';
-import { localStorage } from 'src/main/store';
-import { CevalState, toggle, throttle, clamp, povChances } from './util';
-import { observable, action, runInAction } from 'mobx';
-import { isHydrated } from 'mobx-persist-store';
+import { validateFen } from "chess.js";
+import { makeEngine, maxThreads } from "./engine";
+import { localStorage } from "src/main/store";
+import { CevalState, toggle, throttle, clamp, povChances } from "./util";
+import { observable, action, runInAction } from "mobx";
 
-const cevalDisabledSentinel = '1';
+const cevalDisabledSentinel = "1";
 
 const enabledAfterDisable = action(() => {
-  const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
+  const enabledAfter = window.sessionStorage.getItem("ceval.enabled-after");
   const disable = localStorage.evalStorage.disable || cevalDisabledSentinel;
   return enabledAfter == disable;
 });
@@ -44,7 +43,7 @@ export class Ceval {
   }
 
   onEmit = throttle(200, (ev, work) => {
-    this.sortPvsInPlace(ev.pvs, work.ply % 2 ? 'white' : 'black');
+    this.sortPvsInPlace(ev.pvs, work.ply % 2 ? "white" : "black");
     this.opts.emit(ev);
   });
 
@@ -58,12 +57,12 @@ export class Ceval {
     });
 
     window.sessionStorage.setItem(
-      'ceval.enabled-after',
+      "ceval.enabled-after",
       this.evalStorage.disable
     );
 
     if (
-      'movetime' in this.search.by &&
+      "movetime" in this.search.by &&
       (step.ceval?.millis ?? 0) >= this.search.by.movetime
     ) {
       this.lastStarted = { steps, gameId };
@@ -165,10 +164,10 @@ export class Ceval {
     if (!this.enabled && !document.hidden) {
       const disable = this.evalStorage.disable || cevalDisabledSentinel;
       if (disable)
-        window.sessionStorage.setItem('ceval.enabled-after', disable);
+        window.sessionStorage.setItem("ceval.enabled-after", disable);
       this.enabled = true;
     } else {
-      window.sessionStorage.setItem('ceval.enabled-after', '');
+      window.sessionStorage.setItem("ceval.enabled-after", "");
       this.enabled = false;
     }
   }
