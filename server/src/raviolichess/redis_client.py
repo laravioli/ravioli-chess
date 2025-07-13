@@ -1,7 +1,7 @@
-from environs import env
-from environs.exceptions import EnvError
 import redis
 import redis.asyncio as aioredis
+from environs import env
+from environs.exceptions import EnvError
 
 try:
     socket_path = env.str('REDIS_SOCKET_PATH')

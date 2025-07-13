@@ -13,6 +13,7 @@ DEBUG = env.bool("DEBUG", default=False)
 
 # Security
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+SSL = env.bool('SSL', default = False)
 CSRF_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_SAMESITE = "Strict"
 CSRF_COOKIE_HTTPONLY = False

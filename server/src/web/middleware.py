@@ -1,5 +1,6 @@
 import uuid
 import datetime
+from raviolichess import settings
 
 class CookieMiddleware:
     def __init__(self, get_response):
@@ -23,6 +24,10 @@ class CookieMiddleware:
         if delete_cookie:
             response.delete_cookie('anon')
         elif set_cookie:
-            response.set_cookie('anon', str(uuid.uuid4()),max_age = datetime.timedelta(days=365), httponly = True, samesite = 'Lax')
-    
+            response.set_cookie('anon', 
+                                str(uuid.uuid4()),
+                                max_age = datetime.timedelta(days=365),
+                                secure = settings.SSL, 
+                                httponly = True, 
+                                samesite = 'Lax')
         return response
