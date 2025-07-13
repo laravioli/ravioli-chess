@@ -34,8 +34,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_vite",
     "rest_framework",
-    "web",
     "api",
+    "web",
+    "websocket",
 ]
 
 MIDDLEWARE = [
