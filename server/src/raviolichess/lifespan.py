@@ -1,4 +1,6 @@
 from .redis_client import async_redis_client
+import asyncio
+import functools
 
 async def lifespan_app(scope, receive, send):
     while True:
@@ -9,3 +11,8 @@ async def lifespan_app(scope, receive, send):
             await async_redis_client.aclose()
             await send({'type': 'lifespan.shutdown.complete'})
             return
+        
+
+
+
+

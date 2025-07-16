@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
       },
 
       proxy: {
-        "/taxi": {
+        "/ws": {
           target: wsTarget,
           changeOrigin: false,
           ws: true,

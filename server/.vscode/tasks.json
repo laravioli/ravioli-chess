@@ -11,18 +11,9 @@
       }
     },
     {
-      "label": "Server collectstatic",
-      "type": "shell",
-      "command": "python3",
-      "args": ["manage.py", "collectstatic", "--noinput"],
-      "options": {
-        "cwd": "${workspaceFolder}/src"
-      }
-    },
-    {
       "label": "Build",
       "dependsOrder": "sequence",
-      "dependsOn": ["Client Build", "Server collectstatic"],
+      "dependsOn": ["Client Build"],
       "group": {
         "kind": "build",
         "isDefault": true

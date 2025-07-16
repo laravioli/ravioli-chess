@@ -20,7 +20,6 @@ class UserLogin(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        print(request)
         username = request.data["username"]
         password = request.data["password"]
         user = authenticate(username=username, password=password)
@@ -37,14 +36,9 @@ class UserLogin(APIView):
 
 
 class UserLogout(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        if not request.user.is_authenticated:
-            return Response(
-                {"detail": "You're not logged in."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         logout(request)
         return Response(
             {"detail": "Successfully logged out."},
@@ -52,6 +46,7 @@ class UserLogout(APIView):
         )
 
 
+#todo : remove this and do json script payload
 class UserSession(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
