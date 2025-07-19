@@ -1,6 +1,6 @@
 import { validateFen } from "chess.js";
 import { makeEngine, maxThreads } from "./engine";
-import { localStorage } from "src/main/store";
+import { localStorage } from "src/main/store/localstorage.js";
 import { CevalState, toggle, throttle, clamp, povChances } from "./util";
 import { observable, action, runInAction } from "mobx";
 

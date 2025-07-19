@@ -7,8 +7,7 @@ export class UserStore {
   @observable accessor logged = false;
   @observable accessor errorLog = undefined;
 
-  constructor(rootStore) {
-    this.rootStore = rootStore;
+  constructor() {
     this._syncTab = new BroadcastChannel("syncTab");
     this._syncTab.onmessage = (event) => {
       const { type, ...data } = event.data;

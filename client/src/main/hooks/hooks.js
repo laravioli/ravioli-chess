@@ -1,12 +1,18 @@
-import { useContext } from 'react';
+import { useContext } from "react";
 import {
   DataContext,
   LocalStorageContext,
-  StoreContext,
+  GlobalStoreContext,
   PageStoreContext,
-} from '../context/context';
+} from "../context/context";
 
-export const useInitData = () => useContext(DataContext);
+/* Hooks to retrieve stores*/
 export const useLocalStorage = () => useContext(LocalStorageContext);
-export const useStore = () => useContext(StoreContext);
+export const useStore = () => useContext(GlobalStoreContext);
 export const usePageStore = () => useContext(PageStoreContext);
+
+/* Hook to retrieve ui data from the inital html*/
+export const useHTMLData = () => {
+  const { data } = useContext(DataContext);
+  return data;
+};

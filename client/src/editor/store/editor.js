@@ -1,7 +1,7 @@
-import { Board } from 'src/lib/board/board';
-import { Fen } from 'src/lib/fen/fen';
-import { action, runInAction } from 'mobx';
-import { pieceTheme } from 'src/lib/board/utils';
+import { Board } from "src/lib/board/board";
+import { Fen } from "src/lib/fen/fen";
+import { action, runInAction } from "mobx";
+import { pieceTheme } from "src/lib/board/utils";
 
 export class EditorStore {
   board = new Board();
@@ -22,11 +22,11 @@ export class EditorStore {
 
   makeBoardCfg = () => {
     return {
-      pieceTheme: pieceTheme('bases'),
+      pieceTheme: pieceTheme("bases"),
       position: this.fen.current,
       orientation: this.rootStore.uiStore.orientation,
       draggable: true,
-      dropOffBoard: 'trash',
+      dropOffBoard: "trash",
       sparePieces: true,
       hideSparePieces: false,
       onDrop: action((s, t, p, newPos) => {

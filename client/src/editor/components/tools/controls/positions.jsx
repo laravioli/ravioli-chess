@@ -1,24 +1,24 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useInitData, usePageStore } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
-import { autorun } from 'mobx';
-import { NativeSelect } from '@mantine/core';
-import { short_fen } from './utils';
-import classes from './controls.module.css';
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useHTMLData, usePageStore } from "src/main/hooks/hooks";
+import { observer } from "mobx-react-lite";
+import { autorun } from "mobx";
+import { NativeSelect } from "@mantine/core";
+import { short_fen } from "./utils";
+import classes from "./controls.module.css";
 
 export const Positions = observer(() => {
   const editorStore = usePageStore();
-  const position = useInitData();
+  const { positions } = useHTMLData();
 
   const data = useMemo(
     () => [
-      { label: 'select position', value: '' },
-      ...position.map((obj) => ({
-        label: [obj.eco, obj.name].join(' '),
+      { label: "select position", value: "" },
+      ...positions.map((obj) => ({
+        label: [obj.eco, obj.name].join(" "),
         value: obj.fen,
       })),
     ],
-    [position]
+    [positions]
   );
   const fens = useMemo(() => data.map((obj) => short_fen(obj.value)), [data]);
 

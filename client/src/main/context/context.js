@@ -1,14 +1,10 @@
-import { createContext } from 'react';
-import { localStorage } from '../store/localstorage';
-import { rootStore } from '../store/rootstore';
+import { createContext } from "react";
+import { localStorage } from "../store/localstorage";
 
-export const DataContext = createContext(null);
+export const GlobalStoreContext = createContext(null);
+export const PageStoreContext = createContext(null);
 export const LocalStorageContext = createContext({
   evalStorage: localStorage.evalStorage,
   lobbyStorage: localStorage.lobbyStorage,
 });
-export const StoreContext = createContext({
-  uiStore: rootStore.uiStore,
-  userStore: rootStore.userStore,
-});
-export const PageStoreContext = createContext(null);
+export const DataContext = createContext(null);

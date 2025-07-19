@@ -32,7 +32,7 @@ class TaxiConsumer(AsyncWebsocketConsumer):
 
         try:
             while True:
-                print(user)
+                #print(user)
                 await asyncio.sleep(2)
         except asyncio.CancelledError:
             pass

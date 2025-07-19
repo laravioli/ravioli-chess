@@ -1,10 +1,10 @@
-import { Board } from 'src/lib/board/board';
-import { Game } from 'src/lib/game/game';
-import { Fen } from 'src/lib/fen/fen';
-import { engineSupported } from 'src/lib/eval/engine';
-import { throttle, isEvalBetter } from 'src/lib/eval/util';
-import { observable, action, runInAction } from 'mobx';
-import { pieceTheme } from 'src/lib/board/utils';
+import { Board } from "src/lib/board/board";
+import { Game } from "src/lib/game/game";
+import { Fen } from "src/lib/fen/fen";
+import { engineSupported } from "src/lib/eval/engine";
+import { throttle, isEvalBetter } from "src/lib/eval/util";
+import { observable, action, runInAction } from "mobx";
+import { pieceTheme } from "src/lib/board/utils";
 
 export class AnalyseStore {
   board = new Board();
@@ -27,11 +27,13 @@ export class AnalyseStore {
 
   @action
   onLoad() {
+    /* code run AFTER the page is mounted */
     this.startCeval();
   }
 
   @action
   onUnLoad() {
+    /* run AFTER the page is unmounted */
     this.ceval.stop();
   }
 
@@ -120,24 +122,24 @@ export class AnalyseStore {
       }, 1000);
     });
     this.game.move(best);
-    this.jump('move');
+    this.jump("move");
   }
 
   /* board */
 
   makeBoardCfg = () => ({
-    pieceTheme: pieceTheme('bases'),
+    pieceTheme: pieceTheme("bases"),
     position: this.fen.current,
     orientation: this.rootStore.uiStore.orientation,
     draggable: true,
-    dropOffBoard: 'snapback',
+    dropOffBoard: "snapback",
     sparePieces: true,
     hideSparePieces: true,
     onDragStart: (source, piece) => {
       if (this.game?.isGameOver()) return false;
       if (
-        (this.game?.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (this.game?.turn() === 'b' && piece.search(/^w/) !== -1)
+        (this.game?.turn() === "w" && piece.search(/^b/) !== -1) ||
+        (this.game?.turn() === "b" && piece.search(/^w/) !== -1)
       ) {
         return false;
       }
@@ -147,15 +149,15 @@ export class AnalyseStore {
         this.game.move({
           from: source,
           to: target,
-          promotion: 'q',
+          promotion: "q",
         });
         // eslint-disable-next-line no-unused-vars
       } catch (error) {
-        return 'snapback';
+        return "snapback";
       }
     },
     onSnapEnd: () => {
-      this.jump('move');
+      this.jump("move");
     },
   });
 }

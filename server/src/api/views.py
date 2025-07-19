@@ -44,21 +44,3 @@ class UserLogout(APIView):
             {"detail": "Successfully logged out."},
             status=status.HTTP_200_OK,
         )
-
-
-#todo : remove this and do json script payload
-class UserSession(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        return Response(
-            {"isAuthenticated": True, "username": request.user.username},
-            status=status.HTTP_200_OK,
-        )
-
-
-def whoami_view(request):
-    if not request.user.is_authenticated:
-        return Response({"isAuthenticated": False})
-
-    return Response({"username": request.user.username})

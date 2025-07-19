@@ -1,20 +1,20 @@
-import { useInitData, usePageStore } from 'src/main/hooks/hooks';
-import { Combobox, useCombobox } from '@mantine/core';
-import { ActionIcon, Tooltip } from '@mantine/core';
-import { IconChessRook } from '@tabler/icons-react';
-import { useMemo } from 'react';
-import { action } from 'mobx';
-import { observer } from 'mobx-react-lite';
+import { useHTMLData, usePageStore } from "src/main/hooks/hooks";
+import { Combobox, useCombobox } from "@mantine/core";
+import { ActionIcon, Tooltip } from "@mantine/core";
+import { IconChessRook } from "@tabler/icons-react";
+import { useMemo } from "react";
+import { action } from "mobx";
+import { observer } from "mobx-react-lite";
 
 export const Positions = observer(() => {
   const analyseStore = usePageStore();
-  const positions = useInitData();
+  const { positions } = useHTMLData();
 
   const options = useMemo(
     () =>
       positions.map((item) => (
         <Combobox.Option value={item.fen} key={item.fen}>
-          {[item.eco, item.name].join(' ')}
+          {[item.eco, item.name].join(" ")}
         </Combobox.Option>
       )),
     [positions]
@@ -38,7 +38,8 @@ export const Positions = observer(() => {
             analyseStore.fen.set(fen);
           }
           combobox.closeDropdown();
-        })}>
+        })}
+      >
         <Combobox.Target>
           <Tooltip label="select position" position="bottom">
             <ActionIcon
@@ -47,7 +48,8 @@ export const Positions = observer(() => {
               onClick={() => combobox.toggleDropdown()}
               styles={{
                 root: { border: 0 },
-              }}>
+              }}
+            >
               <IconChessRook size={40} stroke={1.2}></IconChessRook>
             </ActionIcon>
           </Tooltip>
