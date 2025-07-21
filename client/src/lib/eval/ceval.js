@@ -1,5 +1,5 @@
 import { validateFen } from "chess.js";
-import { makeEngine, maxThreads } from "./engine";
+import { makeEngine, maxThreads, engineSupported } from "./engine";
 import { localStorage } from "src/main/store/localstorage.js";
 import { CevalState, toggle, throttle, clamp, povChances } from "./util";
 import { observable, action, runInAction } from "mobx";
@@ -12,14 +12,13 @@ const enabledAfterDisable = action(() => {
   return enabledAfter == disable;
 });
 
-//possible : does browser support engine
-//allowed : does engine is allowed to run
-//active : does engine is instanciate (worker)
-//enabled : does the button enabled is on or off (mainly to handle tabs)
-
 export class Ceval {
+  /* possible -> does browser support engine
+     allowed  -> does engine is allowed to run
+     active   -> does engine is instanciate (worker)
+     enabled  -> does the button enabled is on or off (mainly to handle tabs) */
+
   @observable accessor enabled;
-  allowed = toggle(true);
   lastStarted = false;
   evalStorage = localStorage.evalStorage;
 
@@ -33,7 +32,8 @@ export class Ceval {
 
   init(opts) {
     this.opts = opts;
-    this.possible = this.opts.possible;
+    this.possible = engineSupported();
+    this.allowed = toggle(this.opts.allowed);
     this.analysable = validateFen(this.opts.initialFen).ok;
     this.enabled =
       this.possible &&

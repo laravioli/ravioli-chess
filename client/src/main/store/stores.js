@@ -4,7 +4,6 @@ import { UserStore } from "src/common/stores/userstore";
 import { AnalyseStore } from "src/analyse/store/analyse";
 import { EditorStore } from "src/editor/store/editor";
 import { PlayStore } from "src/play/store/play";
-import { DEFAULT_POSITION } from "chess.js";
 
 /* Global Store */
 
@@ -12,10 +11,7 @@ export function makeGlobalStore(cfg) {
   return {
     uiStore: new UiStore(),
     userStore: new UserStore(),
-    cevalStore: new Ceval({
-      possible: true,
-      initialFen: DEFAULT_POSITION,
-    }),
+    cevalStore: new Ceval(cfg.ceval),
   };
 }
 

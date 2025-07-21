@@ -1,5 +1,5 @@
-import { Chess } from 'chess.js';
-import { observable, computed, action, makeAutoObservable } from 'mobx';
+import { Chess } from "chess.js";
+import { observable, computed, action, makeAutoObservable } from "mobx";
 
 export class Game {
   @observable accessor currentMove;
@@ -7,7 +7,7 @@ export class Game {
   constructor(fen) {
     this._chess = new Chess(fen);
     Object.getOwnPropertyNames(Chess.prototype).forEach((key) => {
-      if (key !== 'constructor' && typeof Chess.prototype[key] === 'function') {
+      if (key !== "constructor" && typeof Chess.prototype[key] === "function") {
         if (!this[key]) {
           this[key] = (...args) => this._chess[key](...args);
         }
@@ -29,7 +29,7 @@ export class Game {
 
   setRoot(fen) {
     const ply =
-      (this._chess.turn() == 'w' ? 0 : 1) + (this._chess.moveNumber() - 1) * 2;
+      (this._chess.turn() == "w" ? 0 : 1) + (this._chess.moveNumber() - 1) * 2;
     this.root = new Move({
       parent: null,
       ply,
@@ -50,19 +50,19 @@ export class Game {
   @action
   jump(action) {
     switch (action) {
-      case 'move':
+      case "move":
         this.addMove();
         break;
-      case 'undo':
+      case "undo":
         this.undo();
         break;
-      case 'redo':
+      case "redo":
         this.redo();
         break;
-      case 'start':
+      case "start":
         this.start();
         break;
-      case 'end':
+      case "end":
         this.end();
         break;
     }
@@ -146,6 +146,7 @@ class Move {
     makeAutoObservable(this, {
       parent: false,
       ceval: false,
+      children: false,
     });
   }
 }

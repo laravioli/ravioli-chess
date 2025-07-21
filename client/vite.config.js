@@ -48,11 +48,10 @@ export default defineConfig(({ mode }) => {
           target: httpTarget,
           changeOrigin: false,
         },
-        "^/(\\w+)?$": {
+        "^/(\\w+)?(/\\w+)?$": {
           target: httpTarget,
           changeOrigin: false,
           secure: false,
-          rewrite: (path) => path.replace(path, ""),
           configure: (proxy, _options) => {
             proxy.on("proxyRes", (proxyRes, req, _res) => {
               _res.setHeader("cross-origin-embedder-Policy", "credentialless");

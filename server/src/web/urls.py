@@ -7,5 +7,5 @@ from . import views
 app_name = "web"
 urlpatterns = [
     path("", views.index, name="index"),
-    re_path(r"^(?:[-\w]+)$", views.index, name="generic_page"),
+    re_path(r"^(?P<page>[-\w]+)(?P<slug>/[-\w]+)?$", views.index, name="generic_page"),
 ]

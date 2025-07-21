@@ -1,7 +1,6 @@
 import { Board } from "src/lib/board/board";
 import { Game } from "src/lib/game/game";
 import { Fen } from "src/lib/fen/fen";
-import { engineSupported } from "src/lib/eval/engine";
 import { throttle, isEvalBetter } from "src/lib/eval/util";
 import { observable, action, runInAction } from "mobx";
 import { pieceTheme } from "src/lib/board/utils";
@@ -65,7 +64,6 @@ export class AnalyseStore {
   initCeval(fen) {
     const opts = {
       initialFen: fen,
-      possible: engineSupported(),
       emit: (ev) => {
         this.onNewCeval(ev);
       },
