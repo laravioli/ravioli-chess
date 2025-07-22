@@ -5,19 +5,22 @@ import { siteSocket } from "src/lib/socket/socket";
 export class UserStore {
   @observable accessor username = "Anonymous";
   @observable accessor logged = false;
-  @observable accessor errorLog = undefined;
 
   constructor() {
+    this.syncTab();
+  }
+
+  syncTab() {
     this._syncTab = new BroadcastChannel("syncTab");
     this._syncTab.onmessage = (event) => {
-      const { type, ...data } = event.data;
-      if (type === "login") {
+      const data = event.data;
+      if (data.type === "login") {
         runInAction(() => {
           this.logged = true;
           this.username = data.username;
         });
       }
-      if (type == "logout") {
+      if (data.type == "logout") {
         runInAction(() => {
           this.logged = false;
           this.username = "Anonymous";
@@ -77,17 +80,6 @@ export class UserStore {
     } catch (error) {
       throw error;
     }
-  }
-
-  @action
-  async getSession() {
-    try {
-      const response = await apiJSON.get("session");
-      runInAction(() => {
-        this.username = response.data.username;
-        this.logged = true;
-      });
-    } catch (error) {}
   }
 
   @action

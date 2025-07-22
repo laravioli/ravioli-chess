@@ -7,12 +7,16 @@ import { PlayStore } from "src/play/store/play";
 
 /* Global Store */
 
+let globalStore = null;
+
 export function makeGlobalStore(cfg) {
-  return {
-    uiStore: new UiStore(),
-    userStore: new UserStore(),
-    cevalStore: new Ceval(cfg.ceval),
-  };
+  if (!globalStore)
+    globalStore = {
+      uiStore: new UiStore(),
+      userStore: new UserStore(),
+      cevalStore: new Ceval(cfg.ceval),
+    };
+  return globalStore;
 }
 
 /* Page Store */
