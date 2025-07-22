@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'channels',
     "rest_framework",
     "api",
+    "game",
+    "lobby",
     "web",
     "websocket",
 ]
