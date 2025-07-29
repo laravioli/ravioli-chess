@@ -11,8 +11,8 @@ export class UserStore {
   }
 
   syncTab() {
-    this._syncTab = new BroadcastChannel("syncTab");
-    this._syncTab.onmessage = (event) => {
+    this.channel = new BroadcastChannel("syncTab");
+    this.channel.onmessage = (event) => {
       const data = event.data;
       if (data.type === "login") {
         runInAction(() => {

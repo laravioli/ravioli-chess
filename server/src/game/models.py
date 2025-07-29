@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Game(models.Model):
 
     class Status(models.TextChoices):
+        CREATED = "CREATED"
         CANCELLED = "CANCELED"
         COMPLETED = "COMPLETED"
         PENDING = "PENDING"
@@ -22,5 +23,9 @@ class Game(models.Model):
     data = models.JSONField(blank=True, null=True)
     pub_date = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.game_id
+
     class Meta:
         get_latest_by = "pub_date"
+        ordering = ["pub_date"]
