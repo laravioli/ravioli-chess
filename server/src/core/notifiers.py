@@ -1,11 +1,12 @@
-import redis
+class Notifier:
+    """Background notifier for process communication"""
 
+    from raviolichess.layers import async_layer
 
-class AsyncProcessNotifier:
-    """Class used has a background task, wich listen from external events and execute handlers"""
+    __layer__ = async_layer
 
-    def __init__(self, *, layer: redis.Redis, channels: dict):
-        self._pubsub = layer.pubsub()
+    def __init__(self, *, channels: dict):
+        self._pubsub = Notifier.__layer__.pubsub()
         self._channels = channels
 
     async def run(self):
