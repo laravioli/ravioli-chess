@@ -1,7 +1,7 @@
 import redis
 import random
 import string
-from raviolichess.redis_client import sync_redis_client as r
+from raviolichess.layers import sync_redis_client as r
 from .models import Game
 
 ID_CHARS = string.ascii_letters + string.digits

@@ -13,7 +13,7 @@ DEBUG = env.bool("DEBUG", default=False)
 
 # Security
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
-SSL = env.bool('SSL', default = False)
+SSL = env.bool("SSL", default=False)
 CSRF_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_SAMESITE = "Strict"
 CSRF_COOKIE_HTTPONLY = False
@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_vite",
-    'channels',
+    "channels",
     "rest_framework",
     "api",
     "game",
@@ -77,9 +77,9 @@ WSGI_APPLICATION = "raviolichess.wsgi.app"
 
 # Channels config
 try:
-    REDIS_HOST = ['unix://' + env.str("REDIS_SOCKET_PATH")]
+    REDIS_HOST = ["unix://" + env.str("REDIS_SOCKET_PATH")]
 except EnvError:
-    REDIS_HOST = [(env.str('REDIS_HOST'), env.str('REDIS_PORT'))]
+    REDIS_HOST = [(env.str("REDIS_HOST"), env.str("REDIS_PORT"))]
 
 CHANNEL_LAYERS = {
     "default": {
@@ -100,15 +100,17 @@ DATABASES = {
 }
 
 if default_engine != "django.db.backends.sqlite3":
-    DATABASES["default"].update({
-        "USER": env.str("DB_USER"),
-        "PASSWORD": env.str("DB_PASSWORD"),
-        "HOST": env.str("DB_HOST"),
-        "PORT": env.str("DB_PORT"),
-        "OPTIONS": {
-            "pool": True,
-        },
-    })
+    DATABASES["default"].update(
+        {
+            "USER": env.str("DB_USER"),
+            "PASSWORD": env.str("DB_PASSWORD"),
+            "HOST": env.str("DB_HOST"),
+            "PORT": env.str("DB_PORT"),
+            "OPTIONS": {
+                "pool": True,
+            },
+        }
+    )
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -192,3 +194,6 @@ else:
             "rest_framework.renderers.JSONRenderer",
         ],
     }
+
+if DEBUG:
+    DATA_UPLOAD_MAX_NUMBER_FIELDS = None
