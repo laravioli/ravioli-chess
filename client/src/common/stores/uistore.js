@@ -7,8 +7,7 @@ export class UiStore {
 
   @action
   toggleOrientation(board) {
-    board.flip();
+    board.toggleOrientation();
     this.orientation = this.orientation === "white" ? "black" : "white";
-    document.querySelector(".board").dataset.side = this.orientation;
   }
 }

@@ -1,11 +1,9 @@
-import imgUrl from '/images/pieces/bases/bB.png';
-
-export const objectMap = (obj, fn) =>
-  Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]));
+import imgUrl from "/images/pieces/bases/bB.png";
+import { SQUARES } from "chess.js";
 
 export const pieceTheme = function (theme) {
-  const base = imgUrl.split('base')[0] + `${theme}/`;
+  const base = imgUrl.split("base")[0] + `${theme}/`;
   return function (piece) {
-    return base + piece + '.png';
+    return base + piece + ".png";
   };
 };

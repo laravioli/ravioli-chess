@@ -1,4 +1,4 @@
-import { Chess } from "chess.js";
+import { Chess, SQUARES } from "chess.js";
 import { observable, computed, action, makeAutoObservable } from "mobx";
 
 export class Game {
@@ -27,6 +27,19 @@ export class Game {
     return moves.reverse();
   }
 
+  toDests() {
+    const dests = new Map();
+    SQUARES.forEach((s) => {
+      const ms = this._chess.moves({ square: s, verbose: true });
+      if (ms.length)
+        dests.set(
+          s,
+          ms.map((m) => m.to)
+        );
+    });
+    return dests;
+  }
+
   setRoot(fen) {
     const ply =
       (this._chess.turn() == "w" ? 0 : 1) + (this._chess.moveNumber() - 1) * 2;
@@ -36,6 +49,7 @@ export class Game {
       fen,
       san: null,
       uci: null,
+      dests: this.toDests(),
       outcome: this._chess.isGameOver(),
     });
     this.currentMove = this.root;
@@ -80,6 +94,7 @@ export class Game {
         fen: this._chess.fen(),
         san: info.san,
         uci: info.lan,
+        dests: this.toDests(),
         outcome: this._chess.isGameOver(),
         children: [],
       });
@@ -133,13 +148,14 @@ class Move {
   outcome;
   children = [];
 
-  constructor({ parent, ply, fen, san, uci, outcome }) {
+  constructor({ parent, ply, fen, san, uci, outcome, dests }) {
     this.parent = parent;
     this.ceval = null;
     this.ply = ply;
     this.fen = fen;
     this.san = san;
     this.uci = uci;
+    this.dests = dests;
     this.outcome = outcome;
     this.children = [];
 

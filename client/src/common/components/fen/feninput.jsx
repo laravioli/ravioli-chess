@@ -1,10 +1,10 @@
-import { useRef, useEffect } from 'react';
-import { usePageStore } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
-import { autorun } from 'mobx';
-import { TextInput } from '@mantine/core';
-import classes from './fen.module.css';
-import { action } from 'mobx';
+import { useRef, useEffect } from "react";
+import { usePageStore } from "src/main/hooks/hooks";
+import { observer } from "mobx-react-lite";
+import { autorun } from "mobx";
+import { TextInput } from "@mantine/core";
+import classes from "./fen.module.css";
+import { action } from "mobx";
 
 export const FenInput = observer(() => {
   const pageStore = usePageStore();
@@ -22,10 +22,10 @@ export const FenInput = observer(() => {
   }, []);
 
   const onKeyDown = action((event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       const fen = inputRef.current.value;
       pageStore.fen.setFromInput(fen);
-      pageStore.board.position(pageStore.fen.current, true);
+      pageStore.updateBoard(pageStore.fen.current);
     }
   });
 

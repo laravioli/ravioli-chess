@@ -1,12 +1,11 @@
-import { Board } from "src/lib/board/board";
+import { Chessground } from "@lichess-org/chessground";
 import { Game } from "src/lib/game/game";
 import { Fen } from "src/lib/fen/fen";
 import { throttle, isEvalBetter } from "src/lib/eval/util";
 import { observable, action, runInAction } from "mobx";
-import { pieceTheme } from "src/lib/board/utils";
 
 export class AnalyseStore {
-  board = new Board();
+  board = undefined;
   game = undefined;
   fen = undefined;
   ceval = undefined;
@@ -14,8 +13,8 @@ export class AnalyseStore {
 
   constructor(rootStore, { fen }) {
     runInAction(() => {
-      this.rootStore = rootStore;
-      this.ceval = this.rootStore.cevalStore;
+      this.ui = rootStore.uiStore;
+      this.ceval = rootStore.cevalStore;
       this.game = new Game(fen);
       this.fen = new Fen(fen);
       this.initCeval(fen);
@@ -55,8 +54,8 @@ export class AnalyseStore {
     if (!this.ceval.enabled || move.ceval || move.outcome)
       this.evaluation = move.ceval;
     this.restartCeval();
-    this.board.position(move.fen, true);
     this.fen.set(move.fen);
+    this.updateBoard();
   }
 
   /* ceval */
@@ -125,37 +124,53 @@ export class AnalyseStore {
 
   /* board */
 
-  makeBoardCfg = () => ({
-    pieceTheme: pieceTheme("bases"),
-    position: this.fen.current,
-    orientation: this.rootStore.uiStore.orientation,
-    draggable: true,
-    dropOffBoard: "snapback",
-    sparePieces: true,
-    hideSparePieces: true,
-    onDragStart: (source, piece) => {
-      if (this.game?.isGameOver()) return false;
-      if (
-        (this.game?.turn() === "w" && piece.search(/^b/) !== -1) ||
-        (this.game?.turn() === "b" && piece.search(/^w/) !== -1)
-      ) {
-        return false;
-      }
-    },
-    onDrop: (source, target) => {
-      try {
-        this.game.move({
-          from: source,
-          to: target,
-          promotion: "q",
-        });
-        // eslint-disable-next-line no-unused-vars
-      } catch (error) {
-        return "snapback";
-      }
-    },
-    onSnapEnd: () => {
+  mountBoard(div) {
+    const config = this.makeBoardCfg();
+    this.board = Chessground(div, config);
+  }
+
+  onUnMountBoard() {
+    this.board.destroy();
+  }
+
+  turnColor(move) {
+    return move.ply % 2 == 0 ? "white" : "black";
+  }
+
+  updateBoard() {
+    this.board.set(this.moveBoardCfg());
+  }
+
+  moveBoardCfg = () => {
+    const move = this.game.currentMove;
+    const color = this.turnColor(move);
+    return {
+      fen: move.fen,
+      turnColor: color,
+      movable: { color: color, dests: move.dests },
+    };
+  };
+
+  onUserMove() {
+    return (orig, dest) => {
+      this.game.move({ from: orig, to: dest });
       this.jump("move");
-    },
-  });
+    };
+  }
+
+  makeBoardCfg = () => {
+    const opts = this.moveBoardCfg();
+    return {
+      fen: opts.fen,
+      turnColor: opts.turnColor,
+      movable: {
+        free: false,
+        color: opts.movable.color,
+        dests: opts.movable.dests,
+      },
+      orientation: this.ui.orientation,
+      draggable: { showGhost: true },
+      events: { move: this.onUserMove() },
+    };
+  };
 }

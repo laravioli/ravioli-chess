@@ -1,15 +1,14 @@
-import { Board } from "src/lib/board/board";
+import { Chessground } from "@lichess-org/chessground";
 import { Fen } from "src/lib/fen/fen";
 import { action, runInAction } from "mobx";
-import { pieceTheme } from "src/lib/board/utils";
 
 export class EditorStore {
-  board = new Board();
+  board = undefined;
   fen = undefined;
 
   constructor(rootStore, { fen }) {
     runInAction(() => {
-      this.rootStore = rootStore;
+      this.ui = rootStore.uiStore;
       this.fen = new Fen(fen);
     });
   }
@@ -20,18 +19,32 @@ export class EditorStore {
   @action
   onUnLoad() {}
 
+  mountBoard(div) {
+    const config = this.makeBoardCfg();
+    this.board = Chessground(div, config);
+  }
+
+  onUnMountBoard() {
+    this.board.destroy();
+  }
+
+  updateBoard(fen) {
+    this.board.set({ fen: fen });
+  }
+
   makeBoardCfg = () => {
     return {
-      pieceTheme: pieceTheme("bases"),
-      position: this.fen.current,
-      orientation: this.rootStore.uiStore.orientation,
-      draggable: true,
-      dropOffBoard: "trash",
-      sparePieces: true,
-      hideSparePieces: false,
-      onDrop: action((s, t, p, newPos) => {
-        this.fen.position = this.board.objToFen(newPos);
-      }),
+      fen: this.fen.current,
+      orientation: this.ui.orientation,
+      highlight: {
+        lastMove: false,
+        check: false,
+      },
+      events: {
+        move: action(() => {
+          this.fen.position = this.board.getFen();
+        }),
+      },
     };
   };
 }

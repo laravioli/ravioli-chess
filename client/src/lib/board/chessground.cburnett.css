@@ -1,0 +1,37 @@
+/** Embedded SVGs for all chess pieces */
+.cg-wrap piece.pawn.white {
+  background-image: url("/images/pieces/bases/wP.png");
+}
+.cg-wrap piece.bishop.white {
+  background-image: url("/images/pieces/bases/wB.png");
+}
+.cg-wrap piece.knight.white {
+  background-image: url("/images/pieces/bases/wN.png");
+}
+.cg-wrap piece.rook.white {
+  background-image: url("/images/pieces/bases/wR.png");
+}
+.cg-wrap piece.queen.white {
+  background-image: url("/images/pieces/bases/wQ.png");
+}
+.cg-wrap piece.king.white {
+  background-image: url("/images/pieces/bases/wK.png");
+}
+.cg-wrap piece.pawn.black {
+  background-image: url("/images/pieces/bases/bP.png");
+}
+.cg-wrap piece.bishop.black {
+  background-image: url("/images/pieces/bases/bB.png");
+}
+.cg-wrap piece.knight.black {
+  background-image: url("/images/pieces/bases/bN.png");
+}
+.cg-wrap piece.rook.black {
+  background-image: url("/images/pieces/bases/bR.png");
+}
+.cg-wrap piece.queen.black {
+  background-image: url("/images/pieces/bases/bQ.png");
+}
+.cg-wrap piece.king.black {
+  background-image: url("/images/pieces/bases/bK.png");
+}

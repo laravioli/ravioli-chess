@@ -542,6 +542,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@lichess-org/chessground@^9.4.1":
+  version "9.4.1"
+  resolved "https://registry.yarnpkg.com/@lichess-org/chessground/-/chessground-9.4.1.tgz#8c00af742a9ad868ce25330c6008bea1a825ecc6"
+  integrity sha512-CbrJwhaXKz9uBXBAjQCtEeJSyU0SFOk6GsWfU/oijLLOC1qXGXReyRX6WsHQ66CoufPX3kd8jQUvr8k33XoWLA==
+
 "@mantine/core@^7.15.3":
   version "7.17.7"
   resolved "https://registry.yarnpkg.com/@mantine/core/-/core-7.17.7.tgz#b873666f2aa8ab7af3ce47db4e34f1bd5d808829"

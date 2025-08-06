@@ -20,7 +20,7 @@ input:-webkit-autofill {
 
 .main-wrap {
   display: grid;
-  grid-template-areas: '. . main . .';
+  grid-template-areas: ". . main . .";
   grid-template-columns:
     1vw 1fr auto
     1fr 1vw;
@@ -32,9 +32,9 @@ input:-webkit-autofill {
   display: grid;
   place-items: center;
   grid-template-areas:
-    'evalbar board . tools'
-    'evalbar board . tools'
-    '. copyables . .';
+    "evalbar board . tools"
+    "evalbar board . tools"
+    ". copyables . .";
   grid-template-rows: auto 1fr min-content;
   grid-template-columns: 1rem var(--board-scale) 1rem minmax(10rem, 21rem);
 }
@@ -43,7 +43,7 @@ input:-webkit-autofill {
   grid-area: main;
   display: grid;
   place-items: center;
-  grid-template-areas: 'chat board . tools ';
+  grid-template-areas: "chat board . tools ";
   grid-template-rows: auto auto auto;
   grid-template-columns:
     max-content clamp(var(--board-min-width), 100vmin, 50rem)
@@ -60,9 +60,14 @@ input:-webkit-autofill {
 }
 
 .board {
-  cursor: grab;
   grid-area: board;
   width: 100%;
+  height: auto; /* Let height adjust based on width */
+  aspect-ratio: 1; /* Enforces a square aspect ratio */
+  max-width: var(--board-max-width);
+  min-width: var(--board-min-width);
+  direction: ltr;
+  cursor: grab;
 }
 
 .copyables {
