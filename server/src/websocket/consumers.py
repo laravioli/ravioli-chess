@@ -2,27 +2,30 @@ import json
 import asyncio
 from urllib.parse import parse_qs
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .core.game import new_game
+from .core.app import App
 
 
 class TaxiConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         print("connect")
+        self.app: App = self.scope["state"]["app"]
         self.sri = parse_qs(self.scope["query_string"].decode("utf8"))["sri"][0]
-        self.task = asyncio.create_task(self.test())
-        await self.channel_layer.group_add("hello", self.channel_name)
         await self.accept()
         # await self.send(text_data=json.dumps({"message": 'start'}))
 
     async def disconnect(self, close_code):
-        self.task.cancel()
         print("disconnect")
-        await self.channel_layer.group_discard("hello", self.channel_name)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-
-        await self.send(text_data=json.dumps({"message": "pong"}))
+        print(text_data_json)
+        type = text_data_json.get("t", None)
+        if type == "newgame":
+            id = await new_game(self.app.id_providers.get("game"))
+            await self.send(text_data=json.dumps({"message": id}))
+        else:
+            await self.send(text_data=json.dumps({"message": "pong"}))
 
     async def test(self):
         session = self.scope["session"]

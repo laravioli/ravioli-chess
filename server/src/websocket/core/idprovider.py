@@ -41,7 +41,7 @@ class AsyncIdProvider(MixinRessourceSequencer):
                 async with self._layer.lock(
                     f"generate-{self._key}", blocking=False, timeout=2
                 ):
-                    ids = await self._generator(self._layer, batch=batch)
+                    ids = await self._generator(batch=batch)
                     async with self._layer.pipeline() as pipe:
                         await pipe.sadd(self._key, *ids)
                         await pipe.spop(self._key)

@@ -2,11 +2,7 @@ from raviolichess.layers import get_redis_layer
 from .notifiers import Notifier
 from .idprovider import AsyncIdProvider
 from .idgenerator import game_id_generator
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from redis.asyncio import Redis as AsyncRedis
+from redis.asyncio import Redis as AsyncRedis
 
 
 class App:

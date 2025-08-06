@@ -1,8 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import redis.asyncio as redis
+import redis.asyncio as redis
 
 
 class Notifier:
