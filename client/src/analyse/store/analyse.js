@@ -1,4 +1,5 @@
 import { Chessground } from "@lichess-org/chessground";
+import { uciToMove } from "@lichess-org/chessground/util";
 import { Game } from "src/lib/game/game";
 import { Fen } from "src/lib/fen/fen";
 import { throttle, isEvalBetter } from "src/lib/eval/utils";
@@ -152,6 +153,8 @@ export class AnalyseStore {
       fen: move.fen,
       turnColor: color,
       movable: { color: color, dests: move.dests },
+      check: move.check,
+      lastMove: uciToMove(move.uci),
     };
   };
 

@@ -95,6 +95,7 @@ export class Game {
         san: info.san,
         uci: info.lan,
         dests: this.toDests(),
+        check: this._chess.isCheck(),
         outcome: this._chess.isGameOver(),
         children: [],
       });
@@ -145,16 +146,18 @@ class Move {
   fen;
   san;
   uci;
+  check;
   outcome;
   children = [];
 
-  constructor({ parent, ply, fen, san, uci, outcome, dests }) {
+  constructor({ parent, ply, fen, san, uci, check, outcome, dests }) {
     this.parent = parent;
     this.ceval = null;
     this.ply = ply;
     this.fen = fen;
     this.san = san;
     this.uci = uci;
+    this.check = check;
     this.dests = dests;
     this.outcome = outcome;
     this.children = [];
