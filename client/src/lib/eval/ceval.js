@@ -1,7 +1,8 @@
+//https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
 import { validateFen } from "chess.js";
 import { makeEngine, maxThreads, engineSupported } from "./engine";
 import { localStorage } from "src/main/store/localstorage.js";
-import { CevalState, toggle, throttle, clamp, povChances } from "./util";
+import { CevalState, toggle, throttle, clamp, povChances } from "./utils";
 import { observable, action, runInAction } from "mobx";
 
 const cevalDisabledSentinel = "1";
@@ -43,7 +44,8 @@ export class Ceval {
   }
 
   onEmit = throttle(200, (ev, work) => {
-    this.sortPvsInPlace(ev.pvs, work.ply % 2 ? "white" : "black");
+    this.sortPvsInPlace(ev.pvs, work.ply % 2 === 0 ? "white" : "black");
+
     this.opts.emit(ev);
   });
 

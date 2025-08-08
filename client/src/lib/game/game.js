@@ -162,6 +162,7 @@ class Move {
     makeAutoObservable(this, {
       parent: false,
       ceval: false,
+      dests: false,
       children: false,
     });
   }

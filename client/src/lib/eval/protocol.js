@@ -1,3 +1,4 @@
+//https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/protocol.ts
 export class Protocol {
   expectedPvs = 1;
   options = new Map();
@@ -9,12 +10,12 @@ export class Protocol {
 
     // Get engine name, version and options.
     this.options = new Map([
-      ['Threads', '1'],
-      ['Hash', '16'],
-      ['MultiPV', '1'],
-      ['UCI_Variant', 'chess'],
+      ["Threads", "1"],
+      ["Hash", "16"],
+      ["MultiPV", "1"],
+      ["UCI_Variant", "chess"],
     ]);
-    this.send('uci');
+    this.send("uci");
   }
 
   setOption(name, value) {
@@ -36,22 +37,22 @@ export class Protocol {
     //console.log(`rcv : ${command}`);
     //
     const parts = command.trim().split(/\s+/g);
-    if (parts[0] === 'uciok') {
+    if (parts[0] === "uciok") {
       // Analyse without contempt.
-      this.setOption('UCI_AnalyseMode', 'true');
+      this.setOption("UCI_AnalyseMode", "true");
 
-      this.send?.('ucinewgame');
-      this.send?.('isready');
-    } else if (parts[0] === 'readyok') {
+      this.send?.("ucinewgame");
+      this.send?.("isready");
+    } else if (parts[0] === "readyok") {
       this.swapWork();
-    } else if (parts[0] === 'id' && parts[1] === 'name') {
-      this.engineName = parts.slice(2).join(' ');
-    } else if (parts[0] === 'bestmove') {
+    } else if (parts[0] === "id" && parts[1] === "name") {
+      this.engineName = parts.slice(2).join(" ");
+    } else if (parts[0] === "bestmove") {
       if (this.work && this.currentEval) this.work.emit(this.currentEval);
       this.work = undefined;
       this.swapWork();
       return;
-    } else if (this.work && !this.work.stopRequested && parts[0] === 'info') {
+    } else if (this.work && !this.work.stopRequested && parts[0] === "info") {
       let depth = 0,
         nodes,
         multiPv = 1,
@@ -62,25 +63,25 @@ export class Protocol {
         moves = [];
       for (let i = 1; i < parts.length; i++) {
         switch (parts[i]) {
-          case 'depth':
+          case "depth":
             depth = parseInt(parts[++i]);
             break;
-          case 'nodes':
+          case "nodes":
             nodes = parseInt(parts[++i]);
             break;
-          case 'multipv':
+          case "multipv":
             multiPv = parseInt(parts[++i]);
             break;
-          case 'time':
+          case "time":
             millis = parseInt(parts[++i]);
             break;
-          case 'score':
-            isMate = parts[++i] === 'mate';
+          case "score":
+            isMate = parts[++i] === "mate";
             povEv = parseInt(parts[++i]);
-            if (parts[i + 1] === 'lowerbound' || parts[i + 1] === 'upperbound')
+            if (parts[i + 1] === "lowerbound" || parts[i + 1] === "upperbound")
               evalType = parts[++i];
             break;
-          case 'pv':
+          case "pv":
             moves = parts.slice(++i);
             i = parts.length;
             break;
@@ -136,9 +137,9 @@ export class Protocol {
       }
     } else if (
       command &&
-      !['Stockfish', 'id', 'option', 'info'].includes(parts[0]) &&
-      !['Analysis Contempt', 'UCI_Variant', 'UCI_AnalyseMode'].includes(
-        command.split(': ')[1]
+      !["Stockfish", "id", "option", "info"].includes(parts[0]) &&
+      !["Analysis Contempt", "UCI_Variant", "UCI_AnalyseMode"].includes(
+        command.split(": ")[1]
       )
     )
       console.warn(`SF: ${command}`);
@@ -147,7 +148,7 @@ export class Protocol {
   stop() {
     if (this.work && !this.work.stopRequested) {
       this.work.stopRequested = true;
-      this.send?.('stop');
+      this.send?.("stop");
     }
   }
 
@@ -161,21 +162,21 @@ export class Protocol {
       this.currentEval = undefined;
       this.expectedPvs = 1;
 
-      this.setOption('Threads', this.work.threads);
-      this.setOption('Hash', this.work.hashSize || 16);
-      this.setOption('MultiPV', Math.max(1, this.work.multiPv));
+      this.setOption("Threads", this.work.threads);
+      this.setOption("Hash", this.work.hashSize || 16);
+      this.setOption("MultiPV", Math.max(1, this.work.multiPv));
 
       if (this.gameId && this.gameId !== this.work.gameId)
-        this.send('ucinewgame');
+        this.send("ucinewgame");
       this.gameId = this.work.gameId;
 
       this.send(
         [
-          'position fen',
+          "position fen",
           this.work.initialFen,
-          'moves',
+          "moves",
           ...this.work.moves,
-        ].join(' ')
+        ].join(" ")
       );
       const [by, value] = Object.entries(this.work.search)[0];
       this.send(`go ${by} ${value}`);

@@ -1,7 +1,8 @@
 import { Chessground } from "@lichess-org/chessground";
 import { Game } from "src/lib/game/game";
 import { Fen } from "src/lib/fen/fen";
-import { throttle, isEvalBetter } from "src/lib/eval/util";
+import { throttle, isEvalBetter } from "src/lib/eval/utils";
+import { makeShapes } from "./utils";
 import { observable, action, runInAction } from "mobx";
 
 export class AnalyseStore {
@@ -77,6 +78,7 @@ export class AnalyseStore {
     if (!move.ceval || isEvalBetter(ev, move.ceval)) {
       move.ceval = this.evaluation = ev;
     }
+    this.setAutoShapes();
   }
 
   startCeval = throttle(800, () => {
@@ -98,6 +100,7 @@ export class AnalyseStore {
   @action
   toggleCeval() {
     this.ceval?.toggle();
+    this.setAutoShapes();
     this.startCeval();
   }
 
@@ -108,8 +111,8 @@ export class AnalyseStore {
     });
   }
 
-  getBestEval(node) {
-    return node.ceval && node.ceval.pvs[0].moves[0];
+  getBestEval(move) {
+    return move.ceval && move.ceval.pvs[0].moves[0];
   }
 
   async playUci() {
@@ -139,6 +142,7 @@ export class AnalyseStore {
 
   updateBoard() {
     this.board.set(this.moveBoardCfg());
+    this.setAutoShapes();
   }
 
   moveBoardCfg = () => {
@@ -172,5 +176,9 @@ export class AnalyseStore {
       draggable: { showGhost: true },
       events: { move: this.onUserMove() },
     };
+  };
+
+  setAutoShapes = () => {
+    this.board?.setAutoShapes(makeShapes(this));
   };
 }

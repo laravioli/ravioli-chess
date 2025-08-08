@@ -3,11 +3,11 @@
 /*----------------*/
 
 export const CevalState = Object.freeze({
-  Initial: Symbol('Initial'),
-  Loading: Symbol('Loading'),
-  Idle: Symbol('Idle'),
-  Computing: Symbol('Computing'),
-  Failed: Symbol('Failed'),
+  Initial: Symbol("Initial"),
+  Loading: Symbol("Loading"),
+  Idle: Symbol("Idle"),
+  Computing: Symbol("Computing"),
+  Failed: Symbol("Failed"),
 });
 
 export const sharedWasmMemory = (lo, hi = 32767) => {
@@ -50,8 +50,8 @@ function maxHashMB() {
 export const maxHash = maxHashMB();
 
 function sharedMemoryTest() {
-  if (typeof Atomics !== 'object') return false;
-  if (typeof SharedArrayBuffer !== 'function') return false;
+  if (typeof Atomics !== "object") return false;
+  if (typeof SharedArrayBuffer !== "function") return false;
 
   let mem;
   try {
@@ -59,7 +59,7 @@ function sharedMemoryTest() {
 
     if (!(mem.buffer instanceof SharedArrayBuffer)) return false;
 
-    window.postMessage(mem.buffer, '*');
+    window.postMessage(mem.buffer, "*");
   } catch {
     return false;
   }
@@ -69,31 +69,31 @@ function sharedMemoryTest() {
 export const browserSupport = memoize(() => {
   const features = [];
   if (
-    typeof WebAssembly === 'object' &&
-    typeof WebAssembly.validate === 'function' &&
+    typeof WebAssembly === "object" &&
+    typeof WebAssembly.validate === "function" &&
     WebAssembly.validate(Uint8Array.from([0, 97, 115, 109, 1, 0, 0, 0]))
   ) {
-    features.push('wasm');
+    features.push("wasm");
     // i32x4.dot_i16x8_s, i32x4.trunc_sat_f64x2_u_zero
     const sourceWithSimd = Uint8Array.from([
       0, 97, 115, 109, 1, 0, 0, 0, 1, 12, 2, 96, 2, 123, 123, 1, 123, 96, 1,
       123, 1, 123, 3, 3, 2, 0, 1, 7, 9, 2, 1, 97, 0, 0, 1, 98, 0, 1, 10, 19, 2,
       9, 0, 32, 0, 32, 1, 253, 186, 1, 11, 7, 0, 32, 0, 253, 253, 1, 11,
     ]);
-    if (WebAssembly.validate(sourceWithSimd)) features.push('simd');
-    if (sharedMemoryTest()) features.push('sharedMem');
+    if (WebAssembly.validate(sourceWithSimd)) features.push("simd");
+    if (sharedMemoryTest()) features.push("sharedMem");
   }
   try {
     new Worker(
       URL.createObjectURL(
         new Blob(["import('data:text/javascript,export default {}')"], {
-          type: 'application/javascript',
+          type: "application/javascript",
         })
       )
     ).terminate();
-    features.push('dynamicImportFromWorker');
+    features.push("dynamicImportFromWorker");
   } catch (error) {
-    console.error('Worker creation failed:', error);
+    console.error("Worker creation failed:", error);
   }
 
   return Object.freeze(features);
@@ -186,7 +186,7 @@ function throttlePromiseWithResult(wrapped) {
               throw err;
             }
           ),
-        reject: () => reject(new Error('Throttled')),
+        reject: () => reject(new Error("Throttled")),
       };
     });
     return next;
@@ -208,14 +208,15 @@ function throttlePromise(wrapped) {
 const isMobile = () => isAndroid() || isIos();
 
 export const fewerCores = memoize(
-  () => isMobile() || navigator.userAgent.includes('CrOS')
+  () => isMobile() || navigator.userAgent.includes("CrOS")
 );
 
 /*----------------*/
 /*------STAT------*/
-/*----------------*/
+/*https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/winningChances.ts
+ */
 
-const toPov = (color, diff) => (color === 'white' ? diff : -diff);
+const toPov = (color, diff) => (color === "white" ? diff : -diff);
 
 const rawWinningChances = (cp) => {
   const MULTIPLIER = -0.00368208;
@@ -232,7 +233,7 @@ const mateWinningChances = (mate) => {
 };
 
 const evalWinningChances = (ev) =>
-  typeof ev.mate !== 'undefined'
+  typeof ev.mate !== "undefined"
     ? mateWinningChances(ev.mate)
     : cpWinningChances(ev.cp);
 
@@ -247,9 +248,6 @@ export const povChances = (color, ev) => toPov(color, evalWinningChances(ev));
 export const povDiff = (color, e1, e2) =>
   (povChances(color, e1) - povChances(color, e2)) / 2;
 
-export const sortPvsInPlace = (pvs, color) =>
-  pvs.sort((a, b) => povChances(color, b) - povChances(color, a));
-
 /*----------------*/
 /*-----ANALYSE----*/
 /*----------------*/
@@ -260,5 +258,5 @@ export function isEvalBetter(a, b) {
 
 export function renderEval(e) {
   e = Math.max(Math.min(Math.round(e / 10) / 10, 99), -99);
-  return (e > 0 ? '+' : '') + e.toFixed(1);
+  return (e > 0 ? "+" : "") + e.toFixed(1);
 }

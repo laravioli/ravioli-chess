@@ -2,14 +2,23 @@ import { usePageStore } from "src/main/hooks/hooks";
 import { Action } from "./action";
 import { IconTestPipe } from "@tabler/icons-react";
 
+import { parseUci, makeSquare } from "chessops/util";
+
 export const TestButton = () => {
   const store = usePageStore();
   const test = async () => {
     console.log("board " + store.board.getFen());
     console.log("chess " + store.game?.fen());
     console.log("fen from module" + store.fen.current);
-    console.log("current move", store.game?.currentMove);
-    console.log("bestEval", store.getBestEval?.(store.game?.currentMove));
+    const move = store.game?.currentMove;
+    if (move) {
+      console.log("current move", move);
+      console.log("bestEval", store.getBestEval?.(move));
+      if (move.ceval?.pvs[0]) {
+        const m = parseUci(move.ceval.pvs[0].moves[0]);
+        console.log(makeSquare(m.from), makeSquare(m.to));
+      }
+    }
   };
   return (
     <Action label="test" onClick={() => test()}>

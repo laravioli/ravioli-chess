@@ -1,4 +1,5 @@
-import { Protocol } from './protocol';
+//https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/engines/stockfishWebEngine.ts
+import { Protocol } from "./protocol";
 import {
   CevalState,
   sharedWasmMemory,
@@ -6,7 +7,7 @@ import {
   browserSupport,
   clamp,
   fewerCores,
-} from './util';
+} from "./utils.js";
 
 export class StockfishWebEngine {
   constructor(info) {
@@ -28,12 +29,12 @@ export class StockfishWebEngine {
   }
 
   async boot() {
-    const makeModule = await import('./stockfish/sf16-7.js');
+    const makeModule = await import("./stockfish/sf16-7.js");
     const module = await makeModule.default({
       wasmMemory: sharedWasmMemory(this.info.minMem),
       onError: (msg) => Promise.reject(new Error(msg)),
     });
-    if (this.info.tech === 'NNUE') {
+    if (this.info.tech === "NNUE") {
       this.store = undefined;
       module.onError = this.makeErrorHandler(module);
       const nnueFilenames = this.info.assets.nnue ?? [];
@@ -68,8 +69,8 @@ export class StockfishWebEngine {
           return storedBuffer;
         const req = new XMLHttpRequest();
 
-        req.open('get', `./static/web/nnue/${nnueFilename}`, true);
-        req.responseType = 'arraybuffer';
+        req.open("get", `./static/web/nnue/${nnueFilename}`, true);
+        req.responseType = "arraybuffer";
         req.onprogress = (e) =>
           this.status?.({ download: { bytes: e.loaded, total: e.total } });
 
@@ -88,7 +89,7 @@ export class StockfishWebEngine {
         this.status?.();
         this.store
           ?.put(nnueFilename, nnueBuffer)
-          .catch(() => console.warn('IDB store failed'));
+          .catch(() => console.warn("IDB store failed"));
         return nnueBuffer;
       })
     );
@@ -96,7 +97,7 @@ export class StockfishWebEngine {
 
   makeErrorHandler(module) {
     return (msg) => {
-      if (msg.startsWith('BAD_NNUE') && this.store) {
+      if (msg.startsWith("BAD_NNUE") && this.store) {
         // if we got this from IDB, we must remove it. but wait for getModels::store.put to finish first
         const index = Math.max(0, Number(msg.slice(9)));
         const nnueFilename =
@@ -123,21 +124,21 @@ export class StockfishWebEngine {
   stop = () => this.protocol.compute(undefined);
   engineName = () => this.protocol.engineName;
   destroy = () => {
-    this.module?.uci('quit');
+    this.module?.uci("quit");
     this.module = undefined;
   };
 }
 
 const sf16 = {
-  id: '__sf16nnue7',
-  name: 'Stockfish 16 NNUE · 7MB',
-  short: 'SF 16 · 7MB',
-  tech: 'NNUE',
-  requires: ['sharedMem', 'simd', 'dynamicImportFromWorker'],
+  id: "__sf16nnue7",
+  name: "Stockfish 16 NNUE · 7MB",
+  short: "SF 16 · 7MB",
+  tech: "NNUE",
+  requires: ["sharedMem", "simd", "dynamicImportFromWorker"],
   cloudEval: false,
   assets: {
-    root: 'assets',
-    js: 'sf16-7',
+    root: "assets",
+    js: "sf16-7",
   },
   minMem: 1536,
   maxHash,
