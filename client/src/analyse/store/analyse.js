@@ -10,19 +10,15 @@ import { observable, action, runInAction } from "mobx";
 export class AnalyseStore {
   board;
   game;
-  fen;
   ceval;
   @observable.ref accessor evaluation = undefined;
   @observable.shallow accessor node;
 
   constructor(rootStore, { fen }) {
-    window.analysis = this;
-
     runInAction(() => {
       this.ui = rootStore.uiStore;
       this.ceval = rootStore.cevalStore;
       this.game = new Game(fen);
-      this.fen = new Fen(fen);
       this.initCeval(fen);
     });
   }
@@ -45,7 +41,6 @@ export class AnalyseStore {
 
   @action
   newGame(fen) {
-    if (fen !== this.fen.current) this.fen.set(fen);
     this.game.load(fen);
     this.restartCeval();
 
@@ -60,7 +55,6 @@ export class AnalyseStore {
     if (!this.ceval.enabled || move.ceval || move.outcome)
       this.evaluation = move.ceval;
     this.restartCeval();
-    this.fen.set(move.fen);
     this.updateBoard();
   }
 

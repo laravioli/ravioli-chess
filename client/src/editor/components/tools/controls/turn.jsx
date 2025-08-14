@@ -1,17 +1,17 @@
-import { usePageStore } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
-import { NativeSelect } from '@mantine/core';
+import { usePageStore } from "src/main/hooks/hooks";
+import { observer } from "mobx-react-lite";
+import { NativeSelect } from "@mantine/core";
 
 export const TurnToPlay = observer(() => {
   const editorStore = usePageStore();
 
   const data = [
-    { label: 'White to play', value: 'w' },
-    { label: 'Black to play', value: 'b' },
+    { label: "White to play", value: "white" },
+    { label: "Black to play", value: "black" },
   ];
 
-  const onChange = () => {
-    editorStore.fen.setTurn();
+  const onChange = (event) => {
+    editorStore.fen.setTurn(event.target.value);
   };
 
   return (

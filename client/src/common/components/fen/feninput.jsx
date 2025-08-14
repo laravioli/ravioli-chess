@@ -44,7 +44,7 @@ export const FenInput = observer(() => {
       variant="filled"
       onBlur={onBlur}
       onKeyDown={onKeyDown}
-      disabled={!!pageStore.game}
+      readOnly={!!pageStore.game}
       classNames={{ root: classes.root, input: classes.input }}
     />
   );

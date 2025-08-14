@@ -32,9 +32,8 @@ export const Positions = observer(() => {
         position="top"
         withinPortal={false}
         onOptionSubmit={action((fen) => {
-          if (fen != analyseStore.fen.current) {
+          if (true) {
             analyseStore.newGame(fen);
-            analyseStore.fen.set(fen);
             analyseStore.updateBoard();
           }
           combobox.closeDropdown();

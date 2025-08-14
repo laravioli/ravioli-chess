@@ -23,19 +23,18 @@ export class Fen {
 
   @computed
   get current() {
-    return this.legalFen || makeFen(this.setup);
+    return this.legalFen || makeFen(this.getSetup());
   }
 
   @computed
   get legalFen() {
-    return setupPosition("chess", this.setup).unwrap(
+    return setupPosition("chess", this.getSetup()).unwrap(
       (pos) => makeFen(pos.toSetup()),
       (_) => undefined
     );
   }
 
-  @computed
-  get setup() {
+  getSetup() {
     const fen = this.boardFen || this.initialFen;
     const board = parseFen(fen).unwrap(
       (setup) => setup.board,
@@ -95,9 +94,8 @@ export class Fen {
   }
 
   @action
-  setTurn(turn = undefined) {
-    const newTurn = turn ?? (this.turn === "w" ? "b" : "w");
-    this.turn = newTurn;
+  setTurn(color) {
+    this.turn = color;
   }
 
   isValid(fen) {

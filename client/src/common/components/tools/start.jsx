@@ -8,7 +8,7 @@ export const StartButton = () => {
 
   const onStart = () => {
     store.newGame?.(INITIAL_FEN);
-    store.setFen(INITIAL_FEN);
+    store.setFen?.(INITIAL_FEN);
   };
 
   return (
