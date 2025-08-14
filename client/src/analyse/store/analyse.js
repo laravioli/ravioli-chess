@@ -2,18 +2,22 @@ import { Chessground } from "@lichess-org/chessground";
 import { uciToMove } from "@lichess-org/chessground/util";
 import { Game } from "src/lib/game/game";
 import { Fen } from "src/lib/fen/fen";
-import { throttle, isEvalBetter } from "src/lib/eval/utils";
-import { makeShapes } from "./utils";
+import { isEvalBetter } from "src/lib/eval/utils";
+import { throttle } from "src/lib/common";
+import { makeShapes } from "./autoshape";
 import { observable, action, runInAction } from "mobx";
 
 export class AnalyseStore {
-  board = undefined;
-  game = undefined;
-  fen = undefined;
-  ceval = undefined;
+  board;
+  game;
+  fen;
+  ceval;
   @observable.ref accessor evaluation = undefined;
+  @observable.shallow accessor node;
 
   constructor(rootStore, { fen }) {
+    window.analysis = this;
+
     runInAction(() => {
       this.ui = rootStore.uiStore;
       this.ceval = rootStore.cevalStore;
@@ -159,7 +163,7 @@ export class AnalyseStore {
   };
 
   onUserMove() {
-    return (orig, dest) => {
+    return (orig, dest, capture) => {
       this.game.move({ from: orig, to: dest });
       this.jump("move");
     };
@@ -181,6 +185,7 @@ export class AnalyseStore {
     };
   };
 
+  //reset autoshape before switching page : the problem is i should cancel the throtling of evaluation
   setAutoShapes = () => {
     this.board?.setAutoShapes(makeShapes(this));
   };

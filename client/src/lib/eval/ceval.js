@@ -2,7 +2,8 @@
 import { validateFen } from "chess.js";
 import { makeEngine, maxThreads, engineSupported } from "./engine";
 import { localStorage } from "src/main/store/localstorage.js";
-import { CevalState, toggle, throttle, clamp, povChances } from "./utils";
+import { CevalState, povChances } from "./utils";
+import { toggle, throttle, clamp } from "../common";
 import { observable, action, runInAction } from "mobx";
 
 const cevalDisabledSentinel = "1";

@@ -5,9 +5,9 @@ import {
   sharedWasmMemory,
   maxHash,
   browserSupport,
-  clamp,
   fewerCores,
 } from "./utils.js";
+import { clamp } from "../common.js";
 
 export class StockfishWebEngine {
   constructor(info) {

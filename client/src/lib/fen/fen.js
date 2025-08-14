@@ -1,6 +1,10 @@
-import { observable, computed, action } from 'mobx';
-import { getCastlingRights, isValidInput } from './utils';
-import { validateFen } from 'chess.js';
+import { observable, computed, action } from "mobx";
+import {
+  fenToCastlings,
+  castlingsToFen,
+  getLegalFen,
+  validateFen,
+} from "./utils";
 
 export class Fen {
   @observable accessor position;
@@ -19,27 +23,24 @@ export class Fen {
     return [
       this.position,
       this.turn,
-      getCastlingRights(this.castling),
-      '-',
+      castlingsToFen(this.castling),
+      "-",
       this.halfmove,
       this.fullmove,
-    ].join(' ');
+    ].join(" ");
   }
 
   @computed
   get isLegal() {
-    return validateFen(this.current).ok;
+    return !!getLegalFen(this.current);
   }
 
   @action
   set(initialFen) {
-    const fen = initialFen.split(' ');
+    const fen = initialFen.split(" ");
     this.position = fen[0];
     this.turn = fen[1];
-    this.castling = ['K', 'Q', 'k', 'q'].reduce((acc, key) => {
-      acc[key] = fen[2].includes(key);
-      return acc;
-    }, {});
+    this.castling = fenToCastlings(fen[2]);
     this.halfmove = fen[4];
     this.fullmove = fen[5];
   }
@@ -51,13 +52,13 @@ export class Fen {
 
   @action
   setTurn(turn = undefined) {
-    const newTurn = turn ?? (this.turn === 'w' ? 'b' : 'w');
+    const newTurn = turn ?? (this.turn === "w" ? "b" : "w");
     this.turn = newTurn;
   }
 
   @action
   setFromInput(input) {
-    if (input !== this.current && isValidInput(input)) {
+    if (input !== this.current && (input = validateFen(input))) {
       this.set(input);
     } else {
       this.inputRef.current.value = this.current;
@@ -73,9 +74,9 @@ export class Fen {
   @action
   reset(cr) {
     this.position = cr
-      ? 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
-      : '8/8/8/8/8/8/8/8';
-    this.turn = 'w';
+      ? "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+      : "8/8/8/8/8/8/8/8";
+    this.turn = "w";
     this.castling = {
       K: cr,
       Q: cr,

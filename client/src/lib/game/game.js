@@ -1,8 +1,8 @@
 import { Chess, SQUARES } from "chess.js";
 import { observable, computed, action, makeAutoObservable } from "mobx";
-
+import "./tree";
 export class Game {
-  @observable accessor currentMove;
+  @observable.ref accessor currentMove;
 
   constructor(fen) {
     this._chess = new Chess(fen);
@@ -161,12 +161,5 @@ class Move {
     this.dests = dests;
     this.outcome = outcome;
     this.children = [];
-
-    makeAutoObservable(this, {
-      parent: false,
-      ceval: false,
-      dests: false,
-      children: false,
-    });
   }
 }
