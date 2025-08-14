@@ -13,11 +13,15 @@ export class EditorStore {
     });
   }
 
+  //Loader
+
   @action
   onLoad() {}
 
   @action
   onUnLoad() {}
+
+  //Board
 
   mountBoard(div) {
     const config = this.makeBoardCfg();
@@ -26,10 +30,6 @@ export class EditorStore {
 
   onUnMountBoard() {
     this.board.destroy();
-  }
-
-  updateBoard(fen) {
-    this.board.set({ fen: fen });
   }
 
   makeBoardCfg = () => {
@@ -41,10 +41,25 @@ export class EditorStore {
         check: false,
       },
       events: {
-        move: action(() => {
-          this.fen.position = this.board.getFen();
+        change: action(() => {
+          this.fen.boardFen = this.board.getFen();
         }),
       },
     };
   };
+
+  //Fen
+
+  @action
+  setFen(fen) {
+    this.fen.set(fen, () => this._updateBoard(fen));
+  }
+
+  @action
+  _updateBoard(fen) {
+    if (this.board) {
+      this.board.set({ fen: fen });
+      this.fen.boardFen = this.board.getFen();
+    }
+  }
 }

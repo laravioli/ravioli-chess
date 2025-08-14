@@ -11,7 +11,6 @@ export const FenInput = observer(() => {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    pageStore.fen.inputRef.current = inputRef.current;
     inputRef.current.value = pageStore.fen.current;
 
     return autorun(() => {
@@ -23,9 +22,16 @@ export const FenInput = observer(() => {
 
   const onKeyDown = action((event) => {
     if (event.key === "Enter") {
-      const fen = inputRef.current.value;
-      pageStore.fen.setFromInput(fen);
-      pageStore.updateBoard(pageStore.fen.current);
+      inputRef.current.blur();
+    }
+  });
+
+  const onBlur = action(() => {
+    const fen = inputRef.current.value;
+    if (fen !== pageStore.fen.current && pageStore.fen.isValid(fen)) {
+      pageStore.setFen(fen);
+    } else {
+      inputRef.current.value = pageStore.fen.current;
     }
   });
 
@@ -36,6 +42,7 @@ export const FenInput = observer(() => {
       leftSectionPointerEvents="none"
       leftSection="FEN"
       variant="filled"
+      onBlur={onBlur}
       onKeyDown={onKeyDown}
       disabled={!!pageStore.game}
       classNames={{ root: classes.root, input: classes.input }}

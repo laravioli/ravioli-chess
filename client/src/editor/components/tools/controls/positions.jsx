@@ -45,8 +45,7 @@ export const Positions = observer(() => {
   const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen) {
-      editorStore.fen.set(fen);
-      editorStore.updateBoard(fen);
+      editorStore.setFen(fen);
     } else {
       setValue(fen);
     }

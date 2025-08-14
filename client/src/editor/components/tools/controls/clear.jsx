@@ -1,19 +1,13 @@
 import { usePageStore } from "src/main/hooks/hooks";
-import { observer } from "mobx-react-lite";
 import { Action } from "src/common/components/tools/action";
 import { IconTrash } from "@tabler/icons-react";
+import { EMPTY_FEN } from "chessops/fen";
 
-export const ClearButton = observer(() => {
+export const ClearButton = () => {
   const editorStore = usePageStore();
-
-  const onClear = () => {
-    editorStore.fen.reset(false);
-    editorStore.updateBoard(editorStore.fen.current);
-  };
-
   return (
-    <Action label="clear board" onClick={onClear}>
+    <Action label="clear board" onClick={() => editorStore.setFen(EMPTY_FEN)}>
       <IconTrash size={40} stroke={1.5} />
     </Action>
   );
-});
+};

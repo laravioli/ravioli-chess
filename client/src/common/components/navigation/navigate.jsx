@@ -13,13 +13,11 @@ export const Navigate = observer(({ path }) => {
   const Icon = isEdit ? IconMathMaxMin : IconEdit;
 
   const onClick = action(() => {
-    if (!isEdit || pageStore.fen.isAnalysable()) {
+    if (!isEdit || pageStore.fen.legalFen) {
       navigate(path, {
         replace: true,
         state: { fen: pageStore.fen.current },
       });
-    } else {
-      current.updateBoard(pageStore.fen.current);
     }
   });
 
@@ -27,7 +25,7 @@ export const Navigate = observer(({ path }) => {
     <Action
       label={label}
       onClick={onClick}
-      disabled={isEdit && !pageStore.fen.isLegal}
+      disabled={isEdit && !pageStore.fen.legalFen}
     >
       <Icon size={30} stroke={1.2} />
     </Action>

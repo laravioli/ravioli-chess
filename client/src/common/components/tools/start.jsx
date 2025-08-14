@@ -1,5 +1,5 @@
 import { usePageStore } from "src/main/hooks/hooks";
-import { DEFAULT_POSITION } from "chess.js";
+import { INITIAL_FEN } from "chessops/fen";
 import { Action } from "./action";
 import { IconReload } from "@tabler/icons-react";
 
@@ -7,9 +7,8 @@ export const StartButton = () => {
   const store = usePageStore();
 
   const onStart = () => {
-    store.newGame?.(DEFAULT_POSITION);
-    store.fen.reset(true);
-    store.updateBoard(DEFAULT_POSITION);
+    store.newGame?.(INITIAL_FEN);
+    store.setFen(INITIAL_FEN);
   };
 
   return (

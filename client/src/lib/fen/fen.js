@@ -1,53 +1,97 @@
 import { observable, computed, action } from "mobx";
-import {
-  fenToCastlings,
-  castlingsToFen,
-  getLegalFen,
-  validateFen,
-} from "./utils";
+import { defined } from "src/lib/common";
+import { castlingsToFen } from "./utils";
+import { Board } from "chessops/board";
+import { setupPosition, Castles } from "chessops/variant";
+import { makeFen, parseFen, parseCastlingFen } from "chessops/fen";
 
 export class Fen {
-  @observable accessor position;
+  remainingChecks = undefined;
+  pockets = undefined;
+  @observable accessor boardFen;
   @observable accessor turn;
-  @observable accessor castling;
-  @observable accessor halfmove;
-  @observable accessor fullmove;
-  inputRef = { current: null };
+  @observable accessor castlings;
+  @observable accessor castlingRights;
+  @observable accessor halfmoves;
+  @observable accessor fullmoves;
 
   constructor(fen) {
+    this.initialFen = fen.split(" ")[0];
+    this.castlings = { K: false, Q: false, k: false, q: false };
     this.set(fen);
   }
 
   @computed
   get current() {
-    return [
-      this.position,
-      this.turn,
-      castlingsToFen(this.castling),
-      "-",
-      this.halfmove,
-      this.fullmove,
-    ].join(" ");
+    return this.legalFen || makeFen(this.setup);
   }
 
   @computed
-  get isLegal() {
-    return !!getLegalFen(this.current);
+  get legalFen() {
+    return setupPosition("chess", this.setup).unwrap(
+      (pos) => makeFen(pos.toSetup()),
+      (_) => undefined
+    );
+  }
+
+  @computed
+  get setup() {
+    const fen = this.boardFen || this.initialFen;
+    const board = parseFen(fen).unwrap(
+      (setup) => setup.board,
+      (_) => Board.empty()
+    );
+
+    return {
+      board,
+      pockets: this.pockets,
+      turn: this.turn,
+      castlingRights:
+        this.castlingRights ||
+        parseCastlingFen(board, castlingsToFen(this.castlings)).unwrap(),
+      epSquare: undefined,
+      remainingChecks: this.remainingChecks,
+      halfmoves: this.halfmoves,
+      fullmoves: this.fullmoves,
+    };
   }
 
   @action
-  set(initialFen) {
-    const fen = initialFen.split(" ");
-    this.position = fen[0];
-    this.turn = fen[1];
-    this.castling = fenToCastlings(fen[2]);
-    this.halfmove = fen[4];
-    this.fullmove = fen[5];
+  set(fen, updateBoard) {
+    parseFen(fen).unwrap(
+      (setup) => {
+        updateBoard?.();
+        this.setSetup(setup);
+        return true;
+      },
+      (_) => false
+    );
+  }
+
+  @action
+  setSetup(setup) {
+    this.pockets = setup.pockets;
+    this.turn = setup.turn;
+    this.castlingRights = setup.castlingRights;
+    this.remainingChecks = setup.remainingChecks;
+    this.halfmoves = setup.halfmoves;
+    this.fullmoves = setup.fullmoves;
+
+    const castles = Castles.fromSetup(setup);
+    this.castlings["Q"] =
+      defined(castles.rook.white.a) || this.castlingRights.has(0);
+    this.castlings["K"] =
+      defined(castles.rook.white.h) || this.castlingRights.has(7);
+    this.castlings["q"] =
+      defined(castles.rook.black.a) || this.castlingRights.has(56);
+    this.castlings["k"] =
+      defined(castles.rook.black.h) || this.castlingRights.has(63);
   }
 
   @action
   setCastlingRight(id, value) {
-    this.castling[id] = value;
+    if (this.castlings[id] !== value) this.castlingRights = undefined;
+    this.castlings[id] = value;
   }
 
   @action
@@ -56,34 +100,7 @@ export class Fen {
     this.turn = newTurn;
   }
 
-  @action
-  setFromInput(input) {
-    if (input !== this.current && (input = validateFen(input))) {
-      this.set(input);
-    } else {
-      this.inputRef.current.value = this.current;
-    }
-  }
-
-  @action
-  isAnalysable() {
-    this.setFromInput(this.inputRef.current.value);
-    return this.isLegal;
-  }
-
-  @action
-  reset(cr) {
-    this.position = cr
-      ? "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-      : "8/8/8/8/8/8/8/8";
-    this.turn = "w";
-    this.castling = {
-      K: cr,
-      Q: cr,
-      k: cr,
-      q: cr,
-    };
-    this.halfmove = 0;
-    this.fullmove = 1;
+  isValid(fen) {
+    return parseFen(fen).isOk;
   }
 }
