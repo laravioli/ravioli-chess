@@ -1,8 +1,9 @@
+import { observable } from "mobx";
 import { Chess } from "chessops/chess";
 import { makeFen, parseFen } from "chessops/fen";
 import { makeSanAndPlay } from "chessops/san";
 import { chessgroundDests } from "chessops/compat";
-import { roleToChar, parseUci } from "chessops/util";
+import { parseUci } from "chessops/util";
 
 // prettier-ignore
 const SQUARES = [
@@ -31,9 +32,8 @@ function uciToId(uci) {
   return `${IDS.get(start)}${IDS.get(end)}`;
 }
 
-function cgToUci(orig, dest, capture = undefined) {
+function cgToUci(orig, dest) {
   let uci = `${orig}${dest}`;
-  if (capture) uci = uci.concat(roleToChar(capture.role));
   return uci;
 }
 
@@ -49,28 +49,36 @@ export function setRoot(fen) {
   const pos = Chess.fromSetup(setup).unwrap();
   const ply = (setup.turn === "white" ? 0 : 1) + 2 * (setup.fullmoves - 1);
   const dests = chessgroundDests(pos);
-  const root = { children: [], fen, id: "", ply, dests };
+  const root = observable(
+    { children: [], fen, id: "", ply, dests },
+    {},
+    { deep: false }
+  );
   setNodeChecks(root, pos);
 
   return root;
 }
 
-export function nodeFromUser(parent, origin, dest, capture = undefined) {
+export function nodeFromUser(parent, origin, dest) {
   const setup = parseFen(parent.fen).unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
-  const uci = cgToUci(origin, dest, capture);
+  const uci = cgToUci(origin, dest);
   const san = makeSanAndPlay(pos, parseUci(uci));
   const newFen = makeFen(pos.toSetup());
   const dests = chessgroundDests(pos);
-  const newNode = {
-    children: [],
-    fen: newFen,
-    id: uciToId(uci),
-    ply: parent.ply + 1,
-    san,
-    uci,
-    dests,
-  };
+  const newNode = observable(
+    {
+      children: [],
+      fen: newFen,
+      id: uciToId(uci),
+      ply: parent.ply + 1,
+      san,
+      uci,
+      dests,
+    },
+    {},
+    { deep: false }
+  );
   setNodeChecks(newNode, pos);
 
   return newNode;

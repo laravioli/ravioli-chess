@@ -4,8 +4,15 @@
 
 const head = (path) => path.slice(0, 2);
 const tail = (path) => path.slice(2);
-export const init = (path) => path.slice(0, -2);
-export const fromNodeList = (nodes) => nodes.map((n) => n.id).join("");
+
+export const TreePath = {
+  init(path) {
+    return path.slice(0, -2);
+  },
+  fromNodeList(nodes) {
+    return nodes.map((n) => n.id).join("");
+  },
+};
 
 //ops
 
@@ -24,37 +31,27 @@ function collect(from, pickChild) {
   return nodes;
 }
 
-export const last = (nodeList) => nodeList[nodeList.length - 1];
-
-export function updateAll(root, f) {
-  // applies f recursively to all nodes
-  function update(node) {
-    f(node);
-    node.children.forEach(update);
-  }
-  update(root);
-}
-
-export const mainlineNodeList = (from) =>
-  collect(from, (node) => node.children[0]);
-
+export const TreeOps = {
+  last(nodeList) {
+    return nodeList[nodeList.length - 1];
+  },
+  updateAll(root, f) {
+    // applies f recursively to all nodes
+    function update(node) {
+      f(node);
+      node.children.forEach(update);
+    }
+    update(root);
+  },
+  mainlineNodeList(from) {
+    return collect(from, (node) => node.children[0]);
+  },
+};
 //tree
 
 export class Tree {
   constructor(root) {
     this.root = root;
-  }
-
-  pathIsMainline(path) {
-    this.pathIsMainlineFrom(this.root, path);
-  }
-
-  pathIsMainlineFrom(node, path) {
-    if (path === "") return true;
-    const child = node.children[0];
-    return (
-      child?.id === head(path) && this.pathIsMainlineFrom(child, tail(path))
-    );
   }
 
   getNodeList = (path) =>

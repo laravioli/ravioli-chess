@@ -1,13 +1,6 @@
-import { observable, action, runInAction, remove } from "mobx";
+import { observable, action, runInAction } from "mobx";
 import { Chessground } from "@lichess-org/chessground";
-import {
-  init,
-  fromNodeList,
-  last,
-  updateAll,
-  mainlineNodeList,
-  Tree,
-} from "src/lib/game/tree";
+import { TreePath, TreeOps, Tree } from "src/lib/game/tree";
 import { throttle } from "src/lib/common";
 import { isEvalBetter } from "src/lib/eval/utils";
 import { setRoot, nodeFromUser } from "./utils";
@@ -16,12 +9,12 @@ import { makeShapes } from "./autoshape";
 
 export class AnalyseStore {
   board;
-  ceval;
   tree;
+  ceval;
   path;
   nodeList;
   @observable.ref accessor mainline;
-  @observable.shallow accessor node;
+  @observable accessor node;
 
   constructor(rootStore, { fen }) {
     window.analysis = this;
@@ -56,6 +49,7 @@ export class AnalyseStore {
     this.setPath("");
   }
 
+  @action
   reload(fen) {
     this.tree.root = setRoot(fen);
     this.jump("");
@@ -65,17 +59,14 @@ export class AnalyseStore {
   setPath(path) {
     this.path = path;
     this.nodeList = this.tree.getNodeList(path);
-    this.node = last(this.nodeList);
-    this.mainline = mainlineNodeList(this.tree.root);
+    this.node = TreeOps.last(this.nodeList);
+    this.mainline = TreeOps.mainlineNodeList(this.tree.root);
   }
 
   @action
   jump(path) {
-    const pathChanged = path !== this.path;
     this.setPath(path);
-    if (pathChanged) {
-      this.restartCeval();
-    }
+    this.restartCeval();
     this.updateBoard();
   }
 
@@ -87,12 +78,12 @@ export class AnalyseStore {
 
   @action
   jumpPrev() {
-    this.jump(init(this.path));
+    this.jump(TreePath.init(this.path));
   }
 
   @action
   jumpLast() {
-    this.jump(fromNodeList(this.mainline));
+    this.jump(TreePath.fromNodeList(this.mainline));
   }
 
   @action
@@ -147,28 +138,15 @@ export class AnalyseStore {
 
   @action
   clearEvals() {
-    this.ceval?.stop();
-    updateAll(this.tree.root, (node) => {
+    TreeOps.updateAll(this.tree.root, (node) => {
       delete node.ceval;
     });
-    remove(this.node, "ceval");
-
-    this.startCeval();
+    this.restartCeval();
   }
 
   getBestEval(node) {
     return node.ceval && node.ceval.pvs[0].moves[0];
   }
-
-  /*async playUci() {
-    const best = await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(this.getBestEval(this.node));
-      }, 1000);
-    });
-    //this.game.move(best); addNode
-    //this.jump("move");
-  }*/
 
   /* Board */
 
@@ -204,7 +182,7 @@ export class AnalyseStore {
 
   onUserMove() {
     return (origin, dest, capture) => {
-      const newNode = nodeFromUser(this.node, origin, dest, capture);
+      const newNode = nodeFromUser(this.node, origin, dest);
       const newPath = this.tree.addNode(newNode, this.path);
       this.jump(newPath);
     };
