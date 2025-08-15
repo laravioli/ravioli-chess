@@ -1,10 +1,12 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
-import { validateFen } from "chess.js";
+import { observable, action, runInAction } from "mobx";
+import { parseFen } from "chessops/fen";
 import { makeEngine, maxThreads, engineSupported } from "./engine";
 import { localStorage } from "src/main/store/localstorage.js";
 import { CevalState, povChances } from "./utils";
 import { toggle, throttle, clamp } from "../common";
-import { observable, action, runInAction } from "mobx";
+import { defaultPosition, setupPosition } from "chessops/variant";
+import { Result } from "@badrap/result";
 
 const cevalDisabledSentinel = "1";
 
@@ -35,8 +37,13 @@ export class Ceval {
   init(opts) {
     this.opts = opts;
     this.possible = engineSupported();
+    const pos = this.opts.initialFen
+      ? parseFen(this.opts.initialFen).chain((setup) =>
+          setupPosition("chess", setup)
+        )
+      : Result.ok(defaultPosition("chess"));
+    this.analysable = pos.isOk;
     this.allowed = toggle(this.opts.allowed);
-    this.analysable = validateFen(this.opts.initialFen).ok;
     this.enabled =
       this.possible &&
       this.analysable &&

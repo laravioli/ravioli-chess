@@ -1,9 +1,8 @@
-import { useLocalStorage, usePageStore } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
-import { Paper } from '@mantine/core';
-import { renderPvs } from './utils.jsx';
-import { renderLine } from './utils';
-import classes from './move.module.css';
+import { useLocalStorage, usePageStore } from "src/main/hooks/hooks";
+import { observer } from "mobx-react-lite";
+import { Paper } from "@mantine/core";
+import { renderPvs, renderLine } from "./utils.jsx";
+import classes from "./move.module.css";
 
 export const Moves = () => {
   return (
@@ -12,7 +11,8 @@ export const Moves = () => {
       padding="sm"
       shadow="xl"
       radius=""
-      withBorder>
+      withBorder
+    >
       <Pvs />
       <Line />
     </Paper>
@@ -25,8 +25,8 @@ const Pvs = observer(() => {
   return (
     <>
       {analyseStore.ceval.enabled &&
-        !analyseStore.game.currentMove.outcome &&
-        renderPvs(analyseStore.evaluation, multipv)}
+        !analyseStore.node.outcome &&
+        renderPvs(analyseStore.node.ceval, multipv)}
     </>
   );
 });
@@ -34,5 +34,5 @@ const Pvs = observer(() => {
 const Line = observer(() => {
   const analyseStore = usePageStore();
 
-  return <>{renderLine(analyseStore.game.line)}</>;
+  return <>{renderLine(analyseStore.mainline)}</>;
 });

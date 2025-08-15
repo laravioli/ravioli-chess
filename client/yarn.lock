@@ -1002,11 +1002,6 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chess.js@^1.0.0-beta.8:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/chess.js/-/chess.js-1.2.0.tgz#0f963dcf61ef437ccfad06afcbe06ed6978bbf98"
-  integrity sha512-QWdfpAkMslQ48hDDoEzEko6GbYTAKKx4UdXAPEF8nFnAuqp+woyL8LHSbziRP8u1aMAbnlOF0YkXF4ui0Nsubg==
-
 chessops@^0.14.2:
   version "0.14.2"
   resolved "https://registry.yarnpkg.com/chessops/-/chessops-0.14.2.tgz#b5d822e5f92cc94ddb2a74a461b2705b2fa6afe6"
@@ -1923,11 +1918,6 @@ iterator.prototype@^1.1.4:
     get-proto "^1.0.0"
     has-symbols "^1.1.0"
     set-function-name "^2.0.2"
-
-jquery@^3.7.1:
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.7.1.tgz#083ef98927c9a6a74d05a6af02806566d16274de"
-  integrity sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==
 
 js-cookie@^3.0.5:
   version "3.0.5"

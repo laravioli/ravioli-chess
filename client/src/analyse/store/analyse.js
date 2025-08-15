@@ -1,33 +1,43 @@
-import { Chessground } from "@lichess-org/chessground";
-import { uciToMove } from "@lichess-org/chessground/util";
-import { Game } from "src/lib/game/game";
-import { Fen } from "src/lib/fen/fen";
-import { isEvalBetter } from "src/lib/eval/utils";
-import { throttle } from "src/lib/common";
-import { makeShapes } from "./autoshape";
 import { observable, action, runInAction } from "mobx";
+import { Chessground } from "@lichess-org/chessground";
+import {
+  init,
+  fromNodeList,
+  last,
+  updateAll,
+  mainlineNodeList,
+  Tree,
+} from "src/lib/game/tree";
+import { throttle } from "src/lib/common";
+import { isEvalBetter } from "src/lib/eval/utils";
+import { setRoot, nodeFromUser } from "./utils";
+import { uciToMove } from "@lichess-org/chessground/util";
+import { makeShapes } from "./autoshape";
 
 export class AnalyseStore {
   board;
-  game;
   ceval;
-  @observable.ref accessor evaluation = undefined;
+  tree;
+  path;
+  nodeList;
+  @observable.ref accessor mainline;
   @observable.shallow accessor node;
 
   constructor(rootStore, { fen }) {
+    window.analysis = this;
     runInAction(() => {
       this.ui = rootStore.uiStore;
       this.ceval = rootStore.cevalStore;
-      this.game = new Game(fen);
+      this.initTree(fen);
       this.initCeval(fen);
     });
   }
 
-  /* loader */
+  /* Loader */
 
   @action
   onLoad() {
-    /* code run AFTER the page is mounted */
+    /* run AFTER the page is mounted */
     this.startCeval();
   }
 
@@ -37,28 +47,52 @@ export class AnalyseStore {
     this.ceval.stop();
   }
 
-  /* game */
+  /* Tree */
 
   @action
-  newGame(fen) {
-    this.game.load(fen);
+  initTree(fen) {
+    if (!this.tree) this.tree = new Tree(setRoot(fen));
+    else this.tree.root = setRoot(fen);
+    this.setPath("");
     this.restartCeval();
-
-    if (!this.ceval || !this.ceval.enabled) this.evaluation = null;
   }
 
   @action
-  jump(action) {
-    this.game.jump(action);
+  setPath(path) {
+    this.path = path;
+    this.nodeList = this.tree.getNodeList(path);
+    this.node = last(this.nodeList);
+    this.mainline = mainlineNodeList(this.tree.root);
+  }
 
-    const move = this.game.currentMove;
-    if (!this.ceval.enabled || move.ceval || move.outcome)
-      this.evaluation = move.ceval;
-    this.restartCeval();
+  @action
+  jump(path) {
+    const pathChanged = path !== this.path;
+    this.setPath(path);
+    if (pathChanged) {
+      this.restartCeval();
+    }
     this.updateBoard();
   }
 
-  /* ceval */
+  jumpNext() {
+    const child = this.node.children[0];
+    if (child) this.jump(this.path + child.id);
+  }
+
+  jumpPrev() {
+    this.jump(init(this.path));
+  }
+
+  jumpLast() {
+    this.jump(fromNodeList(this.mainline));
+  }
+
+  jumpFirst() {
+    this.jump(this.tree.root);
+  }
+
+  /* Ceval */
 
   initCeval(fen) {
     const opts = {
@@ -72,18 +106,18 @@ export class AnalyseStore {
 
   @action
   onNewCeval(ev) {
-    let move = this.game.currentMove;
-    if (ev.fen !== move.fen) return;
-    if (!move.ceval || isEvalBetter(ev, move.ceval)) {
-      move.ceval = this.evaluation = ev;
+    const node = this.node;
+    if (ev.fen !== node.fen) return;
+    if (!node.ceval || isEvalBetter(ev, node.ceval)) {
+      node.ceval = ev;
     }
     this.setAutoShapes();
   }
 
   startCeval = throttle(800, () => {
     if (this.ceval?.enabled) {
-      if (this.game && !this.game.isGameOver()) {
-        this.ceval.start(this.game.line, undefined);
+      if (this.tree && !this.node.outcome) {
+        this.ceval.start(this.nodeList, undefined);
       } else {
         this.ceval.stop();
       }
@@ -105,26 +139,26 @@ export class AnalyseStore {
 
   @action
   clearEvals() {
-    this.game.line.forEach((move) => {
-      if (move.ceval) move.ceval = null;
+    updateAll(this.tree.root, (node) => {
+      delete node.ceval;
     });
   }
 
-  getBestEval(move) {
-    return move.ceval && move.ceval.pvs[0].moves[0];
+  getBestEval(node) {
+    return node.ceval && node.ceval.pvs[0].moves[0];
   }
 
-  async playUci() {
+  /*async playUci() {
     const best = await new Promise((resolve) => {
       setTimeout(() => {
-        resolve(this.getBestEval(this.game.currentMove));
+        resolve(this.getBestEval(this.node));
       }, 1000);
     });
-    this.game.move(best);
-    this.jump("move");
-  }
+    //this.game.move(best); addNode
+    //this.jump("move");
+  }*/
 
-  /* board */
+  /* Board */
 
   mountBoard(div) {
     const config = this.makeBoardCfg();
@@ -135,36 +169,37 @@ export class AnalyseStore {
     this.board.destroy();
   }
 
-  turnColor(move) {
-    return move.ply % 2 == 0 ? "white" : "black";
+  turnColor(node) {
+    return node.ply % 2 == 0 ? "white" : "black";
   }
 
   updateBoard() {
-    this.board.set(this.moveBoardCfg());
+    this.board.set(this.cgOptions());
     this.setAutoShapes();
   }
 
-  moveBoardCfg = () => {
-    const move = this.game.currentMove;
-    const color = this.turnColor(move);
+  cgOptions = () => {
+    const node = this.node;
+    const color = this.turnColor(node);
     return {
-      fen: move.fen,
+      fen: node.fen,
       turnColor: color,
-      movable: { color: color, dests: move.dests },
-      check: move.check,
-      lastMove: uciToMove(move.uci),
+      movable: { color: color, dests: node.dests },
+      check: node.check,
+      lastMove: uciToMove(node.uci),
     };
   };
 
   onUserMove() {
-    return (orig, dest, capture) => {
-      this.game.move({ from: orig, to: dest });
-      this.jump("move");
+    return (origin, dest, capture) => {
+      const newNode = nodeFromUser(this.node, origin, dest, capture);
+      const newPath = this.tree.addNode(newNode, this.path);
+      this.jump(newPath);
     };
   }
 
   makeBoardCfg = () => {
-    const opts = this.moveBoardCfg();
+    const opts = this.cgOptions();
     return {
       fen: opts.fen,
       turnColor: opts.turnColor,

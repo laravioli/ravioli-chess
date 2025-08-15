@@ -38,8 +38,10 @@ function cgToUci(orig, dest, capture = undefined) {
 }
 
 const setNodeChecks = (node, pos) => {
-  pos.isCheck() && (node["check"] = true);
-  node["check"] && pos.isCheckmate() && (node["outcome"] = true);
+  pos.isCheck() &&
+    (node["check"] = true) &&
+    pos.isCheckmate() &&
+    (node["outcome"] = true);
 };
 
 export function setRoot(fen) {
@@ -53,10 +55,7 @@ export function setRoot(fen) {
   return root;
 }
 
-export function newNodeFromUserMove(
-  parent,
-  { origin, dest, capture = undefined }
-) {
+export function nodeFromUser(parent, origin, dest, capture = undefined) {
   const setup = parseFen(parent.fen).unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
   const uci = cgToUci(origin, dest, capture);

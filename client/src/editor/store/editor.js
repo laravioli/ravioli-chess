@@ -1,6 +1,6 @@
-import { Chessground } from "@lichess-org/chessground";
-import { Fen } from "src/lib/fen/fen";
 import { action, runInAction } from "mobx";
+import { Chessground } from "@lichess-org/chessground";
+import { Fen } from "./fen";
 
 export class EditorStore {
   board = undefined;
