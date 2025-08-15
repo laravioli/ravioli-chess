@@ -7,11 +7,10 @@ export const EvalBar = observer(() => {
   const { uiStore } = useStore();
   const analyseStore = usePageStore();
 
-  if (!analyseStore.ceval.enabled || analyseStore.game.currentMove.outcome)
-    return null;
+  if (!analyseStore.ceval.enabled || analyseStore.node.outcome) return null;
 
-  const progress = analyseStore.evaluation
-    ? povChances("white", analyseStore.evaluation)
+  const progress = analyseStore.node.ceval
+    ? povChances("white", analyseStore.node.ceval)
     : 0.0;
 
   return (

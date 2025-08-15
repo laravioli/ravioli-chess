@@ -1,4 +1,4 @@
-import { observable, action, runInAction } from "mobx";
+import { observable, action, runInAction, remove } from "mobx";
 import { Chessground } from "@lichess-org/chessground";
 import {
   init,
@@ -54,7 +54,11 @@ export class AnalyseStore {
     if (!this.tree) this.tree = new Tree(setRoot(fen));
     else this.tree.root = setRoot(fen);
     this.setPath("");
-    this.restartCeval();
+  }
+
+  reload(fen) {
+    this.tree.root = setRoot(fen);
+    this.jump("");
   }
 
   @action
@@ -75,21 +79,25 @@ export class AnalyseStore {
     this.updateBoard();
   }
 
+  @action
   jumpNext() {
     const child = this.node.children[0];
     if (child) this.jump(this.path + child.id);
   }
 
+  @action
   jumpPrev() {
     this.jump(init(this.path));
   }
 
+  @action
   jumpLast() {
     this.jump(fromNodeList(this.mainline));
   }
 
+  @action
   jumpFirst() {
-    this.jump(this.tree.root);
+    this.jump("");
   }
 
   /* Ceval */
@@ -139,9 +147,13 @@ export class AnalyseStore {
 
   @action
   clearEvals() {
+    this.ceval?.stop();
     updateAll(this.tree.root, (node) => {
       delete node.ceval;
     });
+    remove(this.node, "ceval");
+
+    this.startCeval();
   }
 
   getBestEval(node) {

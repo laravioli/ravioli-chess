@@ -46,40 +46,44 @@ export class Tree {
   }
 
   pathIsMainline(path) {
-    pathIsMainlineFrom(root, path);
+    this.pathIsMainlineFrom(this.root, path);
   }
 
   pathIsMainlineFrom(node, path) {
     if (path === "") return true;
     const child = node.children[0];
-    return child?.id === head(path) && pathIsMainlineFrom(child, tail(path));
+    return (
+      child?.id === head(path) && this.pathIsMainlineFrom(child, tail(path))
+    );
   }
 
   getNodeList = (path) =>
-    collect(root, function (node) {
+    collect(this.root, function (node) {
       const id = head(path);
       if (id === "") return;
       path = tail(path);
       return findChildById(node, id);
     });
 
-  findNode = (path) => findNodeFrom(this.root, path);
+  findNode = (path) => this.findNodeFrom(this.root, path);
 
   findNodeFrom(node, path) {
     if (path === "") return node;
     const child = findChildById(node, head(path));
-    return child ? findNodeFrom(child, tail(path)) : undefined;
+    return child ? this.findNodeFrom(child, tail(path)) : undefined;
   }
 
   updateAt(path, update) {
-    const node = findNode(path);
+    const node = this.findNode(path);
     if (node) update(node);
     return node;
   }
 
   addNode(node, path) {
     const newPath = path + node.id;
-    if (findNode(newPath)) return newPath;
-    return updateAt(path, (n) => n.children.push(node)) ? newPath : undefined;
+    if (this.findNode(newPath)) return newPath;
+    return this.updateAt(path, (n) => n.children.push(node))
+      ? newPath
+      : undefined;
   }
 }

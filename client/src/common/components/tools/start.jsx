@@ -7,7 +7,7 @@ export const StartButton = () => {
   const store = usePageStore();
 
   const onStart = () => {
-    store.newGame?.(INITIAL_FEN);
+    store.reload?.(INITIAL_FEN);
     store.setFen?.(INITIAL_FEN);
   };
 

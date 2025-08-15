@@ -78,6 +78,7 @@ export class Ceval {
       this.lastStarted = { steps, gameId };
       return;
     }
+
     const work = {
       threads: this.threads,
       hashSize: this.hashSize,

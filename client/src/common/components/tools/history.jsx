@@ -3,30 +3,28 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconChevronsRight,
-} from '@tabler/icons-react';
-import { ActionIcon } from '@mantine/core';
-import { usePageStore } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
+} from "@tabler/icons-react";
+import { ActionIcon } from "@mantine/core";
+import { usePageStore } from "src/main/hooks/hooks";
+import { observer } from "mobx-react-lite";
 
 export const History = observer(({ size }) => {
   const pageStore = usePageStore();
   const actions = [
-    { icon: IconChevronsLeft, action: 'start' },
-    { icon: IconChevronLeft, action: 'undo' },
-    { icon: IconChevronRight, action: 'redo' },
-    { icon: IconChevronsRight, action: 'end' },
+    {
+      icon: IconChevronsLeft,
+      action: () => pageStore.jumpFirst(),
+      key: "start",
+    },
+    { icon: IconChevronLeft, action: () => pageStore.jumpPrev(), key: "undo" },
+    { icon: IconChevronRight, action: () => pageStore.jumpNext(), key: "redo" },
+    { icon: IconChevronsRight, action: () => pageStore.jumpLast(), key: "end" },
   ];
 
   return (
     <>
-      {actions.map(({ icon: Icon, action }) => (
-        <ActionIcon
-          key={action}
-          className="icon"
-          size={size}
-          onClick={() => {
-            pageStore.jump(action);
-          }}>
+      {actions.map(({ icon: Icon, action, key }) => (
+        <ActionIcon key={key} className="icon" size={size} onClick={action}>
           <Icon size={50} stroke={1.5} />
         </ActionIcon>
       ))}

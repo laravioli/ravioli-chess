@@ -8,9 +8,9 @@ export const TestButton = () => {
   const store = usePageStore();
   const test = async () => {
     console.log("board " + store.board.getFen());
-    console.log("chess " + store.game?.fen());
-    console.log("fen from module" + store.fen.current);
-    const move = store.game?.currentMove;
+    console.log("chess " + store.node?.fen);
+    console.log("fen from module" + store.fen?.current);
+    const move = store.node;
     if (move) {
       console.log("current move", move);
       console.log("bestEval", store.getBestEval?.(move));

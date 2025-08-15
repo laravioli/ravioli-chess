@@ -49,7 +49,7 @@ export function setRoot(fen) {
   const pos = Chess.fromSetup(setup).unwrap();
   const ply = (setup.turn === "white" ? 0 : 1) + 2 * (setup.fullmoves - 1);
   const dests = chessgroundDests(pos);
-  const root = { fen, id: "", ply, dests };
+  const root = { children: [], fen, id: "", ply, dests };
   setNodeChecks(root, pos);
 
   return root;

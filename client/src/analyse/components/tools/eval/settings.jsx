@@ -1,10 +1,10 @@
-import { usePageStore, useLocalStorage } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
-import { useState, useCallback } from 'react';
-import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
-import { IconSettings } from '@tabler/icons-react';
-import { getRecommendedThreads } from 'src/lib/eval/engine';
-import classes from './eval.module.css';
+import { usePageStore, useLocalStorage } from "src/main/hooks/hooks";
+import { observer } from "mobx-react-lite";
+import { useState, useCallback } from "react";
+import { ActionIcon, Popover, Slider, Stack, Text, Group } from "@mantine/core";
+import { IconSettings } from "@tabler/icons-react";
+import { getRecommendedThreads } from "src/lib/eval/engine";
+import classes from "./eval.module.css";
 
 export const Settings = () => {
   const [opened, setOpened] = useState(false);
@@ -16,12 +16,14 @@ export const Settings = () => {
       onChange={setOpened}
       position="bottom-start"
       shadow="md"
-      width={250}>
+      width={250}
+    >
       <Popover.Target>
         <ActionIcon
           onClick={() => setOpened((o) => !o)}
-          variant={'default'}
-          bd={0}>
+          variant={"default"}
+          bd={0}
+        >
           <IconSettings size={18} />
         </ActionIcon>
       </Popover.Target>
@@ -89,7 +91,6 @@ const MultiPvSettings = observer(() => {
       if (value !== multipv) {
         evalStorage.setMultiPv(value);
         analyseStore.clearEvals();
-        analyseStore.restartCeval();
       }
     },
     [multipv]

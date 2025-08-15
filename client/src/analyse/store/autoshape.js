@@ -14,12 +14,12 @@ export function makeShapes(ctrl) {
   let shapes = [];
 
   if (engine.enabled && engine.search.multiPv) {
-    const move = ctrl.game.currentMove;
-    const bestEval = ctrl.getBestEval(move);
+    const node = ctrl.node;
+    const bestEval = ctrl.getBestEval(node);
     if (bestEval)
       shapes = shapes.concat(makeShapesFromUci(bestEval, "paleBlue"));
-    if (move.ceval && move.ceval.pvs[1]) {
-      move.ceval.pvs.forEach((pv) => {
+    if (node.ceval && node.ceval.pvs[1]) {
+      node.ceval.pvs.forEach((pv) => {
         if (pv.moves[0] == bestEval) return;
         shapes = shapes.concat(makeShapesFromUci(pv.moves[0], "paleGrey"));
       });
