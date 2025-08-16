@@ -7,7 +7,7 @@ import classes from "./move.module.css";
 export const Moves = () => {
   return (
     <Paper
-      className={classes.move}
+      className={classes.moves}
       padding="sm"
       shadow="xl"
       radius=""

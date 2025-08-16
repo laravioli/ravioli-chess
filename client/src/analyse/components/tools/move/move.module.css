@@ -1,4 +1,4 @@
-.move {
+.moves {
   background: var(--mantine-color-dark-8);
   border: none;
   height: clamp(240px, 60vmin, 640px);
@@ -9,19 +9,32 @@
   }
 }
 
-.row {
-  display: flex;
-  box-sizing: border-box;
-  font-weight: 600;
-  height: 30px;
-  overflow: hidden;
-  padding: 0 15px 0 15px;
-  position: relative;
-  width: 100%;
-  gap: 8px;
+.pvs {
+  --text-fz: 13px;
+  --text-lh: 2em;
+  height: 2em;
 }
 
-.text {
-  left: 3rem;
-  position: absolute;
+.lines {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.row {
+  display: flex;
+  flex: 0 0 10%;
+  font-size: 0.8em;
+  justify-content: center;
+  border-inline-end: 1px solid var(--mantine-color-dark-4);
+  background: var(--mantine-color-dark-5);
+  line-height: 2.07em;
+  color: var(--mantine-color-gray-6);
+}
+
+.move {
+  display: flex;
+  flex: 0 0 45%;
+  font-size: 1em;
+  line-height: 1.75em;
+  padding: 0 0.3em 0 0.5em;
 }

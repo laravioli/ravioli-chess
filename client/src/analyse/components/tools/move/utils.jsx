@@ -5,7 +5,7 @@ import { parseUci } from "chessops/util";
 import { parseFen } from "chessops/fen";
 import { renderEval } from "src/lib/eval/utils";
 
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { Text, Divider } from "@mantine/core";
 import classes from "./move.module.css";
 
@@ -26,60 +26,72 @@ function parsePv(pos, pv) {
 }
 
 export function renderPvs(evaluation, multipv) {
-  if (!evaluation) return "";
-  const setup = parseFen(evaluation.fen).unwrap();
-  const pos = setupPosition(lichessRules("standard"), setup);
-  const pvs = Array.from({ length: multipv }, (_, i) => {
-    const pvData = evaluation.pvs?.[i];
-    if (!pvData || !pos) return "";
-    return {
-      moves: parsePv(pos.isOk ? pos.value.clone() : undefined, pvData.moves),
-      eval: pvData,
-    };
-  });
+  let pvs;
+  if (!evaluation) pvs = new Array(multipv).fill({});
+  else {
+    const setup = parseFen(evaluation.fen).unwrap();
+    const pos = setupPosition(lichessRules("standard"), setup);
+    pvs = Array.from({ length: multipv }, (_, i) => {
+      const pvData = evaluation.pvs?.[i];
+      if (!pvData || !pos) return "";
+      return {
+        moves: parsePv(pos.isOk ? pos.value.clone() : undefined, pvData.moves),
+        eval: pvData,
+      };
+    });
+  }
 
   return (
     <>
       {pvs.map((pv, index) => (
-        <Text size="sm" lineClamp={1} key={index}>
-          {multipv > 1 && (
-            <span style={{ opacity: 0.6, marginRight: 6 }}>
-              {getEval(pv.eval)}
-            </span>
-          )}
-          {pv.moves}
-        </Text>
+        <div key={index}>
+          <Text classNames={{ root: classes.pvs }} lineClamp={1}>
+            {multipv > 1 && (
+              <span style={{ opacity: 0.6, marginRight: 6 }}>
+                {getEval(pv.eval)}
+              </span>
+            )}
+            {pv.moves}
+          </Text>
+          <Divider />
+        </div>
       ))}
-      <Divider my="xs" />
     </>
   );
 }
 
 export const renderLine = (line) => {
-  let turn, moves;
-  line = line.slice(1);
+  let turn, move;
   const color = useCallback(
     (ply) => ((ply - 1) % 2 === 0 ? "white" : "black"),
     []
   );
-  return line
-    .map((move, index) => {
-      turn = plyToTurn(move.ply);
-      if (index == 0 && color(move.ply) === "black") {
-        moves = "... " + move.san;
-      } else if (color(move.ply) === "white") {
-        moves = move.san + " " + (line[index + 1]?.san ?? "");
-      } else {
-        return null;
-      }
-      return (
-        <div className={classes.row} key={turn}>
-          {turn + ". "}
-          <Text className={classes.text}> {moves} </Text>
-        </div>
-      );
-    })
-    .filter((value) => value);
+  line = line.slice(1);
+  if (line.length == 0) return null;
+
+  return (
+    <div className={classes.lines}>
+      {line
+        .map((node, index) => {
+          turn = plyToTurn(node.ply);
+          if (index == 0 && color(node.ply) === "black") {
+            move = ["...", node.san];
+          } else if (color(node.ply) === "white") {
+            move = [node.san, line[index + 1]?.san ?? null];
+          } else {
+            return null;
+          }
+          return (
+            <React.Fragment key={turn}>
+              <div className={classes.row}>{turn}</div>
+              <div className={classes.move}>{move[0]}</div>
+              {move[1] && <div className={classes.move}>{move[1]}</div>}
+            </React.Fragment>
+          );
+        })
+        .filter((value) => value)}
+    </div>
+  );
 };
 
 const plyToTurn = (ply) => Math.floor((ply - 1) / 2) + 1;

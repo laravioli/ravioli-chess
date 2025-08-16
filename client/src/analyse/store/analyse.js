@@ -44,8 +44,7 @@ export class AnalyseStore {
 
   @action
   initTree(fen) {
-    if (!this.tree) this.tree = new Tree(makeObservableNode(makeRoot(fen)));
-    else this.tree.root = setRoot(fen);
+    this.tree = new Tree(makeObservableNode(makeRoot(fen)));
     this.setPath("");
   }
 
@@ -141,7 +140,6 @@ export class AnalyseStore {
     TreeOps.updateAll(this.tree.root, (node) => {
       node.ceval = undefined;
     });
-
     this.restartCeval();
   }
 
