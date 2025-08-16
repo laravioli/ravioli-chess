@@ -3,7 +3,7 @@ import { Chessground } from "@lichess-org/chessground";
 import { TreePath, TreeOps, Tree } from "src/lib/game/tree";
 import { throttle } from "src/lib/common";
 import { isEvalBetter } from "src/lib/eval/utils";
-import { setRoot, nodeFromUser } from "./utils";
+import { makeObservableNode, makeRoot, makeNode } from "./node";
 import { uciToMove } from "@lichess-org/chessground/util";
 import { makeShapes } from "./autoshape";
 
@@ -14,7 +14,7 @@ export class AnalyseStore {
   path;
   nodeList;
   @observable.ref accessor mainline;
-  @observable accessor node;
+  @observable.ref accessor node;
 
   constructor(rootStore, { fen }) {
     window.analysis = this;
@@ -44,14 +44,14 @@ export class AnalyseStore {
 
   @action
   initTree(fen) {
-    if (!this.tree) this.tree = new Tree(setRoot(fen));
+    if (!this.tree) this.tree = new Tree(makeObservableNode(makeRoot(fen)));
     else this.tree.root = setRoot(fen);
     this.setPath("");
   }
 
   @action
   reload(fen) {
-    this.tree.root = setRoot(fen);
+    this.tree.root = makeObservableNode(makeRoot(fen));
     this.jump("");
   }
 
@@ -139,8 +139,9 @@ export class AnalyseStore {
   @action
   clearEvals() {
     TreeOps.updateAll(this.tree.root, (node) => {
-      delete node.ceval;
+      node.ceval = undefined;
     });
+
     this.restartCeval();
   }
 
@@ -182,7 +183,8 @@ export class AnalyseStore {
 
   onUserMove() {
     return (origin, dest, capture) => {
-      const newNode = nodeFromUser(this.node, origin, dest);
+      const parent = this.node;
+      const newNode = makeObservableNode(makeNode(parent, origin, dest));
       const newPath = this.tree.addNode(newNode, this.path);
       this.jump(newPath);
     };

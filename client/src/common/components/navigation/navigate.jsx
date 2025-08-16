@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import { Action } from "../tools/action";
 import { IconMathMaxMin, IconEdit } from "@tabler/icons-react";
 import { action } from "mobx";
+import { INITIAL_FEN } from "chessops/fen";
 
 export const Navigate = observer(({ path }) => {
   const pageStore = usePageStore();
@@ -16,7 +17,7 @@ export const Navigate = observer(({ path }) => {
     if (!isEdit || pageStore.fen.legalFen) {
       navigate(path, {
         replace: true,
-        state: { fen: pageStore.fen.current },
+        state: { fen: pageStore.fen?.current || INITIAL_FEN },
       });
     }
   });

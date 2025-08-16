@@ -1,10 +1,3 @@
-import { observable } from "mobx";
-import { Chess } from "chessops/chess";
-import { makeFen, parseFen } from "chessops/fen";
-import { makeSanAndPlay } from "chessops/san";
-import { chessgroundDests } from "chessops/compat";
-import { parseUci } from "chessops/util";
-
 // prettier-ignore
 const SQUARES = [
   'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8',
@@ -26,60 +19,13 @@ function* generateIds() {
   ]);
 }
 
-function uciToId(uci) {
+export function uciToId(uci) {
   const start = uci.slice(0, 2);
   const end = uci.slice(2, 4);
   return `${IDS.get(start)}${IDS.get(end)}`;
 }
 
-function cgToUci(orig, dest) {
+export function cgToUci(orig, dest) {
   let uci = `${orig}${dest}`;
   return uci;
-}
-
-const setNodeChecks = (node, pos) => {
-  pos.isCheck() &&
-    (node["check"] = true) &&
-    pos.isCheckmate() &&
-    (node["outcome"] = true);
-};
-
-export function setRoot(fen) {
-  const setup = parseFen(fen).unwrap();
-  const pos = Chess.fromSetup(setup).unwrap();
-  const ply = (setup.turn === "white" ? 0 : 1) + 2 * (setup.fullmoves - 1);
-  const dests = chessgroundDests(pos);
-  const root = observable(
-    { children: [], fen, id: "", ply, dests },
-    {},
-    { deep: false }
-  );
-  setNodeChecks(root, pos);
-
-  return root;
-}
-
-export function nodeFromUser(parent, origin, dest) {
-  const setup = parseFen(parent.fen).unwrap();
-  const pos = Chess.fromSetup(setup).unwrap();
-  const uci = cgToUci(origin, dest);
-  const san = makeSanAndPlay(pos, parseUci(uci));
-  const newFen = makeFen(pos.toSetup());
-  const dests = chessgroundDests(pos);
-  const newNode = observable(
-    {
-      children: [],
-      fen: newFen,
-      id: uciToId(uci),
-      ply: parent.ply + 1,
-      san,
-      uci,
-      dests,
-    },
-    {},
-    { deep: false }
-  );
-  setNodeChecks(newNode, pos);
-
-  return newNode;
 }

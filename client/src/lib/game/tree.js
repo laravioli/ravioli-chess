@@ -1,5 +1,4 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/tree/tree.ts
-
 //path
 
 const head = (path) => path.slice(0, 2);
