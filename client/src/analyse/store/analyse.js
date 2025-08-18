@@ -1,3 +1,4 @@
+//https://github.com/lichess-org/lila/blob/master/ui/analyse/src/ctrl.ts
 import { observable, action, runInAction } from "mobx";
 import { Chessground } from "@lichess-org/chessground";
 import { TreePath, TreeOps, Tree } from "src/lib/game/tree";
@@ -95,27 +96,28 @@ export class AnalyseStore {
   initCeval(fen) {
     const opts = {
       initialFen: fen,
-      emit: (ev) => {
-        this.onNewCeval(ev);
+      emit: (ev, work) => {
+        this.onNewCeval(ev, work.path);
       },
     };
     this.ceval.setOpts(opts);
   }
 
   @action
-  onNewCeval(ev) {
-    const node = this.node;
-    if (ev.fen !== node.fen) return;
-    if (!node.ceval || isEvalBetter(ev, node.ceval)) {
-      node.ceval = ev;
-    }
-    this.setAutoShapes();
+  onNewCeval(ev, path) {
+    this.tree.updateAt(path, (node) => {
+      if (ev.fen !== node.fen) return;
+      if (!node.ceval || isEvalBetter(ev, node.ceval)) {
+        node.ceval = ev;
+      }
+      if (path === this.path) this.setAutoShapes();
+    });
   }
 
   startCeval = throttle(800, () => {
     if (this.ceval?.enabled) {
       if (this.tree && !this.node.outcome) {
-        this.ceval.start(this.nodeList, undefined);
+        this.ceval.start(this.path, this.nodeList, undefined);
       } else {
         this.ceval.stop();
       }
@@ -137,10 +139,11 @@ export class AnalyseStore {
 
   @action
   clearEvals() {
+    this.ceval?.stop();
     TreeOps.updateAll(this.tree.root, (node) => {
       node.ceval = undefined;
     });
-    this.restartCeval();
+    this.startCeval();
   }
 
   getBestEval(node) {
@@ -156,6 +159,7 @@ export class AnalyseStore {
 
   onUnMountBoard() {
     this.board.destroy();
+    this.board = undefined;
   }
 
   turnColor(node) {
@@ -204,7 +208,6 @@ export class AnalyseStore {
     };
   };
 
-  //reset autoshape before switching page : the problem is i should cancel the throtling of evaluation
   setAutoShapes = () => {
     this.board?.setAutoShapes(makeShapes(this));
   };

@@ -53,11 +53,10 @@ export class Ceval {
 
   onEmit = throttle(200, (ev, work) => {
     this.sortPvsInPlace(ev.pvs, work.ply % 2 === 0 ? "white" : "black");
-
-    this.opts.emit(ev);
+    this.opts.emit(ev, work);
   });
 
-  doStart(steps, gameId) {
+  doStart(path, steps, gameId) {
     if (!this.enabled || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
 
@@ -75,7 +74,7 @@ export class Ceval {
       "movetime" in this.search.by &&
       (step.ceval?.millis ?? 0) >= this.search.by.movetime
     ) {
-      this.lastStarted = { steps, gameId };
+      this.lastStarted = { path, steps, gameId };
       return;
     }
 
@@ -87,6 +86,7 @@ export class Ceval {
       initialFen: steps[0].fen,
       moves: [],
       currentFen: step.fen,
+      path,
       ply: step.ply,
       search: this.search.by,
       multiPv: this.search.multiPv,
@@ -107,13 +107,14 @@ export class Ceval {
     this.worker.start(work);
 
     this.lastStarted = {
+      path,
       steps,
       gameId,
     };
   }
 
-  start(steps, gameId) {
-    this.doStart(steps, gameId);
+  start(path, steps, gameId) {
+    this.doStart(path, steps, gameId);
   }
 
   stop() {

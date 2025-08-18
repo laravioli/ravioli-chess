@@ -1,9 +1,11 @@
 .moves {
+  --paper-radius: var(--mantine-radius-);
   background: var(--mantine-color-dark-8);
   border: none;
   height: clamp(240px, 60vmin, 640px);
-  overflow: hidden;
-
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
   @mixin light {
     background: var(--mantine-color-gray-3);
   }
@@ -12,11 +14,12 @@
 .pvs {
   --text-fz: 13px;
   --text-lh: 2em;
-  height: 2em;
+  min-height: 2em;
 }
 
 .lines {
   display: flex;
+  overflow-y: scroll;
   flex-flow: row wrap;
 }
 
@@ -37,4 +40,9 @@
   font-size: 1em;
   line-height: 1.75em;
   padding: 0 0.3em 0 0.5em;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--mantine-color-blue-6);
+  }
 }

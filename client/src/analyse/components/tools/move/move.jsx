@@ -6,13 +6,7 @@ import classes from "./move.module.css";
 
 export const Moves = () => {
   return (
-    <Paper
-      className={classes.moves}
-      padding="sm"
-      shadow="xl"
-      radius=""
-      withBorder
-    >
+    <Paper className={classes.moves}>
       <Pvs />
       <Line />
     </Paper>
@@ -33,6 +27,13 @@ const Pvs = observer(() => {
 
 const Line = observer(() => {
   const analyseStore = usePageStore();
+  const handlers = {
+    click: (event) => {
+      if (event.target.dataset.p !== undefined) {
+        analyseStore.jump(event.target.dataset.p);
+      }
+    },
+  };
 
-  return <>{renderLine(analyseStore.mainline)}</>;
+  return <>{renderLine(analyseStore.mainline, handlers)}</>;
 });

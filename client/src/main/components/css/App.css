@@ -53,6 +53,7 @@ input:-webkit-autofill {
 .toolbar {
   grid-area: tools;
   border-radius: 6px;
+  user-select: none;
 
   .page-analyse & {
     width: 100%;

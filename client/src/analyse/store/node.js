@@ -16,7 +16,7 @@ export function makeRoot(fen) {
   const ply = (setup.turn === "white" ? 0 : 1) + 2 * (setup.fullmoves - 1);
   const dests = chessgroundDests(pos);
   const isCheck = pos.isCheck();
-  const root = {
+  return {
     children: [],
     fen,
     id: "",
@@ -26,8 +26,6 @@ export function makeRoot(fen) {
     check: isCheck,
     outcome: isCheck && pos.isCheckmate(),
   };
-
-  return root;
 }
 
 export function makeNode(parent, origin, dest) {
@@ -38,7 +36,7 @@ export function makeNode(parent, origin, dest) {
   const newFen = makeFen(pos.toSetup());
   const dests = chessgroundDests(pos);
   const isCheck = pos.isCheck();
-  const newNode = {
+  return {
     children: [],
     fen: newFen,
     id: uciToId(uci),
@@ -50,6 +48,4 @@ export function makeNode(parent, origin, dest) {
     check: isCheck,
     outcome: isCheck && pos.isCheckmate(),
   };
-
-  return newNode;
 }
