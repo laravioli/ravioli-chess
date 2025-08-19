@@ -1,7 +1,8 @@
 import { useLocalStorage, usePageStore } from "src/main/hooks/hooks";
 import { observer } from "mobx-react-lite";
 import { Paper } from "@mantine/core";
-import { renderPvs, renderLine } from "./utils.jsx";
+import { Pvs } from "../eval/pvs.jsx";
+import { renderLine } from "./utils.jsx";
 import classes from "./move.module.css";
 
 export const Moves = () => {
@@ -12,18 +13,6 @@ export const Moves = () => {
     </Paper>
   );
 };
-
-const Pvs = observer(() => {
-  const analyseStore = usePageStore();
-  const multipv = useLocalStorage().evalStorage.multipv;
-  return (
-    <>
-      {analyseStore.ceval.enabled &&
-        !analyseStore.node.outcome &&
-        renderPvs(analyseStore.node.ceval, multipv)}
-    </>
-  );
-});
 
 const Line = observer(() => {
   const analyseStore = usePageStore();

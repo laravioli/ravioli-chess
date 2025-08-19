@@ -154,7 +154,17 @@ export function isEvalBetter(a, b) {
   return a.depth > b.depth || (a.depth === b.depth && a.nodes > b.nodes);
 }
 
-export function renderEval(e) {
+export const getEval = (evaluation) => {
+  if (evaluation) {
+    if (evaluation.mate) {
+      return "#" + evaluation.mate;
+    } else {
+      return renderEval(evaluation.cp);
+    }
+  }
+};
+
+function renderEval(e) {
   e = Math.max(Math.min(Math.round(e / 10) / 10, 99), -99);
   return (e > 0 ? "+" : "") + e.toFixed(1);
 }

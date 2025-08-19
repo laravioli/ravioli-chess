@@ -11,12 +11,6 @@
   }
 }
 
-.pvs {
-  --text-fz: 13px;
-  --text-lh: 2em;
-  min-height: 2em;
-}
-
 .lines {
   display: flex;
   overflow-y: scroll;

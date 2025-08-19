@@ -1,6 +1,6 @@
 import { usePageStore } from "src/main/hooks/hooks";
 import { observer } from "mobx-react-lite";
-import { getEval } from "../move/utils";
+import { getEval } from "src/lib/eval/utils";
 import classes from "./eval.module.css";
 
 export const EvalScore = observer(() => {
