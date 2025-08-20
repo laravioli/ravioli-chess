@@ -10,11 +10,7 @@ export const EvalScore = observer(() => {
   let score = "";
 
   if (evaluation) {
-    if (evaluation.mate) {
-      score = "#" + evaluation.mate;
-    } else {
-      score = getEval(evaluation);
-    }
+    score = getEval(evaluation);
   }
 
   if (analyseStore.node.outcome && analyseStore.ceval.enabled) {

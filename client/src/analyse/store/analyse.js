@@ -12,8 +12,8 @@ export class AnalyseStore {
   board;
   tree;
   ceval;
-  path;
   nodeList;
+  @observable.ref accessor path;
   @observable.ref accessor mainline;
   @observable.ref accessor node;
 

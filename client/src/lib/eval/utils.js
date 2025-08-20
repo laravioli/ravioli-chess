@@ -158,7 +158,7 @@ export const getEval = (evaluation) => {
   if (evaluation) {
     if (evaluation.mate) {
       return "#" + evaluation.mate;
-    } else {
+    } else if (evaluation.cp) {
       return renderEval(evaluation.cp);
     }
   }
