@@ -48,7 +48,7 @@ export class UserStore {
       });
       setTimeout(
         () =>
-          this._syncTab.postMessage({
+          this.channel.postMessage({
             type: "login",
             username: this.username,
           }),
@@ -70,7 +70,7 @@ export class UserStore {
       });
       setTimeout(
         () =>
-          this._syncTab.postMessage({
+          this.channel.postMessage({
             type: "logout",
           }),
         0
