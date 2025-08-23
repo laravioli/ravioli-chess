@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+//https://github.com/lichess-org/lila/blob/master/ui/analyse/src/treeView/columnView.ts
+import React, { useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import { usePageStore } from "src/main/hooks/hooks";
 import { defined } from "src/lib/common";
@@ -57,7 +58,54 @@ function renderChildrenOf(ctrl, node, opts) {
           })}
         </>
       );
+    const mainChildren = renderChildrenOf(ctrl, main, {
+      parentPath: opts.parentPath + main.id,
+      isMainline: true,
+    });
+
+    const passOpts = {
+      parentPath: opts.parentPath,
+      isMainline: true,
+    };
+
+    return (
+      <>
+        {isWhite && renderIndex(main.ply, false)}
+        {renderMoveOf(ctrl, main, passOpts)}
+        {isWhite && emptyMove()}
+        <div className={classes.interrupt}>
+          {renderLines(ctrl, cs.slice(1), {
+            parentPath: opts.parentPath,
+            isMainline: passOpts.isMainline,
+          })}
+        </div>
+        {isWhite && mainChildren && renderIndex(main.ply, false)}
+        {isWhite && mainChildren && emptyMove()}
+        {mainChildren}
+      </>
+    );
   }
+  if (!cs[1]) return renderMoveAndChildrenOf(ctrl, main, opts);
+  return renderLines(ctrl, cs, opts);
+}
+
+function renderLines(ctrl, nodes, opts) {
+  return (
+    <div className={clsx(classes.lines, !nodes[1] && classes.single)}>
+      {nodes.map((n) => (
+        <React.Fragment key={n.id}>
+          <div className={classes.line}>
+            <div className={classes.branch} />
+            {renderMoveAndChildrenOf(ctrl, n, {
+              parentPath: opts.parentPath,
+              isMainline: false,
+              withIndex: true,
+            })}
+          </div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
 }
 
 function eventPath(e) {

@@ -1,3 +1,5 @@
+/*https://github.com/lichess-org/lila/blob/master/ui/lib/css/tree/_tree.scss*/
+
 .displayarea {
   --paper-radius: var(--mantine-radius-);
   background: var(--mantine-color-dark-8);
@@ -12,6 +14,8 @@
 }
 
 .tree {
+  --c-border: hsl(0, 0%, 25%);
+  --c-font-dim: hsl(0, 0%, 58%);
   display: flex;
   overflow-y: scroll;
   flex-flow: row wrap;
@@ -22,9 +26,32 @@
     font-size: 0.8em;
     justify-content: center;
     border-inline-end: 1px solid var(--mantine-color-dark-4);
-    background: var(--mantine-color-dark-5);
+    background: var(--mantine-color-dark-6);
     line-height: 2.07em;
     color: var(--mantine-color-gray-6);
+  }
+
+  & .move {
+    display: inline-block;
+    cursor: pointer;
+    font-size: 1.092em;
+    padding: 0 2px;
+
+    & .index {
+      font-size: 90%;
+      color: var(--c-font-dim);
+      padding-inline-start: 5px;
+
+      &:first-child {
+        padding-inline-start: 0;
+      }
+    }
+
+    &.active {
+      font-weight: bold;
+      background: var(--mantine-color-blue-9);
+      color: var(--c-font-clear);
+    }
   }
 
   & > .move {
@@ -42,19 +69,82 @@
       color: var(--c-font-dim);
     }
 
-    &.active {
-      font-weight: bold;
-      background: var(--mantine-color-blue-9);
-      color: var(--c-font-clear);
-    }
-
     &.empty {
       color: var(--mantine-color-gray-6);
       cursor: default;
     }
+  }
 
-    &:not(.empty):hover {
-      background-color: var(--mantine-color-blue-6);
+  & .move:not(.empty):hover {
+    background-color: var(--mantine-color-blue-6);
+  }
+
+  & > .interrupt {
+    font-size: 95%;
+    flex: 0 0 100%;
+    background: var(--mantine-color-dark-6);
+    border-top: 1px solid var(--c-border);
+    border-bottom: 1px solid var(--c-border);
+    max-width: 100%;
+  }
+
+  & .line {
+    display: block;
+    padding-inline-start: 7px;
+    position: relative;
+    margin: 2px 0;
+
+    & > .branch {
+      border-inline-start: 2px solid var(--c-border);
+      margin-inline-start: -9px;
+      position: absolute;
+      width: 8px;
+      margin-top: -2px;
+      height: calc(100% + 2px);
     }
+    &:last-child > .branch,
+    &.expand > .branch {
+      height: calc(0.8em + 2px);
+    }
+    & > .branch::before {
+      margin-top: 0.8em;
+      content: " ";
+      border-top: 2px solid var(--c-border);
+      position: absolute;
+      width: 7px;
+      height: 6px;
+    }
+
+    & .move.active {
+      border-radius: 6px;
+      outline: 1px solid var(--mantine-color-blue-6);
+    }
+  }
+
+  & .lines {
+    display: block;
+    margin-top: 2px;
+    margin-inline-start: 6px;
+    margin-bottom: 0.8em;
+    padding-inline-start: 2px;
+
+    &.single {
+      border-inline-start: none;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+    & .move {
+      font-size: 13px;
+    }
+
+    & .lines {
+      margin-inline-start: 1px;
+    }
+  }
+
+  & > .interrupt > .lines {
+    margin-inline-start: 0px;
   }
 }
