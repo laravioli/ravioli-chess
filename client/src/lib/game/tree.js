@@ -1,5 +1,6 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/tree/tree.ts
-//path
+
+import { observable } from "mobx";
 
 const head = (path) => path.slice(0, 2);
 const tail = (path) => path.slice(2);
@@ -49,6 +50,8 @@ export const TreeOps = {
 //tree
 
 export class Tree {
+  @observable.ref accessor root;
+
   constructor(root) {
     this.root = root;
   }

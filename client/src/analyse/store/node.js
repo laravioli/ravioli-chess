@@ -6,8 +6,11 @@ import { chessgroundDests } from "chessops/compat";
 import { uciToId, cgToUci } from "./utils";
 import { parseUci } from "chessops";
 
+//todo : find a good way to make lines reactive (the trivial solution is to pass around path)
 export function makeObservableNode(node) {
-  return makeObservable(node, { ceval: observable.ref });
+  return makeObservable(node, {
+    ceval: observable.ref,
+  });
 }
 
 export function makeRoot(fen) {

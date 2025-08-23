@@ -12,7 +12,7 @@ export const Line = observer(() => {
     () => ({
       click: (e) => {
         const path = eventPath(e);
-        if (defined(path)) {
+        if (path) {
           analyseStore.jump(path);
         }
       },
@@ -20,7 +20,9 @@ export const Line = observer(() => {
     []
   );
 
-  return <>{renderLines(analyseStore, handlers)}</>;
+  return (
+    <>{defined(analyseStore.node) && renderLines(analyseStore, handlers)}</>
+  );
 });
 
 function renderLines(ctrl, handlers) {
@@ -33,7 +35,6 @@ function renderLines(ctrl, handlers) {
       {renderChildrenOf(ctrl, root, {
         parentPath: "",
         isMainline: true,
-        activePath: ctrl.path,
       })}
     </div>
   );
@@ -53,7 +54,6 @@ function renderChildrenOf(ctrl, node, opts) {
           {renderMoveAndChildrenOf(ctrl, main, {
             parentPath: opts.parentPath,
             isMainline: true,
-            activePath: opts.activePath,
           })}
         </>
       );
@@ -92,7 +92,7 @@ function renderMoveOf(ctrl, node, opts) {
 function renderMainlineMoveOf(ctrl, node, opts) {
   const path = opts.parentPath + node.id;
   return (
-    <div className={moveClasses(path, opts)} p={path}>
+    <div className={moveClasses(path, ctrl.path)} p={path}>
       {renderMove(node)}
     </div>
   );
@@ -103,7 +103,7 @@ function renderVariationMoveOf(ctrl, node, opts) {
     path = opts.parentPath + node.id;
 
   return (
-    <div className={moveClasses(path, opts)} p={path}>
+    <div className={moveClasses(path, ctrl.path)} p={path}>
       {withIndex && renderIndex(node.ply, true)}
       {node.san}
     </div>
@@ -111,7 +111,7 @@ function renderVariationMoveOf(ctrl, node, opts) {
 }
 
 function emptyMove() {
-  return <div className={classes.move}>...</div>;
+  return <div className={clsx([classes.move, classes.empty])}>...</div>;
 }
 
 function renderMoveAndChildrenOf(ctrl, node, opts) {
@@ -122,14 +122,13 @@ function renderMoveAndChildrenOf(ctrl, node, opts) {
       {renderChildrenOf(ctrl, node, {
         parentPath: path,
         isMainline: opts.isMainline,
-        activePath: opts.activePath,
       })}
     </>
   );
 }
 
-function moveClasses(path, opts) {
+function moveClasses(path, currentPath) {
   const cls = [classes.move];
-  if (opts.activePath === path) cls.push(classes.active);
+  if (currentPath === path) cls.push(classes.active);
   return clsx(cls);
 }

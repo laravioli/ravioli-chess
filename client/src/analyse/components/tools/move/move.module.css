@@ -48,7 +48,12 @@
       color: var(--c-font-clear);
     }
 
-    &:hover {
+    &.empty {
+      color: var(--mantine-color-gray-6);
+      cursor: default;
+    }
+
+    &:not(.empty):hover {
       background-color: var(--mantine-color-blue-6);
     }
   }
