@@ -25,7 +25,7 @@ export const History = observer(({ size }) => {
     <>
       {actions.map(({ icon: Icon, action, key }) => (
         <ActionIcon key={key} className="icon" size={size} onClick={action}>
-          <Icon size={50} stroke={1.5} />
+          <Icon size={60} stroke={1.2} />
         </ActionIcon>
       ))}
     </>

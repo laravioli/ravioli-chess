@@ -1,5 +1,5 @@
 .action {
-  --ai-size: var(--ai-size-sm);
+  --ai-size: calc(1.6rem * var(--mantine-scale));
   border: 0;
 
   :global(.page-analyse) & {

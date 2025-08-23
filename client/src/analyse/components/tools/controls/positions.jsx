@@ -42,13 +42,9 @@ export const Positions = observer(() => {
           <Tooltip label="select position" position="bottom">
             <ActionIcon
               className="icon"
-              size="sm"
               onClick={() => combobox.toggleDropdown()}
-              styles={{
-                root: { border: 0 },
-              }}
             >
-              <IconChessRook size={40} stroke={1.2}></IconChessRook>
+              <IconChessRook stroke={1.2}></IconChessRook>
             </ActionIcon>
           </Tooltip>
         </Combobox.Target>
