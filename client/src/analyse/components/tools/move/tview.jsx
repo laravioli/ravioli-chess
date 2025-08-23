@@ -6,7 +6,7 @@ import { getEval } from "src/lib/eval/utils";
 import clsx from "clsx";
 import classes from "./move.module.css";
 
-export const Line = observer(() => {
+export const TView = observer(() => {
   const analyseStore = usePageStore();
   const handlers = useMemo(
     () => ({
@@ -21,15 +21,15 @@ export const Line = observer(() => {
   );
 
   return (
-    <>{defined(analyseStore.node) && renderLines(analyseStore, handlers)}</>
+    <>{defined(analyseStore.node) && renderTree(analyseStore, handlers)}</>
   );
 });
 
-function renderLines(ctrl, handlers) {
+function renderTree(ctrl, handlers) {
   const root = ctrl.tree.root;
   const blackStarts = (root.ply & 1) === 1;
   return (
-    <div className={classes.lines} onClick={handlers["click"]}>
+    <div className={classes.tree} onClick={handlers["click"]}>
       {blackStarts && renderIndex(root.ply, false)}
       {blackStarts && emptyMove()}
       {renderChildrenOf(ctrl, root, {

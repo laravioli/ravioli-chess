@@ -1,4 +1,4 @@
-.moves {
+.displayarea {
   --paper-radius: var(--mantine-radius-);
   background: var(--mantine-color-dark-8);
   border: none;
@@ -11,7 +11,7 @@
   }
 }
 
-.lines {
+.tree {
   display: flex;
   overflow-y: scroll;
   flex-flow: row wrap;
