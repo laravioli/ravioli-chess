@@ -1,7 +1,7 @@
 import { usePageStore } from "src/main/hooks/hooks";
 import { useNavigate } from "react-router";
 import { observer } from "mobx-react-lite";
-import { Action } from "../tools/action";
+import { Action } from "../controls/action";
 import { IconMathMaxMin, IconEdit } from "@tabler/icons-react";
 import { action } from "mobx";
 import { INITIAL_FEN } from "chessops/fen";
@@ -17,7 +17,7 @@ export const Navigate = observer(({ path }) => {
     if (!isEdit || pageStore.fen.legalFen) {
       navigate(path, {
         replace: true,
-        state: { fen: pageStore.fen?.current || INITIAL_FEN },
+        state: { fen: getFen(path, pageStore) || INITIAL_FEN },
       });
     }
   });
@@ -32,3 +32,6 @@ export const Navigate = observer(({ path }) => {
     </Action>
   );
 });
+
+const getFen = (path, store) =>
+  path === "/editor" ? store.node?.fen : store.fen.current;

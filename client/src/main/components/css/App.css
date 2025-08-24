@@ -8,9 +8,10 @@ html {
 }
 
 :root {
-  --board-min-width: 19rem;
-  --board-max-width: 43rem;
-  --board-scale: clamp(var(--board-min-width), 72vmin, var(--board-max-width));
+  --main-bradius: 6px;
+  --board-min-width: 16rem;
+  --board-max-width: 50rem;
+  --board-scale: clamp(var(--board-min-width), 80vmin, var(--board-max-width));
 }
 
 input:-webkit-autofill {
@@ -26,18 +27,37 @@ input:-webkit-autofill {
     1fr 1vw;
 }
 
+/*analyse and editor layout*/
+
 .page-analyse,
 .page-editor {
   grid-area: main;
   display: grid;
-  place-items: center;
   grid-template-areas:
-    "evalbar board . tools"
-    "evalbar board . tools"
+    "evalbar board . side"
     ". copyables . .";
-  grid-template-rows: auto 1fr min-content;
-  grid-template-columns: 1rem var(--board-scale) 1rem minmax(10rem, 21rem);
+  grid-template-rows: var(--board-scale) auto;
+  grid-template-columns: 1rem var(--board-scale) 1rem minmax(16rem, 24rem);
 }
+
+.analyse__side {
+  grid-area: side;
+  display: grid;
+  grid-template-areas:
+    "tools"
+    "controls";
+  grid-template-rows: 1fr min-content;
+}
+
+.editor__side {
+  grid-area: side;
+  display: grid;
+  align-self: center;
+  grid-template-areas: "controls";
+  grid-template-rows: min-content;
+}
+
+/*play layout*/
 
 .page-play {
   grid-area: main;
@@ -50,21 +70,31 @@ input:-webkit-autofill {
     1rem max-content;
 }
 
+/*common layout*/
+
 .toolbar {
   grid-area: tools;
-  border-radius: 6px;
-  user-select: none;
-
-  .page-analyse & {
-    width: 100%;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+  border-radius: var(--main-bradius);
+  background: var(--mantine-color-dark-8);
+  @mixin light {
+    background: var(--mantine-color-gray-4);
   }
+  user-select: none;
+}
+
+.controls {
+  grid-area: controls;
+  border-radius: 0 0 var(--main-bradius) var(--main-bradius);
 }
 
 .board {
   grid-area: board;
   width: 100%;
-  height: auto; /* Let height adjust based on width */
-  aspect-ratio: 1; /* Enforces a square aspect ratio */
+  height: auto;
+  aspect-ratio: 1;
   max-width: var(--board-max-width);
   min-width: var(--board-min-width);
   direction: ltr;
@@ -73,8 +103,12 @@ input:-webkit-autofill {
 
 .copyables {
   grid-area: copyables;
+  align-self: start;
+  margin-top: 15px;
   width: 100%;
 }
+
+/*misc */
 
 .icon {
   --ai-size: calc(1.6rem * var(--mantine-scale));

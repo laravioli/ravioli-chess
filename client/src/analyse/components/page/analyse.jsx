@@ -1,7 +1,16 @@
 import { PageStoreProvider } from "src/main/context/provider";
 import { EvalBar } from "../tools/eval/bar";
 import { Board } from "src/common/components/board/board";
+import { FenInput } from "../underboard/feninput";
 import { Tools } from "../tools/tools";
+import { Controls } from "../controls/controls";
+
+const Side = () => (
+  <div className="analyse__side">
+    <Tools />
+    <Controls />
+  </div>
+);
 
 const Analyse = () => {
   return (
@@ -9,7 +18,8 @@ const Analyse = () => {
       <div className={"page-analyse"}>
         <EvalBar />
         <Board />
-        <Tools />
+        <Side />
+        <FenInput />
       </div>
     </PageStoreProvider>
   );

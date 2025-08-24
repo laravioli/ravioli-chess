@@ -3,7 +3,7 @@ import { usePageStore } from "src/main/hooks/hooks";
 import { observer } from "mobx-react-lite";
 import { autorun } from "mobx";
 import { TextInput } from "@mantine/core";
-import classes from "./fen.module.css";
+import classes from "src/common/css/fen.module.css";
 import { action } from "mobx";
 
 export const FenInput = observer(() => {
@@ -44,7 +44,6 @@ export const FenInput = observer(() => {
       variant="filled"
       onBlur={onBlur}
       onKeyDown={onKeyDown}
-      readOnly={!!pageStore.tree}
       classNames={{ root: classes.root, input: classes.input }}
     />
   );

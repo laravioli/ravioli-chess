@@ -1,5 +1,5 @@
 import { usePageStore } from "src/main/hooks/hooks";
-import { Action } from "src/common/components/tools/action";
+import { Action } from "src/common/components/controls/action";
 import { IconTrash } from "@tabler/icons-react";
 import { EMPTY_FEN } from "chessops/fen";
 

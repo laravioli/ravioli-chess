@@ -2,15 +2,13 @@
 
 .displayarea {
   --paper-radius: var(--mantine-radius-);
-  background: var(--mantine-color-dark-8);
+  background: inherit;
+  position: relative;
   border: none;
-  height: clamp(240px, 60vmin, 640px);
   display: flex;
   flex-direction: column;
-  overflow: auto;
-  @mixin light {
-    background: var(--mantine-color-gray-3);
-  }
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .tree {
