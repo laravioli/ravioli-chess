@@ -1,6 +1,6 @@
-import { useStore, usePageStore } from 'src/main/hooks/hooks';
-import { Action } from './action';
-import { IconRepeat } from '@tabler/icons-react';
+import { useStore, usePageStore } from "src/main/hooks/hooks";
+import { Action } from "./action";
+import { IconRepeat } from "@tabler/icons-react";
 
 export const FlipButton = () => {
   const store = usePageStore();
@@ -11,7 +11,7 @@ export const FlipButton = () => {
 
   return (
     <Action label="flip board" onClick={onFlip}>
-      <IconRepeat size={40} stroke={1.2} />
+      <IconRepeat size={40} stroke={1.2} color="gray" />
     </Action>
   );
 };

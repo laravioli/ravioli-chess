@@ -28,7 +28,7 @@ const CastlingBox = observer(({ id, label }) => {
     <Checkbox
       checked={castlingRight}
       label={label}
-      color="gray"
+      color="dark"
       variant="outline"
       radius="xs"
       onChange={onChange}

@@ -40,7 +40,7 @@ export const FenInput = observer(() => {
       ref={inputRef}
       className="copyables"
       leftSectionPointerEvents="none"
-      leftSection="FEN"
+      leftSection={"FEN"}
       variant="filled"
       onBlur={onBlur}
       onKeyDown={onKeyDown}

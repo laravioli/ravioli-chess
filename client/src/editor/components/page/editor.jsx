@@ -2,10 +2,15 @@ import { PageStoreProvider } from "src/main/context/provider";
 import { Board } from "src/common/components/board/board";
 import { FenInput } from "../fen/feninput";
 import { Controls } from "../controls/controls";
+import { SparePieces } from "../spare/spare";
 
 const Side = () => (
   <div className="editor__side">
-    <Controls />
+    <div>
+      <SparePieces side="top" />
+      <Controls />
+      <SparePieces side="bottom" />
+    </div>
   </div>
 );
 

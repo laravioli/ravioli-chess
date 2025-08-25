@@ -51,10 +51,22 @@ input:-webkit-autofill {
 
 .editor__side {
   grid-area: side;
-  display: grid;
-  align-self: center;
-  grid-template-areas: "controls";
-  grid-template-rows: min-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.editor__side {
+  user-select: none;
+
+  & > div {
+    background-color: var(--mantine-color-dark-6);
+    border: light-dark(
+      1px solid var(--mantine-color-gray-5),
+      1px solid var(--mantine-color-dark-4)
+    );
+    border-radius: var(--main-bradius);
+  }
 }
 
 /*play layout*/
@@ -88,6 +100,11 @@ input:-webkit-autofill {
 .controls {
   grid-area: controls;
   border-radius: 0 0 var(--main-bradius) var(--main-bradius);
+
+  .page-editor & {
+    margin-top: 5%;
+    margin-bottom: 5%;
+  }
 }
 
 .board {

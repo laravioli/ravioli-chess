@@ -1,0 +1,93 @@
+.spare-top {
+  grid-area: spare-top;
+  border-bottom: light-dark(
+    1px solid var(--mantine-color-gray-5),
+    2px solid var(--mantine-color-dark-5)
+  );
+}
+
+.spare-bottom {
+  grid-area: spare-bottom;
+  border-top: light-dark(
+    1px solid var(--mantine-color-gray-5),
+    2px solid var(--mantine-color-dark-5)
+  );
+}
+
+.spare-bottom,
+.spare-top {
+  display: flex;
+  flex-wrap: wrap;
+  cursor: pointer;
+  justify-content: space-around;
+  background: var(--mantine-color-dark-6);
+}
+
+.spare {
+  height: auto;
+  flex: 0 0 16.66%;
+  transition: all 150ms;
+
+  & > div {
+    position: relative;
+    display: block;
+    height: 0;
+    padding-bottom: 100%;
+    width: 100%;
+
+    & > .piece {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      z-index: 2;
+      will-change: transform;
+      pointer-events: none;
+    }
+  }
+}
+
+.spare-white {
+  & .pawn {
+    background-image: url("/images/pieces/bases/wP.png");
+  }
+  & .knight {
+    background-image: url("/images/pieces/bases/wB.png");
+  }
+  & .bishop {
+    background-image: url("/images/pieces/bases/wN.png");
+  }
+  & .rook {
+    background-image: url("/images/pieces/bases/wR.png");
+  }
+  & .queen {
+    background-image: url("/images/pieces/bases/wQ.png");
+  }
+  & .king {
+    background-image: url("/images/pieces/bases/wK.png");
+  }
+}
+
+.spare-black {
+  & .pawn {
+    background-image: url("/images/pieces/bases/bP.png");
+  }
+  & .knight {
+    background-image: url("/images/pieces/bases/bB.png");
+  }
+  & .bishop {
+    background-image: url("/images/pieces/bases/bN.png");
+  }
+  & .rook {
+    background-image: url("/images/pieces/bases/bR.png");
+  }
+  & .queen {
+    background-image: url("/images/pieces/bases/bQ.png");
+  }
+  & .king {
+    background-image: url("/images/pieces/bases/bK.png");
+  }
+}

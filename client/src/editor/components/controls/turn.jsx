@@ -1,6 +1,7 @@
 import { usePageStore } from "src/main/hooks/hooks";
 import { observer } from "mobx-react-lite";
 import { NativeSelect } from "@mantine/core";
+import classes from "./controls.module.css";
 
 export const TurnToPlay = observer(() => {
   const editorStore = usePageStore();
@@ -19,6 +20,7 @@ export const TurnToPlay = observer(() => {
       value={editorStore.fen.turn}
       onChange={onChange}
       data={data}
+      classNames={{ input: classes.select }}
     />
   );
 });

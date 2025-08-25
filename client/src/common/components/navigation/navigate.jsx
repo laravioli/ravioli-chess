@@ -12,6 +12,7 @@ export const Navigate = observer(({ path }) => {
   const isEdit = path !== "/editor";
   const label = isEdit ? "analysis board" : "edit board";
   const Icon = isEdit ? IconMathMaxMin : IconEdit;
+  const disabled = isEdit && !pageStore.fen.legalFen;
 
   const onClick = action(() => {
     if (!isEdit || pageStore.fen.legalFen) {
@@ -23,12 +24,8 @@ export const Navigate = observer(({ path }) => {
   });
 
   return (
-    <Action
-      label={label}
-      onClick={onClick}
-      disabled={isEdit && !pageStore.fen.legalFen}
-    >
-      <Icon size={30} stroke={1.2} />
+    <Action label={label} onClick={onClick} disabled={disabled}>
+      <Icon size={30} stroke={1.2} color={disabled ? "gray" : "blue"} />
     </Action>
   );
 });

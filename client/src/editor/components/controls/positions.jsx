@@ -56,7 +56,7 @@ export const Positions = observer(() => {
       value={value}
       onChange={onChange}
       data={data}
-      classNames={{ wrapper: classes.wrapper }}
+      classNames={{ input: classes.select }}
     />
   );
 });
