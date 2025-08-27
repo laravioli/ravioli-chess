@@ -1,0 +1,36 @@
+.analyse {
+  grid-area: main;
+  display: grid;
+  grid-template-areas:
+    "evalbar board . side"
+    ". copyables . .";
+  grid-template-rows: var(--board-width) auto;
+  grid-template-columns: 1rem var(--board-width) 1rem minmax(16rem, 24rem);
+
+  & > .evalbar {
+    grid-area: evalbar;
+  }
+
+  & > .side {
+    grid-area: side;
+    display: grid;
+    grid-template-areas:
+      "tools"
+      "controls";
+    grid-template-rows: 1fr min-content;
+
+    & > .tools {
+      grid-area: tools;
+    }
+
+    & > .controls {
+      grid-area: controls;
+    }
+  }
+
+  & > .copyables {
+    grid-area: copyables;
+    align-self: start;
+    margin-top: 15px;
+  }
+}

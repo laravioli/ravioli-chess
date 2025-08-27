@@ -1,0 +1,6 @@
+.editor {
+  --icon-light: var(--mantine-color-gray-4);
+  --icon-light-hover: var(--mantine-color-gray-3);
+  --icon-dark: var(--mantine-color-dark-6);
+  --icon-dark-hover: var(--mantine-color-dark-5);
+}

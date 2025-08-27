@@ -7,7 +7,7 @@ export const ClearButton = () => {
   const editorStore = usePageStore();
   return (
     <Action label="clear board" onClick={() => editorStore.setFen(EMPTY_FEN)}>
-      <IconTrash size={40} stroke={1.2} color="gray" />
+      <IconTrash size={40} stroke={1.2} />
     </Action>
   );
 };

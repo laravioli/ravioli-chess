@@ -8,7 +8,7 @@ import { ActionIcon } from "@mantine/core";
 import { usePageStore } from "src/main/hooks/hooks";
 import { observer } from "mobx-react-lite";
 
-export const History = observer(({ size }) => {
+export const History = observer(({ className, size }) => {
   const pageStore = usePageStore();
   const actions = [
     {
@@ -24,7 +24,12 @@ export const History = observer(({ size }) => {
   return (
     <>
       {actions.map(({ icon: Icon, action, key }) => (
-        <ActionIcon key={key} className="icon" size={size} onClick={action}>
+        <ActionIcon
+          key={key}
+          className={className}
+          size={size}
+          onClick={action}
+        >
           <Icon size={60} stroke={1.2} />
         </ActionIcon>
       ))}

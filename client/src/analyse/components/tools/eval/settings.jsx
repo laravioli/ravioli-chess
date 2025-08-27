@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { ActionIcon, Popover, Slider, Stack, Text, Group } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
 import { getRecommendedThreads } from "src/lib/eval/engine";
-import classes from "./eval.module.css";
+import classes from "../../../css/eval.module.css";
 
 export const Settings = () => {
   const [opened, setOpened] = useState(false);

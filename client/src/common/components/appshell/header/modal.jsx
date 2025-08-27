@@ -1,7 +1,7 @@
-import { useDisclosure } from '@mantine/hooks';
-import { useLocalStorage } from 'src/main/hooks/hooks';
-import { useCallback, useMemo } from 'react';
-import { observer } from 'mobx-react-lite';
+import { useDisclosure } from "@mantine/hooks";
+import { useLocalStorage } from "src/main/hooks/hooks";
+import { useCallback, useMemo } from "react";
+import { observer } from "mobx-react-lite";
 import {
   Modal,
   NativeSelect,
@@ -11,9 +11,9 @@ import {
   Button,
   Group,
   Stack,
-} from '@mantine/core';
-import { Link } from 'react-router';
-import classes from './header.module.css';
+} from "@mantine/core";
+import { Link } from "react-router";
+import classes from "../../../css/header.module.css";
 
 export const PlayModal = () => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -49,7 +49,7 @@ const AnonSelect = observer(() => {
     <NativeSelect
       value={lobbyStorage.anon}
       label="with"
-      data={['friend', 'random player', 'computer']}
+      data={["friend", "random player", "computer"]}
       onChange={(event) => lobbyStorage.setAnon(event.currentTarget.value)}
     />
   );
@@ -80,7 +80,7 @@ const AiLevel = observer(() => {
         label={null}
         marks={marks}
         classNames={{ mark: classes.mark }}
-        disabled={lobbyStorage.anon !== 'computer'}
+        disabled={lobbyStorage.anon !== "computer"}
       />
     </>
   );
@@ -93,8 +93,8 @@ const TimeMode = observer(() => {
       value={lobbyStorage.timeMode}
       label="time control"
       data={[
-        { label: 'Real Time', value: 'realTime' },
-        { label: 'Unlimited', value: 'unlimited' },
+        { label: "Real Time", value: "realTime" },
+        { label: "Unlimited", value: "unlimited" },
       ]}
       onChange={(event) => lobbyStorage.setTimeMode(event.currentTarget.value)}
     />
@@ -130,7 +130,7 @@ const GameClock = observer(() => {
           lobbyStorage.setTime(scale(event));
         }}
         scale={scale}
-        disabled={lobbyStorage.timeMode !== 'realTime'}
+        disabled={lobbyStorage.timeMode !== "realTime"}
       />
       <Text size="sm">
         Increment in secondes : <b>{lobbyStorage.increment}</b>
@@ -144,7 +144,7 @@ const GameClock = observer(() => {
         }}
         label={null}
         scale={scale}
-        disabled={lobbyStorage.timeMode !== 'realTime'}
+        disabled={lobbyStorage.timeMode !== "realTime"}
       />
     </>
   );
@@ -158,7 +158,7 @@ const Side = observer(() => {
       value={lobbyStorage.side}
       label="side"
       onChange={(event) => lobbyStorage.setSide(event.currentTarget.value)}
-      data={['white', 'black', 'random']}
+      data={["white", "black", "random"]}
     />
   );
 });

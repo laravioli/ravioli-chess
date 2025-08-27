@@ -1,5 +1,5 @@
 import { ActionIcon, Tooltip } from "@mantine/core";
-import classes from "./controls.module.css";
+import classes from "../../css/icon.module.css";
 
 export const Action = ({ children, label, onClick, disabled = false }) => {
   const handler = disabled
@@ -11,7 +11,7 @@ export const Action = ({ children, label, onClick, disabled = false }) => {
   return (
     <Tooltip label={label}>
       <ActionIcon
-        className={classes.action}
+        className={classes.icon}
         data-disabled={disabled}
         onClick={handler}
       >

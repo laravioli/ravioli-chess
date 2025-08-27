@@ -1,0 +1,11 @@
+.icon {
+  --ai-size: calc(1.6rem * var(--mantine-scale));
+  border: 0;
+  background-color: light-dark(var(--icon-light), var(--icon-dark));
+  &:hover {
+    background-color: light-dark(
+      var(--icon-light-hover),
+      var(--icon-dark-hover)
+    );
+  }
+}

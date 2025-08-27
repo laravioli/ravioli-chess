@@ -8,7 +8,7 @@ import { parseUci } from "chessops/util";
 import { parseFen } from "chessops/fen";
 import { getEval } from "src/lib/eval/utils";
 import { Text, Divider } from "@mantine/core";
-import classes from "./eval.module.css";
+import classes from "../../../css/eval.module.css";
 
 const MAX_NUM_MOVES = 12;
 

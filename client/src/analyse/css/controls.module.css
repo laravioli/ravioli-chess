@@ -1,0 +1,22 @@
+.controls {
+  border-bottom-left-radius: var(--main-bradius);
+  border-bottom-right-radius: var(--main-bradius);
+
+  & .history {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    justify-content: space-evenly;
+  }
+}
+
+.controls {
+  background: light-dark(
+    var(--mantine-color-gray-5),
+    var(--mantine-color-dark-6)
+  );
+  border-top: light-dark(
+    1px solid var(--mantine-color-gray-5),
+    1px solid var(--mantine-color-dark-6)
+  );
+}

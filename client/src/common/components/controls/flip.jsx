@@ -11,7 +11,7 @@ export const FlipButton = () => {
 
   return (
     <Action label="flip board" onClick={onFlip}>
-      <IconRepeat size={40} stroke={1.2} color="gray" />
+      <IconRepeat size={40} stroke={1.2} />
     </Action>
   );
 };

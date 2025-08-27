@@ -11,7 +11,7 @@ html {
   --main-bradius: 6px;
   --board-min-width: 16rem;
   --board-max-width: 50rem;
-  --board-scale: clamp(var(--board-min-width), 80vmin, var(--board-max-width));
+  --board-width: clamp(var(--board-min-width), 80vmin, var(--board-max-width));
 }
 
 input:-webkit-autofill {
@@ -36,8 +36,8 @@ input:-webkit-autofill {
   grid-template-areas:
     "evalbar board . side"
     ". copyables . .";
-  grid-template-rows: var(--board-scale) auto;
-  grid-template-columns: 1rem var(--board-scale) 1rem minmax(16rem, 24rem);
+  grid-template-rows: var(--board-width) auto;
+  grid-template-columns: 1rem var(--board-width) 1rem minmax(16rem, 24rem);
 }
 
 .analyse__side {
@@ -89,7 +89,7 @@ input:-webkit-autofill {
   display: flex;
   flex-flow: column;
   overflow: hidden;
-  border-radius: var(--main-bradius);
+  border-radius: var(--main-bradius) var(--main-bradius) 0 0;
   background: var(--mantine-color-dark-8);
   @mixin light {
     background: var(--mantine-color-gray-4);
@@ -107,37 +107,9 @@ input:-webkit-autofill {
   }
 }
 
-.board {
-  grid-area: board;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-  max-width: var(--board-max-width);
-  min-width: var(--board-min-width);
-  direction: ltr;
-  cursor: grab;
-}
-
 .copyables {
   grid-area: copyables;
   align-self: start;
   margin-top: 15px;
   width: 100%;
-}
-
-/*misc */
-
-.icon {
-  --ai-size: calc(1.6rem * var(--mantine-scale));
-  border: 0;
-  background-color: light-dark(
-    var(--mantine-color-gray-5),
-    var(--mantine-color-dark-6)
-  );
-  &:hover {
-    background-color: light-dark(
-      var(--mantine-color-gray-4),
-      var(--mantine-color-dark-4)
-    );
-  }
 }

@@ -1,8 +1,8 @@
-import "src/lib/board/chessground.base.css";
-import "src/lib/board/chessground.brown.css";
-import "src/lib/board/chessground.cburnett.css";
+import "src/common/css/chessground.base.css";
+import "src/common/css/chessground.brown.css";
+import "src/common/css/chessground.cburnett.css";
 import "@mantine/notifications/styles.css";
-import "src/main/components/css/App.css";
+import "src/main/css/App.css";
 import "vite/modulepreload-polyfill";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

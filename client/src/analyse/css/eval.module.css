@@ -1,14 +1,17 @@
-.evaltool {
+.eval {
   display: flex;
+  flex: 0 0 30px;
   column-gap: 6px;
   align-items: stretch;
+  padding-top: 3px;
   position: relative;
-  flex: 0 0 30px;
+}
+
+.eval {
   background: light-dark(
     var(--mantine-color-gray-5),
     var(--mantine-color-dark-6)
   );
-  border-top: 1px solid var(--mantine-color-dark-5);
   border-bottom: 1px solid var(--mantine-color-dark-5);
 
   @mixin light {
@@ -17,21 +20,20 @@
   }
 }
 
-.evalscore {
+.score {
   flex: 1 0 auto;
   line-height: 25px;
   font-size: 1.2em;
   text-align: center;
   font-weight: bold;
 }
-.evalinfo {
+.info {
   flex: 2 1;
 }
 
 .bar {
-  grid-area: evalbar;
   width: 1em;
-  height: calc(var(--board-scale) * 0.997);
+  height: calc(var(--board-width) * 0.997);
   position: relative;
   top: -1px;
   @mixin light {

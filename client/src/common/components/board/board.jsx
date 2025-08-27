@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import { usePageStore } from "src/main/hooks/hooks";
+import classes from "../../css/board.module.css";
 
 export function Board() {
   const divRef = useRef(null);
@@ -12,5 +13,5 @@ export function Board() {
     };
   }, []);
 
-  return <div className="board" ref={divRef} />;
+  return <div className={classes.board} ref={divRef} />;
 }

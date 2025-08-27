@@ -1,13 +1,13 @@
-import { Box, Button, Drawer, Group, Text } from '@mantine/core';
-import { AuthenticationForm } from './authentification.jsx';
-import { PlayModal } from './modal.jsx';
-import { Link } from 'react-router';
-import { ToggleColorScheme } from './colorscheme.jsx';
-import { useStore } from 'src/main/hooks/hooks';
-import { useDisclosure } from '@mantine/hooks';
-import { observer } from 'mobx-react-lite';
-import { notifications } from '@mantine/notifications';
-import classes from './header.module.css';
+import { Box, Button, Drawer, Group, Text } from "@mantine/core";
+import { AuthenticationForm } from "./authentification.jsx";
+import { PlayModal } from "./modal.jsx";
+import { Link } from "react-router";
+import { ToggleColorScheme } from "./colorscheme.jsx";
+import { useStore } from "src/main/hooks/hooks";
+import { useDisclosure } from "@mantine/hooks";
+import { observer } from "mobx-react-lite";
+import { notifications } from "@mantine/notifications";
+import classes from "../../../css/header.module.css";
 
 export const Header = observer(() => {
   const { userStore } = useStore();
@@ -37,14 +37,15 @@ export const Header = observer(() => {
                   try {
                     const response = await userStore.logout();
                     notifications.show({
-                      id: 'logout',
-                      position: 'bottom-right',
+                      id: "logout",
+                      position: "bottom-right",
                       message: response,
-                      color: 'red',
+                      color: "red",
                       autoClose: 2000,
                     });
                   } catch (error) {}
-                }}>
+                }}
+              >
                 Logout
               </Button>
             )}
@@ -57,7 +58,8 @@ export const Header = observer(() => {
         position="right"
         opened={openedDrawer}
         onClose={closeDrawer}
-        title="Authentication">
+        title="Authentication"
+      >
         <AuthenticationForm close={closeDrawer} />
       </Drawer>
     </Box>

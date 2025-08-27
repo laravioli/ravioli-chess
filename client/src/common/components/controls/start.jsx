@@ -13,7 +13,7 @@ export const StartButton = () => {
 
   return (
     <Action label="reset board" onClick={onStart}>
-      <IconReload size={40} stroke={1.2} color="gray" />
+      <IconReload size={40} stroke={1.2} />
     </Action>
   );
 };

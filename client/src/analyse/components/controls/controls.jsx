@@ -1,15 +1,16 @@
-import { Group } from "@mantine/core";
 import { History } from "src/common/components/controls/history.jsx";
 import { Actions } from "./actions";
-import classes from "./controls.module.css";
 import clsx from "clsx";
+import layout from "../../css/layout.module.css";
+import styles from "../../css/controls.module.css";
+import { icon } from "src/common/css/icon.module.css";
 
 export const Controls = () => {
   return (
-    <div className={clsx("controls", classes.controls)}>
-      <Group className={classes.history} justify="space-evenly">
-        <History size="xxl" />
-      </Group>
+    <div className={clsx(layout.controls, styles.controls)}>
+      <div className={styles.history}>
+        <History className={icon} size="xxl" />
+      </div>
       <Actions />
     </div>
   );

@@ -1,16 +1,4 @@
 /*https://github.com/lichess-org/lila/blob/master/ui/lib/css/tree/_tree.scss*/
-
-.displayarea {
-  --paper-radius: var(--mantine-radius-);
-  background: inherit;
-  position: relative;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
 .tree {
   --c-border: hsl(0, 0%, 25%);
   --c-font-dim: hsl(0, 0%, 58%);

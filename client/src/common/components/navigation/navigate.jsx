@@ -25,7 +25,7 @@ export const Navigate = observer(({ path }) => {
 
   return (
     <Action label={label} onClick={onClick} disabled={disabled}>
-      <Icon size={30} stroke={1.2} color={disabled ? "gray" : "blue"} />
+      <Icon size={30} stroke={1.2} />
     </Action>
   );
 });

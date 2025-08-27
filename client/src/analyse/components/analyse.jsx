@@ -1,0 +1,31 @@
+import { PageStoreProvider } from "src/main/context/provider";
+import { EvalBar } from "./tools/eval/bar";
+import { Board } from "src/common/components/board/board";
+import { FenInput } from "./underboard/feninput";
+import { Tools } from "./tools/tools";
+import { Controls } from "./controls/controls";
+import clsx from "clsx";
+import layout from "../css/layout.module.css";
+import variables from "../css/variables.module.css";
+
+const Side = () => (
+  <div className={clsx(layout.side, "mantine-visible-from-sm")}>
+    <Tools />
+    <Controls />
+  </div>
+);
+
+const Analyse = () => {
+  return (
+    <PageStoreProvider>
+      <div className={clsx(layout.analyse, variables.analyse)}>
+        <EvalBar />
+        <Board />
+        <Side />
+        <FenInput />
+      </div>
+    </PageStoreProvider>
+  );
+};
+
+export default Analyse;
