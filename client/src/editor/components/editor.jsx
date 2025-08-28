@@ -1,25 +1,27 @@
 import { PageStoreProvider } from "src/main/context/provider";
-import { EvalBar } from "./tools/eval/bar";
 import { Board } from "src/common/components/board/board";
-import { FenInput } from "./underboard/feninput";
-import { Tools } from "./tools/tools";
+import { FenInput } from "./fen/feninput";
 import { Controls } from "./controls/controls";
+import { SparePieces } from "./spare/spare";
 import clsx from "clsx";
 import layout from "../css/layout.module.css";
 import variables from "../css/variables.module.css";
+import classes from "../css/side.module.css";
 
 const Side = () => (
-  <div className={clsx(layout.side, "mantine-visible-from-sm")}>
-    <Tools />
-    <Controls />
+  <div className={clsx(classes.side, "mantine-visible-from-sm")}>
+    <div>
+      <SparePieces side="top" />
+      <Controls />
+      <SparePieces side="bottom" />
+    </div>
   </div>
 );
 
-const Analyse = () => {
+const Editor = () => {
   return (
     <PageStoreProvider>
-      <div className={clsx(layout.analyse, variables.analyse)}>
-        <EvalBar />
+      <div className={clsx(layout.editor, variables.editor)}>
         <Board />
         <Side />
         <div className={layout.copyables}>
@@ -30,4 +32,4 @@ const Analyse = () => {
   );
 };
 
-export default Analyse;
+export default Editor;

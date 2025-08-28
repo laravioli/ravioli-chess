@@ -1,7 +1,7 @@
 import { usePageStore } from "src/main/hooks/hooks";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "@mantine/core";
-import classes from "./controls.module.css";
+import classes from "../../css/controls.module.css";
 
 export const CastlingBoxes = () => {
   const labels = ["O-O", "O-O-O", "o-o", "o-o-o"];

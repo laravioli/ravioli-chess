@@ -1,0 +1,14 @@
+.play {
+  grid-area: main;
+  display: grid;
+  place-items: center;
+  grid-template-areas: "chat board . tools ";
+  grid-template-rows: auto auto auto;
+  grid-template-columns:
+    max-content clamp(var(--board-min-width), 100vmin, 50rem)
+    1rem max-content;
+
+  & > .tools {
+    grid-area: tools;
+  }
+}

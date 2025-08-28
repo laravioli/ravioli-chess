@@ -1,4 +1,12 @@
 .tools {
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+}
+
+.tools {
+  user-select: none;
+  border-radius: var(--main-bradius) var(--main-bradius) 0 0;
   background-color: light-dark(
     var(--mantine-color-gray-4),
     var(--mantine-color-dark-6)

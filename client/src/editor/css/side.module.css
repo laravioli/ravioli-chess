@@ -1,0 +1,19 @@
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.side {
+  user-select: none;
+
+  & > div {
+    background-color: var(--mantine-color-dark-6);
+    border: light-dark(
+      1px solid var(--mantine-color-gray-5),
+      1px solid var(--mantine-color-dark-4)
+    );
+    border-radius: var(--main-bradius);
+  }
+}

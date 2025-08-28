@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import { lazy, Suspense } from "react";
 
 const Analyse = lazy(() => import("src/analyse/components/analyse"));
-const Editor = lazy(() => import("src/editor/components/page/editor"));
-const Play = lazy(() => import("src/play/components/page/play"));
+const Editor = lazy(() => import("src/editor/components/editor"));
+const Play = lazy(() => import("src/play/components/play"));
 const NotFound = lazy(() => import("./notfound"));
 
 export const Router = () => {

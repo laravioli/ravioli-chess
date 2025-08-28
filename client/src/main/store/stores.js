@@ -1,6 +1,6 @@
 import { Ceval } from "src/lib/eval/ceval";
-import { UiStore } from "src/common/stores/uistore";
-import { UserStore } from "src/common/stores/userstore";
+import { UiStore } from "src/common/store/uistore";
+import { UserStore } from "src/common/store/userstore";
 import { AnalyseStore } from "src/analyse/store/analyse";
 import { EditorStore } from "src/editor/store/editor";
 import { PlayStore } from "src/play/store/play";

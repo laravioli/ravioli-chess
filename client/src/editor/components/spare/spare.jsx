@@ -1,8 +1,8 @@
+import React from "react";
 import { observer } from "mobx-react-lite";
 import { usePageStore } from "src/main/hooks/hooks";
-import classes from "./spare.module.css";
+import classes from "../../css/spare.module.css";
 import clsx from "clsx";
-import React from "react";
 
 export const SparePieces = observer(({ side }) => {
   const editor = usePageStore();

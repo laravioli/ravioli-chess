@@ -5,7 +5,7 @@ import { usePageStore } from "src/main/hooks/hooks";
 import { defined } from "src/lib/common";
 import { getEval } from "src/lib/eval/utils";
 import clsx from "clsx";
-import classes from "../../../css/tree.module.css";
+import classes from "../../css/tree.module.css";
 
 export const TView = observer(() => {
   const analyseStore = usePageStore();

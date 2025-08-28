@@ -38,7 +38,6 @@ export const FenInput = observer(() => {
   return (
     <TextInput
       ref={inputRef}
-      className="copyables"
       leftSectionPointerEvents="none"
       leftSection={"FEN"}
       variant="filled"

@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { autorun } from "mobx";
 import { NativeSelect } from "@mantine/core";
 import { short_fen } from "./utils";
-import classes from "./controls.module.css";
+import classes from "../../css/controls.module.css";
 
 export const Positions = observer(() => {
   const editorStore = usePageStore();

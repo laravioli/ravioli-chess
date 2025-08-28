@@ -1,0 +1,19 @@
+.editor {
+  grid-area: main;
+  display: grid;
+  grid-template-areas:
+    ". board . side"
+    ". copyables . .";
+  grid-template-rows: var(--board-width) auto;
+  grid-template-columns: 1rem var(--board-width) 1rem minmax(16rem, 24rem);
+
+  & > .side {
+    grid-area: side;
+  }
+
+  & > .copyables {
+    grid-area: copyables;
+    align-self: start;
+    margin-top: 15px;
+  }
+}
