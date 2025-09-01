@@ -6,7 +6,7 @@ import { IconMathMaxMin, IconEdit } from "@tabler/icons-react";
 import { action } from "mobx";
 import { INITIAL_FEN } from "chessops/fen";
 
-export const Navigate = observer(({ path }) => {
+export const Navigate = observer(({ ttposition, path, getFen }) => {
   const pageStore = usePageStore();
   const navigate = useNavigate();
   const isEdit = path !== "/editor";
@@ -18,17 +18,19 @@ export const Navigate = observer(({ path }) => {
     if (!isEdit || pageStore.fen.legalFen) {
       navigate(path, {
         replace: true,
-        state: { fen: getFen(path, pageStore) || INITIAL_FEN },
+        state: { fen: getFen() || INITIAL_FEN },
       });
     }
   });
 
   return (
-    <Action label={label} onClick={onClick} disabled={disabled}>
+    <Action
+      label={label}
+      onClick={onClick}
+      ttposition={ttposition}
+      disabled={disabled}
+    >
       <Icon size={30} stroke={1.2} />
     </Action>
   );
 });
-
-const getFen = (path, store) =>
-  path === "/editor" ? store.node?.fen : store.fen.current;

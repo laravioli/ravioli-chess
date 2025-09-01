@@ -1,6 +1,15 @@
 .editor {
-  --icon-light: var(--mantine-color-gray-4);
-  --icon-light-hover: var(--mantine-color-gray-3);
-  --icon-dark: var(--mantine-color-dark-6);
-  --icon-dark-hover: var(--mantine-color-dark-5);
+  --controls-bg-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-6)
+  );
+  --ai-icon-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-3)
+  );
+  --ai-icon-bg: var(--bg-color);
+  --ai-icon-hover: light-dark(
+    var(--mantine-color-gray-3),
+    var(--mantine-color-dark-5)
+  );
 }

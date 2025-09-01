@@ -15,7 +15,7 @@
 .tools {
   border-top-left-radius: var(--main-bradius);
   border-top-right-radius: var(--main-bradius);
-  background: var(--mantine-color-dark-8);
+  background: var(--mantine-color-dark-9);
   @mixin light {
     background: var(--mantine-color-gray-4);
   }

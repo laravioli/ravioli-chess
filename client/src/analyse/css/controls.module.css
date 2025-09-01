@@ -3,6 +3,11 @@
   border-bottom-right-radius: var(--main-bradius);
 
   & .history {
+    --ai-icon-bg-hover: light-dark(
+      var(--mantine-color-dark-2),
+      var(--mantine-color-dark-5)
+    );
+    --ai-icon-hover: var(--ai-icon-color);
     display: flex;
     gap: 1rem;
     padding-bottom: 1rem;

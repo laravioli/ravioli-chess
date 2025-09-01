@@ -1,11 +1,18 @@
 .icon {
   --ai-size: calc(1.6rem * var(--mantine-scale));
   border: 0;
-  background-color: light-dark(var(--icon-light), var(--icon-dark));
+  background-color: var(--ai-icon-bg);
   &:hover {
-    background-color: light-dark(
-      var(--icon-light-hover),
-      var(--icon-dark-hover)
-    );
+    background-color: var(--ai-icon-bg-hover);
+  }
+
+  & svg {
+    stroke: var(--ai-icon-color);
+    &:hover {
+      stroke: var(--ai-icon-hover);
+    }
+    & path {
+      stroke: inherit;
+    }
   }
 }

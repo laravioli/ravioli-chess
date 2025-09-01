@@ -7,7 +7,7 @@ import { action } from "mobx";
 import { observer } from "mobx-react-lite";
 import styles from "src/common/css/icon.module.css";
 
-export const Positions = observer(() => {
+export const Positions = observer(({ ttposition }) => {
   const analyseStore = usePageStore();
   const { positions } = useHTMLData();
 
@@ -40,7 +40,12 @@ export const Positions = observer(() => {
         })}
       >
         <Combobox.Target>
-          <Tooltip label="select position" position="bottom">
+          <Tooltip
+            label="select position"
+            position={ttposition}
+            color="gray"
+            withArrow
+          >
             <ActionIcon
               className={styles.icon}
               onClick={() => combobox.toggleDropdown()}
