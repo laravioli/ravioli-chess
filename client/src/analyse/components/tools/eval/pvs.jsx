@@ -65,7 +65,7 @@ function renderPvs(evaluation, multipv) {
             )}
             {pv.moves}
           </Text>
-          <Divider />
+          <Divider classNames={{ root: classes.divider }} />
         </React.Fragment>
       ))}
     </>

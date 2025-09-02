@@ -9,15 +9,13 @@
 
 .eval {
   background: light-dark(
-    var(--mantine-color-gray-5),
+    var(--mantine-color-gray-6),
     var(--mantine-color-dark-6)
   );
-  border-bottom: 1px solid var(--mantine-color-dark-5);
-
-  @mixin light {
-    border-top: none;
-    border-bottom: none;
-  }
+  border-bottom: light-dark(
+    1px solid var(--mantine-color-gray-3),
+    1px solid var(--mantine-color-dark-5)
+  );
 }
 
 .score {
@@ -79,4 +77,10 @@
   --text-fz: 13px;
   --text-lh: 2em;
   min-height: 2em;
+}
+
+.divider {
+  @mixin light {
+    --divider-color: var(--mantine-color-dark-2);
+  }
 }

@@ -18,4 +18,7 @@
 
 .select {
   background: var(--controls-bg-color);
+  @mixin light {
+    border: 1px solid var(--mantine-color-gray-5);
+  }
 }

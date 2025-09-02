@@ -1,6 +1,6 @@
 .editor {
   --controls-bg-color: light-dark(
-    var(--mantine-color-white),
+    var(--mantine-color-gray-4),
     var(--mantine-color-dark-6)
   );
   --ai-icon-color: light-dark(
