@@ -17,7 +17,7 @@
     {% vite_react_refresh %}
     {% vite_asset 'src/main.jsx' %}
   </head>
-  <body {% if user.is_authenticated %} data-username ={{user.username}} {% endif %}>
+  <body>
     {% block content %}
     {% endblock content %}
     </body>

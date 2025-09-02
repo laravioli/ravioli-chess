@@ -13,7 +13,7 @@ export function makeGlobalStore(cfg) {
   if (!globalStore)
     globalStore = {
       uiStore: new UiStore(),
-      userStore: new UserStore(),
+      userStore: new UserStore(cfg.user),
       cevalStore: new Ceval(cfg.ceval),
     };
   return globalStore;

@@ -2,15 +2,26 @@ import { observable, action, runInAction } from "mobx";
 import { apiJSON } from "src/lib/api/json";
 import { siteSocket } from "src/lib/socket/socket";
 
-export class UserStore {
-  @observable accessor username = "Anonymous";
-  @observable accessor logged = false;
+const ANON = "Anonymous";
 
-  constructor() {
-    this.syncTab();
+export class UserStore {
+  @observable accessor username;
+  @observable accessor logged;
+
+  constructor(opts) {
+    runInAction(() => {
+      if (opts.is_auth) {
+        this.username = opts.username;
+        this.logged = true;
+      } else {
+        this.username = ANON;
+        this.logged = false;
+      }
+    });
+    this.subscribeTab();
   }
 
-  syncTab() {
+  subscribeTab() {
     this.channel = new BroadcastChannel("syncTab");
     this.channel.onmessage = (event) => {
       const data = event.data;
@@ -23,7 +34,7 @@ export class UserStore {
       if (data.type == "logout") {
         runInAction(() => {
           this.logged = false;
-          this.username = "Anonymous";
+          this.username = ANON;
         });
       }
       siteSocket.reload();
@@ -65,7 +76,7 @@ export class UserStore {
     try {
       const response = await apiJSON.post("logout", {});
       runInAction(() => {
-        this.username = "Anonymous";
+        this.username = ANON;
         this.logged = false;
       });
       setTimeout(

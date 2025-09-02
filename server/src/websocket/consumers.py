@@ -8,7 +8,7 @@ from .core.app import App
 
 class TaxiConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("connect")
+        print("connect", self.scope["user"])
         self.app: App = self.scope["state"]["app"]
         self.sri = parse_qs(self.scope["query_string"].decode("utf8"))["sri"][0]
         await self.accept()

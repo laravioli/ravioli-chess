@@ -43,13 +43,9 @@ export const PageStoreProvider = ({ children }) => {
 export const DataProvider = ({ children }) => {
   const dataRef = useRef(null);
   const dataScript = document.getElementById("page-init-data");
-  const loadData = () => {
-    const data = dataScript && JSON.parse(dataScript.innerHTML);
-    return data;
-  };
 
   if (!dataRef.current) {
-    dataRef.current = loadData();
+    dataRef.current = dataScript && JSON.parse(dataScript.innerHTML);
   }
 
   useEffect(() => dataScript?.remove(), []);
