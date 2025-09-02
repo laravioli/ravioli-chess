@@ -36,9 +36,20 @@ export class EditorStore {
     return {
       fen: this.fen.current,
       orientation: this.ui.orientation,
+      autoCastle: false,
+      drawable: {
+        enabled: true,
+      },
+      draggable: {
+        showGhost: true,
+        deleteOnDropOff: true,
+      },
       highlight: {
         lastMove: false,
         check: false,
+      },
+      selectable: {
+        enabled: false,
       },
       events: {
         change: action(() => {
