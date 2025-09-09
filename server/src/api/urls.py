@@ -1,8 +1,12 @@
-from django.urls import path
-from api import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from social.views import FriendListViewSet
+from user.views import UserViewSet
+
+router = DefaultRouter()
+router.register(r"users", UserViewSet)
+router.register(r"friends", FriendListViewSet)
 
 urlpatterns = [
-    path("register/", views.UserRegister.as_view(), name="user-register"),
-    path("login/", views.UserLogin.as_view(), name="user-login"),
-    path("logout/", views.UserLogout.as_view(), name="user-logout"),
+    path("", include(router.urls)),
 ]

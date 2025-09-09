@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     "django_vite",
     "channels",
     "rest_framework",
-    "api",
+    "user",
+    "social",
     "game",
     "lobby",
     "web",
@@ -174,26 +175,14 @@ DJANGO_VITE = {
 # Django rest framework
 # https://www.django-rest-framework.org/
 
-if DEBUG:
 
-    REST_FRAMEWORK = {
-        "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-        "PAGE_SIZE": 10,
-        "DEFAULT_AUTHENTICATION_CLASSES": [
-            "rest_framework.authentication.SessionAuthentication",
-        ],
-    }
-else:
-    REST_FRAMEWORK = {
-        "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-        "PAGE_SIZE": 10,
-        "DEFAULT_AUTHENTICATION_CLASSES": [
-            "rest_framework.authentication.SessionAuthentication",
-        ],
-        "DEFAULT_RENDERER_CLASSES": [
-            "rest_framework.renderers.JSONRenderer",
-        ],
-    }
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+}
 
 if DEBUG:
     DATA_UPLOAD_MAX_NUMBER_FIELDS = None
