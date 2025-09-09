@@ -1,10 +1,9 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .permissions import isOwnerOrFriend
 from .models import FriendList
-from django.contrib.auth.models import User
 from .serializers import FriendListSerializer
 from django.shortcuts import get_object_or_404
 
@@ -12,10 +11,17 @@ from django.shortcuts import get_object_or_404
 class FriendListViewSet(
     viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.ListModelMixin
 ):
-    permission_classes = [IsAuthenticated, isOwnerOrFriend]
     queryset = FriendList.objects.prefetch_related("user").all()
     serializer_class = FriendListSerializer
     lookup_field = "user__username"
+
+    def get_permissions(self):
+        if self.action == "retrieve":
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated, isOwnerOrFriend]
+
+        return [permission() for permission in permission_classes]
 
     @action(detail=True, methods=["post"])
     def remove(self, request, user__username=None):

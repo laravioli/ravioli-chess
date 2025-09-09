@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django_vite",
     "channels",
     "rest_framework",
+    "drf_spectacular",
     "user",
     "social",
     "game",
@@ -182,7 +183,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-if DEBUG:
-    DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Raviolichess API",
+    "DESCRIPTION": "An API for an happy ravioli",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+}
