@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: {
-        src: resolve("src"),
+        src: resolve(__dirname, "src"),
         "@tabler/icons-react": "@tabler/icons-react/dist/esm/icons/index.mjs",
       },
     },
@@ -53,8 +53,8 @@ export default defineConfig(({ mode }) => {
           changeOrigin: false,
           secure: false,
           configure: (proxy, _options) => {
-            proxy.on("proxyRes", (proxyRes, req, _res) => {
-              _res.setHeader("cross-origin-embedder-Policy", "credentialless");
+            proxy.on("proxyRes", (_proxyRes, _req, res) => {
+              res.setHeader("cross-origin-embedder-Policy", "credentialless");
             });
           },
         },
@@ -64,7 +64,7 @@ export default defineConfig(({ mode }) => {
     build: {
       manifest: "manifest.json",
       rollupOptions: {
-        input: { main: "src/main.jsx", theme: "src/main/boot/theme.css" },
+        input: { main: "src/main.tsx", theme: "src/main/boot/theme.css" },
 
         output: {
           manualChunks(id) {

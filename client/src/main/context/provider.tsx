@@ -20,9 +20,9 @@ export const GlobalStoreProvider = ({ children }) => {
 export const PageStoreProvider = ({ children }) => {
   const storeRef = useRef(null);
   const globalStore = useContext(GlobalStoreContext);
+  const cfg = useInitCfg();
 
   if (!storeRef.current) {
-    const cfg = useInitCfg();
     const StoreCreator = pageStoreRouter(window.location.pathname);
     storeRef.current = new StoreCreator(globalStore, cfg);
   }

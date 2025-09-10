@@ -1,8 +1,8 @@
 import { Box, Button, Drawer, Group, Text } from "@mantine/core";
-import { AuthenticationForm } from "./authentification.jsx";
-import { PlayModal } from "./modal.jsx";
+import { AuthenticationForm } from "./authentification";
+import { PlayModal } from "./modal";
 import { Link } from "react-router";
-import { ToggleColorScheme } from "./colorscheme.jsx";
+import { ToggleColorScheme } from "./colorscheme";
 import { useStore } from "src/main/hooks/hooks";
 import { useDisclosure } from "@mantine/hooks";
 import { observer } from "mobx-react-lite";

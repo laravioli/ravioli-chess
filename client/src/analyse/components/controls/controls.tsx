@@ -1,4 +1,4 @@
-import { History } from "src/common/components/controls/history.jsx";
+import { History } from "src/common/components/controls/history";
 import { Actions } from "./actions";
 import clsx from "clsx";
 import layout from "../../css/layout.module.css";

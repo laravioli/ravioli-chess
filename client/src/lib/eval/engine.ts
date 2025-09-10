@@ -6,8 +6,8 @@ import {
   maxHash,
   browserSupport,
   fewerCores,
-} from "./utils.js";
-import { clamp } from "../common.js";
+} from "./utils";
+import { clamp } from "../common";
 
 export class StockfishWebEngine {
   constructor(info) {

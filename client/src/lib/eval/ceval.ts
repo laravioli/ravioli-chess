@@ -2,7 +2,7 @@
 import { observable, action, runInAction } from "mobx";
 import { parseFen } from "chessops/fen";
 import { makeEngine, maxThreads, engineSupported } from "./engine";
-import { localStorage } from "src/main/store/localstorage.js";
+import { localStorage } from "src/main/store/localstorage";
 import { CevalState, povChances } from "./utils";
 import { toggle, throttle, clamp } from "../common";
 import { defaultPosition, setupPosition } from "chessops/variant";
