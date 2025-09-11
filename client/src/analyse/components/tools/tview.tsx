@@ -1,40 +1,38 @@
 //https://github.com/lichess-org/lila/blob/master/ui/analyse/src/treeView/columnView.ts
-import React, { useMemo } from "react";
-import { observer } from "mobx-react-lite";
-import { usePageStore } from "src/main/hooks/hooks";
-import { defined } from "src/lib/common";
-import { getEval } from "src/lib/eval/utils";
-import clsx from "clsx";
-import classes from "../../css/tree.module.css";
+import React, { useMemo } from 'react';
+import { observer } from 'mobx-react-lite';
+import { usePageStore } from 'src/main/hooks/hooks';
+import { defined } from 'src/lib/common';
+import { getEval } from 'src/lib/eval/utils';
+import clsx from 'clsx';
+import classes from '../../css/tree.module.css';
 
 export const TView = observer(() => {
   const analyseStore = usePageStore();
   const handlers = useMemo(
     () => ({
-      click: (e) => {
+      click: e => {
         const path = eventPath(e);
         if (path) {
           analyseStore.jump(path);
         }
       },
     }),
-    []
+    [],
   );
 
-  return (
-    <>{defined(analyseStore.node) && renderTree(analyseStore, handlers)}</>
-  );
+  return <>{defined(analyseStore.node) && renderTree(analyseStore, handlers)}</>;
 });
 
 function renderTree(ctrl, handlers) {
   const root = ctrl.tree.root;
   const blackStarts = (root.ply & 1) === 1;
   return (
-    <div className={classes.tree} onClick={handlers["click"]}>
+    <div className={classes.tree} onClick={handlers['click']}>
       {blackStarts && renderIndex(root.ply, false)}
       {blackStarts && emptyMove()}
       {renderChildrenOf(ctrl, root, {
-        parentPath: "",
+        parentPath: '',
         isMainline: true,
       })}
     </div>
@@ -92,7 +90,7 @@ function renderChildrenOf(ctrl, node, opts) {
 function renderLines(ctrl, nodes, opts) {
   return (
     <div className={clsx(classes.lines, !nodes[1] && classes.single)}>
-      {nodes.map((n) => (
+      {nodes.map(n => (
         <React.Fragment key={n.id}>
           <div className={classes.line}>
             <div className={classes.branch} />
@@ -109,13 +107,12 @@ function renderLines(ctrl, nodes, opts) {
 }
 
 function eventPath(e) {
-  return e.target.getAttribute("p") || e.target.parentElement.getAttribute("p");
+  return e.target.getAttribute('p') || e.target.parentElement.getAttribute('p');
 }
 
-const plyToTurn = (ply) => Math.floor((ply - 1) / 2) + 1;
+const plyToTurn = ply => Math.floor((ply - 1) / 2) + 1;
 
-const renderIndexText = (ply, withDots) =>
-  plyToTurn(ply) + (withDots ? (ply % 2 === 1 ? "." : "...") : "");
+const renderIndexText = (ply, withDots) => plyToTurn(ply) + (withDots ? (ply % 2 === 1 ? '.' : '...') : '');
 
 const renderIndex = (ply, withDots) => (
   <span className={classes.index}>{renderIndexText(ply, withDots)}</span>
@@ -132,9 +129,7 @@ function renderMove(node) {
 }
 
 function renderMoveOf(ctrl, node, opts) {
-  return opts.isMainline
-    ? renderMainlineMoveOf(ctrl, node, opts)
-    : renderVariationMoveOf(ctrl, node, opts);
+  return opts.isMainline ? renderMainlineMoveOf(ctrl, node, opts) : renderVariationMoveOf(ctrl, node, opts);
 }
 
 function renderMainlineMoveOf(ctrl, node, opts) {

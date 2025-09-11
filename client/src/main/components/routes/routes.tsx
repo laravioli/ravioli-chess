@@ -1,11 +1,11 @@
-import { Shell } from "src/common/components/appshell/appshell";
-import { BrowserRouter, Routes, Route } from "react-router";
-import { lazy, Suspense } from "react";
+import { Shell } from 'src/common/components/appshell/appshell';
+import { BrowserRouter, Routes, Route } from 'react-router';
+import { lazy, Suspense } from 'react';
 
-const Analyse = lazy(() => import("src/analyse/components/analyse"));
-const Editor = lazy(() => import("src/editor/components/editor"));
-const Play = lazy(() => import("src/play/components/play"));
-const NotFound = lazy(() => import("./notfound"));
+const Analyse = lazy(() => import('src/analyse/components/analyse'));
+const Editor = lazy(() => import('src/editor/components/editor'));
+const Play = lazy(() => import('src/play/components/play'));
+const NotFound = lazy(() => import('./notfound'));
 
 export const Router = () => {
   return (

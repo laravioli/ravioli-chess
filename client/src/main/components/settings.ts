@@ -1,8 +1,4 @@
-import {
-  localStorageColorSchemeManager,
-  createTheme,
-  NativeSelect,
-} from '@mantine/core';
+import { localStorageColorSchemeManager, createTheme, NativeSelect } from '@mantine/core';
 
 const localstorageScheme = localStorageColorSchemeManager({
   key: 'color-scheme',

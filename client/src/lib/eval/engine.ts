@@ -1,16 +1,17 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/engines/stockfishWebEngine.ts
-import { Protocol } from "./protocol";
-import {
-  CevalState,
-  sharedWasmMemory,
-  maxHash,
-  browserSupport,
-  fewerCores,
-} from "./utils";
-import { clamp } from "../common";
+import { Protocol } from './protocol';
+import { CevalState, sharedWasmMemory, maxHash, browserSupport, fewerCores } from './utils';
+import { clamp } from '../common';
+import type { BrowserEngineInfo, EngineNotifier, StockfishWeb, Work } from './interface.js';
 
 export class StockfishWebEngine {
-  constructor(info) {
+  failed?: Error;
+  protocol: Protocol;
+  module?: StockfishWeb;
+  info: BrowserEngineInfo;
+  status: EngineNotifier;
+
+  constructor(info: BrowserEngineInfo) {
     this.info = info;
     this.status = (status = {}) => {
       if (status.error) {
@@ -18,7 +19,7 @@ export class StockfishWebEngine {
       }
     };
     this.protocol = new Protocol();
-    this.boot().catch((e) => {
+    this.boot().catch(e => {
       this.failed = e;
       this.status?.({ error: String(e) });
     });
@@ -29,27 +30,24 @@ export class StockfishWebEngine {
   }
 
   async boot() {
-    const makeModule = await import("./stockfish/sf16-7.js");
-    const module = await makeModule.default({
-      wasmMemory: sharedWasmMemory(this.info.minMem),
-      onError: (msg) => Promise.reject(new Error(msg)),
+    const makeModule = await import('./stockfish/sf16-7.js');
+    const module: StockfishWeb = await makeModule.default({
+      wasmMemory: sharedWasmMemory(this.info.minMem!),
+      onError: (msg: string) => Promise.reject(new Error(msg)),
     });
-    if (this.info.tech === "NNUE") {
-      this.store = undefined;
-      module.onError = this.makeErrorHandler(module);
-      const nnueFilenames = this.info.assets.nnue ?? [];
+    if (this.info.tech === 'NNUE') {
+      module.onError = this.makeErrorHandler();
+      const nnueFilenames: string[] = this.info.assets.nnue ?? [];
       if (!nnueFilenames.length)
         for (let i = 0; ; i++) {
           const nnueFilename = module.getRecommendedNnue(i);
           if (!nnueFilename || nnueFilenames.includes(nnueFilename)) break;
           nnueFilenames.push(nnueFilename);
         }
-      (await this.getModels(nnueFilenames)).forEach((nnueBuffer, i) =>
-        module.setNnueBuffer(nnueBuffer, i)
-      );
+      (await this.getModels(nnueFilenames)).forEach((nnueBuffer, i) => module.setNnueBuffer(nnueBuffer!, i));
     }
-    module.listen = (data) => this.protocol.received(data);
-    this.protocol.connected((cmd) => {
+    module.listen = data => this.protocol.received(data);
+    this.protocol.connected(cmd => {
       //debug
       //console.log(`send : ${cmd}`);
       //
@@ -58,53 +56,35 @@ export class StockfishWebEngine {
     this.module = module;
   }
 
-  getModels(nnueFilenames) {
+  getModels(nnueFilenames: string[]): Promise<(Uint8Array | undefined)[]> {
     return Promise.all(
-      nnueFilenames.map(async (nnueFilename) => {
-        const storedBuffer = await this.store
-          ?.get(nnueFilename)
-          .catch(() => undefined);
-
-        if (storedBuffer && storedBuffer.byteLength > 128 * 1024)
-          return storedBuffer;
+      nnueFilenames.map(async nnueFilename => {
         const req = new XMLHttpRequest();
 
-        req.open("get", `./static/web/nnue/${nnueFilename}`, true);
-        req.responseType = "arraybuffer";
-        req.onprogress = (e) =>
-          this.status?.({ download: { bytes: e.loaded, total: e.total } });
+        req.open('get', `./static/web/nnue/${nnueFilename}`, true);
+        req.responseType = 'arraybuffer';
+        req.onprogress = e => this.status?.({ download: { bytes: e.loaded, total: e.total } });
 
-        const nnueBuffer = await new Promise((resolve, reject) => {
-          req.onerror = () =>
-            reject(new Error(`fetch '${nnueFilename}' failed: ${req.status}`));
+        const nnueBuffer = await new Promise<Uint8Array>((resolve, reject) => {
+          req.onerror = () => reject(new Error(`fetch '${nnueFilename}' failed: ${req.status}`));
           req.onload = () => {
             if (req.status / 100 === 2) resolve(new Uint8Array(req.response));
-            else
-              reject(
-                new Error(`fetch '${nnueFilename}' failed: ${req.status}`)
-              );
+            else reject(new Error(`fetch '${nnueFilename}' failed: ${req.status}`));
           };
           req.send();
         });
         this.status?.();
-        this.store
-          ?.put(nnueFilename, nnueBuffer)
-          .catch(() => console.warn("IDB store failed"));
+
         return nnueBuffer;
-      })
+      }),
     );
   }
 
-  makeErrorHandler(module) {
-    return (msg) => {
-      if (msg.startsWith("BAD_NNUE") && this.store) {
-        // if we got this from IDB, we must remove it. but wait for getModels::store.put to finish first
-        const index = Math.max(0, Number(msg.slice(9)));
-        const nnueFilename =
-          this.info.assets.nnue ?? module.getRecommendedNnue(index);
+  makeErrorHandler() {
+    return (msg: string) => {
+      if (msg.startsWith('BAD_NNUE')) {
         setTimeout(() => {
-          console.warn(`Corrupt NNUE file, removing ${nnueFilename} from IDB`);
-          this.store?.remove(nnueFilename);
+          console.warn('Corrupt NNUE file');
         }, 2000);
       } else this.status?.({ error: msg });
     };
@@ -114,31 +94,31 @@ export class StockfishWebEngine {
     return this.failed
       ? CevalState.Failed
       : !this.module
-      ? CevalState.Loading
-      : this.protocol.isComputing()
-      ? CevalState.Computing
-      : CevalState.Idle;
+        ? CevalState.Loading
+        : this.protocol.isComputing()
+          ? CevalState.Computing
+          : CevalState.Idle;
   }
 
-  start = (work) => this.protocol.compute(work);
+  start = (work: Work) => this.protocol.compute(work);
   stop = () => this.protocol.compute(undefined);
   engineName = () => this.protocol.engineName;
   destroy = () => {
-    this.module?.uci("quit");
+    this.module?.uci('quit');
     this.module = undefined;
   };
 }
 
-const sf16 = {
-  id: "__sf16nnue7",
-  name: "Stockfish 16 NNUE · 7MB",
-  short: "SF 16 · 7MB",
-  tech: "NNUE",
-  requires: ["sharedMem", "simd", "dynamicImportFromWorker"],
+const sf16: BrowserEngineInfo = {
+  id: '__sf16nnue7',
+  name: 'Stockfish 16 NNUE · 7MB',
+  short: 'SF 16 · 7MB',
+  tech: 'NNUE',
+  requires: ['sharedMem', 'simd', 'dynamicImportFromWorker'],
   cloudEval: false,
   assets: {
-    root: "assets",
-    js: "sf16-7",
+    root: 'assets',
+    js: 'sf16-7',
   },
   minMem: 1536,
   maxHash,
@@ -150,21 +130,17 @@ export const makeEngine = () => {
   return new StockfishWebEngine(sf16);
 };
 
-export const engineSupported = () =>
-  sf16.requires.every((req) => browserSupport().includes(req));
+export const engineSupported = () => sf16.requires.every(req => browserSupport().includes(req));
 
 export const getRecommendedThreads = () => {
-  return clamp(
-    navigator.hardwareConcurrency - (navigator.hardwareConcurrency % 2 ? 0 : 1),
-    {
-      min: sf16.minThreads ?? 1,
-      max: maxThreads(),
-    }
-  );
+  return clamp(navigator.hardwareConcurrency - (navigator.hardwareConcurrency % 2 ? 0 : 1), {
+    min: sf16.minThreads ?? 1,
+    max: maxThreads(),
+  });
 };
 
 export const maxThreads = () => {
   return fewerCores()
     ? Math.min(sf16.maxThreads ?? 32, navigator.hardwareConcurrency)
-    : sf16.maxThreads ?? 2;
+    : (sf16.maxThreads ?? 2);
 };

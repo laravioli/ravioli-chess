@@ -1,17 +1,19 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
-import { observable, action, runInAction } from "mobx";
-import { parseFen } from "chessops/fen";
-import { makeEngine, maxThreads, engineSupported } from "./engine";
-import { localStorage } from "src/main/store/localstorage";
-import { CevalState, povChances } from "./utils";
-import { toggle, throttle, clamp } from "../common";
-import { defaultPosition, setupPosition } from "chessops/variant";
-import { Result } from "@badrap/result";
+import { observable, action, runInAction } from 'mobx';
+import { parseFen } from 'chessops/fen';
+import { makeEngine, maxThreads, engineSupported, StockfishWebEngine } from './engine';
+import { localStorage } from 'src/main/store/localstorage';
+import { CevalState, povChances } from './utils';
+import { type Toggle, toggle, throttle, clamp } from '../common';
+import { defaultPosition, setupPosition } from 'chessops/variant';
+import { Result } from '@badrap/result';
+import type { CevalOpts, LocalEval, PvData, Search, Started, Step, Work } from './interface';
+import type { Path } from '../tree/interface';
 
-const cevalDisabledSentinel = "1";
+const cevalDisabledSentinel = '1';
 
 const enabledAfterDisable = action(() => {
-  const enabledAfter = window.sessionStorage.getItem("ceval.enabled-after");
+  const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
   const disable = localStorage.evalStorage.disable || cevalDisabledSentinel;
   return enabledAfter == disable;
 });
@@ -19,44 +21,44 @@ const enabledAfterDisable = action(() => {
 export class Ceval {
   /* possible -> does browser support engine
      allowed  -> does engine is allowed to run
-     active   -> does engine is instanciate (worker)
      enabled  -> does the button enabled is on or off (mainly to handle tabs) */
 
-  @observable accessor enabled;
-  lastStarted = false;
+  opts: CevalOpts;
+  possible: boolean;
+  analysable: boolean;
+  allowed: Toggle;
+  @observable accessor enabled: boolean;
+
+  lastStarted: Started | false = false;
   evalStorage = localStorage.evalStorage;
 
-  constructor(opts) {
+  private worker: StockfishWebEngine | undefined;
+
+  constructor(opts: CevalOpts) {
     this.init(opts);
   }
 
-  setOpts(opts) {
+  setOpts(opts: Partial<CevalOpts>) {
     this.init({ ...this.opts, ...opts });
   }
 
-  init(opts) {
+  init(opts: CevalOpts) {
     this.opts = opts;
     this.possible = engineSupported();
     const pos = this.opts.initialFen
-      ? parseFen(this.opts.initialFen).chain((setup) =>
-          setupPosition("chess", setup)
-        )
-      : Result.ok(defaultPosition("chess"));
+      ? parseFen(this.opts.initialFen).chain(setup => setupPosition('chess', setup))
+      : Result.ok(defaultPosition('chess'));
     this.analysable = pos.isOk;
     this.allowed = toggle(this.opts.allowed);
-    this.enabled =
-      this.possible &&
-      this.analysable &&
-      this.allowed() &&
-      enabledAfterDisable();
+    this.enabled = this.possible && this.analysable && this.allowed() && enabledAfterDisable();
   }
 
-  onEmit = throttle(200, (ev, work) => {
-    this.sortPvsInPlace(ev.pvs, work.ply % 2 === 0 ? "white" : "black");
+  onEmit = throttle(200, (ev: LocalEval, work: Work) => {
+    this.sortPvsInPlace(ev.pvs, work.ply % 2 === 0 ? 'white' : 'black');
     this.opts.emit(ev, work);
   });
 
-  doStart(path, steps, gameId) {
+  doStart(path: Path, steps: Step[], gameId: string | undefined) {
     if (!this.enabled || !this.possible || !enabledAfterDisable()) return;
     const step = steps[steps.length - 1];
 
@@ -65,20 +67,14 @@ export class Ceval {
       this.evalStorage.setDisable(Math.random());
     });
 
-    window.sessionStorage.setItem(
-      "ceval.enabled-after",
-      this.evalStorage.disable
-    );
+    window.sessionStorage.setItem('ceval.enabled-after', this.evalStorage.disable!.toString());
 
-    if (
-      "movetime" in this.search.by &&
-      (step.ceval?.millis ?? 0) >= this.search.by.movetime
-    ) {
+    if ('movetime' in this.search.by && (step.ceval?.millis ?? 0) >= this.search.by.movetime) {
       this.lastStarted = { path, steps, gameId };
       return;
     }
 
-    const work = {
+    const work: Work = {
       threads: this.threads,
       hashSize: this.hashSize,
       gameId,
@@ -90,7 +86,7 @@ export class Ceval {
       ply: step.ply,
       search: this.search.by,
       multiPv: this.search.multiPv,
-      emit: (ev) => {
+      emit: (ev: LocalEval) => {
         if (!this.enabled) return;
         this.onEmit(ev, work);
       },
@@ -99,7 +95,7 @@ export class Ceval {
     // send fen after latest castling move and the following moves
     for (let i = 1; i < steps.length; i++) {
       const s = steps[i];
-      work.moves.push(s.uci);
+      work.moves.push(s.uci!);
     }
 
     if (!this.worker) this.worker = makeEngine();
@@ -113,7 +109,7 @@ export class Ceval {
     };
   }
 
-  start(path, steps, gameId) {
+  start(path: Path, steps: Step[], gameId: string | undefined) {
     this.doStart(path, steps, gameId);
   }
 
@@ -136,7 +132,7 @@ export class Ceval {
       by: {
         movetime: Math.min(this.evalStorage.searchms, Number.POSITIVE_INFINITY),
       },
-    };
+    } as Search;
     if (this.isInfinite) s.by = { depth: 99 };
     return s;
   }
@@ -175,16 +171,15 @@ export class Ceval {
     this.stop();
     if (!this.enabled && !document.hidden) {
       const disable = this.evalStorage.disable || cevalDisabledSentinel;
-      if (disable)
-        window.sessionStorage.setItem("ceval.enabled-after", disable);
+      if (disable) window.sessionStorage.setItem('ceval.enabled-after', disable.toString());
       this.enabled = true;
     } else {
-      window.sessionStorage.setItem("ceval.enabled-after", "");
+      window.sessionStorage.setItem('ceval.enabled-after', '');
       this.enabled = false;
     }
   }
 
   lastEmitFen = null;
-  sortPvsInPlace = (pvs, color) =>
+  sortPvsInPlace = (pvs: PvData[], color: Color) =>
     pvs.sort((a, b) => povChances(color, b) - povChances(color, a));
 }

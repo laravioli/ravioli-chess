@@ -2,8 +2,8 @@
   grid-area: main;
   display: grid;
   grid-template-areas:
-    "evalbar board . side"
-    ". copyables . .";
+    'evalbar board . side'
+    '. copyables . .';
   grid-template-rows: var(--board-width) auto;
   grid-template-columns: 1rem var(--board-width) 1rem minmax(16rem, 24rem);
 
@@ -15,8 +15,8 @@
     grid-area: side;
     display: grid;
     grid-template-areas:
-      "tools"
-      "controls";
+      'tools'
+      'controls';
     grid-template-rows: 1fr min-content;
 
     & > .tools {

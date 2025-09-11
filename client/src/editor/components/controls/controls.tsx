@@ -1,8 +1,8 @@
-import { TurnToPlay } from "./turn";
-import { CastlingBoxes } from "./castlings";
-import { Positions } from "./positions";
-import classes from "../../css/controls.module.css";
-import { Stack } from "@mantine/core";
+import { TurnToPlay } from './turn';
+import { CastlingBoxes } from './castlings';
+import { Positions } from './positions';
+import classes from '../../css/controls.module.css';
+import { Stack } from '@mantine/core';
 
 export const Controls = () => {
   return (

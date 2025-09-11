@@ -1,10 +1,10 @@
-import { Stack, Group, Button } from "@mantine/core";
-import { UserStatus } from "./user";
-import { History } from "src/common/components/controls/history";
-import clsx from "clsx";
-import layout from "../../css/layout.module.css";
-import classes from "../../css/tools.module.css";
-import { icon } from "src/common/css/icon.module.css";
+import { Stack, Group, Button } from '@mantine/core';
+import { UserStatus } from './user';
+import { History } from 'src/common/components/controls/history';
+import clsx from 'clsx';
+import layout from '../../css/layout.module.css';
+import classes from '../../css/tools.module.css';
+import { icon } from 'src/common/css/icon.module.css';
 
 export const Tools = () => {
   return (

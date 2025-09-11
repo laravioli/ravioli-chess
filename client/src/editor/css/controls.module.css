@@ -9,8 +9,8 @@
 .castle {
   display: grid;
   grid:
-    ". ."
-    ". ."
+    '. .'
+    '. .'
     / 1fr 1fr;
   justify-items: left;
   padding-bottom: 1rem;

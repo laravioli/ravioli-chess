@@ -2,15 +2,19 @@
 /*-----ENGINE-----*/
 /*----------------*/
 
-export const CevalState = Object.freeze({
-  Initial: Symbol("Initial"),
-  Loading: Symbol("Loading"),
-  Idle: Symbol("Idle"),
-  Computing: Symbol("Computing"),
-  Failed: Symbol("Failed"),
-});
+import type { Feature, EvalScore, WinningChances, ClientEval } from './interface';
 
-export const sharedWasmMemory = (lo, hi = 32767) => {
+export type CevalState = (typeof CevalState)[keyof typeof CevalState];
+
+export const CevalState = {
+  Initial: 'Initial',
+  Loading: 'Loading',
+  Idle: 'Idle',
+  Computing: 'Computing',
+  Failed: 'Failed',
+} as const;
+
+export const sharedWasmMemory = (lo: number, hi = 32767) => {
   let shrink = 4; // 32767 -> 24576 -> 16384 -> 12288 -> 8192 -> 6144 -> etc
   while (true) {
     try {
@@ -23,8 +27,8 @@ export const sharedWasmMemory = (lo, hi = 32767) => {
   }
 };
 
-const memoize = (compute) => {
-  let computed;
+const memoize = <A>(compute: () => A): (() => A) => {
+  let computed: A;
   return () => {
     if (computed === undefined) computed = compute();
     return computed;
@@ -33,15 +37,13 @@ const memoize = (compute) => {
 
 const isAndroid = memoize(() => /Android/.test(navigator.userAgent));
 
-const isIos = memoize(
-  () => /iPhone|iPod/.test(navigator.userAgent) || isIPad()
-);
+const isIos = memoize(() => /iPhone|iPod/.test(navigator.userAgent) || isIPad());
 
-const isIPad = () =>
-  navigator?.maxTouchPoints > 2 && /iPad|Macintosh/.test(navigator.userAgent);
+const isIPad = () => navigator?.maxTouchPoints > 2 && /iPad|Macintosh/.test(navigator.userAgent);
 
 function maxHashMB() {
-  if (isAndroid()) return 64; // budget androids are easy to crash @ 128
+  if (isAndroid())
+    return 64; // budget androids are easy to crash @ 128
   else if (isIPad())
     return 64; // iPadOS safari pretends to be desktop but acts more like iphone
   else if (isIos()) return 32;
@@ -50,8 +52,8 @@ function maxHashMB() {
 export const maxHash = maxHashMB();
 
 function sharedMemoryTest() {
-  if (typeof Atomics !== "object") return false;
-  if (typeof SharedArrayBuffer !== "function") return false;
+  if (typeof Atomics !== 'object') return false;
+  if (typeof SharedArrayBuffer !== 'function') return false;
 
   let mem;
   try {
@@ -59,7 +61,7 @@ function sharedMemoryTest() {
 
     if (!(mem.buffer instanceof SharedArrayBuffer)) return false;
 
-    window.postMessage(mem.buffer, "*");
+    window.postMessage(mem.buffer, '*');
   } catch {
     return false;
   }
@@ -67,33 +69,33 @@ function sharedMemoryTest() {
 }
 
 export const browserSupport = memoize(() => {
-  const features = [];
+  const features: Feature[] = [];
   if (
-    typeof WebAssembly === "object" &&
-    typeof WebAssembly.validate === "function" &&
+    typeof WebAssembly === 'object' &&
+    typeof WebAssembly.validate === 'function' &&
     WebAssembly.validate(Uint8Array.from([0, 97, 115, 109, 1, 0, 0, 0]))
   ) {
-    features.push("wasm");
+    features.push('wasm');
     // i32x4.dot_i16x8_s, i32x4.trunc_sat_f64x2_u_zero
     const sourceWithSimd = Uint8Array.from([
-      0, 97, 115, 109, 1, 0, 0, 0, 1, 12, 2, 96, 2, 123, 123, 1, 123, 96, 1,
-      123, 1, 123, 3, 3, 2, 0, 1, 7, 9, 2, 1, 97, 0, 0, 1, 98, 0, 1, 10, 19, 2,
-      9, 0, 32, 0, 32, 1, 253, 186, 1, 11, 7, 0, 32, 0, 253, 253, 1, 11,
+      0, 97, 115, 109, 1, 0, 0, 0, 1, 12, 2, 96, 2, 123, 123, 1, 123, 96, 1, 123, 1, 123, 3, 3, 2, 0, 1, 7, 9,
+      2, 1, 97, 0, 0, 1, 98, 0, 1, 10, 19, 2, 9, 0, 32, 0, 32, 1, 253, 186, 1, 11, 7, 0, 32, 0, 253, 253, 1,
+      11,
     ]);
-    if (WebAssembly.validate(sourceWithSimd)) features.push("simd");
-    if (sharedMemoryTest()) features.push("sharedMem");
+    if (WebAssembly.validate(sourceWithSimd)) features.push('simd');
+    if (sharedMemoryTest()) features.push('sharedMem');
   }
   try {
     new Worker(
       URL.createObjectURL(
         new Blob(["import('data:text/javascript,export default {}')"], {
-          type: "application/javascript",
-        })
-      )
+          type: 'application/javascript',
+        }),
+      ),
     ).terminate();
-    features.push("dynamicImportFromWorker");
+    features.push('dynamicImportFromWorker');
   } catch (error) {
-    console.error("Worker creation failed:", error);
+    console.error('Worker creation failed:', error);
   }
 
   return Object.freeze(features);
@@ -105,66 +107,61 @@ export const browserSupport = memoize(() => {
 
 const isMobile = () => isAndroid() || isIos();
 
-export const fewerCores = memoize(
-  () => isMobile() || navigator.userAgent.includes("CrOS")
-);
+export const fewerCores = memoize(() => isMobile() || navigator.userAgent.includes('CrOS'));
 
 /*----------------*/
 /*------STAT------*/
 /*https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/winningChances.ts
  */
 
-const toPov = (color, diff) => (color === "white" ? diff : -diff);
+const toPov = (color: Color, diff: number) => (color === 'white' ? diff : -diff);
 
-const rawWinningChances = (cp) => {
+const rawWinningChances = (cp: number) => {
   const MULTIPLIER = -0.00368208;
   return 2 / (1 + Math.exp(MULTIPLIER * cp)) - 1;
 };
 
-const cpWinningChances = (cp) =>
-  rawWinningChances(Math.min(Math.max(-1000, cp), 1000));
+const cpWinningChances = (cp: number) => rawWinningChances(Math.min(Math.max(-1000, cp), 1000));
 
-const mateWinningChances = (mate) => {
+const mateWinningChances = (mate: number) => {
   const cp = (21 - Math.min(10, Math.abs(mate))) * 100;
   const signed = cp * (mate > 0 ? 1 : -1);
   return rawWinningChances(signed);
 };
 
-const evalWinningChances = (ev) =>
-  typeof ev.mate !== "undefined"
-    ? mateWinningChances(ev.mate)
-    : cpWinningChances(ev.cp);
+const evalWinningChances = (ev: EvalScore): WinningChances =>
+  typeof ev.mate !== 'undefined' ? mateWinningChances(ev.mate) : cpWinningChances(ev.cp!);
 
 // winning chances for a color
 // 1  infinitely winning
 // -1 infinitely losing
-export const povChances = (color, ev) => toPov(color, evalWinningChances(ev));
+export const povChances = (color: Color, ev: EvalScore) => toPov(color, evalWinningChances(ev));
 
 // computes the difference, in winning chances, between two evaluations
 // 1  = e1 is infinitely better than e2
 // -1 = e1 is infinitely worse  than e2
-export const povDiff = (color, e1, e2) =>
+export const povDiff = (color: Color, e1: EvalScore, e2: EvalScore) =>
   (povChances(color, e1) - povChances(color, e2)) / 2;
 
 /*----------------*/
 /*-----ANALYSE----*/
 /*----------------*/
 
-export function isEvalBetter(a, b) {
+export function isEvalBetter(a: ClientEval, b: ClientEval) {
   return a.depth > b.depth || (a.depth === b.depth && a.nodes > b.nodes);
 }
 
-export const getEval = (evaluation) => {
+export const getEval = (evaluation: ClientEval) => {
   if (evaluation) {
     if (evaluation.mate) {
-      return "#" + evaluation.mate;
+      return '#' + evaluation.mate;
     } else if (evaluation.cp) {
       return renderEval(evaluation.cp);
     }
   }
 };
 
-function renderEval(e) {
+function renderEval(e: number) {
   e = Math.max(Math.min(Math.round(e / 10) / 10, 99), -99);
-  return (e > 0 ? "+" : "") + e.toFixed(1);
+  return (e > 0 ? '+' : '') + e.toFixed(1);
 }

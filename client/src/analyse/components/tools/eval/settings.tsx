@@ -1,10 +1,10 @@
-import { usePageStore, useLocalStorage } from "src/main/hooks/hooks";
-import { observer } from "mobx-react-lite";
-import { useState, useCallback } from "react";
-import { ActionIcon, Popover, Slider, Stack, Text, Group } from "@mantine/core";
-import { IconSettings } from "@tabler/icons-react";
-import { getRecommendedThreads } from "src/lib/eval/engine";
-import classes from "../../../css/eval.module.css";
+import { usePageStore, useLocalStorage } from 'src/main/hooks/hooks';
+import { observer } from 'mobx-react-lite';
+import { useState, useCallback } from 'react';
+import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
+import { IconSettings } from '@tabler/icons-react';
+import { getRecommendedThreads } from 'src/lib/eval/engine';
+import classes from '../../../css/eval.module.css';
 
 export const Settings = () => {
   const [opened, setOpened] = useState(false);
@@ -19,11 +19,7 @@ export const Settings = () => {
       width={250}
     >
       <Popover.Target>
-        <ActionIcon
-          onClick={() => setOpened((o) => !o)}
-          variant={"default"}
-          bd={0}
-        >
+        <ActionIcon onClick={() => setOpened(o => !o)} variant={'default'} bd={0}>
           <IconSettings size={18} />
         </ActionIcon>
       </Popover.Target>
@@ -60,24 +56,17 @@ const SearchTimeSettings = observer(() => {
   const searchms = evalStorage.searchms;
 
   const setSearchTime = useCallback(
-    (value) => {
+    value => {
       if (value != searchms / 1000) {
         evalStorage.setSearchMs(value * 1000);
         analyseStore.restartCeval();
       }
     },
-    [searchms]
+    [searchms],
   );
 
   return (
-    <Slider
-      value={searchms / 1000}
-      min={1}
-      max={10}
-      step={1}
-      onChange={setSearchTime}
-      style={{ flex: 1 }}
-    />
+    <Slider value={searchms / 1000} min={1} max={10} step={1} onChange={setSearchTime} style={{ flex: 1 }} />
   );
 });
 
@@ -87,25 +76,16 @@ const MultiPvSettings = observer(() => {
   const multipv = evalStorage.multipv;
 
   const setMultiPv = useCallback(
-    (value) => {
+    value => {
       if (value !== multipv) {
         evalStorage.setMultiPv(value);
         analyseStore.clearEvals();
       }
     },
-    [multipv]
+    [multipv],
   );
 
-  return (
-    <Slider
-      value={multipv}
-      min={1}
-      max={5}
-      step={1}
-      onChange={setMultiPv}
-      style={{ flex: 1 }}
-    />
-  );
+  return <Slider value={multipv} min={1} max={5} step={1} onChange={setMultiPv} style={{ flex: 1 }} />;
 });
 
 const ThreadsSettings = observer(() => {
@@ -114,13 +94,13 @@ const ThreadsSettings = observer(() => {
   const threads = evalStorage.threads;
 
   const setThreads = useCallback(
-    (value) => {
+    value => {
       if (value != threads) {
         evalStorage.setThreads(value);
         analyseStore.restartCeval();
       }
     },
-    [threads]
+    [threads],
   );
   return (
     <Slider

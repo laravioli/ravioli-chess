@@ -1,11 +1,4 @@
-import {
-  Anchor,
-  Button,
-  Group,
-  PasswordInput,
-  Stack,
-  TextInput,
-} from '@mantine/core';
+import { Anchor, Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useState, useMemo } from 'react';
 import { useForm } from '@mantine/form';
@@ -26,13 +19,9 @@ export function AuthenticationForm({ close }) {
     },
 
     validate: {
-      username: (val) => null,
-      email: (val) =>
-        /^\S+@\S+$/.test(val) || type === 'login' ? null : 'Invalid email',
-      password: (val) =>
-        val.length <= 4
-          ? 'Password should include at least 4 characters'
-          : null,
+      username: val => null,
+      email: val => (/^\S+@\S+$/.test(val) || type === 'login' ? null : 'Invalid email'),
+      password: val => (val.length <= 4 ? 'Password should include at least 4 characters' : null),
     },
   });
 
@@ -42,10 +31,10 @@ export function AuthenticationForm({ close }) {
         ['login', userStore.login.bind(userStore)],
         ['register', userStore.register.bind(userStore)],
       ]),
-    []
+    [],
   );
 
-  const onSubmit = async (values) => {
+  const onSubmit = async values => {
     setLoading(true);
     try {
       await handlers.get(type)(values);
@@ -121,10 +110,9 @@ export function AuthenticationForm({ close }) {
             form.clearErrors();
             toggle();
           }}
-          size="xs">
-          {type === 'register'
-            ? 'Already have an account? Login'
-            : "Don't have an account? Register"}
+          size="xs"
+        >
+          {type === 'register' ? 'Already have an account? Login' : "Don't have an account? Register"}
         </Anchor>
         <Button type="submit" radius="xl" loading={loading}>
           {upperFirst(type)}

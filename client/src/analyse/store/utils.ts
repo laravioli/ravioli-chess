@@ -13,10 +13,7 @@ const SQUARES = [
 const IDS = new Map(generateIds());
 
 function* generateIds() {
-  yield* Array.from({ length: 64 }, (_, i) => [
-    SQUARES[i],
-    String.fromCharCode(35 + i),
-  ]);
+  yield* Array.from({ length: 64 }, (_, i) => [SQUARES[i], String.fromCharCode(35 + i)]);
 }
 
 export function uciToId(uci) {

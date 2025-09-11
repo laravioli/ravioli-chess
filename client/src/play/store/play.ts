@@ -1,5 +1,5 @@
-import { Chessground } from "@lichess-org/chessground";
-import { action, runInAction } from "mobx";
+import { Chessground } from '@lichess-org/chessground';
+import { action, runInAction } from 'mobx';
 
 export class PlayStore {
   board = undefined;

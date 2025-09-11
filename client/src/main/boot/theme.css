@@ -1,9 +1,6 @@
-@import "@mantine/core/styles.css";
+@import '@mantine/core/styles.css';
 
 body {
-  --bg-color: light-dark(
-    var(--mantine-color-gray-5),
-    var(--mantine-color-dark-8)
-  );
+  --bg-color: light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-8));
   background-color: var(--bg-color);
 }

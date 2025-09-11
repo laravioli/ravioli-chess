@@ -1,6 +1,6 @@
-import { useRef, useEffect } from "react";
-import { usePageStore } from "src/main/hooks/hooks";
-import classes from "../../css/board.module.css";
+import { useRef, useEffect } from 'react';
+import { usePageStore } from 'src/main/hooks/hooks';
+import classes from '../../css/board.module.css';
 
 export function Board() {
   const divRef = useRef(null);

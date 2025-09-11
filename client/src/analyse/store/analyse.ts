@@ -1,15 +1,16 @@
 //https://github.com/lichess-org/lila/blob/master/ui/analyse/src/ctrl.ts
-import { observable, action, runInAction } from "mobx";
-import { Chessground } from "@lichess-org/chessground";
-import { TreePath, TreeOps, Tree } from "src/lib/game/tree";
-import { throttle } from "src/lib/common";
-import { isEvalBetter } from "src/lib/eval/utils";
-import { makeObservableNode, makeRoot, makeNode } from "./node";
-import { uciToMove } from "@lichess-org/chessground/util";
-import { makeShapes } from "./autoshape";
+import { observable, action, runInAction } from 'mobx';
+import { Chessground } from '@lichess-org/chessground';
+import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
+import { TreePath, TreeOps, Tree } from 'src/lib/tree/tree';
+import { throttle } from 'src/lib/common';
+import { isEvalBetter } from 'src/lib/eval/utils';
+import { makeObservableNode, makeRoot, makeNode } from './node';
+import { uciToMove } from '@lichess-org/chessground/util';
+import { makeShapes } from './autoshape';
 
 export class AnalyseStore {
-  board;
+  board: ChessgroundApi | undefined;
   tree;
   ceval;
   path;
@@ -18,7 +19,6 @@ export class AnalyseStore {
   @observable.ref accessor node;
 
   constructor(rootStore, { fen }) {
-    window.analysis = this;
     runInAction(() => {
       this.ui = rootStore.uiStore;
       this.ceval = rootStore.cevalStore;
@@ -46,13 +46,13 @@ export class AnalyseStore {
   @action
   initTree(fen) {
     this.tree = new Tree(makeObservableNode(makeRoot(fen)));
-    this.setPath("");
+    this.setPath('');
   }
 
   @action
   reload(fen) {
     this.tree.root = makeObservableNode(makeRoot(fen));
-    this.jump("");
+    this.jump('');
   }
 
   @action
@@ -88,7 +88,7 @@ export class AnalyseStore {
 
   @action
   jumpFirst() {
-    this.jump("");
+    this.jump('');
   }
 
   /* Ceval */
@@ -105,7 +105,7 @@ export class AnalyseStore {
 
   @action
   onNewCeval(ev, path) {
-    this.tree.updateAt(path, (node) => {
+    this.tree.updateAt(path, node => {
       if (ev.fen !== node.fen) return;
       if (!node.ceval || isEvalBetter(ev, node.ceval)) {
         node.ceval = ev;
@@ -140,7 +140,7 @@ export class AnalyseStore {
   @action
   clearEvals() {
     this.ceval?.stop();
-    TreeOps.updateAll(this.tree.root, (node) => {
+    TreeOps.updateAll(this.tree.root, node => {
       node.ceval = undefined;
     });
     this.startCeval();
@@ -152,7 +152,7 @@ export class AnalyseStore {
 
   /* Board */
 
-  mountBoard(div) {
+  mountBoard(div: HTMLElement) {
     const config = this.makeBoardCfg();
     this.board = Chessground(div, config);
   }
@@ -163,7 +163,7 @@ export class AnalyseStore {
   }
 
   turnColor(node) {
-    return node.ply % 2 == 0 ? "white" : "black";
+    return node.ply % 2 == 0 ? 'white' : 'black';
   }
 
   updateBoard() {

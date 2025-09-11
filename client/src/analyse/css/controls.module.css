@@ -3,10 +3,7 @@
   border-bottom-right-radius: var(--main-bradius);
 
   & .history {
-    --ai-icon-bg-hover: light-dark(
-      var(--mantine-color-gray-4),
-      var(--mantine-color-dark-5)
-    );
+    --ai-icon-bg-hover: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-5));
     --ai-icon-hover: var(--ai-icon-color);
     display: flex;
     gap: 1rem;
@@ -16,12 +13,6 @@
 }
 
 .controls {
-  background: light-dark(
-    var(--mantine-color-gray-6),
-    var(--mantine-color-dark-6)
-  );
-  border-top: light-dark(
-    1px solid var(--mantine-color-gray-3),
-    1px solid var(--mantine-color-dark-6)
-  );
+  background: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-6));
+  border-top: light-dark(1px solid var(--mantine-color-gray-3), 1px solid var(--mantine-color-dark-6));
 }

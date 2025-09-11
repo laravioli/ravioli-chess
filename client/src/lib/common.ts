@@ -1,16 +1,24 @@
-export const defined = (value) => value !== undefined;
+//https://github.com/lichess-org/lila/blob/master/ui/lib/src/common.ts
 
-export const prop = (initialValue) => {
+export const defined = <T>(value: T | undefined): value is T => value !== undefined;
+
+export interface Prop<T> {
+  (): T;
+  (v: T): T;
+}
+export interface PropWithEffect<T> extends Prop<T> {}
+
+export const prop = <A>(initialValue: A): Prop<A> => {
   let value = initialValue;
-  return (v) => {
+  return (v?: A) => {
     if (defined(v)) value = v;
     return value;
   };
 };
 
-const propWithEffect = (initialValue, effect) => {
+export const propWithEffect = <A>(initialValue: A, effect: (value: A) => void): PropWithEffect<A> => {
   let value = initialValue;
-  return (v) => {
+  return (v?: A) => {
     if (defined(v)) {
       value = v;
       effect(v);
@@ -19,28 +27,33 @@ const propWithEffect = (initialValue, effect) => {
   };
 };
 
-export const toggle = (initialValue, effect = () => {}) => {
-  const prop = propWithEffect(initialValue, effect);
+export interface Toggle extends PropWithEffect<boolean> {
+  toggle(): void;
+  effect(value: boolean): void;
+}
+
+export const toggle = (initialValue: boolean, effect: (value: boolean) => void = () => {}): Toggle => {
+  const prop = propWithEffect<boolean>(initialValue, effect) as Toggle;
   prop.toggle = () => prop(!prop());
   prop.effect = effect;
   return prop;
 };
 
 export function clamp(value, bounds) {
-  return Math.max(
-    bounds.min ?? -Infinity,
-    Math.min(value, bounds.max ?? Infinity)
-  );
+  return Math.max(bounds.min ?? -Infinity, Math.min(value, bounds.max ?? Infinity));
 }
 
 /**
  * Ensures calls to the wrapped function are spaced by the given delay.
  * Any extra calls are dropped, except the last one, which waits for the delay.
  */
-export function throttle(delay, wrapped) {
-  return throttlePromise(function (...args) {
+export function throttle<T extends (...args: any) => void>(
+  delay: number,
+  wrapped: T,
+): (...args: Parameters<T>) => void {
+  return throttlePromise(function (this: any, ...args: Parameters<T>) {
     wrapped.apply(this, args);
-    return new Promise((resolve) => setTimeout(resolve, delay));
+    return new Promise(resolve => setTimeout(resolve, delay));
   });
 }
 
@@ -49,13 +62,22 @@ export function throttle(delay, wrapped) {
  * flight. Any extra calls are dropped, except the last one, which waits for
  * the previous call to complete.
  */
-function throttlePromiseWithResult(wrapped) {
-  let current;
-  let pending;
+function throttlePromiseWithResult<R, T extends (...args: any) => Promise<R>>(
+  wrapped: T,
+): (...args: Parameters<T>) => Promise<R> {
+  let current: Promise<R> | undefined;
+  let pending:
+    | {
+        run: () => Promise<R>;
+        reject: () => void;
+      }
+    | undefined;
 
-  return function (...args) {
+  return function (this: any, ...args: Parameters<T>): Promise<R> {
+    const self = this;
+
     const runCurrent = () => {
-      current = wrapped.apply(this, args).finally(() => {
+      current = wrapped.apply(self, args).finally(() => {
         current = undefined;
         if (pending) {
           pending.run();
@@ -68,20 +90,20 @@ function throttlePromiseWithResult(wrapped) {
     if (!current) return runCurrent();
 
     pending?.reject();
-    const next = new Promise((resolve, reject) => {
+    const next = new Promise<R>((resolve, reject) => {
       pending = {
         run: () =>
           runCurrent().then(
-            (res) => {
+            res => {
               resolve(res);
               return res;
             },
-            (err) => {
+            err => {
               reject(err);
               throw err;
-            }
+            },
           ),
-        reject: () => reject(new Error("Throttled")),
+        reject: () => reject(new Error('Throttled')),
       };
     });
     return next;
@@ -89,9 +111,11 @@ function throttlePromiseWithResult(wrapped) {
 }
 
 /* doesn't fail the promise if it's throttled */
-function throttlePromise(wrapped) {
-  const throttler = throttlePromiseWithResult(wrapped);
-  return function (...args) {
+function throttlePromise<T extends (...args: any) => Promise<void>>(
+  wrapped: T,
+): (...args: Parameters<T>) => Promise<void> {
+  const throttler = throttlePromiseWithResult<void, T>(wrapped);
+  return function (this: any, ...args: Parameters<T>): Promise<void> {
     return throttler.apply(this, args).catch(() => {});
   };
 }

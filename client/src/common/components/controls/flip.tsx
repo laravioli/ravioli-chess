@@ -1,6 +1,6 @@
-import { useStore, usePageStore } from "src/main/hooks/hooks";
-import { Action } from "./action";
-import { IconRepeat } from "@tabler/icons-react";
+import { useStore, usePageStore } from 'src/main/hooks/hooks';
+import { Action } from './action';
+import { IconRepeat } from '@tabler/icons-react';
 
 export const FlipButton = ({ ttposition }) => {
   const store = usePageStore();

@@ -1,8 +1,8 @@
-import { observable, action, runInAction } from "mobx";
-import { apiJSON } from "src/lib/api/json";
-import { siteSocket } from "src/lib/socket/socket";
+import { observable, action, runInAction } from 'mobx';
+import { apiJSON } from 'src/lib/api/json';
+import { siteSocket } from 'src/lib/socket/socket';
 
-const ANON = "Anonymous";
+const ANON = 'Anonymous';
 
 export class UserStore {
   @observable accessor username;
@@ -22,16 +22,16 @@ export class UserStore {
   }
 
   subscribeTab() {
-    this.channel = new BroadcastChannel("syncTab");
-    this.channel.onmessage = (event) => {
+    this.channel = new BroadcastChannel('syncTab');
+    this.channel.onmessage = event => {
       const data = event.data;
-      if (data.type === "login") {
+      if (data.type === 'login') {
         runInAction(() => {
           this.logged = true;
           this.username = data.username;
         });
       }
-      if (data.type == "logout") {
+      if (data.type == 'logout') {
         runInAction(() => {
           this.logged = false;
           this.username = ANON;
@@ -49,7 +49,7 @@ export class UserStore {
   @action
   async login(credential) {
     try {
-      await apiJSON.post("login", {
+      await apiJSON.post('login', {
         username: credential.username,
         password: credential.password,
       });
@@ -60,10 +60,10 @@ export class UserStore {
       setTimeout(
         () =>
           this.channel.postMessage({
-            type: "login",
+            type: 'login',
             username: this.username,
           }),
-        0
+        0,
       );
       setTimeout(() => siteSocket.reload(), 0);
     } catch (error) {
@@ -74,7 +74,7 @@ export class UserStore {
   @action
   async logout() {
     try {
-      const response = await apiJSON.post("logout", {});
+      const response = await apiJSON.post('logout', {});
       runInAction(() => {
         this.username = ANON;
         this.logged = false;
@@ -82,9 +82,9 @@ export class UserStore {
       setTimeout(
         () =>
           this.channel.postMessage({
-            type: "logout",
+            type: 'logout',
           }),
-        0
+        0,
       );
       setTimeout(() => siteSocket.reload(), 0);
       return response.data.detail;
@@ -96,7 +96,7 @@ export class UserStore {
   @action
   async register(credential) {
     try {
-      await apiJSON.post("register", {
+      await apiJSON.post('register', {
         username: credential.username,
         password: credential.password,
         email: credential.email,

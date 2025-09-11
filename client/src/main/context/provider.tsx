@@ -1,6 +1,6 @@
-import { useRef, useEffect, useContext } from "react";
-import { GlobalStoreContext, PageStoreContext, DataContext } from "./context";
-import { makeGlobalStore, pageStoreRouter } from "../store/stores";
+import { useRef, useEffect, useContext } from 'react';
+import { GlobalStoreContext, PageStoreContext, DataContext } from './context';
+import { makeGlobalStore, pageStoreRouter } from '../store/stores';
 
 export const GlobalStoreProvider = ({ children }) => {
   const storeRef = useRef(null);
@@ -10,11 +10,7 @@ export const GlobalStoreProvider = ({ children }) => {
     storeRef.current = makeGlobalStore(cfg);
   }
 
-  return (
-    <GlobalStoreContext.Provider value={storeRef.current}>
-      {children}
-    </GlobalStoreContext.Provider>
-  );
+  return <GlobalStoreContext.Provider value={storeRef.current}>{children}</GlobalStoreContext.Provider>;
 };
 
 export const PageStoreProvider = ({ children }) => {
@@ -29,20 +25,16 @@ export const PageStoreProvider = ({ children }) => {
 
   useEffect(() => {
     storeRef.current.onLoad();
-    window.history.replaceState({}, "");
+    window.history.replaceState({}, '');
     return () => storeRef.current.onUnLoad();
   }, []);
 
-  return (
-    <PageStoreContext.Provider value={storeRef.current}>
-      {children}
-    </PageStoreContext.Provider>
-  );
+  return <PageStoreContext.Provider value={storeRef.current}>{children}</PageStoreContext.Provider>;
 };
 
 export const DataProvider = ({ children }) => {
   const dataRef = useRef(null);
-  const dataScript = document.getElementById("page-init-data");
+  const dataScript = document.getElementById('page-init-data');
 
   if (!dataRef.current) {
     dataRef.current = dataScript && JSON.parse(dataScript.innerHTML);
@@ -50,11 +42,7 @@ export const DataProvider = ({ children }) => {
 
   useEffect(() => dataScript?.remove(), []);
 
-  return (
-    <DataContext.Provider value={dataRef.current}>
-      {children}
-    </DataContext.Provider>
-  );
+  return <DataContext.Provider value={dataRef.current}>{children}</DataContext.Provider>;
 };
 
 const useInitCfg = () => {

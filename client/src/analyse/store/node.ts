@@ -1,10 +1,10 @@
-import { makeObservable, observable } from "mobx";
-import { Chess } from "chessops/chess";
-import { makeFen, parseFen } from "chessops/fen";
-import { makeSanAndPlay } from "chessops/san";
-import { chessgroundDests } from "chessops/compat";
-import { uciToId, cgToUci } from "./utils";
-import { parseUci } from "chessops";
+import { makeObservable, observable } from 'mobx';
+import { Chess } from 'chessops/chess';
+import { makeFen, parseFen } from 'chessops/fen';
+import { makeSanAndPlay } from 'chessops/san';
+import { chessgroundDests } from 'chessops/compat';
+import { uciToId, cgToUci } from './utils';
+import { parseUci } from 'chessops';
 
 export function makeObservableNode(node) {
   return makeObservable(node, {
@@ -15,13 +15,13 @@ export function makeObservableNode(node) {
 export function makeRoot(fen) {
   const setup = parseFen(fen).unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
-  const ply = (setup.turn === "white" ? 0 : 1) + 2 * (setup.fullmoves - 1);
+  const ply = (setup.turn === 'white' ? 0 : 1) + 2 * (setup.fullmoves - 1);
   const dests = chessgroundDests(pos);
   const isCheck = pos.isCheck();
   return {
     children: [],
     fen,
-    id: "",
+    id: '',
     ply,
     dests,
     ceval: undefined,

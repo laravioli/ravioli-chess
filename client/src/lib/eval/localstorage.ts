@@ -1,49 +1,42 @@
-import { makeAutoObservable } from "mobx";
-import { makePersistable } from "mobx-persist-store";
-import { getRecommendedThreads } from "./engine";
+import { makeAutoObservable } from 'mobx';
+import { makePersistable } from 'mobx-persist-store';
+import { getRecommendedThreads } from './engine';
 
 export class LocalEvalStorage {
   multipv = 1;
   searchms = 3000;
-  threads = getRecommendedThreads();
+  threads: number = getRecommendedThreads();
   hashsize = 16;
-  sri = undefined;
-  disable = undefined;
+  sri: string | undefined;
+  disable?: number;
 
   constructor() {
     makeAutoObservable(this);
     makePersistable(this, {
-      name: "eval-storage",
-      properties: [
-        "multipv",
-        "searchms",
-        "threads",
-        "hashsize",
-        "sri",
-        "disable",
-      ],
+      name: 'eval-storage',
+      properties: ['multipv', 'searchms', 'threads', 'hashsize', 'sri', 'disable'],
       storage: window.localStorage,
     });
   }
 
-  setMultiPv(number) {
-    this.multipv = number;
+  setMultiPv(nb: number) {
+    this.multipv = nb;
   }
 
-  setSearchMs(millis) {
+  setSearchMs(millis: number) {
     this.searchms = millis;
   }
 
-  setThreads(number) {
-    this.threads = number;
+  setThreads(nb: number) {
+    this.threads = nb;
   }
 
-  setSri(string) {
-    this.sri = string;
+  setSri(sri: string) {
+    this.sri = sri;
   }
 
-  setDisable(boolean) {
-    this.disable = boolean;
+  setDisable(nb: number) {
+    this.disable = nb;
   }
 
   get isTab() {

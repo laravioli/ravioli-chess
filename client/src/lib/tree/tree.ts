@@ -1,23 +1,23 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/tree/tree.ts
 
-import { observable } from "mobx";
+import { observable } from 'mobx';
 
-const head = (path) => path.slice(0, 2);
-const tail = (path) => path.slice(2);
+const head = path => path.slice(0, 2);
+const tail = path => path.slice(2);
 
 export const TreePath = {
   init(path) {
     return path.slice(0, -2);
   },
   fromNodeList(nodes) {
-    return nodes.map((n) => n.id).join("");
+    return nodes.map(n => n.id).join('');
   },
 };
 
 //ops
 
 function findChildById(node, id) {
-  return node.children.find((n) => n.id === id);
+  return node.children.find(n => n.id === id);
 }
 
 function collect(from, pickChild) {
@@ -44,7 +44,7 @@ export const TreeOps = {
     update(root);
   },
   mainlineNodeList(from) {
-    return collect(from, (node) => node.children[0]);
+    return collect(from, node => node.children[0]);
   },
 };
 //tree
@@ -56,18 +56,18 @@ export class Tree {
     this.root = root;
   }
 
-  getNodeList = (path) =>
+  getNodeList = path =>
     collect(this.root, function (node) {
       const id = head(path);
-      if (id === "") return;
+      if (id === '') return;
       path = tail(path);
       return findChildById(node, id);
     });
 
-  findNode = (path) => this.findNodeFrom(this.root, path);
+  findNode = path => this.findNodeFrom(this.root, path);
 
   findNodeFrom(node, path) {
-    if (path === "") return node;
+    if (path === '') return node;
     const child = findChildById(node, head(path));
     return child ? this.findNodeFrom(child, tail(path)) : undefined;
   }
@@ -81,8 +81,6 @@ export class Tree {
   addNode(node, path) {
     const newPath = path + node.id;
     if (this.findNode(newPath)) return newPath;
-    return this.updateAt(path, (n) => n.children.push(node))
-      ? newPath
-      : undefined;
+    return this.updateAt(path, n => n.children.push(node)) ? newPath : undefined;
   }
 }

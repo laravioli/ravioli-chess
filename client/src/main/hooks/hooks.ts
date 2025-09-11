@@ -1,10 +1,5 @@
-import { useContext } from "react";
-import {
-  DataContext,
-  LocalStorageContext,
-  GlobalStoreContext,
-  PageStoreContext,
-} from "../context/context";
+import { useContext } from 'react';
+import { DataContext, LocalStorageContext, GlobalStoreContext, PageStoreContext } from '../context/context';
 
 /* Hooks to retrieve stores*/
 export const useLocalStorage = () => useContext(LocalStorageContext);

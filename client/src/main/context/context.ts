@@ -1,5 +1,5 @@
-import { createContext } from "react";
-import { localStorage } from "../store/localstorage";
+import { createContext } from 'react';
+import { localStorage } from '../store/localstorage';
 
 export const GlobalStoreContext = createContext(null);
 export const PageStoreContext = createContext(null);
