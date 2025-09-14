@@ -151,14 +151,12 @@ export function isEvalBetter(a: ClientEval, b: ClientEval) {
   return a.depth > b.depth || (a.depth === b.depth && a.nodes > b.nodes);
 }
 
-export const getEval = (evaluation: ClientEval) => {
-  if (evaluation) {
-    if (evaluation.mate) {
-      return '#' + evaluation.mate;
-    } else if (evaluation.cp) {
-      return renderEval(evaluation.cp);
-    }
-  }
+export const getEval = (evaluation: EvalScore) => {
+  if (evaluation.mate) {
+    return '#' + evaluation.mate;
+  } else if (evaluation.cp) {
+    return renderEval(evaluation.cp);
+  } else return '';
 };
 
 function renderEval(e: number) {

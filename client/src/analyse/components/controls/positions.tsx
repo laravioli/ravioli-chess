@@ -1,14 +1,15 @@
 import { useHTMLData, usePageStore } from 'src/main/hooks/hooks';
-import { Combobox, useCombobox } from '@mantine/core';
+import { Combobox, useCombobox, type FloatingPosition } from '@mantine/core';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconChessRook } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styles from 'src/common/css/icon.module.css';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
 
-export const Positions = observer(({ ttposition }) => {
-  const analyseStore = usePageStore();
+export const Positions = observer(({ ttposition }: { ttposition: FloatingPosition }) => {
+  const analyseStore = usePageStore<AnalyseStore>();
   const { positions } = useHTMLData();
 
   const options = useMemo(

@@ -1,8 +1,18 @@
 import { ActionIcon, Tooltip } from '@mantine/core';
+import type { FloatingPosition } from '@mantine/core';
 import classes from '../../css/icon.module.css';
+import type { MouseEventHandler, ReactNode } from 'react';
 
-export const Action = ({ children, label, onClick, ttposition, disabled = false }) => {
-  const handler = disabled
+interface ActionsProps {
+  children: ReactNode;
+  label: string;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+  ttposition: FloatingPosition;
+  disabled?: boolean;
+}
+
+export const Action = ({ children, label, onClick, ttposition, disabled = false }: ActionsProps) => {
+  const handler: MouseEventHandler<HTMLButtonElement> = disabled
     ? event => {
         event.preventDefault();
       }

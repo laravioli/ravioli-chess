@@ -3,7 +3,11 @@ import { DataContext, LocalStorageContext, GlobalStoreContext, PageStoreContext 
 import type { PageStore } from '../store/stores';
 
 /* Hooks to retrieve stores*/
-export const useLocalStorage = () => useContext(LocalStorageContext);
+export const useLocalStorage = () => {
+  const localStorage = useContext(LocalStorageContext);
+  if (!localStorage) throw new Error('useLocalStorage hook must be use within a LocalStorageProvider');
+  return localStorage;
+};
 export const useGlobalStore = () => {
   const store = useContext(GlobalStoreContext);
   if (!store) throw new Error('useGlobalStore hook must be use within a GlobalStoreProvider');
@@ -18,13 +22,15 @@ export const usePageStore = <T extends PageStore>(): T => {
 
 /* Hook to retrieve data from the inital html*/
 export const useHTMLData = () => {
-  const { data } = useContext(DataContext);
-  return data;
+  const payload = useContext(DataContext);
+  if (!payload) throw new Error('missing initial server data');
+  return payload.data;
 };
 
 export const useInitCfg = () => {
-  const { cfg } = useContext(DataContext);
+  const payload = useContext(DataContext);
+  if (!payload) throw new Error('missing initial server data');
   const navCfg = window.history.state?.usr;
 
-  return navCfg ?? cfg;
+  return navCfg ?? payload.cfg;
 };

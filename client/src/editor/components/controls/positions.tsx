@@ -5,9 +5,10 @@ import { autorun } from 'mobx';
 import { NativeSelect } from '@mantine/core';
 import { short_fen } from './utils';
 import classes from '../../css/controls.module.css';
+import type { EditorStore } from 'src/editor/store/editor';
 
 export const Positions = observer(() => {
-  const editorStore = usePageStore();
+  const editorStore = usePageStore<EditorStore>();
   const { positions } = useHTMLData();
 
   const data = useMemo(
@@ -23,7 +24,7 @@ export const Positions = observer(() => {
   const fens = useMemo(() => data.map(obj => short_fen(obj.value)), [data]);
 
   const matcher = useCallback(
-    fen => {
+    (fen: FEN) => {
       const match = fens.findIndex(pos => pos === short_fen(fen));
       if (match > 0) {
         return data[match].value;

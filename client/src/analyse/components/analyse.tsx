@@ -1,3 +1,4 @@
+import { useInitStore } from '../store/init';
 import { PageStoreProvider } from 'src/main/context/provider';
 import { EvalBar } from './tools/eval/bar';
 import { Board } from 'src/common/components/board/board';
@@ -7,7 +8,6 @@ import { Controls } from './controls/controls';
 import clsx from 'clsx';
 import layout from '../css/layout.module.css';
 import variables from '../css/variables.module.css';
-import { useInitStore } from '../store/init';
 
 const Side = () => (
   <div className={clsx(layout.side, 'mantine-visible-from-sm')}>

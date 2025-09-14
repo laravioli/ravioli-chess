@@ -5,13 +5,14 @@ import { FlipButton } from 'src/common/components/controls/flip';
 import { StartButton } from 'src/common/components/controls/start';
 import { Navigate } from 'src/common/components/navigation/navigate';
 import { Positions } from './positions';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
 
 export const Actions = () => {
   const actions = useActionConfigs();
 
   return (
     <Group justify="center">
-      {actions.map(action => (
+      {(actions as any[]).map(action => (
         <action.Component key={action.key} {...action.props} />
       ))}
     </Group>
@@ -19,7 +20,7 @@ export const Actions = () => {
 };
 
 const useActionConfigs = () => {
-  const store = usePageStore();
+  const store = usePageStore<AnalyseStore>();
   const opts = { ttposition: 'bottom' };
   const handlers = {
     start: () => store.reload(INITIAL_FEN),

@@ -1,7 +1,8 @@
 import { observable, action, runInAction } from 'mobx';
 import { apiJSON } from 'src/lib/api/json';
 import { siteSocket } from 'src/lib/socket/socket';
-import type { Credential, ServerUserOpts } from './interface';
+import type { Credential } from './interface';
+import type { ServerUserOpts } from 'src/main/boot/interface';
 
 const ANON = 'Anonymous';
 

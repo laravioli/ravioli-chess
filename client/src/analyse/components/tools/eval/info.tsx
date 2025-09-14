@@ -6,9 +6,10 @@ import { getEval } from 'src/lib/eval/utils';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import classes from '../../../css/eval.module.css';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
 
 export const EvalToggle = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
   const { evalStorage } = useLocalStorage();
 
   const onClick = useCallback(() => {
@@ -44,7 +45,7 @@ export const EvalToggle = observer(() => {
 });
 
 export const EvalScore = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
 
   const evaluation = analyseStore.node.ceval;
   let score = '';
@@ -61,7 +62,7 @@ export const EvalScore = observer(() => {
 });
 
 export const Depth = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
   const evaluation = analyseStore.node.ceval;
   let depth = '';
 

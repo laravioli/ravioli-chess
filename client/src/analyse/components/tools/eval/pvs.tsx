@@ -1,33 +1,19 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { useLocalStorage, usePageStore } from 'src/main/hooks/hooks';
-import { setupPosition } from 'chessops/variant';
+import { Position, setupPosition } from 'chessops/variant';
 import { lichessRules } from 'chessops/compat';
 import { makeSanAndPlay } from 'chessops/san';
 import { parseUci } from 'chessops/util';
 import { parseFen } from 'chessops/fen';
 import { getEval } from 'src/lib/eval/utils';
 import { Text, Divider } from '@mantine/core';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
+import type { LocalEval, PvData, Uci } from 'src/lib/eval/interface';
 import classes from '../../../css/eval.module.css';
 
-const MAX_NUM_MOVES = 12;
-
-function parsePv(pos, pv) {
-  const nb = Math.min(MAX_NUM_MOVES, pv.length);
-  const result = [];
-  for (let i = 0; i < nb; i++) {
-    if (pos.turn === 'white') result.push(`${pos.fullmoves}.`);
-    else if (i === 0) result.push(`${pos.fullmoves}...`);
-    const uci = pv[i];
-    const san = makeSanAndPlay(pos, parseUci(uci));
-    if (san === '--') break;
-    result.push(san);
-  }
-  return result.join(' ');
-}
-
 export const Pvs = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
   const multipv = useLocalStorage().evalStorage.multipv;
   return (
     <>
@@ -38,17 +24,40 @@ export const Pvs = observer(() => {
   );
 });
 
-function renderPvs(evaluation, multipv) {
-  let pvs;
+const MAX_NUM_MOVES = 12;
+
+function parsePv(moves: Uci[], pos?: Position) {
+  const nb = Math.min(MAX_NUM_MOVES, moves.length);
+  const result: string[] = [];
+  if (pos) {
+    for (let i = 0; i < nb; i++) {
+      if (pos.turn === 'white') result.push(`${pos.fullmoves}.`);
+      else if (i === 0) result.push(`${pos.fullmoves}...`);
+      const uci = moves[i];
+      const san = makeSanAndPlay(pos, parseUci(uci)!);
+      if (san === '--') break;
+      result.push(san);
+    }
+  }
+  return result.join(' ');
+}
+
+interface Pv {
+  moves?: string;
+  eval?: PvData;
+}
+
+function renderPvs(evaluation: LocalEval | undefined, multipv: number) {
+  let pvs: Pv[];
   if (!evaluation) pvs = new Array(multipv).fill({});
   else {
     const setup = parseFen(evaluation.fen).unwrap();
     const pos = setupPosition(lichessRules('standard'), setup);
     pvs = Array.from({ length: multipv }, (_, i) => {
       const pvData = evaluation.pvs?.[i];
-      if (!pvData || !pos) return '';
+      if (!pvData || !pos) return {};
       return {
-        moves: parsePv(pos.isOk ? pos.value.clone() : undefined, pvData.moves),
+        moves: parsePv(pvData.moves, pos.isOk ? pos.value.clone() : undefined),
         eval: pvData,
       };
     });
@@ -58,7 +67,9 @@ function renderPvs(evaluation, multipv) {
       {pvs.map((pv, index) => (
         <React.Fragment key={index}>
           <Text classNames={{ root: classes.pvs }} lineClamp={1}>
-            {multipv > 1 && <span style={{ opacity: 0.6, marginRight: 6 }}>{getEval(pv.eval)}</span>}
+            {multipv > 1 && (
+              <span style={{ opacity: 0.6, marginRight: 6 }}>{pv.eval && getEval(pv.eval)}</span>
+            )}
             {pv.moves}
           </Text>
           <Divider classNames={{ root: classes.divider }} />

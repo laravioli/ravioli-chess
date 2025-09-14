@@ -5,13 +5,14 @@ import { StartButton } from 'src/common/components/controls/start';
 import { Navigate } from 'src/common/components/navigation/navigate';
 import { ClearButton } from './clear';
 import classes from '../../css/side.module.css';
+import type { EditorStore } from 'src/editor/store/editor';
 
 export const Actions = () => {
   const actions = useActionConfigs();
 
   return (
     <div className={classes.actions}>
-      {actions.map(action => (
+      {(actions as any[]).map(action => (
         <action.Component key={action.key} {...action.props} />
       ))}
     </div>
@@ -19,7 +20,7 @@ export const Actions = () => {
 };
 
 const useActionConfigs = () => {
-  const store = usePageStore();
+  const store = usePageStore<EditorStore>();
   const opts = { ttposition: 'right' };
   const handlers = {
     start: () => store.setFen(INITIAL_FEN),

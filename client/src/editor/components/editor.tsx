@@ -1,3 +1,4 @@
+import { useInitStore } from '../store/init';
 import { PageStoreProvider } from 'src/main/context/provider';
 import { Board } from 'src/common/components/board/board';
 import { FenInput } from './fen/feninput';
@@ -8,7 +9,6 @@ import clsx from 'clsx';
 import layout from '../css/layout.module.css';
 import variables from '../css/variables.module.css';
 import classes from '../css/side.module.css';
-import { useInitStore } from '../store/init';
 
 const Side = () => (
   <div className={clsx(layout.side, classes.side, 'mantine-visible-from-sm')}>

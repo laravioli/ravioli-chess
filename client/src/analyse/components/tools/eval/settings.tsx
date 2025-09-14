@@ -5,21 +5,20 @@ import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { getRecommendedThreads } from 'src/lib/eval/engine';
 import classes from '../../../css/eval.module.css';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
 
 export const Settings = () => {
   const [opened, setOpened] = useState(false);
 
   return (
-    <Popover
-      className={classes.settings}
-      opened={opened}
-      onChange={setOpened}
-      position="bottom-start"
-      shadow="md"
-      width={250}
-    >
+    <Popover opened={opened} onChange={setOpened} position="bottom-start" shadow="md" width={250}>
       <Popover.Target>
-        <ActionIcon onClick={() => setOpened(o => !o)} variant={'default'} bd={0}>
+        <ActionIcon
+          className={classes.settings}
+          onClick={() => setOpened(o => !o)}
+          variant={'default'}
+          bd={0}
+        >
           <IconSettings size={18} />
         </ActionIcon>
       </Popover.Target>
@@ -51,7 +50,7 @@ export const Settings = () => {
 };
 
 const SearchTimeSettings = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
   const { evalStorage } = useLocalStorage();
   const searchms = evalStorage.searchms;
 
@@ -71,7 +70,7 @@ const SearchTimeSettings = observer(() => {
 });
 
 const MultiPvSettings = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
   const { evalStorage } = useLocalStorage();
   const multipv = evalStorage.multipv;
 
@@ -89,7 +88,7 @@ const MultiPvSettings = observer(() => {
 });
 
 const ThreadsSettings = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
   const { evalStorage } = useLocalStorage();
   const threads = evalStorage.threads;
 

@@ -1,5 +1,5 @@
 //https://github.com/lichess-org/lila/blob/master/ui/analyse/src/treeView/columnView.ts
-import React, { useMemo } from 'react';
+import React, { useMemo, type MouseEvent, type MouseEventHandler } from 'react';
 import { observer } from 'mobx-react-lite';
 import { usePageStore } from 'src/main/hooks/hooks';
 import { defined } from 'src/lib/common';
@@ -7,10 +7,22 @@ import { getEval } from 'src/lib/eval/utils';
 import clsx from 'clsx';
 import classes from '../../css/tree.module.css';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
+import type { Node, Path } from 'src/lib/tree/interface';
+import type { Ply } from 'src/lib/eval/interface';
+
+interface Handlers {
+  click: MouseEventHandler<HTMLDivElement>;
+}
+
+interface TreeOpts {
+  parentPath: Path;
+  isMainline: boolean;
+  withIndex?: boolean;
+}
 
 export const TView = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const handlers = useMemo(
+  const handlers: Handlers = useMemo(
     () => ({
       click: e => {
         const path = eventPath(e);
@@ -25,7 +37,7 @@ export const TView = observer(() => {
   return <>{defined(analyseStore.node) && renderTree(analyseStore, handlers)}</>;
 });
 
-function renderTree(ctrl, handlers) {
+function renderTree(ctrl: AnalyseStore, handlers: Handlers) {
   const root = ctrl.tree.root;
   const blackStarts = (root.ply & 1) === 1;
   return (
@@ -40,7 +52,7 @@ function renderTree(ctrl, handlers) {
   );
 }
 
-function renderChildrenOf(ctrl, node, opts) {
+function renderChildrenOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
   const cs = node.children,
     main = cs[0];
   if (!main) return;
@@ -88,7 +100,7 @@ function renderChildrenOf(ctrl, node, opts) {
   return renderLines(ctrl, cs, opts);
 }
 
-function renderLines(ctrl, nodes, opts) {
+function renderLines(ctrl: AnalyseStore, nodes: Node[], opts: TreeOpts) {
   return (
     <div className={clsx(classes.lines, !nodes[1] && classes.single)}>
       {nodes.map(n => (
@@ -107,19 +119,21 @@ function renderLines(ctrl, nodes, opts) {
   );
 }
 
-function eventPath(e) {
-  return e.target.getAttribute('p') || e.target.parentElement.getAttribute('p');
+function eventPath(e: MouseEvent<HTMLDivElement>) {
+  const target = e.target as HTMLElement;
+  return target.dataset.p || target.parentElement?.dataset.p;
 }
 
-const plyToTurn = ply => Math.floor((ply - 1) / 2) + 1;
+const plyToTurn = (ply: Ply) => Math.floor((ply - 1) / 2) + 1;
 
-const renderIndexText = (ply, withDots) => plyToTurn(ply) + (withDots ? (ply % 2 === 1 ? '.' : '...') : '');
+const renderIndexText = (ply: Ply, withDots: boolean) =>
+  plyToTurn(ply) + (withDots ? (ply % 2 === 1 ? '.' : '...') : '');
 
-const renderIndex = (ply, withDots) => (
+const renderIndex = (ply: Ply, withDots: boolean) => (
   <span className={classes.index}>{renderIndexText(ply, withDots)}</span>
 );
 
-function renderMove(node) {
+function renderMove(node: Node) {
   const ev = node.ceval;
   return (
     <>
@@ -129,25 +143,25 @@ function renderMove(node) {
   );
 }
 
-function renderMoveOf(ctrl, node, opts) {
+function renderMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
   return opts.isMainline ? renderMainlineMoveOf(ctrl, node, opts) : renderVariationMoveOf(ctrl, node, opts);
 }
 
-function renderMainlineMoveOf(ctrl, node, opts) {
+function renderMainlineMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
   const path = opts.parentPath + node.id;
   return (
-    <div className={moveClasses(path, ctrl.path)} p={path}>
+    <div className={moveClasses(path, ctrl.path)} data-p={path}>
       {renderMove(node)}
     </div>
   );
 }
 
-function renderVariationMoveOf(ctrl, node, opts) {
+function renderVariationMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
   const withIndex = opts.withIndex || node.ply % 2 === 1,
     path = opts.parentPath + node.id;
 
   return (
-    <div className={moveClasses(path, ctrl.path)} p={path}>
+    <div className={moveClasses(path, ctrl.path)} data-p={path}>
       {withIndex && renderIndex(node.ply, true)}
       {node.san}
     </div>
@@ -158,7 +172,7 @@ function emptyMove() {
   return <div className={clsx([classes.move, classes.empty])}>...</div>;
 }
 
-function renderMoveAndChildrenOf(ctrl, node, opts) {
+function renderMoveAndChildrenOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
   const path = opts.parentPath + node.id;
   return (
     <>
@@ -171,7 +185,7 @@ function renderMoveAndChildrenOf(ctrl, node, opts) {
   );
 }
 
-function moveClasses(path, currentPath) {
+function moveClasses(path: Path, currentPath: Path) {
   const cls = [classes.move];
   if (currentPath === path) cls.push(classes.active);
   return clsx(cls);

@@ -7,7 +7,7 @@ export const GlobalStoreProvider = ({ children }) => {
   const storeRef = useRef<GlobalStore | null>(null);
 
   if (!storeRef.current) {
-    const { cfg } = useContext(DataContext);
+    const { cfg } = useContext(DataContext)!;
     storeRef.current = makeGlobalStore(cfg);
   }
 

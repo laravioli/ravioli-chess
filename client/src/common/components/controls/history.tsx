@@ -2,6 +2,7 @@ import { IconChevronsLeft, IconChevronLeft, IconChevronRight, IconChevronsRight 
 import { ActionIcon, type ActionIconProps } from '@mantine/core';
 import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
 
 interface Props {
   className: string;
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export const History = observer(({ className, size }: Props) => {
-  const pageStore = usePageStore();
+  const pageStore = usePageStore<AnalyseStore>();
   const actions = [
     {
       icon: IconChevronsLeft,

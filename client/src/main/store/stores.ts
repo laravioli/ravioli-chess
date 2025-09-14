@@ -3,7 +3,7 @@ import { UserStore } from 'src/common/store/userstore';
 import { AnalyseStore } from 'src/analyse/store/analyse';
 import { EditorStore } from 'src/editor/store/editor';
 import { PlayStore } from 'src/play/store/play';
-import type { ServerConfig } from '../boot/config';
+import type { ServerConfig } from '../boot/interface';
 
 /* Global Store */
 
