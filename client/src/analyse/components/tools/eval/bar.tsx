@@ -1,21 +1,21 @@
-import { useStore, usePageStore } from 'src/main/hooks/hooks';
+import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { povChances } from 'src/lib/eval/utils';
 import classes from '../../../css/eval.module.css';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
 
 export const EvalBar = observer(() => {
-  const { uiStore } = useStore();
-  const analyseStore = usePageStore();
+  const store = usePageStore<AnalyseStore>();
 
-  if (!analyseStore.ceval.enabled || analyseStore.node.outcome) return null;
+  if (!store.ceval.enabled || store.node.outcome) return null;
 
-  const progress = analyseStore.node.ceval ? povChances('white', analyseStore.node.ceval) : 0.0;
+  const progress = store.node.ceval ? povChances('white', store.node.ceval) : 0.0;
 
   return (
     <div
       className={[classes.bar, classes.barblack].join(' ')}
       style={{
-        transform: uiStore.orientation === 'black' ? 'rotate(180deg)' : '',
+        transform: store.orientation === 'black' ? 'rotate(180deg)' : '',
       }}
     >
       <div

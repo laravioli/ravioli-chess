@@ -3,14 +3,14 @@ import { AuthenticationForm } from './authentification';
 import { PlayModal } from './modal';
 import { Link } from 'react-router';
 import { ToggleColorScheme } from './colorscheme';
-import { useStore } from 'src/main/hooks/hooks';
+import { useGlobalStore } from 'src/main/hooks/hooks';
 import { useDisclosure } from '@mantine/hooks';
 import { observer } from 'mobx-react-lite';
 import { notifications } from '@mantine/notifications';
 import classes from '../../../css/header.module.css';
 
 export const Header = observer(() => {
-  const { userStore } = useStore();
+  const { userStore } = useGlobalStore();
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
   return (
     <Box pb={6}>

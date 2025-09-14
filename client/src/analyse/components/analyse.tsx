@@ -7,6 +7,7 @@ import { Controls } from './controls/controls';
 import clsx from 'clsx';
 import layout from '../css/layout.module.css';
 import variables from '../css/variables.module.css';
+import { useInitStore } from '../store/init';
 
 const Side = () => (
   <div className={clsx(layout.side, 'mantine-visible-from-sm')}>
@@ -16,8 +17,9 @@ const Side = () => (
 );
 
 const Analyse = () => {
+  const makeStore = useInitStore();
   return (
-    <PageStoreProvider>
+    <PageStoreProvider factory={makeStore}>
       <div className={clsx(layout.analyse, variables.analyse)}>
         <EvalBar />
         <Board />

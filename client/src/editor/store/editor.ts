@@ -1,19 +1,25 @@
-import { action, runInAction } from 'mobx';
+import { action, runInAction, computed, observable } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
+import { opposite } from '@lichess-org/chessground/util';
 import { Fen } from './fen';
+import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
+import type { EditorOpts } from './interface';
 
 export class EditorStore {
-  board = undefined;
-  fen = undefined;
+  opts: EditorOpts;
+  board: ChessgroundApi | undefined;
+  fen: Fen;
 
-  constructor(rootStore, { fen }) {
+  @observable accessor isFlipped = false;
+
+  constructor(opts: EditorOpts) {
     runInAction(() => {
-      this.ui = rootStore.uiStore;
-      this.fen = new Fen(fen);
+      this.opts = opts;
+      this.fen = new Fen(opts.fen);
     });
   }
 
-  //Loader
+  /* Loader */
 
   @action
   onLoad() {}
@@ -21,21 +27,32 @@ export class EditorStore {
   @action
   onUnLoad() {}
 
-  //Board
+  /* Board */
 
-  mountBoard(div) {
+  mountBoard(div: HTMLElement) {
     const config = this.makeBoardCfg();
     this.board = Chessground(div, config);
   }
 
-  onUnMountBoard() {
-    this.board.destroy();
+  @action
+  flip() {
+    this.board?.toggleOrientation();
+    this.isFlipped = !this.isFlipped;
   }
 
-  makeBoardCfg = () => {
+  @computed
+  get orientation() {
+    return this.isFlipped ? opposite(this.opts.orientation) : this.opts.orientation;
+  }
+
+  onUnMountBoard() {
+    this.board?.destroy();
+  }
+
+  makeBoardCfg = (): CgConfig => {
     return {
       fen: this.fen.current,
-      orientation: this.ui.orientation,
+      orientation: this.opts.orientation,
       autoCastle: false,
       drawable: {
         enabled: true,
@@ -53,21 +70,21 @@ export class EditorStore {
       },
       events: {
         change: action(() => {
-          this.fen.boardFen = this.board.getFen();
+          this.fen.boardFen = this.board!.getFen();
         }),
       },
     };
   };
 
-  //Fen
+  /* Fen */
 
   @action
-  setFen(fen) {
+  setFen(fen: FEN) {
     this.fen.set(fen, () => this._updateBoard(fen));
   }
 
   @action
-  _updateBoard(fen) {
+  _updateBoard(fen: FEN) {
     if (this.board) {
       this.board.set({ fen: fen });
       this.fen.boardFen = this.board.getFen();

@@ -7,7 +7,7 @@ import classes from '../../css/spare.module.css';
 
 export const SparePieces = observer(({ side }) => {
   const editor = usePageStore();
-  const orientation = editor.ui.orientation;
+  const orientation = editor.orientation;
   const color = side === 'bottom' ? orientation : opposite(orientation);
   const pieces = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'].map(role => [color, role]);
   return (

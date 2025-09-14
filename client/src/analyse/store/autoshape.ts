@@ -1,15 +1,21 @@
 // https://github.com/lichess-org/lila/blob/master/ui/analyse/src/autoShape.ts
 import { parseUci, makeSquare } from 'chessops/util';
+import { isDrop } from 'chessops/types';
+import type { AnalyseStore } from './analyse';
+import type { DrawShape } from '@lichess-org/chessground/draw';
 
-function makeShapesFromUci(uci, brush) {
-  const move = parseUci(uci);
-  const shapes = [{ orig: makeSquare(move.from), dest: makeSquare(move.to), brush }];
+function makeShapesFromUci(uci: string, brush: string) {
+  const move = parseUci(uci)!;
+  const to = makeSquare(move.to);
+  if (isDrop(move)) return [];
+
+  const shapes: DrawShape[] = [{ orig: makeSquare(move.from), dest: to, brush }];
   return shapes;
 }
 
-export function makeShapes(ctrl) {
+export function makeShapes(ctrl: AnalyseStore) {
   const engine = ctrl.ceval;
-  let shapes = [];
+  let shapes: DrawShape[] = [];
 
   if (engine.enabled && engine.search.multiPv) {
     const node = ctrl.node;

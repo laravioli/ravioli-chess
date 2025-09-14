@@ -1,13 +1,19 @@
-export let siteSocket;
+import type { Site } from '../site/site';
+import type { Path } from '../tree/interface';
 
-export function wsConnect(path) {
+export let siteSocket: WsSocket;
+
+export function wsConnect(path: Path) {
   return (siteSocket = new WsSocket(path));
 }
 
 class WsSocket {
-  constructor(path) {
+  ws: WebSocket;
+  url: string;
+
+  constructor(path: string) {
     const protocol = location.protocol === 'https' ? 'wss://' : 'ws://';
-    this.url = url(protocol + location.host + path, { sri: site.sri });
+    this.url = url(protocol + location.host + path, { sri: window.site.sri });
     this.connect();
   }
 
@@ -18,7 +24,7 @@ class WsSocket {
       console.log(data);
       setTimeout(() => ws.send(JSON.stringify({ message: 'ping' })), 1000);
     };
-    ws.onclose = e => {
+    ws.onclose = _event => {
       console.error('Chat socket closed unexpectedly');
     };
   };
@@ -29,7 +35,7 @@ class WsSocket {
   };
 }
 
-export const url = (path, params) => {
+export const url = (path: string, params: Site) => {
   const searchParams = new URLSearchParams();
   for (const k of Object.keys(params)) if (params[k]) searchParams.append(k, params[k]);
   const query = searchParams.toString();

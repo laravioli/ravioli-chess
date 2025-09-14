@@ -1,35 +1,48 @@
-import { useRef, useEffect, useContext } from 'react';
-import { GlobalStoreContext, PageStoreContext, DataContext } from './context';
-import { makeGlobalStore, pageStoreRouter } from '../store/stores';
+import { useRef, useEffect, useContext, type ReactNode } from 'react';
+import { GlobalStoreContext, PageStoreContext, LocalStorageContext, DataContext } from './context';
+import { makeGlobalStore, type GlobalStore, type PageStore } from '../store/stores';
+import { makeLocalStorage, type LocalStorage } from '../store/localstorage';
 
 export const GlobalStoreProvider = ({ children }) => {
-  const storeRef = useRef(null);
+  const storeRef = useRef<GlobalStore | null>(null);
 
   if (!storeRef.current) {
-    const cfg = useInitCfg();
+    const { cfg } = useContext(DataContext);
     storeRef.current = makeGlobalStore(cfg);
   }
 
   return <GlobalStoreContext.Provider value={storeRef.current}>{children}</GlobalStoreContext.Provider>;
 };
 
-export const PageStoreProvider = ({ children }) => {
-  const storeRef = useRef(null);
-  const globalStore = useContext(GlobalStoreContext);
-  const cfg = useInitCfg();
+type PageStoreProviderProps<T extends PageStore> = {
+  children: ReactNode;
+  factory: () => T;
+};
+
+export const PageStoreProvider = <T extends PageStore>({ children, factory }: PageStoreProviderProps<T>) => {
+  const storeRef = useRef<T | null>(null);
 
   if (!storeRef.current) {
-    const StoreCreator = pageStoreRouter(window.location.pathname);
-    storeRef.current = new StoreCreator(globalStore, cfg);
+    storeRef.current = factory();
   }
 
   useEffect(() => {
-    storeRef.current.onLoad();
+    storeRef.current?.onLoad();
     window.history.replaceState({}, '');
-    return () => storeRef.current.onUnLoad();
+    return () => storeRef.current?.onUnLoad();
   }, []);
 
   return <PageStoreContext.Provider value={storeRef.current}>{children}</PageStoreContext.Provider>;
+};
+
+export const LocalStorageProvider = ({ children }) => {
+  const storeRef = useRef<LocalStorage | null>(null);
+
+  if (!storeRef.current) {
+    storeRef.current = makeLocalStorage();
+  }
+
+  return <LocalStorageContext.Provider value={storeRef.current}>{children}</LocalStorageContext.Provider>;
 };
 
 export const DataProvider = ({ children }) => {
@@ -43,11 +56,4 @@ export const DataProvider = ({ children }) => {
   useEffect(() => dataScript?.remove(), []);
 
   return <DataContext.Provider value={dataRef.current}>{children}</DataContext.Provider>;
-};
-
-const useInitCfg = () => {
-  const { cfg } = useContext(DataContext);
-  const navCfg = window.history.state?.usr;
-
-  return navCfg ?? cfg;
 };

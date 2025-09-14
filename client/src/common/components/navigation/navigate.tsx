@@ -18,7 +18,7 @@ export const Navigate = observer(({ ttposition, path, getFen }) => {
     if (!isEdit || pageStore.fen.legalFen) {
       navigate(path, {
         replace: true,
-        state: { fen: getFen() || INITIAL_FEN },
+        state: { fen: getFen() || INITIAL_FEN, orientation: pageStore.board!.state.orientation },
       });
     }
   });

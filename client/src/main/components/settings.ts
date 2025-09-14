@@ -1,10 +1,15 @@
-import { localStorageColorSchemeManager, createTheme, NativeSelect } from '@mantine/core';
+import {
+  localStorageColorSchemeManager,
+  createTheme,
+  NativeSelect,
+  type MantineProviderProps,
+} from '@mantine/core';
 
 const localstorageScheme = localStorageColorSchemeManager({
   key: 'color-scheme',
 });
 
-export const MantineSettings = {
+export const MantineSettings: MantineProviderProps = {
   theme: createTheme({
     fontFamily: 'Arial',
     fontFamilyMonospace: 'Courier New, monospace',
@@ -18,7 +23,7 @@ export const MantineSettings = {
     cursorType: 'pointer',
     components: {
       NativeSelect: NativeSelect.extend({
-        vars: (theme, prop) => ({
+        vars: (_theme, _prop) => ({
           wrapper: {
             '--input-bd-focus': 'var(--input-bd)',
           },

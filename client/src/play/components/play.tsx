@@ -4,10 +4,12 @@ import { Tools } from './tools/tools';
 import clsx from 'clsx';
 import layout from '../css/layout.module.css';
 import variables from '../css/variables.module.css';
+import { useInitStore } from '../store/init';
 
 const Play = () => {
+  const makeStore = useInitStore();
   return (
-    <PageStoreProvider>
+    <PageStoreProvider factory={makeStore}>
       <div className={clsx(layout.play, variables.play)}>
         <Board />
         <Tools />

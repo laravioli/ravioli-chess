@@ -4,18 +4,23 @@ import { castlingsToFen } from './utils';
 import { Board } from 'chessops/board';
 import { setupPosition, Castles } from 'chessops/variant';
 import { makeFen, parseFen, parseCastlingFen } from 'chessops/fen';
+import { type Setup, Material, RemainingChecks } from 'chessops/setup';
+import type { SquareSet } from 'chessops/squareSet';
+import type { Castlings, CastlingSide } from './interface';
 
 export class Fen {
-  remainingChecks = undefined;
-  pockets = undefined;
-  @observable accessor boardFen;
-  @observable accessor turn;
-  @observable accessor castlings;
-  @observable accessor castlingRights;
-  @observable accessor halfmoves;
-  @observable accessor fullmoves;
+  remainingChecks: RemainingChecks | undefined;
+  pockets: Material | undefined;
+  initialFen: string;
 
-  constructor(fen) {
+  @observable accessor boardFen: string;
+  @observable accessor turn: Color;
+  @observable accessor castlings: Castlings;
+  @observable accessor castlingRights: SquareSet | undefined;
+  @observable accessor halfmoves: number;
+  @observable accessor fullmoves: number;
+
+  constructor(fen: FEN) {
     this.initialFen = fen.split(' ')[0];
     this.castlings = { K: false, Q: false, k: false, q: false };
     this.set(fen);
@@ -34,7 +39,7 @@ export class Fen {
     );
   }
 
-  getSetup() {
+  getSetup(): Setup {
     const fen = this.boardFen || this.initialFen;
     const board = parseFen(fen).unwrap(
       setup => setup.board,
@@ -54,7 +59,7 @@ export class Fen {
   }
 
   @action
-  set(fen, updateBoard) {
+  set(fen: FEN, updateBoard?: () => void) {
     parseFen(fen).unwrap(
       setup => {
         updateBoard?.();
@@ -66,7 +71,7 @@ export class Fen {
   }
 
   @action
-  setSetup(setup) {
+  setSetup(setup: Setup) {
     this.pockets = setup.pockets;
     this.turn = setup.turn;
     this.castlingRights = setup.castlingRights;
@@ -82,17 +87,17 @@ export class Fen {
   }
 
   @action
-  setCastlingRight(id, value) {
+  setCastlingRight(id: CastlingSide, value: boolean) {
     if (this.castlings[id] !== value) this.castlingRights = undefined;
     this.castlings[id] = value;
   }
 
   @action
-  setTurn(color) {
+  setTurn(color: Color) {
     this.turn = color;
   }
 
-  isValid(fen) {
+  isValid(fen: FEN) {
     return parseFen(fen).isOk;
   }
 }

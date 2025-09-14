@@ -1,3 +1,9 @@
+type RandomToken = string;
+
+export interface Site {
+  sri: RandomToken;
+}
+
 const randomToken = () => {
   try {
     const data = globalThis.crypto.getRandomValues(new Uint8Array(9));
@@ -9,7 +15,5 @@ const randomToken = () => {
 };
 
 export const initSite = () => {
-  window.site = {};
-  const site = window.site;
-  site.sri = randomToken();
+  window.site = { sri: randomToken() };
 };

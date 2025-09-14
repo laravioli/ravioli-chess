@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import layout from '../css/layout.module.css';
 import variables from '../css/variables.module.css';
 import classes from '../css/side.module.css';
+import { useInitStore } from '../store/init';
 
 const Side = () => (
   <div className={clsx(layout.side, classes.side, 'mantine-visible-from-sm')}>
@@ -31,8 +32,9 @@ const Copyables = () => {
 };
 
 const Editor = () => {
+  const makeStore = useInitStore();
   return (
-    <PageStoreProvider>
+    <PageStoreProvider factory={makeStore}>
       <div className={clsx(layout.editor, variables.editor)}>
         <Board />
         <Side />

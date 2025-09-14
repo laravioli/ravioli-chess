@@ -5,14 +5,15 @@ import { makeSanAndPlay } from 'chessops/san';
 import { chessgroundDests } from 'chessops/compat';
 import { uciToId, cgToUci } from './utils';
 import { parseUci } from 'chessops';
+import type { Node } from 'src/lib/tree/interface';
 
-export function makeObservableNode(node) {
+export function makeObservableNode(node: Node): Node {
   return makeObservable(node, {
     ceval: observable.ref,
   });
 }
 
-export function makeRoot(fen) {
+export function makeRoot(fen: FEN): Node {
   const setup = parseFen(fen).unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
   const ply = (setup.turn === 'white' ? 0 : 1) + 2 * (setup.fullmoves - 1);
@@ -30,11 +31,11 @@ export function makeRoot(fen) {
   };
 }
 
-export function makeNode(parent, origin, dest) {
+export function makeNode(parent: Node, origin: Key, dest: Key): Node {
   const setup = parseFen(parent.fen).unwrap();
   const pos = Chess.fromSetup(setup).unwrap();
   const uci = cgToUci(origin, dest);
-  const san = makeSanAndPlay(pos, parseUci(uci));
+  const san = makeSanAndPlay(pos, parseUci(uci)!);
   const newFen = makeFen(pos.toSetup());
   const dests = chessgroundDests(pos);
   const isCheck = pos.isCheck();

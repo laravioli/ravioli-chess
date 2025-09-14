@@ -1,29 +1,38 @@
 //https://github.com/lichess-org/lila/blob/master/ui/analyse/src/ctrl.ts
-import { observable, action, runInAction } from 'mobx';
+import { observable, action, runInAction, computed } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 import { TreePath, TreeOps, Tree } from 'src/lib/tree/tree';
 import { throttle } from 'src/lib/common';
 import { isEvalBetter } from 'src/lib/eval/utils';
 import { makeObservableNode, makeRoot, makeNode } from './node';
-import { uciToMove } from '@lichess-org/chessground/util';
+import { uciToMove, opposite } from '@lichess-org/chessground/util';
 import { makeShapes } from './autoshape';
+import type { Ceval } from 'src/lib/eval/ceval';
+import type { CevalOpts, ClientEval } from 'src/lib/eval/interface';
+import type { Node, Path } from 'src/lib/tree/interface';
+import type { AnalyseOpts, JustCaptured } from './interface';
 
 export class AnalyseStore {
   board: ChessgroundApi | undefined;
-  tree;
-  ceval;
-  path;
-  nodeList;
-  mainline;
-  @observable.ref accessor node;
+  ceval: Ceval;
 
-  constructor(rootStore, { fen }) {
+  tree: Tree;
+  path: Path;
+  nodeList: Node[];
+  mainline: Node[];
+  @observable.ref accessor node: Node;
+
+  opts: AnalyseOpts;
+
+  @observable accessor isFlipped = false;
+
+  constructor(ceval: Ceval, opts: AnalyseOpts) {
     runInAction(() => {
-      this.ui = rootStore.uiStore;
-      this.ceval = rootStore.cevalStore;
-      this.initTree(fen);
-      this.initCeval(fen);
+      this.opts = opts;
+      this.ceval = ceval;
+      this.initTree(opts.fen);
+      this.initCeval(opts.fen);
     });
   }
 
@@ -44,19 +53,19 @@ export class AnalyseStore {
   /* Tree */
 
   @action
-  initTree(fen) {
+  initTree(fen: FEN) {
     this.tree = new Tree(makeObservableNode(makeRoot(fen)));
     this.setPath('');
   }
 
   @action
-  reload(fen) {
+  reload(fen: FEN) {
     this.tree.root = makeObservableNode(makeRoot(fen));
     this.jump('');
   }
 
   @action
-  setPath(path) {
+  setPath(path: Path) {
     this.path = path;
     this.nodeList = this.tree.getNodeList(path);
     this.node = TreeOps.last(this.nodeList);
@@ -64,7 +73,7 @@ export class AnalyseStore {
   }
 
   @action
-  jump(path) {
+  jump(path: Path) {
     this.setPath(path);
     this.restartCeval();
     this.updateBoard();
@@ -93,18 +102,19 @@ export class AnalyseStore {
 
   /* Ceval */
 
-  initCeval(fen) {
-    const opts = {
+  initCeval(fen: FEN) {
+    const opts: CevalOpts = {
+      allowed: true,
       initialFen: fen,
       emit: (ev, work) => {
         this.onNewCeval(ev, work.path);
       },
     };
-    this.ceval.setOpts(opts);
+    this.ceval.init(opts);
   }
 
   @action
-  onNewCeval(ev, path) {
+  onNewCeval(ev: ClientEval, path: Path) {
     this.tree.updateAt(path, node => {
       if (ev.fen !== node.fen) return;
       if (!node.ceval || isEvalBetter(ev, node.ceval)) {
@@ -146,7 +156,7 @@ export class AnalyseStore {
     this.startCeval();
   }
 
-  getBestEval(node) {
+  getBestEval(node: Node) {
     return node.ceval && node.ceval.pvs[0].moves[0];
   }
 
@@ -158,16 +168,27 @@ export class AnalyseStore {
   }
 
   onUnMountBoard() {
-    this.board.destroy();
+    this.board?.destroy();
     this.board = undefined;
   }
 
-  turnColor(node) {
+  turnColor(node: Node) {
     return node.ply % 2 == 0 ? 'white' : 'black';
   }
 
+  @action
+  flip() {
+    this.board?.toggleOrientation();
+    this.isFlipped = !this.isFlipped;
+  }
+
+  @computed
+  get orientation() {
+    return this.isFlipped ? opposite(this.opts.orientation) : this.opts.orientation;
+  }
+
   updateBoard() {
-    this.board.set(this.cgOptions());
+    this.board?.set(this.cgOptions());
     this.setAutoShapes();
   }
 
@@ -180,19 +201,24 @@ export class AnalyseStore {
       movable: { color: color, dests: node.dests },
       check: node.check,
       lastMove: uciToMove(node.uci),
-    };
+    } as const;
   };
 
   onUserMove() {
-    return (origin, dest, capture) => {
+    return (origin: Key, dest: Key, _capture?: JustCaptured) => {
       const parent = this.node;
       const newNode = makeObservableNode(makeNode(parent, origin, dest));
       const newPath = this.tree.addNode(newNode, this.path);
+
+      if (!newPath) {
+        console.log("Can't addNode", newNode, this.path);
+        return;
+      }
       this.jump(newPath);
     };
   }
 
-  makeBoardCfg = () => {
+  makeBoardCfg = (): CgConfig => {
     const opts = this.cgOptions();
     return {
       fen: opts.fen,
@@ -202,7 +228,7 @@ export class AnalyseStore {
         color: opts.movable.color,
         dests: opts.movable.dests,
       },
-      orientation: this.ui.orientation,
+      orientation: this.opts.orientation,
       draggable: { showGhost: true },
       events: { move: this.onUserMove() },
     };

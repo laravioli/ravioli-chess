@@ -1,10 +1,10 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
-import { observable, action, runInAction } from 'mobx';
-import { parseFen } from 'chessops/fen';
 import { makeEngine, maxThreads, engineSupported, StockfishWebEngine } from './engine';
-import { localStorage } from 'src/main/store/localstorage';
 import { CevalState, povChances } from './utils';
 import { type Toggle, toggle, throttle, clamp } from '../common';
+import { parseFen } from 'chessops/fen';
+import { observable, action, runInAction } from 'mobx';
+import { localStorage } from 'src/main/store/localstorage';
 import { defaultPosition, setupPosition } from 'chessops/variant';
 import { Result } from '@badrap/result';
 import type { CevalOpts, LocalEval, PvData, Search, Started, Step, Work } from './interface';
@@ -19,10 +19,6 @@ const enabledAfterDisable = action(() => {
 });
 
 export class Ceval {
-  /* possible -> does browser support engine
-     allowed  -> does engine is allowed to run
-     enabled  -> does the button enabled is on or off (mainly to handle tabs) */
-
   opts: CevalOpts;
   possible: boolean;
   analysable: boolean;
@@ -34,8 +30,8 @@ export class Ceval {
 
   private worker: StockfishWebEngine | undefined;
 
-  constructor(opts: CevalOpts) {
-    this.init(opts);
+  constructor() {
+    this.possible = engineSupported();
   }
 
   setOpts(opts: Partial<CevalOpts>) {
@@ -44,7 +40,6 @@ export class Ceval {
 
   init(opts: CevalOpts) {
     this.opts = opts;
-    this.possible = engineSupported();
     const pos = this.opts.initialFen
       ? parseFen(this.opts.initialFen).chain(setup => setupPosition('chess', setup))
       : Result.ok(defaultPosition('chess'));

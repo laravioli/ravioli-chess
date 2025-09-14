@@ -6,9 +6,10 @@ import { defined } from 'src/lib/common';
 import { getEval } from 'src/lib/eval/utils';
 import clsx from 'clsx';
 import classes from '../../css/tree.module.css';
+import type { AnalyseStore } from 'src/analyse/store/analyse';
 
 export const TView = observer(() => {
-  const analyseStore = usePageStore();
+  const analyseStore = usePageStore<AnalyseStore>();
   const handlers = useMemo(
     () => ({
       click: e => {

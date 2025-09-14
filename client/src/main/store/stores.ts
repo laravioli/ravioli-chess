@@ -1,49 +1,34 @@
 import { Ceval } from 'src/lib/eval/ceval';
-import { UiStore } from 'src/common/store/uistore';
 import { UserStore } from 'src/common/store/userstore';
 import { AnalyseStore } from 'src/analyse/store/analyse';
 import { EditorStore } from 'src/editor/store/editor';
 import { PlayStore } from 'src/play/store/play';
+import type { ServerConfig } from '../boot/config';
 
 /* Global Store */
 
-let globalStore = null;
+export interface GlobalStore {
+  userStore: UserStore;
+  ceval: Ceval;
+}
 
-export function makeGlobalStore(cfg) {
-  if (!globalStore)
+export type PageStore = AnalyseStore | EditorStore | PlayStore;
+
+let globalStore: GlobalStore | null = null;
+
+export function makeGlobalStore(cfg: ServerConfig) {
+  if (!globalStore) {
     globalStore = {
-      uiStore: new UiStore(),
       userStore: new UserStore(cfg.user),
-      cevalStore: new Ceval(cfg.ceval),
+      ceval: new Ceval(),
     };
+  }
   return globalStore;
 }
 
-/* Page Store */
+/* Note on Transition */
 
-/* note: Each pageStore has onLoad and onUnload hook. Their purpose is to update (init/clean) global store object
-         order : 
-         -> newPage start rendering (create a new PageStore)
-         -> oldPage unMount
-         -> newPage mount
-         {  BAD : update a global observable state subscribed by newPage
-         -> oldPage onUnLoad()
-         -> newPage onLoad()
-         }
-         PageStore is local (do init in constructor) but has access to global store
+/* Never perform an observable state change because of routing
+   It doesn't play well with mobx/react router
+   In this case the state should live in a PageStore
 */
-
-const patterns = new Map([
-  [/^\/(analysis)?$/, AnalyseStore],
-  [/^\/editor$/, EditorStore],
-  [/^\/play$/, PlayStore],
-]);
-
-export function pageStoreRouter(path) {
-  for (const [regex, value] of patterns) {
-    if (regex.test(path)) {
-      return value;
-    }
-  }
-  return null;
-}

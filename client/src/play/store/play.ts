@@ -1,12 +1,19 @@
 import { Chessground } from '@lichess-org/chessground';
+import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 import { action, runInAction } from 'mobx';
+import type { GlobalStore } from 'src/main/store/stores';
+import type { PlayOpts } from './interface';
 
 export class PlayStore {
-  board = undefined;
+  globalStore: GlobalStore;
+  board: ChessgroundApi | undefined;
 
-  constructor(rootStore, { fen }) {
+  opts: PlayOpts;
+
+  constructor(globalStore: GlobalStore, opts: PlayOpts) {
     runInAction(() => {
-      this.rootStore = rootStore;
+      this.opts = opts;
+      this.globalStore = globalStore;
     });
   }
 
@@ -16,13 +23,18 @@ export class PlayStore {
   @action
   onUnLoad() {}
 
-  mountBoard(div) {
+  mountBoard(div: HTMLElement) {
     const config = this.makeBoardCfg();
     this.board = Chessground(div, config);
   }
 
+  flip() {
+    this.board?.toggleOrientation();
+  }
+
   onUnMountBoard() {
-    this.board.destroy();
+    this.board?.destroy();
+    this.board = undefined;
   }
 
   @action

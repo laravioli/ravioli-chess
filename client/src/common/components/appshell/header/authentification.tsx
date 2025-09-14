@@ -3,10 +3,10 @@ import { notifications } from '@mantine/notifications';
 import { useState, useMemo } from 'react';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
-import { useStore } from 'src/main/hooks/hooks';
+import { useGlobalStore } from 'src/main/hooks/hooks';
 
 export function AuthenticationForm({ close }) {
-  const { userStore } = useStore();
+  const { userStore } = useGlobalStore();
   const [loading, setLoading] = useState(false);
   const [type, toggle] = useToggle(['login', 'register']);
 

@@ -1,28 +1,19 @@
-//github.com/lichess-org/lila/blob/master/ui/%40types/lichess/tree.d.ts
-import type { Ply, Uci, LocalEval, ClientEval, ServerEval } from '../eval/interface';
+import type { SquareName } from 'chessops';
+import type { Ply, Uci, ClientEval } from '../eval/interface';
 export type Path = string;
 
-export interface NodeBase {
+type Dests = Map<SquareName, SquareName[]>;
+
+export interface Node {
   id: string;
   ply: Ply;
   uci?: Uci;
   fen: FEN;
-  dests?: string;
-  drops?: string | null;
-  check?: Key;
-  threat?: LocalEval;
+  dests: Dests;
+  check: boolean;
   ceval?: ClientEval;
-  eval?: ServerEval;
-  forceVariation?: boolean;
-  shapes?: Shape[];
   san?: string;
-  threefold?: boolean;
-}
-export interface NodeFromServer extends NodeBase {
-  children?: Node[];
-}
-
-export interface Node extends NodeBase {
+  outcome: boolean;
   children: Node[];
 }
 
@@ -30,3 +21,16 @@ export interface Shape {
   orig: Key;
   dest?: Key;
 }
+
+export interface TPath {
+  init(path: Path): Path;
+  fromNodeList(nodes: Node[]): Path;
+}
+
+export interface TOps {
+  last(nodeList: Node[]): Node;
+  updateAll(root: Node, f: (node: Node) => void): void;
+  mainlineNodeList(from: Node): Node[];
+}
+
+export type MaybeNode = Node | undefined;

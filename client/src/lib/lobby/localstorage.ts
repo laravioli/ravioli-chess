@@ -1,13 +1,16 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
 
+type Anon = 'friend' | 'random player' | 'computer';
+type TimeMode = 'realTime' | 'unlimited';
+
 export class LocalLobbyStorage {
-  anon = 'friend';
-  timeMode = 'realTime';
-  time = 5;
-  increment = 0;
-  aiLevel = 3;
-  side = 'white';
+  anon: Anon = 'friend';
+  timeMode: TimeMode = 'realTime';
+  time: number = 5;
+  increment: number = 0;
+  aiLevel: number = 3;
+  side: Color = 'white';
 
   constructor() {
     makeAutoObservable(this);
@@ -18,27 +21,27 @@ export class LocalLobbyStorage {
     });
   }
 
-  setAnon(string) {
-    this.anon = string;
+  setAnon(anon: Anon) {
+    this.anon = anon;
   }
 
-  setTimeMode(string) {
+  setTimeMode(string: TimeMode) {
     this.timeMode = string;
   }
 
-  setTime(minutes) {
+  setTime(minutes: number) {
     this.time = minutes;
   }
 
-  setIncrement(secondes) {
+  setIncrement(secondes: number) {
     this.increment = secondes;
   }
 
-  setAiLevel(level) {
+  setAiLevel(level: number) {
     this.aiLevel = level;
   }
 
-  setSide(side) {
+  setSide(side: Color) {
     this.side = side;
   }
 }

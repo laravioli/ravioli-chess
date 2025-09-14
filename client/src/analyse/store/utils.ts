@@ -8,21 +8,23 @@ const SQUARES = [
   'a3', 'b3', 'c3', 'd3', 'e3', 'f3', 'g3', 'h3',
   'a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2',
   'a1', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'
-]
+] as const;
 
-const IDS = new Map(generateIds());
+const IDS = new Map<Key, string>(generateIds());
 
-function* generateIds() {
-  yield* Array.from({ length: 64 }, (_, i) => [SQUARES[i], String.fromCharCode(35 + i)]);
+function* generateIds(): IterableIterator<[Key, string]> {
+  for (let i = 0; i < SQUARES.length; i++) {
+    yield [SQUARES[i], String.fromCharCode(35 + i)];
+  }
 }
 
-export function uciToId(uci) {
-  const start = uci.slice(0, 2);
-  const end = uci.slice(2, 4);
+export function uciToId(uci: string) {
+  const start = uci.slice(0, 2) as Key;
+  const end = uci.slice(2, 4) as Key;
   return `${IDS.get(start)}${IDS.get(end)}`;
 }
 
-export function cgToUci(orig, dest) {
+export function cgToUci(orig: Key, dest: Key) {
   let uci = `${orig}${dest}`;
   return uci;
 }

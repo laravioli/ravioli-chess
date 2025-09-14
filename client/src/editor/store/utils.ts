@@ -1,6 +1,8 @@
-const CASTLINGS = ['K', 'Q', 'k', 'q'];
+import type { Castlings } from './interface';
 
-export const castlingsToFen = castling => {
+const CASTLINGS = ['K', 'Q', 'k', 'q'] as const;
+
+export const castlingsToFen = (castling: Castlings) => {
   let fen = '';
   for (const toggle of CASTLINGS) {
     if (castling[toggle]) fen += toggle;

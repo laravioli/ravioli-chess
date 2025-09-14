@@ -1,11 +1,12 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/tree/tree.ts
 
 import { observable } from 'mobx';
+import type { Path, TOps, TPath, Node, MaybeNode } from './interface';
 
-const head = path => path.slice(0, 2);
-const tail = path => path.slice(2);
+const head = (path: Path) => path.slice(0, 2);
+const tail = (path: Path) => path.slice(2);
 
-export const TreePath = {
+export const TreePath: TPath = {
   init(path) {
     return path.slice(0, -2);
   },
@@ -16,11 +17,11 @@ export const TreePath = {
 
 //ops
 
-function findChildById(node, id) {
+function findChildById(node: Node, id: string): MaybeNode {
   return node.children.find(n => n.id === id);
 }
 
-function collect(from, pickChild) {
+function collect(from: Node, pickChild: (n: Node) => MaybeNode) {
   const nodes = [from];
   let n = from,
     c;
@@ -31,13 +32,13 @@ function collect(from, pickChild) {
   return nodes;
 }
 
-export const TreeOps = {
+export const TreeOps: TOps = {
   last(nodeList) {
     return nodeList[nodeList.length - 1];
   },
   updateAll(root, f) {
     // applies f recursively to all nodes
-    function update(node) {
+    function update(node: Node) {
       f(node);
       node.children.forEach(update);
     }
@@ -50,13 +51,13 @@ export const TreeOps = {
 //tree
 
 export class Tree {
-  @observable.ref accessor root;
+  @observable.ref accessor root: Node;
 
-  constructor(root) {
+  constructor(root: Node) {
     this.root = root;
   }
 
-  getNodeList = path =>
+  getNodeList = (path: Path) =>
     collect(this.root, function (node) {
       const id = head(path);
       if (id === '') return;
@@ -64,21 +65,21 @@ export class Tree {
       return findChildById(node, id);
     });
 
-  findNode = path => this.findNodeFrom(this.root, path);
+  findNode = (path: Path) => this.findNodeFrom(this.root, path);
 
-  findNodeFrom(node, path) {
+  findNodeFrom(node: Node, path: Path): MaybeNode {
     if (path === '') return node;
     const child = findChildById(node, head(path));
     return child ? this.findNodeFrom(child, tail(path)) : undefined;
   }
 
-  updateAt(path, update) {
+  updateAt(path: Path, update: (node: Node) => void) {
     const node = this.findNode(path);
     if (node) update(node);
     return node;
   }
 
-  addNode(node, path) {
+  addNode(node: Node, path: Path) {
     const newPath = path + node.id;
     if (this.findNode(newPath)) return newPath;
     return this.updateAt(path, n => n.children.push(node)) ? newPath : undefined;

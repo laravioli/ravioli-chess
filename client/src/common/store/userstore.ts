@@ -1,14 +1,17 @@
 import { observable, action, runInAction } from 'mobx';
 import { apiJSON } from 'src/lib/api/json';
 import { siteSocket } from 'src/lib/socket/socket';
+import type { Credential, ServerUserOpts } from './interface';
 
 const ANON = 'Anonymous';
 
 export class UserStore {
-  @observable accessor username;
-  @observable accessor logged;
+  @observable accessor username: string;
+  @observable accessor logged: boolean;
 
-  constructor(opts) {
+  channel: BroadcastChannel;
+
+  constructor(opts: ServerUserOpts) {
     runInAction(() => {
       if (opts.is_auth) {
         this.username = opts.username;
@@ -42,12 +45,12 @@ export class UserStore {
   }
 
   @action
-  setName(username) {
+  setName(username: string) {
     this.username = username;
   }
 
   @action
-  async login(credential) {
+  async login(credential: Credential) {
     try {
       await apiJSON.post('login', {
         username: credential.username,
@@ -94,7 +97,7 @@ export class UserStore {
   }
 
   @action
-  async register(credential) {
+  async register(credential: Credential) {
     try {
       await apiJSON.post('register', {
         username: credential.username,

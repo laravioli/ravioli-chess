@@ -82,21 +82,22 @@ export interface EvalScore {
   mate?: number;
 }
 
+export interface PvData extends EvalScore {
+  moves: string[];
+}
+
 interface ClientEvalBase extends EvalScore {
   fen: FEN;
   depth: number;
   nodes: number;
   pvs: PvData[];
 }
-export interface CloudEval extends ClientEvalBase {
-  cloud: true;
-  millis?: undefined;
-}
+
 export interface LocalEval extends ClientEvalBase {
   cloud?: false;
   millis: number;
 }
-export type ClientEval = CloudEval | LocalEval;
+export type ClientEval = LocalEval;
 
 export interface Step {
   ply: number;
@@ -112,14 +113,9 @@ export interface Started {
   gameId: string | undefined;
 }
 
-export interface PvData extends EvalScore {
-  moves: string[];
-}
-
 export interface CevalOpts {
-  possible: boolean;
   allowed: boolean;
-  initialFen: string | undefined;
+  initialFen?: string;
   emit: (ev: LocalEval, work: Work) => void;
   search?: Search;
 }
