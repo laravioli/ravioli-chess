@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+
 from social.models import FriendList
 from rest_framework.validators import UniqueValidator
 
@@ -28,3 +30,24 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["email", "username", "password"]
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(style={"input_type": "password"})
+
+    def validate(self, data):
+        username = data.get("username")
+        password = data.get("password")
+        user = authenticate(username=username, password=password)
+
+        if not user:
+            msg = "Unable to log in with provided credentials."
+            raise serializers.ValidationError(msg)
+
+        data["user"] = user
+        return data
+
+
+class AuthDetailSerializer(serializers.Serializer):
+    detail = serializers.CharField(read_only=True, required=False)

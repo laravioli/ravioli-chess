@@ -26,6 +26,9 @@ dist-ssr
 *.sln
 *.sw?
 
+#generated
+/src/lib/api
+
 
 # misc
 package-lock.json

@@ -1,12 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from social.views import FriendListViewSet
-from user.views import UserViewSet
+
+# from social.views import FriendListViewSet
 
 router = DefaultRouter()
-router.register(r"users", UserViewSet)
-router.register(r"friends", FriendListViewSet)
+# router.register(r"friends", FriendListViewSet)
 
-urlpatterns = [
-    path("", include(router.urls)),
-]
+urlpatterns = [path("", include(router.urls)), path("user/", include("user.urls"))]

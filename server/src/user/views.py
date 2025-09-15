@@ -1,39 +1,45 @@
-from rest_framework import viewsets, mixins, permissions
+from rest_framework import viewsets, permissions, generics, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework import status
-from user.serializers import RegisterSerializer
+from user.serializers import RegisterSerializer, LoginSerializer, AuthDetailSerializer
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 
-class UserViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+@extend_schema_view(post=extend_schema(operation_id="user_register"))
+class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
-    @action(detail=False, methods=["post"])
-    def login(self, request):
-        username = request.data["username"]
-        password = request.data["password"]
-        user = authenticate(username=username, password=password)
 
-        if user is not None:
+class LoginView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = LoginSerializer
+
+    @extend_schema(operation_id="user_login", responses=AuthDetailSerializer)
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.validated_data["user"]
             login(request, user)
-            return Response(
-                {"detail": "Successfully logged in"}, status=status.HTTP_200_OK
-            )
-        return Response(
-            {"detail": "Invalid username or password"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
 
-    @action(
-        detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+        return Response({"detail": "Successfully logged in"}, status=status.HTTP_200_OK)
+
+
+class LogoutView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        operation_id="user_logout", request=None, responses=AuthDetailSerializer
     )
-    def logout(self, request):
+    def post(self, request):
         logout(request)
-        return Response(
+        reponse = Response(
             {"detail": "Successfully logged out."},
             status=status.HTTP_200_OK,
         )
+
+        return reponse
