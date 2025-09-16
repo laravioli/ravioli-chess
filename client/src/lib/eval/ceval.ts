@@ -14,7 +14,7 @@ const cevalDisabledSentinel = '1';
 
 const enabledAfterDisable = action(() => {
   const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
-  const disable = localStorage.evalStorage.disable || cevalDisabledSentinel;
+  const disable = localStorage!.evalStorage.disable || cevalDisabledSentinel;
   return enabledAfter == disable;
 });
 
@@ -26,7 +26,7 @@ export class Ceval {
   @observable accessor enabled: boolean;
 
   lastStarted: Started | false = false;
-  evalStorage = localStorage.evalStorage;
+  evalStorage = localStorage!.evalStorage;
 
   private worker: StockfishWebEngine | undefined;
 

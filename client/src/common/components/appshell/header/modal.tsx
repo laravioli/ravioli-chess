@@ -41,7 +41,7 @@ const AnonSelect = observer(() => {
       value={lobbyStorage.anon}
       label="with"
       data={['friend', 'random player', 'computer']}
-      onChange={event => lobbyStorage.setAnon(event.currentTarget.value)}
+      onChange={event => lobbyStorage.setAnon(event.currentTarget.value as any)}
     />
   );
 });
@@ -87,7 +87,7 @@ const TimeMode = observer(() => {
         { label: 'Real Time', value: 'realTime' },
         { label: 'Unlimited', value: 'unlimited' },
       ]}
-      onChange={event => lobbyStorage.setTimeMode(event.currentTarget.value)}
+      onChange={event => lobbyStorage.setTimeMode(event.currentTarget.value as any)}
     />
   );
 });
@@ -148,7 +148,7 @@ const Side = observer(() => {
     <NativeSelect
       value={lobbyStorage.side}
       label="side"
-      onChange={event => lobbyStorage.setSide(event.currentTarget.value)}
+      onChange={event => lobbyStorage.setSide(event.currentTarget.value as any)}
       data={['white', 'black', 'random']}
     />
   );

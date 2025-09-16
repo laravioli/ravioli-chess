@@ -12,14 +12,12 @@ export const TurnToPlay = observer(() => {
     { label: 'Black to play', value: 'black' },
   ];
 
-  const onChange = event => {
-    editorStore.fen.setTurn(event.target.value);
-  };
-
   return (
     <NativeSelect
       value={editorStore.fen.turn}
-      onChange={onChange}
+      onChange={event => {
+        editorStore.fen.setTurn(event.target.value as Color);
+      }}
       data={data}
       classNames={{ input: classes.select }}
     />

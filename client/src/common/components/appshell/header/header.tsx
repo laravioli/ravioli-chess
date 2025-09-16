@@ -6,6 +6,7 @@ import { ToggleColorScheme } from './colorscheme';
 import { useGlobalStore } from 'src/main/hooks/hooks';
 import { useDisclosure } from '@mantine/hooks';
 import { observer } from 'mobx-react-lite';
+import { userLogout } from 'src/lib/api';
 import { notifications } from '@mantine/notifications';
 import classes from '../../../css/header.module.css';
 
@@ -33,16 +34,18 @@ export const Header = observer(() => {
               <Button
                 color="red"
                 onClick={async () => {
-                  try {
-                    const response = await userStore.logout();
-                    notifications.show({
-                      id: 'logout',
-                      position: 'bottom-right',
-                      message: response,
-                      color: 'red',
-                      autoClose: 2000,
-                    });
-                  } catch (error) {}
+                  const { data, error } = await userLogout();
+                  if (error) {
+                    return;
+                  }
+                  userStore.logout();
+                  notifications.show({
+                    id: 'logout',
+                    position: 'bottom-right',
+                    message: data?.detail,
+                    color: 'red',
+                    autoClose: 2000,
+                  });
                 }}
               >
                 Logout

@@ -1,5 +1,4 @@
 import { observable, action, runInAction } from 'mobx';
-import { apiJSON } from 'src/lib/api/json';
 import { siteSocket } from 'src/lib/socket/socket';
 import type { Credential } from './interface';
 import type { ServerUserOpts } from 'src/main/boot/interface';
@@ -51,62 +50,32 @@ export class UserStore {
   }
 
   @action
-  async login(credential: Credential) {
-    try {
-      await apiJSON.post('login', {
-        username: credential.username,
-        password: credential.password,
-      });
-      runInAction(() => {
-        this.username = credential.username;
-        this.logged = true;
-      });
-      setTimeout(
-        () =>
-          this.channel.postMessage({
-            type: 'login',
-            username: this.username,
-          }),
-        0,
-      );
-      setTimeout(() => siteSocket.reload(), 0);
-    } catch (error) {
-      throw error;
-    }
+  login(credential: Credential) {
+    this.username = credential.username;
+    this.logged = true;
+    setTimeout(
+      () =>
+        this.channel.postMessage({
+          type: 'login',
+          username: this.username,
+        }),
+      0,
+    );
+    setTimeout(() => siteSocket.reload(), 0);
   }
 
   @action
-  async logout() {
-    try {
-      const response = await apiJSON.post('logout', {});
-      runInAction(() => {
-        this.username = ANON;
-        this.logged = false;
-      });
-      setTimeout(
-        () =>
-          this.channel.postMessage({
-            type: 'logout',
-          }),
-        0,
-      );
-      setTimeout(() => siteSocket.reload(), 0);
-      return response.data.detail;
-    } catch (error) {
-      throw error;
-    }
-  }
+  logout() {
+    this.username = ANON;
+    this.logged = false;
 
-  @action
-  async register(credential: Credential) {
-    try {
-      await apiJSON.post('register', {
-        username: credential.username,
-        password: credential.password,
-        email: credential.email,
-      });
-    } catch (error) {
-      throw error;
-    }
+    setTimeout(
+      () =>
+        this.channel.postMessage({
+          type: 'logout',
+        }),
+      0,
+    );
+    setTimeout(() => siteSocket.reload(), 0);
   }
 }

@@ -19,14 +19,23 @@ class LoginView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
 
-    @extend_schema(operation_id="user_login", responses=AuthDetailSerializer)
+    @extend_schema(
+        operation_id="user_login",
+        responses={200: AuthDetailSerializer, 400: AuthDetailSerializer},
+    )
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             user = serializer.validated_data["user"]
             login(request, user)
-
-        return Response({"detail": "Successfully logged in"}, status=status.HTTP_200_OK)
+            return Response(
+                {"detail": "Successfully logged in"}, status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"detail": serializer.errors["non_field_errors"][0]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class LogoutView(views.APIView):
