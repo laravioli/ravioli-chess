@@ -1,8 +1,7 @@
-from rest_framework import viewsets, permissions, generics, views
-from rest_framework.decorators import action
+from rest_framework import permissions, generics, views
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from rest_framework import status
 from user.serializers import RegisterSerializer, LoginSerializer, AuthDetailSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view
