@@ -26,3 +26,7 @@ class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Friend
         fields = ["to_user", "created"]
+
+
+class EmptySerializer(serializers.Serializer):
+    pass

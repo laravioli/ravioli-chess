@@ -1,4 +1,4 @@
-from .serializers import FriendRequestSerializer, FriendSerializer
+from .serializers import FriendRequestSerializer, FriendSerializer, EmptySerializer
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from .permissions import AreFriends
@@ -25,8 +25,10 @@ class FriendRequestViewSet(
         user = self.request.user
         return FriendRequest.objects.filter(to_user=user).select_related("from_user")
 
-    @extend_schema(operation_id="friend_request_accept")
-    @action(methods=["post"], detail=True)
+    @extend_schema(
+        operation_id="friend_request_accept",
+    )
+    @action(methods=["post"], detail=True, serializer_class=EmptySerializer)
     def accept(self, request, pk=None):
         friend_request = get_object_or_404(
             request.user.friendship_requests_received, pk=pk
