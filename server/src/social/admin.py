@@ -1,37 +1,18 @@
 from django.contrib import admin
-
-from social.models import FriendList, FriendRequest
-
-
-class FriendListAdmin(admin.ModelAdmin):
-    list_filter = ["user"]
-    list_display = ["user"]
-    search_fields = ["user"]
-    readonly_fields = [
-        "user",
-    ]
-    filter_horizontal = ["friends"]
-
-    class Meta:
-        model = FriendList
+from .models import Friend, FriendRequest
 
 
-admin.site.register(FriendList, FriendListAdmin)
+class FriendAdmin(admin.ModelAdmin):
+    list_display = ("from_user", "to_user", "created")
+    search_fields = ("from_user__username", "to_user__username")
+    list_filter = ("from_user", "to_user")
 
 
 class FriendRequestAdmin(admin.ModelAdmin):
-    list_filter = ["sender", "receiver"]
-    list_display = [
-        "sender",
-        "receiver",
-    ]
-    search_fields = ["sender__username", "receiver__username"]
-    readonly_fields = [
-        "id",
-    ]
-
-    class Meta:
-        model = FriendRequest
+    list_display = ("from_user", "to_user", "created")
+    search_fields = ("from_user__username", "to_user__username")
+    list_filter = ("from_user", "to_user")
 
 
+admin.site.register(Friend, FriendAdmin)
 admin.site.register(FriendRequest, FriendRequestAdmin)
