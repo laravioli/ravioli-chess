@@ -91,19 +91,20 @@ class Friend(models.Model):
         """Are these two users friends?"""
         return Friend.objects.filter(to_user=user1, from_user=user2).exists()
 
-    def remove_friend(self, from_user, to_user):
+    @classmethod
+    def remove_friend(cls, from_user, to_user):
         """Remove a friendship relationship"""
         try:
-            qs = Friend.objects.filter(
+            qs = cls.objects.filter(
                 to_user__in=[to_user, from_user], from_user__in=[from_user, to_user]
             )
             if qs:
                 qs.delete()
                 return True
             else:
-                return False
+                raise ValidationError("Cant remove a non friend user")
         except Friend.DoesNotExist:
-            return False
+            raise ValidationError("Cant remove a non friend user")
 
     def save(self, *args, **kwargs):
         # Ensure users can't be friends with themselves

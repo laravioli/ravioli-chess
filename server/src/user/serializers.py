@@ -1,7 +1,15 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.validators import UniqueValidator
+from django.contrib.auth import get_user_model
+
+user_model = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = user_model
+        fields = ["username"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -10,7 +18,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[
             UniqueValidator(
-                queryset=User.objects.all(),
+                queryset=user_model.objects.all(),
                 message="Email address invalid or already taken",
             )
         ]
@@ -18,7 +26,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        user = User.objects.create_user(
+        user = user_model.objects.create_user(
             email=validated_data["email"],
             username=validated_data["username"],
             password=validated_data["password"],
@@ -26,7 +34,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
     class Meta:
-        model = User
+        model = user_model
         fields = ["email", "username", "password"]
 
 
@@ -45,7 +53,3 @@ class LoginSerializer(serializers.Serializer):
 
         data["user"] = user
         return data
-
-
-class AuthDetailSerializer(serializers.Serializer):
-    detail = serializers.CharField(read_only=True, required=False)

@@ -23,10 +23,10 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
 
 class FriendSerializer(serializers.ModelSerializer):
+    to_user = serializers.SlugRelatedField(
+        queryset=user_model.objects.all(), slug_field="username"
+    )
+
     class Meta:
         model = Friend
         fields = ["to_user", "created"]
-
-
-class EmptySerializer(serializers.Serializer):
-    pass

@@ -1,10 +1,18 @@
-from rest_framework import permissions, generics, views
+from rest_framework import permissions, generics, views, viewsets
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
-from rest_framework import status
-from user.serializers import RegisterSerializer, LoginSerializer, AuthDetailSerializer
+from rest_framework import status, filters
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from api.serializers import DetailResponseSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view
+
+
+class UserListViewSet(viewsets.GenericViewSet, generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["username"]
 
 
 @extend_schema_view(post=extend_schema(operation_id="user_register"))
@@ -20,7 +28,7 @@ class LoginView(generics.GenericAPIView):
 
     @extend_schema(
         operation_id="user_login",
-        responses={200: AuthDetailSerializer, 400: AuthDetailSerializer},
+        responses={200: DetailResponseSerializer, 400: DetailResponseSerializer},
     )
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -41,7 +49,7 @@ class LogoutView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
-        operation_id="user_logout", request=None, responses=AuthDetailSerializer
+        operation_id="user_logout", request=None, responses=DetailResponseSerializer
     )
     def post(self, request):
         logout(request)

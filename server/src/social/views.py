@@ -1,12 +1,15 @@
-from .serializers import FriendRequestSerializer, FriendSerializer, EmptySerializer
+from .serializers import FriendRequestSerializer, FriendSerializer
+from api.serializers import EmptyRequestSerializer
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
-from .permissions import AreFriends
+from api.pagination import SmallResultsSetPagination
+from .permissions import IsSelfOrFriend
 from .models import FriendRequest, Friend
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 
 
@@ -14,21 +17,40 @@ user_model = get_user_model()
 
 
 class FriendRequestViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
 ):
+    pagination_class = SmallResultsSetPagination
     permission_classes = [IsAuthenticated]
     serializer_class = FriendRequestSerializer
     queryset = FriendRequest.objects.all()
     lookup_field = "pk"
 
     def get_queryset(self):
-        user = self.request.user
-        return FriendRequest.objects.filter(to_user=user).select_related("from_user")
+        return FriendRequest.objects.filter(
+            Q(from_user=self.request.user) | Q(to_user=self.request.user)
+        ).select_related("from_user", "to_user")
+
+    @action(detail=False, methods=["get"])
+    def received(self, request):
+        queryset = self.get_queryset().filter(to_user=request.user)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=["get"])
+    def sent(self, request):
+        queryset = self.get_queryset().filter(from_user=request.user)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @extend_schema(
         operation_id="friend_request_accept",
     )
-    @action(methods=["post"], detail=True, serializer_class=EmptySerializer)
+    @action(methods=["post"], detail=True, serializer_class=EmptyRequestSerializer)
     def accept(self, request, pk=None):
         friend_request = get_object_or_404(
             request.user.friendship_requests_received, pk=pk
@@ -42,7 +64,7 @@ class FriendRequestViewSet(
         )
 
     @extend_schema(operation_id="friend_request_reject")
-    @action(methods=["delete"], detail=True)
+    @action(methods=["post"], detail=True, serializer_class=EmptyRequestSerializer)
     def reject(self, request, pk=None):
         friend_request = get_object_or_404(
             request.user.friendship_requests_received, pk=pk
@@ -56,7 +78,7 @@ class FriendRequestViewSet(
         )
 
     @extend_schema(operation_id="friend_request_cancel")
-    @action(methods=["delete"], detail=True)
+    @action(methods=["post"], detail=True, serializer_class=EmptyRequestSerializer)
     def cancel(self, request, pk=None):
         friend_request = get_object_or_404(request.user.friendship_requests_sent, pk=pk)
         friend_request.cancel()
@@ -69,21 +91,30 @@ class FriendRequestViewSet(
 
 
 class FriendViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
-    permission_classes = [IsAuthenticated, AreFriends]
+    """End point to list and remove friends"""
+
+    permission_classes = [IsAuthenticated, IsSelfOrFriend]
     serializer_class = FriendSerializer
     queryset = Friend.objects.all()
     lookup_field = "pk"
 
     def get_queryset(self):
-        user = self.request.user
-        return Friend.objects.filter(from_user=user).select_related("to_user")
+        if self.action == "list":
+            return (
+                Friend.objects.filter(from_user=self.target_user)
+                .select_related("to_user")
+                .order_by("-created")
+            )
+        else:
+            return self.queryset
 
     @extend_schema(operation_id="friend_remove")
-    @action(methods=["delete"], detail=True)
-    def remove(self, request, pk=None):
-        user = request.user
-        to_user = user_model.objects.get(pk=pk)
-        Friend.remove_friend(from_user=user, to_user=to_user)
+    @action(methods=["post"], detail=False, permission_classes=[IsAuthenticated])
+    def remove(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        to_user = serializer.validated_data["to_user"]
+        Friend.remove_friend(from_user=request.user, to_user=to_user)
         return Response(
-            {f"detail": "Successfully removed {to_user.username} from your friends"}
+            {"detail": f"Successfully removed {to_user.username} from your friends"}
         )
