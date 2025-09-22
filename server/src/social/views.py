@@ -1,10 +1,10 @@
+from .models import FriendRequest, Friend
 from .serializers import FriendRequestSerializer, FriendSerializer
 from api.serializers import EmptyRequestSerializer
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from api.pagination import SmallResultsSetPagination
 from .permissions import IsSelfOrFriend
-from .models import FriendRequest, Friend
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -29,20 +29,24 @@ class FriendRequestViewSet(
     lookup_field = "pk"
 
     def get_queryset(self):
-        return FriendRequest.objects.filter(
-            Q(from_user=self.request.user) | Q(to_user=self.request.user)
-        ).select_related("from_user", "to_user")
-
-    @action(detail=False, methods=["get"])
-    def received(self, request):
-        queryset = self.get_queryset().filter(to_user=request.user)
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        if self.action == "list":
+            return FriendRequest.objects.filter(
+                Q(from_user=self.request.user) | Q(to_user=self.request.user)
+            ).select_related("from_user", "to_user")
+        elif self.action == "sent":
+            return FriendRequest.objects.filter(
+                from_user=self.request.user
+            ).select_related("to_user")
+        elif self.action in ["received", "accept", "reject"]:
+            return FriendRequest.objects.filter(
+                to_user=self.request.user
+            ).select_related("from_user")
+        else:
+            return self.queryset
 
     @action(detail=False, methods=["get"])
     def sent(self, request):
-        queryset = self.get_queryset().filter(from_user=request.user)
+        queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -52,9 +56,7 @@ class FriendRequestViewSet(
     )
     @action(methods=["post"], detail=True, serializer_class=EmptyRequestSerializer)
     def accept(self, request, pk=None):
-        friend_request = get_object_or_404(
-            request.user.friendship_requests_received, pk=pk
-        )
+        friend_request = self.get_object()
         friend_request.accept()
         return Response(
             {
@@ -63,12 +65,17 @@ class FriendRequestViewSet(
             status=status.HTTP_204_NO_CONTENT,
         )
 
+    @action(detail=False, methods=["get"])
+    def received(self, request):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
     @extend_schema(operation_id="friend_request_reject")
     @action(methods=["post"], detail=True, serializer_class=EmptyRequestSerializer)
     def reject(self, request, pk=None):
-        friend_request = get_object_or_404(
-            request.user.friendship_requests_received, pk=pk
-        )
+        friend_request = self.get_object()
         friend_request.reject()
         return Response(
             {

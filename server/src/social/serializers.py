@@ -1,10 +1,12 @@
 from .models import Friend, FriendRequest
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema_serializer
 
 user_model = get_user_model()
 
 
+@extend_schema_serializer(component_name="FriendReqSerializer")
 class FriendRequestSerializer(serializers.ModelSerializer):
 
     from_user = serializers.SlugRelatedField(slug_field="username", read_only=True)
