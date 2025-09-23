@@ -8,7 +8,7 @@ import 'src/main/css/App.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { boot } from 'src/main/boot';
-import App from './App';
+import App from './main/components/app/App';
 
 boot()
   .then(() =>

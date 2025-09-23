@@ -1,14 +1,15 @@
 import { MantineProvider } from '@mantine/core';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Notifications } from '@mantine/notifications';
-import { MantineSettings } from 'src/main/components/settings';
+import { mantineConfig, queryClient } from './config';
 import { GlobalStoreProvider, LocalStorageProvider, DataProvider } from 'src/main/context/provider';
 import { Router } from 'src/main/components/routes/routes';
 
 function App() {
   return (
-    <>
-      <MantineProvider {...MantineSettings}>
-        <Notifications />
+    <MantineProvider {...mantineConfig}>
+      <Notifications />
+      <QueryClientProvider client={queryClient}>
         <DataProvider>
           <LocalStorageProvider>
             <GlobalStoreProvider>
@@ -16,8 +17,8 @@ function App() {
             </GlobalStoreProvider>
           </LocalStorageProvider>
         </DataProvider>
-      </MantineProvider>
-    </>
+      </QueryClientProvider>
+    </MantineProvider>
   );
 }
 

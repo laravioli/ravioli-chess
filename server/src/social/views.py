@@ -30,17 +30,25 @@ class FriendRequestViewSet(
 
     def get_queryset(self):
         if self.action == "list":
-            return FriendRequest.objects.filter(
-                Q(from_user=self.request.user) | Q(to_user=self.request.user)
-            ).select_related("from_user", "to_user")
+            return (
+                FriendRequest.objects.filter(
+                    Q(from_user=self.request.user) | Q(to_user=self.request.user)
+                )
+                .select_related("from_user", "to_user")
+                .order_by("-created")
+            )
         elif self.action == "sent":
-            return FriendRequest.objects.filter(
-                from_user=self.request.user
-            ).select_related("to_user")
+            return (
+                FriendRequest.objects.filter(from_user=self.request.user)
+                .select_related("to_user")
+                .order_by("-created")
+            )
         elif self.action in ["received", "accept", "reject"]:
-            return FriendRequest.objects.filter(
-                to_user=self.request.user
-            ).select_related("from_user")
+            return (
+                FriendRequest.objects.filter(to_user=self.request.user)
+                .select_related("from_user")
+                .order_by("-created")
+            )
         else:
             return self.queryset
 

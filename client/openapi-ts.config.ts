@@ -9,13 +9,18 @@ export default defineConfig({
   },
   plugins: [
     '@hey-api/schemas',
+    '@tanstack/react-query',
     {
-      dates: true,
-      name: '@hey-api/transformers',
+      name: '@hey-api/client-fetch',
+      throwOnError: true,
     },
     {
-      enums: 'javascript',
+      name: '@hey-api/transformers',
+      dates: true,
+    },
+    {
       name: '@hey-api/typescript',
+      enums: 'javascript',
     },
     {
       name: '@hey-api/sdk',

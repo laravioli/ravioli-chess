@@ -12,7 +12,7 @@ class UserListViewSet(viewsets.GenericViewSet, generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ["username"]
+    search_fields = ["^username"]
 
 
 @extend_schema_view(post=extend_schema(operation_id="user_register"))

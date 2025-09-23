@@ -28,38 +28,40 @@ export function AuthenticationForm({ close }) {
 
   const onLogin = async (body: LoginRequest) => {
     setLoading(true);
-    const { error } = await userLogin({
-      body,
-    });
-    if (error) {
-      form.setErrors({
-        username: error.detail,
-        password: error.detail,
-      });
-    } else {
+    try {
+      await userLogin({ body });
       userStore.login(body);
       close();
+    } catch (error: any) {
+      if (error.detail)
+        form.setErrors({
+          username: error.detail,
+          password: error.detail,
+        });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const onRegister = async (body: RegisterRequestWritable) => {
     setLoading(true);
-    const { error } = await userRegister({ body });
-    if (error) {
-      form.setErrors(error as any);
+
+    try {
+      await userRegister({ body });
+      toggle();
+      notifications.show({
+        id: 'register',
+        position: 'bottom-right',
+        message: "Welcome to Raviolichess — you're in!",
+        color: 'cyan.4',
+        autoClose: 4000,
+      });
+    } catch (err: any) {
+      console.error(err);
+      form.setErrors(err);
+    } finally {
       setLoading(false);
-      return;
     }
-    toggle();
-    notifications.show({
-      id: 'register',
-      position: 'bottom-right',
-      message: "Welcome to Raviolichess — you're in!",
-      color: 'cyan.4',
-      autoClose: 4000,
-    });
-    setLoading(false);
   };
 
   return (

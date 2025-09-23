@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query';
 import {
   localStorageColorSchemeManager,
   createTheme,
@@ -9,7 +10,7 @@ const localstorageScheme = localStorageColorSchemeManager({
   key: 'color-scheme',
 });
 
-export const MantineSettings: MantineProviderProps = {
+export const mantineConfig: MantineProviderProps = {
   theme: createTheme({
     fontFamily: 'Arial',
     fontFamilyMonospace: 'Courier New, monospace',
@@ -35,3 +36,11 @@ export const MantineSettings: MantineProviderProps = {
   colorSchemeManager: localstorageScheme,
   defaultColorScheme: 'dark',
 };
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+    },
+  },
+});

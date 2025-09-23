@@ -1,6 +1,7 @@
 import { Box, Button, Drawer, Group, Text } from '@mantine/core';
 import { AuthenticationForm } from './authentification';
 import { PlayModal } from './modal';
+import { SearchUsers2 } from './search';
 import { Link } from 'react-router';
 import { ToggleColorScheme } from './colorscheme';
 import { useGlobalStore } from 'src/main/hooks/hooks';
@@ -27,7 +28,8 @@ export const Header = observer(() => {
               Edit
             </Link>
           </Group>
-          <Group visibleFrom="sm">
+          <Group>
+            <SearchUsers2 />
             {userStore.logged && <Text>{userStore.username}</Text>}
             {!userStore.logged && <Button onClick={openDrawer}>Log in</Button>}
             {userStore.logged && (

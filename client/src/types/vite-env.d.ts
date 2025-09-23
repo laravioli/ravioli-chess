@@ -8,4 +8,5 @@ declare global {
       sri: string;
     };
   }
+  type Timeout = ReturnType<typeof setTimeout>;
 }
