@@ -4,14 +4,15 @@ import { Notifications } from '@mantine/notifications';
 import { mantineConfig, queryClient } from './config';
 import { GlobalStoreProvider, LocalStorageProvider, DataProvider } from 'src/main/context/provider';
 import { Router } from 'src/main/components/routes/routes';
+import type { AppConfig } from './config';
 
-function App() {
+function App(props: AppConfig) {
   return (
     <MantineProvider {...mantineConfig}>
       <Notifications />
       <QueryClientProvider client={queryClient}>
         <DataProvider>
-          <LocalStorageProvider>
+          <LocalStorageProvider localStorage={props.localStorage}>
             <GlobalStoreProvider>
               <Router />
             </GlobalStoreProvider>

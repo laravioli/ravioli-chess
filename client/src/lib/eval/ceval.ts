@@ -4,7 +4,7 @@ import { CevalState, povChances } from './utils';
 import { type Toggle, toggle, throttle, clamp } from '../common';
 import { parseFen } from 'chessops/fen';
 import { observable, action, runInAction } from 'mobx';
-import { localStorage } from 'src/main/store/localstorage';
+import { localStorage } from 'src/main/boot';
 import { defaultPosition, setupPosition } from 'chessops/variant';
 import { Result } from '@badrap/result';
 import type { CevalOpts, LocalEval, PvData, Search, Started, Step, Work } from './interface';

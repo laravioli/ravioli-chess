@@ -28,7 +28,7 @@ export function makeGlobalStore(cfg: ServerConfig) {
 
 /* Note on Transition */
 
-/* Never perform an observable state change because of routing
+/* Never perform a global observable state change because of routing (page)
    It doesn't play well with mobx/react router
    In this case the state should live in a PageStore
 */

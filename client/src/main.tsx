@@ -11,10 +11,10 @@ import { boot } from 'src/main/boot';
 import App from './main/components/app/App';
 
 boot()
-  .then(() =>
+  .then(config =>
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
-        <App />
+        <App {...config} />
       </StrictMode>,
     ),
   )

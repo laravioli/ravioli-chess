@@ -1,7 +1,7 @@
 import { useRef, useEffect, useContext, type ReactNode } from 'react';
 import { GlobalStoreContext, PageStoreContext, LocalStorageContext, DataContext } from './context';
 import { makeGlobalStore, type GlobalStore, type PageStore } from '../store/stores';
-import { makeLocalStorage, type LocalStorage } from '../store/localstorage';
+import type { LocalStorage } from '../store/localstorage';
 
 export const GlobalStoreProvider = ({ children }) => {
   const storeRef = useRef<GlobalStore | null>(null);
@@ -35,11 +35,17 @@ export const PageStoreProvider = <T extends PageStore>({ children, factory }: Pa
   return <PageStoreContext.Provider value={storeRef.current}>{children}</PageStoreContext.Provider>;
 };
 
-export const LocalStorageProvider = ({ children }) => {
+export const LocalStorageProvider = ({
+  children,
+  localStorage,
+}: {
+  children: React.ReactNode;
+  localStorage: LocalStorage;
+}) => {
   const storeRef = useRef<LocalStorage | null>(null);
 
   if (!storeRef.current) {
-    storeRef.current = makeLocalStorage();
+    storeRef.current = localStorage;
   }
 
   return <LocalStorageContext.Provider value={storeRef.current}>{children}</LocalStorageContext.Provider>;

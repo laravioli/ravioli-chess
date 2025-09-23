@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx';
-import { makePersistable } from 'mobx-persist-store';
 
 type Anon = 'friend' | 'random player' | 'computer';
 type TimeMode = 'realTime' | 'unlimited';
@@ -14,11 +13,6 @@ export class LocalLobbyStorage {
 
   constructor() {
     makeAutoObservable(this);
-    makePersistable(this, {
-      name: 'lobby-storage',
-      properties: ['anon', 'timeMode', 'time', 'increment', 'aiLevel', 'side'],
-      storage: window.localStorage,
-    });
   }
 
   setAnon(anon: Anon) {

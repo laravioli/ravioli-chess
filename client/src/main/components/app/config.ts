@@ -1,3 +1,4 @@
+import type { LocalStorage } from 'src/main/store/localstorage';
 import { QueryClient } from '@tanstack/react-query';
 import {
   localStorageColorSchemeManager,
@@ -44,3 +45,7 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+export interface AppConfig {
+  localStorage: LocalStorage;
+}
