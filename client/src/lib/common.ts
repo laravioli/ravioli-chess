@@ -1,4 +1,5 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/common.ts
+import { useState, useEffect } from 'react';
 
 export const defined = <T>(value: T | undefined): value is T => value !== undefined;
 
@@ -120,27 +121,18 @@ function throttlePromise<T extends (...args: any) => Promise<void>>(
   };
 }
 
-export function debounce<T extends (...args: any) => void>(
-  f: T,
-  wait: number,
-  immediate = false,
-): (...args: Parameters<T>) => void {
-  let timeout: Timeout | undefined;
-  let lastBounce = 0;
+export function useDebounce(value: any, delay: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
 
-  return function (this: any, ...args: Parameters<T>) {
-    const self = this;
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
 
-    if (timeout) clearTimeout(timeout);
-    timeout = undefined;
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
 
-    const elapsed = performance.now() - lastBounce;
-    lastBounce = performance.now();
-    if (immediate && elapsed > wait) f.apply(self, args);
-    else
-      timeout = setTimeout(() => {
-        timeout = undefined;
-        f.apply(self, args);
-      }, wait);
-  };
+  return debouncedValue;
 }

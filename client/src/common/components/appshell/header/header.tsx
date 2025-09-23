@@ -1,18 +1,13 @@
-import { Box, Button, Drawer, Group, Text } from '@mantine/core';
-import { AuthenticationForm } from './authentification';
+import { Box, Drawer, Group } from '@mantine/core';
+import { AuthenticationForm, UserConnection } from './authentification';
 import { PlayModal } from './modal';
-import { SearchUsers2 } from './search';
+import { SearchUsers } from './search';
 import { Link } from 'react-router';
 import { ToggleColorScheme } from './colorscheme';
-import { useGlobalStore } from 'src/main/hooks/hooks';
 import { useDisclosure } from '@mantine/hooks';
-import { observer } from 'mobx-react-lite';
-import { userLogout } from 'src/lib/api';
-import { notifications } from '@mantine/notifications';
 import classes from '../../../css/header.module.css';
 
-export const Header = observer(() => {
-  const { userStore } = useGlobalStore();
+export const Header = () => {
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
   return (
     <Box pb={6}>
@@ -29,30 +24,8 @@ export const Header = observer(() => {
             </Link>
           </Group>
           <Group>
-            <SearchUsers2 />
-            {userStore.logged && <Text>{userStore.username}</Text>}
-            {!userStore.logged && <Button onClick={openDrawer}>Log in</Button>}
-            {userStore.logged && (
-              <Button
-                color="red"
-                onClick={async () => {
-                  const { data, error } = await userLogout();
-                  if (error) {
-                    return;
-                  }
-                  userStore.logout();
-                  notifications.show({
-                    id: 'logout',
-                    position: 'bottom-right',
-                    message: data?.detail,
-                    color: 'red',
-                    autoClose: 2000,
-                  });
-                }}
-              >
-                Logout
-              </Button>
-            )}
+            <SearchUsers />
+            <UserConnection openDrawer={openDrawer} />
             <ToggleColorScheme />
           </Group>
         </Group>
@@ -63,4 +36,4 @@ export const Header = observer(() => {
       </Drawer>
     </Box>
   );
-});
+};
