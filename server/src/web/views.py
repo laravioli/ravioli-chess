@@ -16,8 +16,7 @@ def make_context(user, page=None, slug=None):
         "to_json": {
             "cfg": {
                 "user": {"username": user.username, "is_auth": user.is_authenticated},
-                "orientation": "white",
-                "fen": fen,
+                "page": {"orientation": "white", "fen": fen},
             },
             "data": {"positions": list(queryset)},
         }

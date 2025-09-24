@@ -4,17 +4,17 @@ import { CevalState, povChances } from './utils';
 import { type Toggle, toggle, throttle, clamp } from '../common';
 import { parseFen } from 'chessops/fen';
 import { observable, action, runInAction } from 'mobx';
-import { localStorage } from 'src/main/boot';
 import { defaultPosition, setupPosition } from 'chessops/variant';
 import { Result } from '@badrap/result';
+import type { LocalEvalStorage } from './localstorage';
 import type { CevalOpts, LocalEval, PvData, Search, Started, Step, Work } from './interface';
 import type { Path } from '../tree/interface';
 
 const cevalDisabledSentinel = '1';
 
-const enabledAfterDisable = action(() => {
+const enabledAfterDisable = action((ceval: Ceval) => {
   const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
-  const disable = localStorage!.evalStorage.disable || cevalDisabledSentinel;
+  const disable = ceval.evalStorage.disable || cevalDisabledSentinel;
   return enabledAfter == disable;
 });
 
@@ -26,11 +26,12 @@ export class Ceval {
   @observable accessor enabled: boolean;
 
   lastStarted: Started | false = false;
-  evalStorage = localStorage!.evalStorage;
+  evalStorage: LocalEvalStorage;
 
   private worker: StockfishWebEngine | undefined;
 
-  constructor() {
+  constructor(evalStorage: LocalEvalStorage) {
+    this.evalStorage = evalStorage;
     this.possible = engineSupported();
   }
 
@@ -45,7 +46,7 @@ export class Ceval {
       : Result.ok(defaultPosition('chess'));
     this.analysable = pos.isOk;
     this.allowed = toggle(this.opts.allowed);
-    this.enabled = this.possible && this.analysable && this.allowed() && enabledAfterDisable();
+    this.enabled = this.possible && this.analysable && this.allowed() && enabledAfterDisable(this);
   }
 
   onEmit = throttle(200, (ev: LocalEval, work: Work) => {
@@ -54,7 +55,7 @@ export class Ceval {
   });
 
   doStart(path: Path, steps: Step[], gameId: string | undefined) {
-    if (!this.enabled || !this.possible || !enabledAfterDisable()) return;
+    if (!this.enabled || !this.possible || !enabledAfterDisable(this)) return;
     const step = steps[steps.length - 1];
 
     runInAction(() => {

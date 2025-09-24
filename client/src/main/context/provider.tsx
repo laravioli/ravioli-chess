@@ -1,14 +1,36 @@
-import { useRef, useEffect, useContext, type ReactNode } from 'react';
+import { useRef, useEffect, type ReactNode } from 'react';
 import { GlobalStoreContext, PageStoreContext, LocalStorageContext, DataContext } from './context';
-import { makeGlobalStore, type GlobalStore, type PageStore } from '../store/stores';
+import type { GlobalStore, PageStore } from '../store/stores';
 import type { LocalStorage } from '../store/localstorage';
+import type { ProvidedData } from '../boot/interface';
 
-export const GlobalStoreProvider = ({ children }) => {
+export const LocalStorageProvider = ({
+  children,
+  localStorage,
+}: {
+  children: React.ReactNode;
+  localStorage: LocalStorage;
+}) => {
+  const storeRef = useRef<LocalStorage | null>(null);
+
+  if (!storeRef.current) {
+    storeRef.current = localStorage;
+  }
+
+  return <LocalStorageContext.Provider value={storeRef.current}>{children}</LocalStorageContext.Provider>;
+};
+
+export const GlobalStoreProvider = ({
+  children,
+  globalStore,
+}: {
+  children: React.ReactNode;
+  globalStore: GlobalStore;
+}) => {
   const storeRef = useRef<GlobalStore | null>(null);
 
   if (!storeRef.current) {
-    const { cfg } = useContext(DataContext)!;
-    storeRef.current = makeGlobalStore(cfg);
+    storeRef.current = globalStore;
   }
 
   return <GlobalStoreContext.Provider value={storeRef.current}>{children}</GlobalStoreContext.Provider>;
@@ -35,31 +57,12 @@ export const PageStoreProvider = <T extends PageStore>({ children, factory }: Pa
   return <PageStoreContext.Provider value={storeRef.current}>{children}</PageStoreContext.Provider>;
 };
 
-export const LocalStorageProvider = ({
-  children,
-  localStorage,
-}: {
-  children: React.ReactNode;
-  localStorage: LocalStorage;
-}) => {
-  const storeRef = useRef<LocalStorage | null>(null);
-
-  if (!storeRef.current) {
-    storeRef.current = localStorage;
-  }
-
-  return <LocalStorageContext.Provider value={storeRef.current}>{children}</LocalStorageContext.Provider>;
-};
-
-export const DataProvider = ({ children }) => {
-  const dataRef = useRef(null);
-  const dataScript = document.getElementById('page-init-data');
+export const DataProvider = ({ children, data }: { children: React.ReactNode; data: ProvidedData }) => {
+  const dataRef = useRef<ProvidedData | null>(null);
 
   if (!dataRef.current) {
-    dataRef.current = dataScript && JSON.parse(dataScript.innerHTML);
+    dataRef.current = data;
   }
-
-  useEffect(() => dataScript?.remove(), []);
 
   return <DataContext.Provider value={dataRef.current}>{children}</DataContext.Provider>;
 };

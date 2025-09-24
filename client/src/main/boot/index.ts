@@ -1,27 +1,23 @@
 import { initSite } from 'src/lib/site/site';
 import { client } from 'src/lib/api/client.gen';
 import { wsConnect } from 'src/lib/socket/socket';
-import { makeEvalStorage, makeLobbyStorage, type LocalStorage } from '../store/localstorage';
+import { makeAppDependencies } from '../components/app/config';
 import Cookies from 'js-cookie';
+import type { ServerPayload } from './interface';
 
 //todo : finish this mess(with let localstore.. for ceval hack): instanciate all object before router here -> providers , give value with app{...config}
 //rewrite type properly
 //disclamer : the change did nothing about multiple render -> resolution : its react18+, i should try on production
 
-export let localStorage: LocalStorage;
-
-export async function boot() {
+export const boot = async () => {
   initSite();
-  initApiClient();
+  setApiClient();
   wsConnect('/ws/taxi');
-  const lobbyStorage = await makeLobbyStorage();
-  const evalStorage = await makeEvalStorage();
-  localStorage = { evalStorage, lobbyStorage };
+  const payload = getHtmlData();
+  return makeAppDependencies(payload);
+};
 
-  return { localStorage };
-}
-
-function initApiClient() {
+const setApiClient = () => {
   client.setConfig({
     baseUrl: 'http://localhost:5173',
     credentials: 'same-origin',
@@ -33,4 +29,15 @@ function initApiClient() {
     }
     return request;
   });
-}
+};
+
+const getHtmlData = () => {
+  const dataScript = document.getElementById('page-init-data');
+  const payload: ServerPayload | undefined = dataScript && JSON.parse(dataScript.innerHTML);
+  dataScript?.remove();
+
+  if (!payload) {
+    throw new Error('missing intial data from server');
+  }
+  return payload;
+};

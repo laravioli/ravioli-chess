@@ -1,7 +1,6 @@
 import { observable, action, runInAction } from 'mobx';
 import { siteSocket } from 'src/lib/socket/socket';
-import type { Credential } from './interface';
-import type { ServerUserOpts } from 'src/main/boot/interface';
+import type { UserOpts, Credential } from './interface';
 
 const ANON = 'Anonymous';
 
@@ -11,7 +10,7 @@ export class UserStore {
 
   channel: BroadcastChannel;
 
-  constructor(opts: ServerUserOpts) {
+  constructor(opts: UserOpts) {
     runInAction(() => {
       if (opts.is_auth) {
         this.username = opts.username;

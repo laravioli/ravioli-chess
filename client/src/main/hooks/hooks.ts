@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { DataContext, LocalStorageContext, GlobalStoreContext, PageStoreContext } from '../context/context';
 import type { PageStore } from '../store/stores';
+import type { PageConfig } from '../boot/interface';
 
 /* Hooks to retrieve stores*/
 export const useLocalStorage = () => {
@@ -27,10 +28,10 @@ export const useHTMLData = () => {
   return payload.data;
 };
 
-export const useInitCfg = () => {
+export const usePageInitCfg = () => {
   const payload = useContext(DataContext);
   if (!payload) throw new Error('missing initial server data');
-  const navCfg = window.history.state?.usr;
+  const navCfg = window.history.state?.usr as PageConfig;
 
-  return navCfg ?? payload.cfg;
+  return navCfg ?? payload.page;
 };

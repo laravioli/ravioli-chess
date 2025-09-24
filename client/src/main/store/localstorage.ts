@@ -1,6 +1,6 @@
 import { LocalEvalStorage } from 'src/lib/eval/localstorage';
 import { LocalLobbyStorage } from 'src/lib/lobby/localstorage';
-import { makePersistable, hydrateStore } from 'mobx-persist-store';
+import { hydrateStore } from 'mobx-persist-store';
 
 export interface LocalStorage {
   evalStorage: LocalEvalStorage;
@@ -10,52 +10,27 @@ export interface LocalStorage {
 type StorageKey = keyof LocalStorage;
 type StoreInstanceType<K extends StorageKey> = LocalStorage[K];
 
-function autoHydrate<K extends StorageKey>(key: string, store: StoreInstanceType<K>) {
-  const storageEventCallback = (e: StorageEvent) => {
-    if (e.key === key && e.newValue) {
-      hydrateStore(store);
-    }
+export function makeLocalStorage() {
+  function autoHydrate<K extends StorageKey>(key: string, store: StoreInstanceType<K>) {
+    const storageEventCallback = (e: StorageEvent) => {
+      if (e.key === key && e.newValue) {
+        hydrateStore(store);
+      }
+    };
+
+    window.addEventListener('storage', storageEventCallback);
+
+    return () => {
+      window.removeEventListener('storage', storageEventCallback);
+    };
+  }
+
+  const localStorage: LocalStorage = {
+    evalStorage: new LocalEvalStorage(),
+    lobbyStorage: new LocalLobbyStorage(),
   };
-  window.addEventListener('storage', storageEventCallback);
-  return () => {
-    window.removeEventListener('storage', storageEventCallback);
-  };
+  autoHydrate('eval-storage', localStorage.evalStorage);
+  autoHydrate('lobby-storage', localStorage.lobbyStorage);
+
+  return localStorage;
 }
-
-//todo create a generic function
-
-export const makeLobbyStorage = async () => {
-  const lobbyStorage = new LocalLobbyStorage();
-  await makePersistable(lobbyStorage, {
-    name: 'lobby-storage',
-    properties: ['anon', 'timeMode', 'time', 'increment', 'aiLevel', 'side'],
-    storage: window.localStorage,
-  });
-  autoHydrate('lobby-storage', lobbyStorage);
-  return lobbyStorage;
-};
-
-export const makeEvalStorage = async () => {
-  const lobbyStorage = new LocalEvalStorage();
-  await makePersistable(lobbyStorage, {
-    name: 'eval-storage',
-    properties: ['multipv', 'searchms', 'threads', 'hashsize', 'sri', 'disable'],
-    storage: window.localStorage,
-  });
-  autoHydrate('lobby-storage', lobbyStorage);
-  return lobbyStorage;
-};
-
-/*makePersistable(this, {
-  name: 'lobby-storage',
-  properties: ['anon', 'timeMode', 'time', 'increment', 'aiLevel', 'side'],
-  storage: window.localStorage,
-  debugMode: true,
-});
-
-makePersistable(this, {
-  name: 'lobby-storage',
-  properties: ['anon', 'timeMode', 'time', 'increment', 'aiLevel', 'side'],
-  storage: window.localStorage,
-  debugMode: true,
-});*/

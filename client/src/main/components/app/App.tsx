@@ -1,23 +1,22 @@
 import { MantineProvider } from '@mantine/core';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Notifications } from '@mantine/notifications';
-import { mantineConfig, queryClient } from './config';
 import { GlobalStoreProvider, LocalStorageProvider, DataProvider } from 'src/main/context/provider';
 import { Router } from 'src/main/components/routes/routes';
-import type { AppConfig } from './config';
+import type { AppDependencies } from './config';
 
-function App(props: AppConfig) {
+function App(dep: AppDependencies) {
   return (
-    <MantineProvider {...mantineConfig}>
+    <MantineProvider {...dep.mantineConfig}>
       <Notifications />
-      <QueryClientProvider client={queryClient}>
-        <DataProvider>
-          <LocalStorageProvider localStorage={props.localStorage}>
-            <GlobalStoreProvider>
+      <QueryClientProvider client={dep.queryClient}>
+        <LocalStorageProvider localStorage={dep.localStorage}>
+          <GlobalStoreProvider globalStore={dep.globalStore}>
+            <DataProvider data={dep.data}>
               <Router />
-            </GlobalStoreProvider>
-          </LocalStorageProvider>
-        </DataProvider>
+            </DataProvider>
+          </GlobalStoreProvider>
+        </LocalStorageProvider>
       </QueryClientProvider>
     </MantineProvider>
   );
