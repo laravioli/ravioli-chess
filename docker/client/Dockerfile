@@ -5,7 +5,8 @@ FROM base AS client-base
 COPY package.json yarn.lock ./
 RUN --mount=type=cache,id=yarn,target=/usr/local/share/.cache/yarn \
     yarn install
-COPY eslint.config.js vite.config.js postcss.config.cjs ./
+COPY eslint.config.js vite.config.ts postcss.config.cjs ./
+COPY tsconfig*.json ./
 COPY public ./public
 
 FROM client-base AS client-dev
