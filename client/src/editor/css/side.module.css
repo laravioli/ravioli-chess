@@ -12,7 +12,7 @@
   & > :nth-child(2) {
     background-color: var(--controls-bg-color);
 
-    border: light-dark(1px solid var(--mantine-color-gray-3), 1px solid var(--mantine-color-dark-5));
+    border: light-dark(1px solid var(--mantine-color-gray-3), 1px solid var(--mantine-color-dark-6));
     border-radius: var(--main-bradius);
   }
   & .spacer {

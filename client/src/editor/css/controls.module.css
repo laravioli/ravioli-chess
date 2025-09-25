@@ -16,9 +16,14 @@
   padding-bottom: 1rem;
 }
 
+.checkbox {
+  @mixin dark {
+    --checkbox-color: var(--mantine-color-dark-5);
+    --checkbox-icon-color: var(--mantine-color-dark-5);
+  }
+}
+
 .select {
   background: var(--controls-bg-color);
-  @mixin light {
-    border: 1px solid var(--mantine-color-gray-5);
-  }
+  border: light-dark(1px, 2px) solid light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-6));
 }

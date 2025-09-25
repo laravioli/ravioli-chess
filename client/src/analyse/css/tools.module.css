@@ -15,11 +15,15 @@
 .tools {
   border-top-left-radius: var(--main-bradius);
   border-top-right-radius: var(--main-bradius);
-  background: var(--mantine-color-dark-9);
+  background: #282828;
   @mixin light {
     background: var(--mantine-color-gray-4);
   }
   user-select: none;
+  @mixin dark {
+    border-right: thin double var(--mantine-color-dark-6);
+    border-left: thin double var(--mantine-color-dark-6);
+  }
 }
 
 .paper {

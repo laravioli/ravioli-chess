@@ -1,9 +1,9 @@
 .spare-top {
-  border-bottom: light-dark(1px solid var(--mantine-color-gray-5), 1px solid var(--mantine-color-dark-5));
+  border-bottom: light-dark(1px solid var(--mantine-color-gray-5), 1px solid var(--mantine-color-dark-6));
 }
 
 .spare-bottom {
-  border-top: light-dark(1px solid var(--mantine-color-gray-5), 1px solid var(--mantine-color-dark-5));
+  border-top: light-dark(1px solid var(--mantine-color-gray-5), 1px solid var(--mantine-color-dark-6));
 }
 
 .spare-bottom,

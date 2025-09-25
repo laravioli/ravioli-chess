@@ -14,5 +14,5 @@
 
 .controls {
   background: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-6));
-  border-top: light-dark(1px solid var(--mantine-color-gray-3), 1px solid var(--mantine-color-dark-6));
+  border-top: light-dark(1px solid var(--mantine-color-gray-6), 1px solid var(--mantine-color-dark-6));
 }
