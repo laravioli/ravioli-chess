@@ -9,24 +9,22 @@ import { IconSearch } from '@tabler/icons-react';
 export const SearchUsers = () => {
   const [value, setValue] = useState('');
   const debounceValue = useDebounce(value, 200);
-  const [userList, setUserList] = useState<string[]>([]);
   const [opened, { open }] = useDisclosure(false);
 
-  const { data, isPending, isError } = useQuery({
+  const { data } = useQuery({
     ...usersListOptions({ query: { search: debounceValue } }),
     enabled: debounceValue.length >= 3,
+    select: data => data.results.map(r => r.username),
+    placeholderData: prev => prev,
   });
 
+  const userList = value.length > 2 ? data : [];
+
   useEffect(() => {
-    if (value.length < 3) {
-      setUserList([]);
-      return;
-    }
-    if (!isPending && !isError) {
-      setUserList(data.results.map(r => r.username));
+    if (userList && userList.length > 0) {
       open();
     }
-  }, [data, value, isPending, isError]);
+  }, [userList]);
 
   const onBlur = () => {
     setValue('');

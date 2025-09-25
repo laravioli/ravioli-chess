@@ -5,10 +5,6 @@ import { makeAppDependencies } from '../components/app/config';
 import Cookies from 'js-cookie';
 import type { ServerPayload } from './interface';
 
-//todo : finish this mess(with let localstore.. for ceval hack): instanciate all object before router here -> providers , give value with app{...config}
-//rewrite type properly
-//disclamer : the change did nothing about multiple render -> resolution : its react18+, i should try on production
-
 export const boot = async () => {
   initSite();
   setApiClient();
@@ -19,7 +15,7 @@ export const boot = async () => {
 
 const setApiClient = () => {
   client.setConfig({
-    baseUrl: 'http://localhost:5173',
+    baseUrl: import.meta.env.VITE_FRONTEND_DOMAIN,
     credentials: 'same-origin',
   });
 
