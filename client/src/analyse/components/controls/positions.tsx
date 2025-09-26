@@ -1,5 +1,6 @@
 import { useHTMLData, usePageStore } from 'src/main/hooks/hooks';
-import { Combobox, useCombobox, type FloatingPosition } from '@mantine/core';
+import { useToolTipConfig } from 'src/common/components/controls/tooltip';
+import { Combobox, useCombobox } from '@mantine/core';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconChessRook } from '@tabler/icons-react';
 import { useMemo } from 'react';
@@ -8,9 +9,10 @@ import { observer } from 'mobx-react-lite';
 import styles from 'src/common/css/icon.module.css';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
 
-export const Positions = observer(({ ttposition }: { ttposition: FloatingPosition }) => {
+export const Positions = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
   const { positions } = useHTMLData();
+  const toolTipProps = useToolTipConfig();
 
   const options = useMemo(
     () =>
@@ -41,7 +43,7 @@ export const Positions = observer(({ ttposition }: { ttposition: FloatingPositio
         })}
       >
         <Combobox.Target>
-          <Tooltip label="select position" position={ttposition} color="gray" withArrow>
+          <Tooltip label="select position" {...toolTipProps}>
             <ActionIcon className={styles.icon} onClick={() => combobox.toggleDropdown()}>
               <IconChessRook stroke={1.2}></IconChessRook>
             </ActionIcon>

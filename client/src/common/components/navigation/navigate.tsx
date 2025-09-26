@@ -5,21 +5,19 @@ import { Action } from '../controls/action';
 import { IconMathMaxMin, IconEdit } from '@tabler/icons-react';
 import { action } from 'mobx';
 import { INITIAL_FEN } from 'chessops/fen';
-import type { FloatingPosition } from '@mantine/core';
 import { EditorStore } from 'src/editor/store/editor';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
 import type { AnalyseOpts } from 'src/analyse/store/interface';
 import type { EditorOpts } from 'src/editor/store/interface';
 
 interface NavigateProps {
-  ttposition: FloatingPosition;
   path: string;
   getFen: () => FEN;
 }
 
 type NavigationState = AnalyseOpts | EditorOpts;
 
-export const Navigate = observer(({ ttposition, path, getFen }: NavigateProps) => {
+export const Navigate = observer(({ path, getFen }: NavigateProps) => {
   const pageStore = usePageStore<AnalyseStore | EditorStore>();
   const navigate = useNavigate();
   const isEdit = pageStore instanceof EditorStore;
@@ -41,8 +39,14 @@ export const Navigate = observer(({ ttposition, path, getFen }: NavigateProps) =
   });
 
   return (
-    <Action label={label} onClick={onClick} ttposition={ttposition} disabled={disabled}>
+    <Action label={label} onClick={onClick} disabled={disabled}>
       <Icon size={30} stroke={1.2} />
     </Action>
   );
 });
+
+const usePageNavigation = () => {
+  //this function should a function handler that perform the navigation
+  //it also return a flag to determine if the nav is allowed
+  //it take as input a State
+};
