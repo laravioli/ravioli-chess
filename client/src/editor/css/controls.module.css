@@ -25,5 +25,5 @@
 
 .select {
   background: var(--controls-bg-color);
-  border: light-dark(1px, 2px) solid light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-6));
+  border: light-dark(1px, 2px) solid light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-5));
 }
