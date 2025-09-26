@@ -1,21 +1,61 @@
 import { useDisclosure } from '@mantine/hooks';
 import { useLocalStorage } from 'src/main/hooks/hooks';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Modal, NativeSelect, FocusTrap, Slider, Text, Button, Group, Stack } from '@mantine/core';
+import { Modal, NativeSelect, FocusTrap, Slider, Text, Button, Group, Stack, Menu } from '@mantine/core';
 import { Link } from 'react-router';
 import classes from '../../../css/header.module.css';
 
-export const PlayModal = () => {
+type Opponent = 'friend' | 'random player' | 'computer';
+
+interface PlayModalProps {
+  label?: string;
+  title: string;
+  opponent: Opponent;
+}
+
+const items: PlayModalProps[] = [
+  { label: 'vs a player', title: 'Create a lobby', opponent: 'random player' },
+  { label: 'with a friend', title: 'Create a lobby', opponent: 'friend' },
+  { label: 'against a computer', title: 'Create a lobby', opponent: 'computer' },
+];
+
+export const HeaderPlay = () => {
+  const [modalProps, setModalProps] = useState<PlayModalProps>(items[0]);
   const [opened, { open, close }] = useDisclosure(false);
+
+  const openModalWithProps = (props: PlayModalProps) => {
+    setModalProps(props);
+    open();
+  };
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Play a game" centered>
+      <Menu
+        trigger="hover"
+        position="bottom-start"
+        offset={0}
+        radius={2}
+        transitionProps={{ exitDuration: 0 }}
+        withinPortal
+      >
+        <Menu.Target>
+          <div className={classes.link} onClick={event => event.preventDefault()}>
+            Play
+          </div>
+        </Menu.Target>
+        <Menu.Dropdown>
+          {items.map(item => (
+            <Menu.Item key={item.label} onClick={() => openModalWithProps(item)}>
+              {item.label}
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
+      <Modal opened={opened} onClose={close} title={modalProps.title} centered>
         <FocusTrap.InitialFocus />
         <Stack>
-          <AnonSelect />
-          <AiLevel />
+          {modalProps.opponent === 'computer' && <AiLevel />}
           <TimeMode />
           <GameClock />
           <Side />
@@ -26,25 +66,9 @@ export const PlayModal = () => {
           </Group>
         </Stack>
       </Modal>
-
-      <div className={classes.link} onClick={open}>
-        Play
-      </div>
     </>
   );
 };
-
-const AnonSelect = observer(() => {
-  const { lobbyStorage } = useLocalStorage();
-  return (
-    <NativeSelect
-      value={lobbyStorage.anon}
-      label="with"
-      data={['friend', 'random player', 'computer']}
-      onChange={event => lobbyStorage.setAnon(event.currentTarget.value as any)}
-    />
-  );
-});
 
 const AiLevel = observer(() => {
   const { lobbyStorage } = useLocalStorage();
@@ -71,7 +95,6 @@ const AiLevel = observer(() => {
         label={null}
         marks={marks}
         classNames={{ mark: classes.mark }}
-        disabled={lobbyStorage.anon !== 'computer'}
       />
     </>
   );

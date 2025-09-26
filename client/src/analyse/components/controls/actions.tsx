@@ -1,11 +1,11 @@
 import { usePageStore } from 'src/main/hooks/hooks';
 import { useNavigate } from 'react-router';
-import { INITIAL_FEN } from 'chessops/fen';
+import { ToolTipConfigProvider } from 'src/common/components/controls/tooltip';
 import { Group } from '@mantine/core';
 import { Action } from 'src/common/components/controls/action';
 import { FlipButton, StartButton } from 'src/common/components/controls/action';
 import { Positions } from './positions';
-import { ToolTipConfigProvider } from 'src/common/components/controls/tooltip';
+import { INITIAL_FEN } from 'chessops/fen';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
 import type { AnalyseOpts } from 'src/analyse/store/interface';
 import { IconEdit } from '@tabler/icons-react';
