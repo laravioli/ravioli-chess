@@ -1,5 +1,5 @@
 import { PageStoreProvider } from 'src/main/context/provider';
-import { Board } from 'src/common/components/board/board';
+import { Board } from 'src/common/components/board';
 import { Tools } from './tools/tools';
 import clsx from 'clsx';
 import layout from '../css/layout.module.css';

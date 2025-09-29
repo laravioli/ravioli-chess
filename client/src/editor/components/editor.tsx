@@ -1,6 +1,6 @@
 import { useInitStore } from '../store/init';
 import { PageStoreProvider } from 'src/main/context/provider';
-import { Board } from 'src/common/components/board/board';
+import { Board } from 'src/common/components/board';
 import { FenInput } from './fen/feninput';
 import { Controls } from './controls/controls';
 import { Actions } from './controls/actions';
