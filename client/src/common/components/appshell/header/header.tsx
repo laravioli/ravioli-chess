@@ -1,6 +1,8 @@
 import { Box, Drawer, Group, Flex } from '@mantine/core';
 import { AuthenticationForm, UserConnection } from './authentification';
+import { IsAuth } from 'src/user/component/isauth';
 import { HeaderPlay } from './play';
+import { HeaderFriends } from './friends';
 import { SearchUsers } from './search';
 import { Link } from 'react-router';
 import { ToggleColorScheme } from './colorscheme';
@@ -18,6 +20,9 @@ export const Header = () => {
 
             <Group h="100%" gap={0} visibleFrom="sm">
               <HeaderPlay />
+              <IsAuth>
+                <HeaderFriends />
+              </IsAuth>
               <Link to="/analysis" className={classes.link} replace>
                 Analyse
               </Link>

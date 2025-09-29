@@ -592,6 +592,11 @@
   resolved "https://registry.npmjs.org/@mantine/hooks/-/hooks-8.3.1.tgz"
   integrity sha512-lQutBS+Q0iz/cNFvdrsYassPWo3RtWcmDGJeOtKfHigLzFOhxUuLOkQgepDbMf3WcVMB/tist6Px1PQOv57JTw==
 
+"@mantine/modals@^8.3.2":
+  version "8.3.2"
+  resolved "https://registry.yarnpkg.com/@mantine/modals/-/modals-8.3.2.tgz#3bbab6b0bb7a9f90432bc103c3feb50556d877f6"
+  integrity sha512-1Of0KP27bAo8HTfsO7p5wy26+aUrb8h1w3mftoVlw463f/NYABm6ax+aZDx5NZdcqime2mnHasHaOWbHDfIk1A==
+
 "@mantine/notifications@^8.1.1":
   version "8.3.1"
   resolved "https://registry.npmjs.org/@mantine/notifications/-/notifications-8.3.1.tgz"

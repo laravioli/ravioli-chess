@@ -1,5 +1,5 @@
 import { Ceval } from 'src/lib/eval/ceval';
-import { UserStore } from 'src/common/store/userstore';
+import { UserStore } from 'src/user/store/userstore';
 import { AnalyseStore } from 'src/analyse/store/analyse';
 import { EditorStore } from 'src/editor/store/editor';
 import { PlayStore } from 'src/play/store/play';
