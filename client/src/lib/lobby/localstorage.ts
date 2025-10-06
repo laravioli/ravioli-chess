@@ -1,14 +1,13 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
-
-type TimeMode = 'realTime' | 'unlimited';
+import type { TimeMode, LobbySide } from './interface';
 
 export class LocalLobbyStorage {
   timeMode: TimeMode = 'realTime';
   time: number = 5;
   increment: number = 0;
   aiLevel: number = 3;
-  side: Color = 'white';
+  side: LobbySide = 'random';
 
   constructor() {
     makeAutoObservable(this);
@@ -35,7 +34,7 @@ export class LocalLobbyStorage {
     this.aiLevel = level;
   }
 
-  setSide(side: Color) {
+  setSide(side: LobbySide) {
     this.side = side;
   }
 }

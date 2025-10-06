@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite';
 import { useLocalStorage } from 'src/main/hooks/hooks';
-import { useCallback, useMemo } from 'react';
-import { FocusTrap, Stack, Group, Button, NativeSelect, Slider, Text } from '@mantine/core';
+import { useCallback, useMemo, memo, type ComponentType } from 'react';
+import { FocusTrap, Stack, Group, Button, NativeSelect, Slider, Text, ActionIcon } from '@mantine/core';
 import { Link } from 'react-router';
 import type { ContextModalProps } from '@mantine/modals';
-import type { ComponentType } from 'react';
-import type { Opponent } from 'src/lib/lobby/interface';
+import type { Opponent, TimeMode, LobbySide } from 'src/lib/lobby/interface';
+import classes from '../../css/modals.module.css';
 
 interface PlayModalBodyProps {
   opponent: Opponent;
@@ -21,7 +21,7 @@ export const PlayModal = ({ context, id, innerProps }: ContextModalProps<ModalPr
     <FocusTrap.InitialFocus />
     <Stack>
       <innerProps.modalBody {...innerProps.modalBodyProps} />
-      <Group justify="center">
+      <Group justify="center" pt={10}>
         <Button component={Link} onClick={() => context.closeModal(id)} to="/play">
           Play
         </Button>
@@ -134,15 +134,61 @@ const GameClock = observer(() => {
   );
 });
 
+interface SideOption {
+  key: string;
+  side: LobbySide;
+}
+
 const Side = observer(() => {
   const { lobbyStorage } = useLocalStorage();
+  const sides: SideOption[] = useMemo(
+    () => [
+      { key: 'w', side: 'white' },
+      { key: 'r', side: 'random' },
+      { key: 'b', side: 'black' },
+    ],
+    [],
+  );
+
+  const onClick = (side: LobbySide) => {
+    lobbyStorage.setSide(side);
+  };
 
   return (
-    <NativeSelect
-      value={lobbyStorage.side}
-      label="side"
-      onChange={event => lobbyStorage.setSide(event.currentTarget.value as any)}
-      data={['white', 'black', 'random']}
-    />
+    <Group justify="center">
+      {sides.map(side => (
+        <ActionIcon
+          key={side.key}
+          classNames={{ root: classes.lobbysideroot }}
+          onClick={() => onClick(side.side)}
+          disabled={side.side === lobbyStorage.side}
+        >
+          <IconChessKnightSharp side={side.side} />
+        </ActionIcon>
+      ))}
+    </Group>
+  );
+});
+
+const IconChessKnightSharp = memo(({ side }: { side: LobbySide }) => {
+  const fill = side === 'random' ? 'url(#sharpBlackWhite)' : side === 'white' ? '#FFFDE7' : 'black';
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 45 45">
+      <defs>
+        <linearGradient id="sharpBlackWhite" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#FFFDE7" />
+          <stop offset="50%" stopColor="#FFFDE7" />
+          <stop offset="50%" stopColor="black" />
+          <stop offset="100%" stopColor="black" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z"
+        fill={fill}
+        stroke="var(--mantine-color-dark-4)"
+        strokeWidth="0.2"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 });
