@@ -1,7 +1,20 @@
 /** Colored board squares as an embedded SVG */
-cg-board {
-  background-color: #f0d9b5;
+cg-board::before {
   background-image: url('/images/board/wood4.jpg');
+}
+
+cg-board::before {
+  top: 0;
+  height: 100%;
+}
+cg-board::before {
+  content: '';
+  left: 0;
+  width: 100%;
+  background-size: cover;
+  position: absolute;
+  border-radius: inherit;
+  box-shadow: inherit;
 }
 
 /** Interactive board square colors */

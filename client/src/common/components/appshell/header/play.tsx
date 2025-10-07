@@ -19,14 +19,7 @@ const items: HeaderPlayData[] = [
 export const HeaderPlay = () => {
   return (
     <>
-      <Menu
-        trigger="hover"
-        position="bottom-start"
-        offset={0}
-        radius={2}
-        transitionProps={{ exitDuration: 0 }}
-        withinPortal
-      >
+      <Menu trigger="click-hover" position="bottom-start" offset={0} radius={2} withinPortal withArrow>
         <Menu.Target>
           <div className={classes.link} onClick={event => event.preventDefault()}>
             Play
