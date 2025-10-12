@@ -34,9 +34,6 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber):
         self._generator = generator
         self.batch = batch
 
-    # Sequencer
-    # what could happen in generate ?event is received => we know we can get something,  a scenario can happen where: you timeout
-    # the wait event, next step
     async def _get(self):
         return await self._layer.spop(self._key)
 
