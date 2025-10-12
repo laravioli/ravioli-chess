@@ -9,6 +9,7 @@ def create_game_db(game_id):
     Game.objects.create(game_id=game_id, status=Game.Status.CREATED)
 
 
+# pretty bad to expose id_provider
 async def new_game(id_provider: AsyncIdProvider):
     id = await id_provider.one()
     await create_game_db(game_id=id)

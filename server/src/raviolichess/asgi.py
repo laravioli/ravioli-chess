@@ -28,9 +28,10 @@ else:
     django.setup(set_prefix=False)
     http_protocol = {}
 
+
+# ASGI APP
 from .lifespan import lifespan_app
 from websocket.routing import websocket_urlpatterns
-
 
 app = ProtocolTypeRouter(
     http_protocol

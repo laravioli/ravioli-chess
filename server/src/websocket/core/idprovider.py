@@ -1,8 +1,9 @@
 import asyncio
-from redis.exceptions import LockError
+from .pubsub import BackgroundSubscriber
+from redis.exceptions import LockError, RedisError
 
 
-class MixinRessourceSequencer:
+class SequencerMixin:
     """get item one by one and generate them in batch"""
 
     async def one(self):
@@ -13,8 +14,9 @@ class MixinRessourceSequencer:
             return item
 
 
-class AsyncIdProvider(MixinRessourceSequencer):
-    """Provide id pulled from an external source"""
+class AsyncIdProvider(SequencerMixin, BackgroundSubscriber):
+    """Provide id pulled from a cache backend.
+    Use pubsub to synchronise processes"""
 
     def __init__(
         self,
@@ -22,9 +24,9 @@ class AsyncIdProvider(MixinRessourceSequencer):
         name,
         generator,
         layer,
-        batch: int = 256,
+        batch: int = 512,
     ):
-        self.channel = f"channel-ids-{name}"
+        self.name = name
         self._key = f"ids:{name}"
         self._layer = layer
         self._lock = asyncio.Lock()
@@ -32,6 +34,9 @@ class AsyncIdProvider(MixinRessourceSequencer):
         self._generator = generator
         self.batch = batch
 
+    # Sequencer
+    # what could happen in generate ?event is received => we know we can get something,  a scenario can happen where: you timeout
+    # the wait event, next step
     async def _get(self):
         return await self._layer.spop(self._key)
 
@@ -41,25 +46,37 @@ class AsyncIdProvider(MixinRessourceSequencer):
                 async with self._layer.lock(
                     f"generate-{self._key}", blocking=False, timeout=2
                 ):
-                    ids = await self._generator(batch=batch)
-                    async with self._layer.pipeline() as pipe:
-                        await pipe.sadd(self._key, *ids)
-                        await pipe.spop(self._key)
-                        await pipe.publish(self.channel, "")
-                        (
-                            _,
-                            item,
-                            _,
-                        ) = await pipe.execute()
-                        return item
+                    # double-check to prevent stale assumption
+                    item = await self._get()
+                    if not item:
+                        ids = await self._generator(batch=batch)
+                        async with self._layer.pipeline() as pipe:
+                            await pipe.sadd(self._key, *ids)
+                            await pipe.spop(self._key)
+                            await pipe.publish(self.channel, "")
+                            (
+                                _,
+                                item,
+                                _,
+                            ) = await pipe.execute()
+                    return item
 
             except LockError:
-                await asyncio.wait_for(self._event.wait(), timeout=2.1)
-                return await self._layer.spop(self._key)
+                try:
+                    await asyncio.wait_for(self._event.wait(), timeout=2.1)
+                    return await self._get()
+                except asyncio.TimeoutError:
+                    continue
 
-            except TimeoutError:
-                continue
+            except RedisError:
+                raise
+
+    # Subscribe
+    @property
+    def channel(self):
+        return f"channel-ids-{self.name}"
 
     async def handler(self, _):
+        """called by Notifier when another process has generate new ids"""
         self._event.set()
         self._event.clear()

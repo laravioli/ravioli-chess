@@ -1,12 +1,13 @@
 import asyncio
 import redis.asyncio as redis
+from abc import ABC, abstractmethod
 
 
-class Notifier:
-    """Background notifier for process communication"""
+class BackgroundListener:
+    """pubsub for process communication"""
 
     def __init__(self, *, layer: redis.Redis):
-        self._pubsub = layer.pubsub()
+        self._pubsub = layer.pubsub(ignore_subscribe_messages=True)
         self._channels = {}
 
     def subscribe(self, channels: dict[str, callable]):
@@ -30,3 +31,14 @@ class Notifier:
             pass
         finally:
             await self._pubsub.aclose()
+
+
+class BackgroundSubscriber(ABC):
+    """interface for subscribing to pubsub channel"""
+
+    @property
+    @abstractmethod
+    def channel(self): ...
+
+    @abstractmethod
+    async def handler(self, message): ...

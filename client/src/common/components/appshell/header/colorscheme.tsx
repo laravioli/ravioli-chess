@@ -9,6 +9,7 @@ export function ToggleColorScheme() {
 
   return (
     <ActionIcon
+      bg={'inherit'}
       onClick={() => toggleColorScheme()}
       variant="default"
       style={{ border: 0 }}

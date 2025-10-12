@@ -17,10 +17,10 @@ user_model = get_user_model()
 
 
 class FriendRequestViewSet(
-    viewsets.GenericViewSet,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
 ):
     pagination_class = SmallResultsSetPagination
     permission_classes = [IsAuthenticated]
@@ -105,7 +105,7 @@ class FriendRequestViewSet(
         )
 
 
-class FriendViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class FriendViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """End point to list and remove friends"""
 
     permission_classes = [IsAuthenticated, IsSelfOrFriend]
