@@ -6,12 +6,15 @@ from abc import ABC, abstractmethod
 class BackgroundListener:
     """pubsub for process communication"""
 
-    def __init__(self, *, layer: redis.Redis):
+    def __init__(self, *, layer: redis.Redis, services):
         self._pubsub = layer.pubsub(ignore_subscribe_messages=True)
         self._channels = {}
+        self.subscribe_services(services)
 
-    def subscribe(self, channels: dict[str, callable]):
-        self._channels.update(channels)
+    def subscribe_services(self, services):
+        for service in services:
+            if isinstance(service, BackgroundSubscriber):
+                self._channels.update({service.channel: service.handler})
 
     def start(self):
         self._task = asyncio.create_task(self.run())
@@ -38,7 +41,7 @@ class BackgroundSubscriber(ABC):
 
     @property
     @abstractmethod
-    def channel(self): ...
+    def channel(self) -> str: ...
 
     @abstractmethod
     async def handler(self, message): ...

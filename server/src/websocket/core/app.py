@@ -7,9 +7,9 @@ from redis.asyncio import Redis as AsyncRedis
 
 
 # todo:0) read more about redis safety (reuse of connection bewteen coroutine, connection pool etc), finish read receive channel-redis impl with this in mind
-#   -> 1) rewrite the App layer (better relation between object, and avoid new Game(object) beter newgame() partial or watever)
+#      1) rewrite the App layer (better relation between object, and avoid new Game(object) beter newgame() partial or watever)
 #               -> write an ABC to make explicit wich class need PUBSUB(a channel + an handler -> then subscribers isinstance(...))
-#      2) read about redis persistance (specially docker) and add it
+#   -> 2) read about redis persistance (specially docker) and add it
 #      3) add django cache
 #      4) configure session with cache
 #      5) write your first cache with opening position
@@ -28,10 +28,6 @@ class App:
         self.services = services
 
     def start(self):
-        subscribers = {}
-        for service in self.services.values():
-            subscribers[service.channel] = service.handler
-        self.listener.subscribe(subscribers)
         self.listener.start()
 
     async def shutdown(self):
@@ -42,12 +38,12 @@ class App:
 
 async def start_app():
     layer = get_redis_layer("async")
-    listener = BackgroundListener(layer=layer)
     services = {
         "game_id": AsyncIdProvider(
             name="game", generator=game_id_generator, layer=layer
         )
     }
+    listener = BackgroundListener(layer=layer, services=services)
 
     app = App(layer=layer, listener=listener, services=services)
     app.start()
