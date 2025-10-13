@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
-    "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_vite",
@@ -101,6 +100,8 @@ CACHES = {
         },
     }
 }
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 # Database
 default_engine = env.str("DB_ENGINE", default="django.db.backends.sqlite3")
