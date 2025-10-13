@@ -12,7 +12,7 @@ class App:
         *,
         layer: AsyncRedis,
         listener: BackgroundListener,
-        services=dict[str, any]
+        services: dict[str, any]
     ):
         self.layer = layer
         self.listener = listener
