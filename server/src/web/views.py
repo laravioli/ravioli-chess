@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import ChessOpeningPosition as c
+from django.core.cache import cache
+from .models import ChessOpeningPosition
 from django.shortcuts import render
 
 
@@ -11,14 +12,25 @@ def index(request, **kwargs):
 
 def make_context(user, page=None, slug=None):
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    queryset = c.objects.values("eco", "name", "fen").order_by("eco")
     context = {
         "to_json": {
             "cfg": {
                 "user": {"username": user.username, "is_auth": user.is_authenticated},
                 "page": {"orientation": "white", "fen": fen},
             },
-            "data": {"positions": list(queryset)},
+            "data": {"positions": get_opening_positions()},
         }
     }
     return context
+
+
+def get_opening_positions():
+    positions = cache.get(ChessOpeningPosition.CACHE_KEY)
+    if positions is None:
+        queryset = ChessOpeningPosition.objects.values("eco", "name", "fen").order_by(
+            "eco"
+        )
+        positions = list(queryset)
+        cache.set(ChessOpeningPosition.CACHE_KEY, positions, timeout=7776000)
+
+    return positions

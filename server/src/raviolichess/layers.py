@@ -5,6 +5,7 @@ from environs.exceptions import EnvError
 
 
 class RedisLayer:
+    """A redis-py client used for custom needs"""
 
     def __init__(self):
         self.backends = {}
@@ -15,10 +16,6 @@ class RedisLayer:
         return self.backends[key]
 
     def make_backend(self, key):
-        try:
-            socket_path = env.str("REDIS_SOCKET_PATH")
-        except EnvError:
-            socket_path = None
 
         if key == "sync":
             backend = redis.Redis
@@ -26,6 +23,11 @@ class RedisLayer:
             backend = aioredis.Redis
         else:
             raise KeyError
+
+        try:
+            socket_path = env.str("REDIS_SOCKET_PATH")
+        except EnvError:
+            socket_path = None
 
         if socket_path:
             return backend(unix_socket_path=socket_path, decode_responses=True, db=1)

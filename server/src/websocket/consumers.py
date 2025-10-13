@@ -22,7 +22,7 @@ class TaxiConsumer(AsyncWebsocketConsumer):
         print(text_data_json)
         type = text_data_json.get("t", None)
         if type == "newgame":
-            id = await new_game(self.app.id_providers.get("game"))
+            id = await new_game(self.app.services.get("game_id"))
             await self.send(text_data=json.dumps({"message": id}))
         else:
             await self.send(text_data=json.dumps({"message": "pong"}))

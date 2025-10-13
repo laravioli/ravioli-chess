@@ -77,19 +77,29 @@ TEMPLATES = [
 ASGI_APPLICATION = "raviolichess.asgi.app"
 WSGI_APPLICATION = "raviolichess.wsgi.app"
 
-# Channels config
+# Redis
 try:
-    REDIS_HOST = ["unix://" + env.str("REDIS_SOCKET_PATH")]
+    REDIS_HOST = f"unix://{env.str("REDIS_SOCKET_PATH")}"
 except EnvError:
-    REDIS_HOST = [(env.str("REDIS_HOST"), env.str("REDIS_PORT"))]
+    REDIS_HOST = f"redis://{env.str("REDIS_HOST")}:{env.str("REDIS_PORT")}"
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": REDIS_HOST,
+            "hosts": [REDIS_HOST],
         },
     },
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_HOST,
+        "OPTIONS": {
+            "db": 1,
+        },
+    }
 }
 
 # Database
