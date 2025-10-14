@@ -5,6 +5,7 @@
   --ai-radius: 3px;
   --ai-size: 70px;
   &[data-disabled] {
+    background-color: var(--ai-hover);
     border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
     cursor: pointer;
   }

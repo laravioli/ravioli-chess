@@ -7,6 +7,7 @@ import { SearchUsers } from './search';
 import { Link } from 'react-router';
 import { ToggleColorScheme } from './colorscheme';
 import { useDisclosure } from '@mantine/hooks';
+import { INITIAL_FEN } from 'chessops/fen';
 import classes from '../../../css/header.module.css';
 
 export const Header = () => {
@@ -23,10 +24,20 @@ export const Header = () => {
               <IsAuth>
                 <HeaderFriends />
               </IsAuth>
-              <Link to="/analysis" className={classes.link} replace>
+              <Link
+                to="/analysis"
+                className={classes.link}
+                state={{ fen: INITIAL_FEN, orientation: 'white' }}
+                replace
+              >
                 Analyse
               </Link>
-              <Link to="/editor" className={classes.link} replace>
+              <Link
+                to="/editor"
+                className={classes.link}
+                state={{ fen: INITIAL_FEN, orientation: 'white' }}
+                replace
+              >
                 Edit
               </Link>
             </Group>
