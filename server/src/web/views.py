@@ -1,9 +1,11 @@
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.cache import never_cache
 from django.core.cache import cache
 from .models import ChessOpeningPosition
 from django.shortcuts import render
 
 
+@never_cache
 @ensure_csrf_cookie
 def index(request, **kwargs):
     context = make_context(request.user, **kwargs)
