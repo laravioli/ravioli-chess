@@ -1,6 +1,6 @@
-from .context import make_context
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render
+from .context import make_context
 
 
 @ensure_csrf_cookie

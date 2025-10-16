@@ -1,17 +1,10 @@
-import { Anchor, Button, Group, PasswordInput, Stack, TextInput, Text } from '@mantine/core';
+import { Anchor, Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
 import { useGlobalStore } from 'src/main/hooks/hooks';
-import {
-  userLogin,
-  userLogout,
-  userRegister,
-  type LoginRequest,
-  type RegisterRequestWritable,
-} from 'src/lib/api';
+import { userLogin, userRegister, type LoginRequest, type RegisterRequestWritable } from 'src/lib/api';
 
 export function AuthenticationForm({ close }) {
   const { userStore } = useGlobalStore();
@@ -123,38 +116,3 @@ export function AuthenticationForm({ close }) {
     </form>
   );
 }
-interface UserConnectionProps {
-  openDrawer: () => void;
-}
-
-export const UserConnection = observer(({ openDrawer }: UserConnectionProps) => {
-  const { userStore } = useGlobalStore();
-  return (
-    <>
-      {userStore.logged && <Text>{userStore.username}</Text>}
-      {!userStore.logged && <Button onClick={openDrawer}>Log in</Button>}
-      {userStore.logged && (
-        <Button
-          color="red"
-          onClick={async () => {
-            try {
-              const { data } = await userLogout();
-              userStore.logout();
-              notifications.show({
-                id: 'logout',
-                position: 'bottom-right',
-                message: data?.detail,
-                color: 'red',
-                autoClose: 2000,
-              });
-            } catch (err) {
-              console.log(err);
-            }
-          }}
-        >
-          Logout
-        </Button>
-      )}
-    </>
-  );
-});

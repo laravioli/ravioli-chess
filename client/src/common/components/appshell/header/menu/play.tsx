@@ -1,22 +1,22 @@
 import { modals } from '@mantine/modals';
-import { PlayModalBody } from '../../modals/play';
+import { PlayModalBody } from '../../../modals/play';
 import { Menu } from '@mantine/core';
 import type { Opponent } from 'src/lib/lobby/interface';
-import classes from '../../../css/header.module.css';
+import classes from 'src/common/css/header.module.css';
 
-interface HeaderPlayData {
+interface MenuPlayData {
   label?: string;
   title: string;
   opponent: Opponent;
 }
 
-const items: HeaderPlayData[] = [
+const items: MenuPlayData[] = [
   { label: 'vs a player', title: 'Create a lobby', opponent: 'random player' },
   { label: 'with a friend', title: 'Create a lobby', opponent: 'friend' },
   { label: 'against a computer', title: 'Create a lobby', opponent: 'computer' },
 ];
 
-export const HeaderPlay = () => {
+export const PlayMenu = () => {
   return (
     <>
       <Menu trigger="click-hover" position="bottom-start" offset={0} radius={2} withinPortal withArrow>

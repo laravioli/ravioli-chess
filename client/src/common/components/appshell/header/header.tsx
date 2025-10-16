@@ -1,11 +1,10 @@
-import { Box, Drawer, Group, Flex } from '@mantine/core';
-import { AuthenticationForm, UserConnection } from './authentification';
+import { Box, Drawer, Group, Flex, Button } from '@mantine/core';
+import { AuthenticationForm } from './authentification';
 import { IsAuth } from 'src/user/component/isauth';
-import { HeaderPlay } from './play';
-import { HeaderFriends } from './friends';
+import { PlayMenu } from './menu/play';
+import { UserMenuV2 } from './menu/user';
 import { SearchUsers } from './search';
 import { Link } from 'react-router';
-import { ToggleColorScheme } from './colorscheme';
 import { useDisclosure } from '@mantine/hooks';
 import { INITIAL_FEN } from 'chessops/fen';
 import classes from '../../../css/header.module.css';
@@ -15,15 +14,12 @@ export const Header = () => {
   return (
     <Box pb={6}>
       <header className={classes.header}>
-        <Flex justify="space-between" align="center" h="100%">
+        <Flex justify="space-between" h="100%" maw={1800} m="0 auto">
           <Group h="100%" gap="md">
             <Box mr="xl">Raviolichess</Box>
 
             <Group h="100%" gap={0} visibleFrom="sm">
-              <HeaderPlay />
-              <IsAuth>
-                <HeaderFriends />
-              </IsAuth>
+              <PlayMenu />
               <Link
                 to="/analysis"
                 className={classes.link}
@@ -42,10 +38,12 @@ export const Header = () => {
               </Link>
             </Group>
           </Group>
-          <Group>
+          <Group h="100%" visibleFrom="sm">
             <SearchUsers />
-            <UserConnection openDrawer={openDrawer} />
-            <ToggleColorScheme />
+            <IsAuth showIf={false}>
+              <Button onClick={openDrawer}>Log in</Button>
+            </IsAuth>
+            <UserMenuV2 />
           </Group>
         </Flex>
       </header>
