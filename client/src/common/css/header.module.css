@@ -54,3 +54,19 @@
   padding-bottom: var(--mantine-spacing-xl);
   border-top: 1px solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
 }
+
+.friend {
+  svg {
+    display: none;
+  }
+
+  &:hover {
+    background-color: inherit;
+    & svg {
+      display: inline-block;
+      &:hover {
+        color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-2));
+      }
+    }
+  }
+}

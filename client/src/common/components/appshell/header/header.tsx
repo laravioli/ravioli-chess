@@ -2,7 +2,7 @@ import { Box, Drawer, Group, Flex, Button } from '@mantine/core';
 import { AuthenticationForm } from './authentification';
 import { IsAuth } from 'src/user/component/isauth';
 import { PlayMenu } from './menu/play';
-import { UserMenuV2 } from './menu/user';
+import { UserMenu } from './menu/user';
 import { SearchUsers } from './search';
 import { Link } from 'react-router';
 import { useDisclosure } from '@mantine/hooks';
@@ -43,7 +43,7 @@ export const Header = () => {
             <IsAuth showIf={false}>
               <Button onClick={openDrawer}>Log in</Button>
             </IsAuth>
-            <UserMenuV2 />
+            <UserMenu />
           </Group>
         </Flex>
       </header>

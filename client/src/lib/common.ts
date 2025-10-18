@@ -1,5 +1,5 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/common.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const defined = <T>(value: T | undefined): value is T => value !== undefined;
 
@@ -135,4 +135,34 @@ export function useDebounce(value: any, delay: number) {
   }, [value, delay]);
 
   return debouncedValue;
+}
+
+export function useDebounceLoading(isLoading: boolean, delay: number) {
+  const [internalLoading, setInternalLoading] = useState(false);
+  const startTimeRef = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (isLoading) {
+      setInternalLoading(true);
+      startTimeRef.current = performance.now();
+    } else if (internalLoading) {
+      const elapsed = performance.now() - (startTimeRef.current ?? 0);
+      const remaining = Math.max(delay - elapsed, 0);
+
+      timeoutRef.current = setTimeout(() => {
+        setInternalLoading(false);
+        timeoutRef.current = null;
+        startTimeRef.current = null;
+      }, remaining);
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [isLoading]);
+
+  return internalLoading;
 }

@@ -1,106 +1,33 @@
 import { observer } from 'mobx-react-lite';
 import { useGlobalStore } from 'src/main/hooks/hooks';
 import { useState, useCallback, useMemo, type Dispatch, type SetStateAction } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useDebounceLoading } from 'src/lib/common';
+import { friendsListQueryKey, friendsListOptions } from 'src/lib/api/@tanstack/react-query.gen';
 import { userLogout } from 'src/lib/api';
+import { ActionIcon, Loader, Menu, MenuItem, UnstyledButton, useMantineColorScheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IsAuth } from 'src/user/component/isauth';
-import { ActionIcon, Menu, MenuItem, UnstyledButton, useMantineColorScheme } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight, IconLogout, IconSettingsFilled } from '@tabler/icons-react';
+import { modals } from '@mantine/modals';
+import { PlayModalBody } from '../../../modals/play';
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconLogout,
+  IconSettingsFilled,
+  IconBrandGooglePlay,
+} from '@tabler/icons-react';
 import type { UserStore } from 'src/user/store/userstore';
 import classes from 'src/common/css/header.module.css';
 
-const MainMenuAuth = ({ setView }) => {
+export const UserMenu = observer(() => {
   const { userStore } = useGlobalStore();
 
-  const logout = useCallback(async () => {
-    try {
-      const { data } = await userLogout();
-      userStore.logout();
-      notifications.show({
-        id: 'logout',
-        position: 'bottom-right',
-        message: data?.detail,
-        color: 'red',
-        autoClose: 2000,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  const menus = useMemo(() => {
+    if (userStore.logged) return { main: MainMenu, theme: ThemeMenu, friends: FriendsMenu };
+    return { main: MainMenuPref, theme: ThemeMenu };
+  }, [userStore.logged]);
 
-  return (
-    <>
-      <Menu.Item>Profile</Menu.Item>
-      <Menu.Item>Friends</Menu.Item>
-      <Menu.Label>Preferences</Menu.Label>
-      <Menu.Item
-        rightSection={<IconChevronRight size={16} stroke={1.5} />}
-        onClick={() => setView('theme')}
-        closeMenuOnClick={false}
-      >
-        Theme
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />} onClick={logout}>
-        Logout
-      </Menu.Item>
-    </>
-  );
-};
-
-const MainMenuAnon = ({ setView }) => {
-  return (
-    <>
-      <Menu.Item
-        rightSection={<IconChevronRight size={16} stroke={1.5} />}
-        onClick={() => setView('theme')}
-        closeMenuOnClick={false}
-      >
-        Theme
-      </Menu.Item>
-    </>
-  );
-};
-
-const ThemeMenu = ({ setView }) => {
-  const { setColorScheme } = useMantineColorScheme();
-
-  return (
-    <>
-      <MenuItem
-        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
-        onClick={() => setView('main')}
-        closeMenuOnClick={false}
-      >
-        Theme
-      </MenuItem>
-      <Menu.Divider />
-      <Menu.Item onClick={() => setColorScheme('dark')}>Dark</Menu.Item>
-      <Menu.Item onClick={() => setColorScheme('light')}>Light</Menu.Item>
-    </>
-  );
-};
-
-type MenuViewFC = React.FC<{
-  setView: Dispatch<SetStateAction<MenuViewKey>>;
-}>;
-
-type MenuViewKey = 'main' | 'theme';
-
-const useMenu = (menuViews: Record<MenuViewKey, MenuViewFC>) => {
-  const [view, setView] = useState<MenuViewKey>('main');
-  const CurrentView = menuViews[view];
-
-  return {
-    currentMenu: <CurrentView setView={setView} />,
-    setView,
-  };
-};
-
-export const UserMenuV2 = observer(() => {
-  const { userStore } = useGlobalStore();
-  const mainMenu = userStore.logged ? MainMenuAuth : MainMenuAnon;
-  const { currentMenu, setView } = useMenu({ main: mainMenu, theme: ThemeMenu });
+  const { currentMenu, navigate } = useMenu(menus);
 
   return (
     <>
@@ -110,7 +37,7 @@ export const UserMenuV2 = observer(() => {
         width={300}
         offset={0}
         radius={2}
-        onExitTransitionEnd={() => setView('main')}
+        onExitTransitionEnd={() => navigate('main')}
         withinPortal
       >
         <Menu.Target>
@@ -122,88 +49,22 @@ export const UserMenuV2 = observer(() => {
   );
 });
 
-export const UserMenu = observer(() => {
-  const { userStore } = useGlobalStore();
-  const { setColorScheme } = useMantineColorScheme();
-  const [view, setView] = useState<'main' | 'friends' | 'theme'>('main');
+type MenuViewFC = React.FC<{
+  navigate: Dispatch<SetStateAction<MenuViewKey>>;
+}>;
 
-  const logout = useCallback(async () => {
-    try {
-      const { data } = await userLogout();
-      userStore.logout();
-      notifications.show({
-        id: 'logout',
-        position: 'bottom-right',
-        message: data?.detail,
-        color: 'red',
-        autoClose: 2000,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+type MenuViewKey = 'main' | ('theme' & 'friends');
 
-  const menuViews = useMemo(
-    () => ({
-      main: (
-        <>
-          <IsAuth showIf={true}>
-            <Menu.Item>Profile</Menu.Item>
-            <Menu.Item>Friends</Menu.Item>
-            <Menu.Label>Preferences</Menu.Label>
-          </IsAuth>
-          <Menu.Item
-            rightSection={<IconChevronRight size={16} stroke={1.5} />}
-            onClick={() => setView('theme')}
-            closeMenuOnClick={false}
-          >
-            Theme
-          </Menu.Item>
-          <IsAuth showIf={true}>
-            <Menu.Divider />
-            <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />} onClick={logout}>
-              Logout
-            </Menu.Item>
-          </IsAuth>
-        </>
-      ),
-      theme: (
-        <>
-          <MenuItem
-            leftSection={<IconChevronLeft size={16} stroke={1.5} />}
-            onClick={() => setView('main')}
-            closeMenuOnClick={false}
-          >
-            Theme
-          </MenuItem>
-          <Menu.Divider />
-          <Menu.Item onClick={() => setColorScheme('dark')}>Dark</Menu.Item>
-          <Menu.Item onClick={() => setColorScheme('light')}>Light</Menu.Item>
-        </>
-      ),
-    }),
-    [],
-  );
+const useMenu = (menuViews: Record<MenuViewKey, MenuViewFC>) => {
+  const [view, setView] = useState<MenuViewKey>('main');
 
-  return (
-    <>
-      <Menu
-        trigger="click"
-        position="bottom-start"
-        width={300}
-        offset={0}
-        radius={2}
-        onExitTransitionEnd={() => setView('main')}
-        withinPortal
-      >
-        <Menu.Target>
-          <UserMenuTarget user={userStore} />
-        </Menu.Target>
-        <Menu.Dropdown>{menuViews[view]}</Menu.Dropdown>
-      </Menu>
-    </>
-  );
-});
+  const CurrentView = menuViews[view];
+
+  return {
+    currentMenu: <CurrentView navigate={setView} />,
+    navigate: setView,
+  };
+};
 
 type UserMenuTargetProps = {
   user: UserStore;
@@ -222,3 +83,129 @@ const UserMenuTarget = observer((props: UserMenuTargetProps) => {
     </ActionIcon>
   );
 });
+
+const MainMenu = ({ navigate }) => {
+  const { userStore } = useGlobalStore();
+  const queryClient = useQueryClient();
+
+  const logout = useCallback(async () => {
+    try {
+      const { data } = await userLogout();
+      userStore.logout();
+      queryClient.invalidateQueries({ queryKey: friendsListQueryKey() });
+      notifications.show({
+        id: 'logout',
+        position: 'bottom-right',
+        message: data?.detail,
+        color: 'red',
+        autoClose: 2000,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  return (
+    <>
+      <Menu.Item>Profile</Menu.Item>
+      <Menu.Item
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
+        onClick={() => navigate('friends')}
+        closeMenuOnClick={false}
+      >
+        Friends
+      </Menu.Item>
+      <Menu.Label>Preferences</Menu.Label>
+      <MainMenuPref navigate={navigate} />
+      <Menu.Divider />
+      <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />} onClick={logout}>
+        Logout
+      </Menu.Item>
+    </>
+  );
+};
+
+const MainMenuPref = ({ navigate }) => {
+  return (
+    <>
+      <Menu.Item
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
+        onClick={() => navigate('theme')}
+        closeMenuOnClick={false}
+      >
+        Theme
+      </Menu.Item>
+    </>
+  );
+};
+
+const ThemeMenu = ({ navigate }) => {
+  const { setColorScheme } = useMantineColorScheme();
+
+  return (
+    <>
+      <MenuItem
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
+        onClick={() => navigate('main')}
+        closeMenuOnClick={false}
+      >
+        Theme
+      </MenuItem>
+      <Menu.Divider />
+      <Menu.Item onClick={() => setColorScheme('dark')} closeMenuOnClick={false}>
+        Dark
+      </Menu.Item>
+      <Menu.Item onClick={() => setColorScheme('light')} closeMenuOnClick={false}>
+        Light
+      </Menu.Item>
+    </>
+  );
+};
+const FriendsMenu = ({ navigate }) => {
+  const { isFetching, data } = useQuery({
+    ...friendsListOptions(),
+  });
+
+  const debouncedLoading = useDebounceLoading(isFetching, 150);
+
+  return (
+    <>
+      <MenuItem
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
+        rightSection={debouncedLoading && <Loader color="gray" size={22} />}
+        onClick={() => navigate('main')}
+        closeMenuOnClick={false}
+      >
+        Friends
+      </MenuItem>
+      <Menu.Divider />
+
+      {!debouncedLoading &&
+        data?.results.map(item => (
+          <Menu.Item
+            className={classes.friend}
+            key={item.to_user}
+            onClick={() => {}}
+            rightSection={
+              <IconBrandGooglePlay
+                stroke={1.2}
+                size={22}
+                onClick={() =>
+                  modals.openContextModal({
+                    modal: 'play',
+                    title: 'Create a lobby',
+                    innerProps: {
+                      modalBody: PlayModalBody,
+                      modalBodyProps: { opponent: 'friend' },
+                    },
+                  })
+                }
+              />
+            }
+          >
+            {item.to_user}
+          </Menu.Item>
+        ))}
+    </>
+  );
+};
