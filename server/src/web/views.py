@@ -5,5 +5,6 @@ from .context import make_context
 
 @ensure_csrf_cookie
 def index(request, **kwargs):
-    context = make_context(request.user, **kwargs)
+    print(dict(request.session))
+    context = make_context(request, **kwargs)
     return render(request, "web/index.html", context)

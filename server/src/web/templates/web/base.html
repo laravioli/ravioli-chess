@@ -18,7 +18,7 @@
     {% vite_react_refresh %}
     {% vite_asset 'src/main.tsx' %}
   </head>
-  <body>
+  <body {% for key, value in preferences.items %} data-{{ key }}="{{ value }}" {% endfor %}>
     {% block content %}
     {% endblock content %}
     </body>

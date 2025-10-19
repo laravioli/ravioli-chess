@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite';
 import { useGlobalStore } from 'src/main/hooks/hooks';
 import { useState, useCallback, useMemo, type Dispatch, type SetStateAction } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useDebounceLoading } from 'src/lib/common';
 import { friendsListQueryKey, friendsListOptions } from 'src/lib/api/@tanstack/react-query.gen';
 import { userLogout } from 'src/lib/api';
 import { ActionIcon, Loader, Menu, MenuItem, UnstyledButton, useMantineColorScheme } from '@mantine/core';
@@ -88,11 +87,16 @@ const MainMenu = ({ navigate }) => {
   const { userStore } = useGlobalStore();
   const queryClient = useQueryClient();
 
+  const { isPending, refetch } = useQuery({
+    ...friendsListOptions(),
+    enabled: false,
+  });
+
   const logout = useCallback(async () => {
     try {
       const { data } = await userLogout();
       userStore.logout();
-      queryClient.invalidateQueries({ queryKey: friendsListQueryKey() });
+      queryClient.removeQueries({ queryKey: friendsListQueryKey() });
       notifications.show({
         id: 'logout',
         position: 'bottom-right',
@@ -109,6 +113,7 @@ const MainMenu = ({ navigate }) => {
     <>
       <Menu.Item>Profile</Menu.Item>
       <Menu.Item
+        onMouseEnter={() => isPending && refetch()}
         rightSection={<IconChevronRight size={16} stroke={1.5} />}
         onClick={() => navigate('friends')}
         closeMenuOnClick={false}
@@ -166,13 +171,11 @@ const FriendsMenu = ({ navigate }) => {
     ...friendsListOptions(),
   });
 
-  const debouncedLoading = useDebounceLoading(isFetching, 150);
-
   return (
     <>
       <MenuItem
         leftSection={<IconChevronLeft size={16} stroke={1.5} />}
-        rightSection={debouncedLoading && <Loader color="gray" size={22} />}
+        rightSection={isFetching && <Loader color="gray" size={22} />}
         onClick={() => navigate('main')}
         closeMenuOnClick={false}
       >
@@ -180,7 +183,7 @@ const FriendsMenu = ({ navigate }) => {
       </MenuItem>
       <Menu.Divider />
 
-      {!debouncedLoading &&
+      {!isFetching &&
         data?.results.map(item => (
           <Menu.Item
             className={classes.friend}

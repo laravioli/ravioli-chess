@@ -1,5 +1,5 @@
 /** Colored board squares as an embedded SVG */
-cg-board::before {
+body[data-board='wood'] cg-board::before {
   background-image: url('/images/board/wood4.jpg');
 }
 

@@ -2,19 +2,22 @@ from django.core.cache import cache
 from .models import ChessOpeningPosition, CACHE_KEYS
 
 
-# General context
-def make_context(user, page="default", slug=None):
+def make_context(request, page="default", slug=None):
+    """compute heavy page context"""
 
     context = {
         "cfg": {
-            "user": {"username": user.username, "is_auth": user.is_authenticated},
+            "user": {
+                "username": request.user.username,
+                "is_auth": request.user.is_authenticated,
+            },
         },
         "data": {"positions": get_opening_positions()},
     }
 
     page_context_fn = PAGES_CONTEXT.get(page)
     if page_context_fn:
-        context["cfg"].update(page_context_fn(user=user, slug=slug))
+        context["cfg"].update(page_context_fn(request=request, slug=slug))
 
     return {"to_json": context}
 
@@ -31,18 +34,17 @@ def get_opening_positions():
     return positions
 
 
-# Page context
-def analysis_context(user=None, slug=None):
+def analysis_context(request, slug=None):
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     return {"page": {"orientation": "white", "fen": fen}}
 
 
-def editor_context(user=None, slug=None):
+def editor_context(request, slug=None):
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     return {"page": {"orientation": "white", "fen": fen}}
 
 
-def play_context(user=None, slug=None):
+def play_context(request, slug=None):
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     return {"page": {"orientation": "white", "fen": fen}}
 
