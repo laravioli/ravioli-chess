@@ -1,4 +1,4 @@
-from preferences.models import DEFAULT_PREFERENCE, SESSION_KEY_PREFERENCE
+from profile.models import ANON_PROFILE, SESSION_KEY
 
 PIECE_VARS = {
     "---white-pawn": "wP",
@@ -19,8 +19,8 @@ PIECE_VARS = {
 def base_context(request):
     """compute light global context"""
 
-    session_preferences = request.session.get(SESSION_KEY_PREFERENCE, {})
+    session_preferences = request.session.get(SESSION_KEY, {})
     return {
-        "preferences": {**DEFAULT_PREFERENCE, **session_preferences},
+        "profile": {**ANON_PROFILE, **session_preferences},
         "pieces": PIECE_VARS,
     }

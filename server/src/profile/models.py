@@ -3,7 +3,7 @@ from django.forms import model_to_dict
 from django.conf import settings
 
 
-class Preference(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True
     )
@@ -18,24 +18,24 @@ class Preference(models.Model):
         max_length=15, choices=BoardChoices, default=BoardChoices.WOOD
     )
 
-    class PiecesChoices(models.TextChoices):
+    class PieceSetChoices(models.TextChoices):
         BASE = "base"
         WIKI = "wiki"
 
-    pieces = models.CharField(
-        max_length=15, choices=PiecesChoices, default=PiecesChoices.BASE
+    pieceset = models.CharField(
+        max_length=15, choices=PieceSetChoices, default=PieceSetChoices.BASE
     )
 
     def to_dict(self):
         return model_to_dict(self, exclude=["user"])
 
     def __str__(self):
-        return f"Preference {self.user.username}"
+        return f"Profile {self.user.username}"
 
 
-DEFAULT_PREFERENCE = {
-    "board": Preference.BoardChoices.WOOD,
-    "pieces": Preference.PiecesChoices.BASE,
+ANON_PROFILE = {
+    "board": Profile.BoardChoices.WOOD,
+    "pieceset": Profile.PieceSetChoices.BASE,
 }
 
-SESSION_KEY_PREFERENCE = "user_preferences"
+SESSION_KEY = "profile"

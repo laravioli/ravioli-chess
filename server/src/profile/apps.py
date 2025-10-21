@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class PreferencesConfig(AppConfig):
+class ProfileConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "preferences"
+    name = "profile"
 
     def ready(self):
         from . import signals

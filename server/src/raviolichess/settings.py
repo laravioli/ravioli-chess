@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "user",
-    "preferences",
+    "profile",
     "social",
     "game",
     "lobby",

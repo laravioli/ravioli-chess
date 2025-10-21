@@ -19,12 +19,12 @@
         <style>
         :root{
         {% for key, value in pieces.items %}
-            {{ key }}: url("{% static 'web/images/pieces/'%}{{preferences.pieces}}/{{value}}.png");
+            {{ key }}: url("{% static 'web/images/pieces/'%}{{profile.pieceset}}/{{value}}.png");
         {% endfor %}
         }
         </style>
     </head>
-    <body {% for key, value in preferences.items %}data-{{ key }}="{{ value }}"{% endfor %}>
+    <body {% for key, value in profile.items %}data-{{ key }}="{{ value }}"{% endfor %}>
         {% block content %}
         {% endblock content %}
     </body>
