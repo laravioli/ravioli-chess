@@ -1,6 +1,6 @@
-from preferences.models import DEFAULT_PREF
+from preferences.models import DEFAULT_PREFERENCE, SESSION_KEY_PREFERENCE
 
-PIECE_IMAGE_MAP = {
+PIECE_VARS = {
     "---white-pawn": "wP",
     "---black-pawn": "bP",
     "---white-knight": "wN",
@@ -19,8 +19,8 @@ PIECE_IMAGE_MAP = {
 def base_context(request):
     """compute light global context"""
 
-    session_pref = request.session.get("user_preferences", {})
+    session_preferences = request.session.get(SESSION_KEY_PREFERENCE, {})
     return {
-        "preferences": {**DEFAULT_PREF, **session_pref},
-        "pieces": PIECE_IMAGE_MAP,
+        "preferences": {**DEFAULT_PREFERENCE, **session_preferences},
+        "pieces": PIECE_VARS,
     }
