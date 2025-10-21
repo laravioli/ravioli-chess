@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('preferences', '0003_alter_preference_board'),
+        ("profile", "0003_alter_preference_board"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='preference',
-            name='pieces',
-            field=models.CharField(default='base', max_length=15),
+            model_name="preference",
+            name="pieces",
+            field=models.CharField(default="base", max_length=15),
         ),
     ]

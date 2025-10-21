@@ -6,18 +6,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('preferences', '0004_alter_preference_pieces'),
+        ("profile", "0004_alter_preference_pieces"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='preference',
-            name='board',
-            field=models.CharField(choices=[('wood', 'Wood'), ('blue', 'Blue'), ('blue2', 'Blue2'), ('brown', 'Brown')], default='wood', max_length=15),
+            model_name="preference",
+            name="board",
+            field=models.CharField(
+                choices=[
+                    ("wood", "Wood"),
+                    ("blue", "Blue"),
+                    ("blue2", "Blue2"),
+                    ("brown", "Brown"),
+                ],
+                default="wood",
+                max_length=15,
+            ),
         ),
         migrations.AlterField(
-            model_name='preference',
-            name='pieces',
-            field=models.CharField(choices=[('base', 'Base'), ('wiki', 'Wiki')], default='base', max_length=15),
+            model_name="preference",
+            name="pieces",
+            field=models.CharField(
+                choices=[("base", "Base"), ("wiki", "Wiki")],
+                default="base",
+                max_length=15,
+            ),
         ),
     ]

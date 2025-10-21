@@ -30,7 +30,7 @@ class Profile(models.Model):
         return model_to_dict(self, exclude=["user"])
 
     def __str__(self):
-        return f"Profile {self.user.username}"
+        return self.user.username
 
 
 ANON_PROFILE = {

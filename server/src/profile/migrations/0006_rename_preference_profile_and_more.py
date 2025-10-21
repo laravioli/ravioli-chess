@@ -7,18 +7,18 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('preferences', '0005_alter_preference_board_alter_preference_pieces'),
+        ("profile", "0005_alter_preference_board_alter_preference_pieces"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='Preference',
-            new_name='Profile',
+            old_name="Preference",
+            new_name="Profile",
         ),
         migrations.RenameField(
-            model_name='profile',
-            old_name='pieces',
-            new_name='pieceset',
+            model_name="profile",
+            old_name="pieces",
+            new_name="pieceset",
         ),
     ]

@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('preferences', '0001_initial'),
+        ("profile", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='preference',
-            name='board',
-            field=models.CharField(default='wodd', max_length=15),
+            model_name="preference",
+            name="board",
+            field=models.CharField(default="wodd", max_length=15),
         ),
         migrations.AlterField(
-            model_name='preference',
-            name='pieces',
+            model_name="preference",
+            name="pieces",
             field=models.CharField(default=None, max_length=15),
         ),
     ]
