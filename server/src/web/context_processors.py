@@ -1,18 +1,18 @@
 from preferences.models import DEFAULT_PREF
 
 PIECE_IMAGE_MAP = {
-    "wP": "white-pawn",
-    "bP": "black-pawn",
-    "wN": "white-knight",
-    "bN": "black-knight",
-    "wB": "white-bishop",
-    "bB": "black-bishop",
-    "wR": "white-rook",
-    "bR": "black-rook",
-    "wQ": "white-queen",
-    "bQ": "black-queen",
-    "wK": "white-king",
-    "bK": "black-king",
+    "---white-pawn": "wP",
+    "---black-pawn": "bP",
+    "---white-knight": "wN",
+    "---black-knight": "bN",
+    "---white-bishop": "wB",
+    "---black-bishop": "bB",
+    "---white-rook": "wR",
+    "---black-rook": "bR",
+    "---white-queen": "wQ",
+    "---black-queen": "bQ",
+    "---white-king": "wK",
+    "---black-king": "bK",
 }
 
 

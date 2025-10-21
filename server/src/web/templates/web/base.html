@@ -1,25 +1,31 @@
 {% load django_vite %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no" />
-    <meta name="darkreader-lock">
-    <title>raviolichess</title>
-    {% load static %}
-    <link rel="icon" href={% static 'web/favicon.ico' %} type="image/x-icon" />
-    <link rel="stylesheet" href={% vite_asset_url 'src/main/boot/theme.css' %} />
- 
-
-    <script src={% static 'web/js/scripts.js'%}></script>
-    {% vite_hmr_client %}
-    {% vite_react_refresh %}
-    {% vite_asset 'src/main.tsx' %}
-  </head>
-  <body {% for key, value in preferences.items %} data-{{ key }}="{{ value }}" {% endfor %}>
-    {% block content %}
-    {% endblock content %}
+    <head>
+        <meta name="description" content="a chess website for ravioli">
+        <meta name="keywords" content="chess, ravioli, tactics, training">
+        <meta charset="UTF-8" />
+        <meta name="viewport"
+              content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no" />
+        <meta name="darkreader-lock">
+        <title>raviolichess</title>
+        {% load static %}
+        <link rel="icon" href={% static 'web/favicon.ico' %} type="image/x-icon" />
+        <link rel="stylesheet" href={% vite_asset_url 'src/main/boot/theme.css' %} />
+        <script src={% static 'web/js/scripts.js'%}></script>
+        {% vite_hmr_client %}
+        {% vite_react_refresh %}
+        {% vite_asset 'src/main.tsx' %}
+        <style>
+        :root{
+        {% for key, value in pieces.items %}
+            {{ key }}: url("{% static 'web/images/pieces/'%}{{preferences.pieces}}/{{value}}.png");
+        {% endfor %}
+        }
+        </style>
+    </head>
+    <body {% for key, value in preferences.items %}data-{{ key }}="{{ value }}"{% endfor %}>
+        {% block content %}
+        {% endblock content %}
     </body>
 </html>

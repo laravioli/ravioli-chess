@@ -1,0 +1,5 @@
+@import '@mantine/notifications/styles.css';
+@import 'src/common/css/chessground.base.css';
+@import 'src/common/css/chessground.board.css';
+@import 'src/common/css/chessground.pieces.css';
+@import './App.css';

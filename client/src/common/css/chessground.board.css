@@ -3,6 +3,18 @@ body[data-board='wood'] cg-board::before {
   background-image: url('/images/board/wood4.jpg');
 }
 
+body[data-board='blue'] cg-board::before {
+  background-image: url('/images/board/blue.png');
+}
+
+body[data-board='blue2'] cg-board::before {
+  background-image: url('/images/board/blue2.jpg');
+}
+
+body[data-board='brown'] cg-board::before {
+  background-image: url('/images/board/brown.png');
+}
+
 cg-board::before {
   top: 0;
   height: 100%;

@@ -44,42 +44,42 @@
 
 .spare-white {
   & .pawn {
-    background-image: url('/images/pieces/bases/wP.png');
+    background-image: var(---white-pawn);
   }
   & .knight {
-    background-image: url('/images/pieces/bases/wB.png');
+    background-image: var(---white-knight);
   }
   & .bishop {
-    background-image: url('/images/pieces/bases/wN.png');
+    background-image: var(---white-bishop);
   }
   & .rook {
-    background-image: url('/images/pieces/bases/wR.png');
+    background-image: var(---white-rook);
   }
   & .queen {
-    background-image: url('/images/pieces/bases/wQ.png');
+    background-image: var(---white-queen);
   }
   & .king {
-    background-image: url('/images/pieces/bases/wK.png');
+    background-image: var(---white-king);
   }
 }
 
 .spare-black {
   & .pawn {
-    background-image: url('/images/pieces/bases/bP.png');
+    background-image: var(---black-pawn);
   }
   & .knight {
-    background-image: url('/images/pieces/bases/bB.png');
+    background-image: var(---black-knight);
   }
   & .bishop {
-    background-image: url('/images/pieces/bases/bN.png');
+    background-image: var(---black-bishop);
   }
   & .rook {
-    background-image: url('/images/pieces/bases/bR.png');
+    background-image: var(---black-rook);
   }
   & .queen {
-    background-image: url('/images/pieces/bases/bQ.png');
+    background-image: var(---black-queen);
   }
   & .king {
-    background-image: url('/images/pieces/bases/bK.png');
+    background-image: var(---black-king);
   }
 }

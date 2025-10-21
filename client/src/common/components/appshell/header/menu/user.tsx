@@ -22,8 +22,13 @@ export const UserMenu = observer(() => {
   const { userStore } = useGlobalStore();
 
   const menus = useMemo(() => {
-    if (userStore.logged) return { main: MainMenu, theme: ThemeMenu, friends: FriendsMenu };
-    return { main: MainMenuPref, theme: ThemeMenu };
+    if (userStore.logged)
+      return {
+        main: MainMenu,
+        friends: FriendsMenu,
+        ...MainMenuPref.subMenus,
+      };
+    return { main: MainMenuPref, ...MainMenuPref.subMenus };
   }, [userStore.logged]);
 
   const { currentMenu, navigate } = useMenu(menus);
@@ -140,6 +145,20 @@ const MainMenuPref = ({ navigate }) => {
       >
         Theme
       </Menu.Item>
+      <Menu.Item
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
+        onClick={() => navigate('board')}
+        closeMenuOnClick={false}
+      >
+        Board
+      </Menu.Item>
+      <Menu.Item
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
+        onClick={() => navigate('pieceset')}
+        closeMenuOnClick={false}
+      >
+        Piece set
+      </Menu.Item>
     </>
   );
 };
@@ -166,6 +185,75 @@ const ThemeMenu = ({ navigate }) => {
     </>
   );
 };
+
+const BoardMenu = ({ navigate }) => {
+  const colors = useMemo(
+    () => [
+      { key: 'wo', value: 'wood' },
+      { key: 'bl', value: 'blue' },
+      { key: 'bl2', value: 'blue2' },
+      { key: 'br', value: 'brown' },
+    ],
+    [],
+  );
+
+  const onClick = useCallback((color: string) => {
+    document.body.dataset['board'] = color;
+  }, []);
+  return (
+    <>
+      <MenuItem
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
+        onClick={() => navigate('main')}
+        closeMenuOnClick={false}
+      >
+        Board
+      </MenuItem>
+      <Menu.Divider />
+      {colors.map(item => (
+        <Menu.Item key={item.key} onClick={() => onClick(item.value)} closeMenuOnClick={false}>
+          {item.value}
+        </Menu.Item>
+      ))}
+    </>
+  );
+};
+
+const PieceSetMenu = ({ navigate }) => {
+  const pieceSet = useMemo(
+    () => [
+      { key: 'ba', value: 'base' },
+      { key: 'wi', value: 'wiki' },
+    ],
+    [],
+  );
+
+  return (
+    <>
+      <MenuItem
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
+        onClick={() => navigate('main')}
+        closeMenuOnClick={false}
+      >
+        Piece set
+      </MenuItem>
+      <Menu.Divider />
+      {pieceSet.map(item => (
+        <Menu.Item
+          key={item.key}
+          onClick={() => {
+            document.body.dataset['pieces'] = item.value;
+            pieceVarRules(item.value);
+          }}
+          closeMenuOnClick={false}
+        >
+          {item.value}
+        </Menu.Item>
+      ))}
+    </>
+  );
+};
+
 const FriendsMenu = ({ navigate }) => {
   const { isFetching, data } = useQuery({
     ...friendsListOptions(),
@@ -212,3 +300,32 @@ const FriendsMenu = ({ navigate }) => {
     </>
   );
 };
+
+const pieceVars = [
+  ['---white-pawn', 'wP'],
+  ['---black-pawn', 'bP'],
+  ['---white-knight', 'wN'],
+  ['---black-knight', 'bN'],
+  ['---white-bishop', 'wB'],
+  ['---black-bishop', 'bB'],
+  ['---white-rook', 'wR'],
+  ['---black-rook', 'bR'],
+  ['---white-queen', 'wQ'],
+  ['---black-queen', 'bQ'],
+  ['---white-king', 'wK'],
+  ['---black-king', 'bK'],
+];
+
+function getImageUrl(theme: string, piece: string) {
+  const base = import.meta.env.BASE_URL;
+  return `${base.replace(/\/+$/, '')}/images/pieces/${theme}/${piece}.png`;
+}
+
+function pieceVarRules(theme: string) {
+  for (const [varName, fileName] of pieceVars) {
+    const url = getImageUrl(theme, fileName);
+    document.body.style.setProperty(varName, `url(${url})`);
+  }
+}
+
+MainMenuPref.subMenus = { theme: ThemeMenu, board: BoardMenu, pieceset: PieceSetMenu };
