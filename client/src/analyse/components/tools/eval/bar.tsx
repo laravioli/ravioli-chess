@@ -3,13 +3,18 @@ import { observer } from 'mobx-react-lite';
 import { povChances } from 'src/lib/eval/utils';
 import classes from '../../../css/eval.module.css';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
+import { useRef } from 'react';
 
 export const EvalBar = observer(() => {
   const store = usePageStore<AnalyseStore>();
+  const progress = useRef(0);
+  const ev = store.node.ceval;
 
   if (!store.ceval.enabled || store.node.outcome) return null;
 
-  const progress = store.node.ceval ? povChances('white', store.node.ceval) : 0.0;
+  if (ev) {
+    progress.current = povChances('white', ev);
+  }
 
   return (
     <div
@@ -21,7 +26,7 @@ export const EvalBar = observer(() => {
       <div
         className={classes.barwhite}
         style={{
-          height: `${(progress + 1) * 50}%`,
+          height: `${(progress.current + 1) * 50}%`,
         }}
       ></div>
     </div>
