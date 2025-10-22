@@ -5,6 +5,7 @@ from django.contrib.auth import login, logout
 from rest_framework import status, filters
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 from api.serializers import DetailResponseSerializer
+from profile.serializers import ProfileSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 
@@ -28,7 +29,7 @@ class LoginView(generics.GenericAPIView):
 
     @extend_schema(
         operation_id="user_login",
-        responses={200: DetailResponseSerializer, 400: DetailResponseSerializer},
+        responses={200: ProfileSerializer, 400: DetailResponseSerializer},
     )
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -36,7 +37,7 @@ class LoginView(generics.GenericAPIView):
             user = serializer.validated_data["user"]
             login(request, user)
             return Response(
-                {"detail": "Successfully logged in"}, status=status.HTTP_200_OK
+                ProfileSerializer(user.profile).data, status=status.HTTP_200_OK
             )
         else:
             return Response(

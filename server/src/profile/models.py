@@ -26,16 +26,15 @@ class Profile(models.Model):
         max_length=15, choices=PieceSetChoices, default=PieceSetChoices.BASE
     )
 
-    def to_dict(self):
+    @classmethod
+    def default_profile(cls) -> dict:
+        return {
+            "board": cls.BoardChoices.WOOD,
+            "pieceset": cls.PieceSetChoices.BASE,
+        }
+
+    def to_dict(self) -> dict:
         return model_to_dict(self, exclude=["user"])
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.user.username
-
-
-ANON_PROFILE = {
-    "board": Profile.BoardChoices.WOOD,
-    "pieceset": Profile.PieceSetChoices.BASE,
-}
-
-SESSION_KEY = "profile"

@@ -3,7 +3,7 @@ import { useGlobalStore } from 'src/main/hooks/hooks';
 import { useState, useCallback, useMemo, type Dispatch, type SetStateAction } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { friendsListQueryKey, friendsListOptions } from 'src/lib/api/@tanstack/react-query.gen';
-import { userLogout } from 'src/lib/api';
+import { userLogout, profileBoardUpdate, profilePiecesetUpdate } from 'src/lib/api';
 import { ActionIcon, Loader, Menu, MenuItem, UnstyledButton, useMantineColorScheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
@@ -16,7 +16,7 @@ import {
   IconBrandGooglePlay,
 } from '@tabler/icons-react';
 import type { UserStore } from 'src/user/store/userstore';
-import { setBoardColor, pieceVarRules } from 'src/user/store/utils';
+import { setBoardColor, setPieceSet, setProfile, getAnonProfile } from 'src/user/store/utils';
 import classes from 'src/common/css/header.module.css';
 
 export const UserMenu = observer(() => {
@@ -103,6 +103,7 @@ const MainMenu = ({ navigate }) => {
       const { data } = await userLogout();
       userStore.logout();
       queryClient.removeQueries({ queryKey: friendsListQueryKey() });
+      setProfile(getAnonProfile());
       notifications.show({
         id: 'logout',
         position: 'bottom-right',
@@ -189,12 +190,13 @@ const ThemeMenu = ({ navigate }) => {
 
 const BoardMenu = ({ navigate }) => {
   const colors = useMemo(
-    () => [
-      { key: 'wo', value: 'wood' },
-      { key: 'bl', value: 'blue' },
-      { key: 'bl2', value: 'blue2' },
-      { key: 'br', value: 'brown' },
-    ],
+    () =>
+      [
+        { key: 'wo', value: 'wood' },
+        { key: 'bl', value: 'blue' },
+        { key: 'bl2', value: 'blue2' },
+        { key: 'br', value: 'brown' },
+      ] as const,
     [],
   );
 
@@ -209,7 +211,18 @@ const BoardMenu = ({ navigate }) => {
       </MenuItem>
       <Menu.Divider />
       {colors.map(item => (
-        <Menu.Item key={item.key} onClick={() => setBoardColor(item.value)} closeMenuOnClick={false}>
+        <Menu.Item
+          key={item.key}
+          onClick={async () => {
+            try {
+              await profileBoardUpdate({ body: { board: item.value } });
+              setBoardColor(item.value);
+            } catch (error: any) {
+              console.log(error);
+            }
+          }}
+          closeMenuOnClick={false}
+        >
           {item.value}
         </Menu.Item>
       ))}
@@ -219,10 +232,11 @@ const BoardMenu = ({ navigate }) => {
 
 const PieceSetMenu = ({ navigate }) => {
   const pieceSet = useMemo(
-    () => [
-      { key: 'ba', value: 'base' },
-      { key: 'wi', value: 'wiki' },
-    ],
+    () =>
+      [
+        { key: 'ba', value: 'base' },
+        { key: 'wi', value: 'wiki' },
+      ] as const,
     [],
   );
 
@@ -239,9 +253,13 @@ const PieceSetMenu = ({ navigate }) => {
       {pieceSet.map(item => (
         <Menu.Item
           key={item.key}
-          onClick={() => {
-            document.body.dataset['pieces'] = item.value;
-            pieceVarRules(item.value);
+          onClick={async () => {
+            try {
+              await profilePiecesetUpdate({ body: { pieceset: item.value } });
+              setPieceSet(item.value);
+            } catch (error: any) {
+              console.log(error);
+            }
           }}
           closeMenuOnClick={false}
         >

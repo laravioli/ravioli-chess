@@ -5,6 +5,7 @@ import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
 import { useGlobalStore } from 'src/main/hooks/hooks';
 import { userLogin, userRegister, type LoginRequest, type RegisterRequestWritable } from 'src/lib/api';
+import { setProfile } from 'src/user/store/utils';
 
 export function AuthenticationForm({ close }) {
   const { userStore } = useGlobalStore();
@@ -29,8 +30,9 @@ export function AuthenticationForm({ close }) {
   const onLogin = async (body: LoginRequest) => {
     setLoading(true);
     try {
-      await userLogin({ body });
+      const { data } = await userLogin({ body });
       userStore.login(body);
+      setProfile(data);
       close();
     } catch (error: any) {
       if (error.detail)

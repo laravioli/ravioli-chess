@@ -1,4 +1,7 @@
-from profile.models import ANON_PROFILE, SESSION_KEY
+from profile.models import Profile
+from profile.serializers import ProfileSerializer
+from django.core.signing import BadSignature
+from urllib.parse import parse_qsl
 
 PIECE_VARS = {
     "---white-pawn": "wP",
@@ -17,10 +20,24 @@ PIECE_VARS = {
 
 
 def base_context(request):
-    """compute light global context"""
+    """compute global context"""
+    if request.user.is_authenticated:
+        profile = request.user.profile.to_dict()
+    else:
+        # anon profile based on a signed cookie
+        profile = Profile.default_profile()
+        try:
+            cookie = request.get_signed_cookie("anon", False)
+        except BadSignature:
+            request.delete_cookie("anon")
+            cookie = False
+        if cookie:
+            data = dict(parse_qsl(cookie))
+            serializer = ProfileSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            profile.update(serializer.validated_data)
 
-    session_preferences = request.session.get(SESSION_KEY, {})
     return {
-        "profile": {**ANON_PROFILE, **session_preferences},
+        "profile": profile,
         "pieces": PIECE_VARS,
     }
