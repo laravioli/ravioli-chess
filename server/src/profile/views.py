@@ -57,7 +57,7 @@ class ProfileViewSet(viewsets.GenericViewSet):
             max_age=datetime.timedelta(days=365),
             secure=settings.SSL,
             httponly=False,
-            samesite="Strict",
+            samesite="Lax",
         )
         return response
 
