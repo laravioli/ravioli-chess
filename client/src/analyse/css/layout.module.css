@@ -1,11 +1,22 @@
 .analyse {
   grid-area: main;
   display: grid;
+  row-gap: 15px;
   grid-template-areas:
     'evalbar board . side'
     '. copyables . .';
   grid-template-rows: var(--board-width) auto;
-  grid-template-columns: 1rem var(--board-width) 1rem minmax(16rem, 24rem);
+  grid-template-columns: 1rem var(--board-width) 1rem minmax(24rem, auto);
+
+  @media (max-width: 765px) and (min-height: 400px) {
+    row-gap: 3px;
+    grid-template-areas:
+      'board'
+      'side'
+      'copyables';
+    grid-template-rows: auto minmax(16rem, auto) auto;
+    grid-template-columns: auto;
+  }
 
   & > .evalbar {
     grid-area: evalbar;
@@ -18,7 +29,12 @@
       'tools'
       'controls';
     grid-template-rows: 1fr min-content;
-
+    @media (max-width: 765px) and (min-height: 400px) {
+      grid-template-areas:
+        'controls'
+        'tools';
+      grid-template-rows: min-content 1fr;
+    }
     & > .tools {
       grid-area: tools;
     }
@@ -31,6 +47,5 @@
   & > .copyables {
     grid-area: copyables;
     align-self: start;
-    margin-top: 15px;
   }
 }

@@ -5,7 +5,7 @@
     '. board . side'
     '. copyables . .';
   grid-template-rows: var(--board-width) auto;
-  grid-template-columns: 1rem var(--board-width) 1rem minmax(16rem, 24rem);
+  grid-template-columns: 1rem var(--board-width) 1rem minmax(24rem, auto);
 
   & > .side {
     grid-area: side;

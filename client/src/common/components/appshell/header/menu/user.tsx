@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useGlobalStore } from 'src/main/hooks/hooks';
-import { useState, useCallback, useMemo, type Dispatch, type SetStateAction } from 'react';
+import { useMenu } from '../../../../hooks/hooks';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { friendsListQueryKey, friendsListOptions } from 'src/lib/api/@tanstack/react-query.gen';
 import { userLogout, profileBoardUpdate, profilePiecesetUpdate } from 'src/lib/api';
@@ -53,23 +54,6 @@ export const UserMenu = observer(() => {
     </>
   );
 });
-
-type MenuViewFC = React.FC<{
-  navigate: Dispatch<SetStateAction<MenuViewKey>>;
-}>;
-
-type MenuViewKey = 'main' | ('theme' & 'friends');
-
-const useMenu = (menuViews: Record<MenuViewKey, MenuViewFC>) => {
-  const [view, setView] = useState<MenuViewKey>('main');
-
-  const CurrentView = menuViews[view];
-
-  return {
-    currentMenu: <CurrentView navigate={setView} />,
-    navigate: setView,
-  };
-};
 
 type UserMenuTargetProps = {
   user: UserStore;

@@ -2,9 +2,8 @@ from .models import FriendRequest, Friend
 from .serializers import FriendRequestSerializer, FriendSerializer
 from api.serializers import EmptyRequestSerializer
 from rest_framework import viewsets, mixins, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from api.pagination import SmallResultsSetPagination
-from .permissions import IsSelfOrFriend
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -108,15 +107,19 @@ class FriendRequestViewSet(
 class FriendViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """End point to list and remove friends"""
 
-    permission_classes = [IsAuthenticated, IsSelfOrFriend]
+    permission_classes = [AllowAny]
     serializer_class = FriendSerializer
     queryset = Friend.objects.all()
     lookup_field = "pk"
 
     def get_queryset(self):
         if self.action == "list":
+            user_username = self.request.query_params.get("username")
+            if not user_username and self.request.user.is_authenticated:
+                user_username = self.request.user
+            target_user = get_object_or_404(user_model, username=user_username)
             return (
-                Friend.objects.filter(from_user=self.target_user)
+                Friend.objects.filter(from_user=target_user)
                 .select_related("to_user")
                 .order_by("-created")
             )

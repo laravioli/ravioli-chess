@@ -13,9 +13,11 @@
 }
 
 .tools {
-  border-top-left-radius: var(--main-bradius);
-  border-top-right-radius: var(--main-bradius);
   background: #282828;
+  @media not (max-width: 765px), not (min-height: 400px) {
+    border-top-left-radius: var(--main-bradius);
+    border-top-right-radius: var(--main-bradius);
+  }
   @mixin light {
     background: var(--mantine-color-gray-4);
   }

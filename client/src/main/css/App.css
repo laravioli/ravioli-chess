@@ -8,10 +8,26 @@ html {
 }
 
 :root {
+  --site-header-height: 60px;
+}
+
+body {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.main-wrap {
   --main-bradius: 6px;
-  --board-min-width: 16rem;
-  --board-max-width: 50rem;
+  --board-min-width: 200px;
+  --board-max-width: 800px;
   --board-width: clamp(var(--board-min-width), 80vmin, var(--board-max-width));
+  --main-margin: 1vw;
+  --main-max-width: auto;
+
+  @media (max-width: 765px) and (min-height: 400px) {
+    --main-max-width: calc(100vh - calc(var(--site-header-height) - 5rem));
+    --main-margin: 0;
+  }
 }
 
 input:-webkit-autofill {
@@ -23,6 +39,6 @@ input:-webkit-autofill {
   display: grid;
   grid-template-areas: '. . main . .';
   grid-template-columns:
-    1vw 1fr auto
-    1fr 1vw;
+    var(--main-margin) 1fr minmax(auto, var(--main-max-width))
+    1fr var(--main-margin);
 }

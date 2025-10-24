@@ -1,5 +1,5 @@
 import { History } from 'src/common/components/controls/history';
-import { Actions } from './actions';
+import { ControlsMenu } from './menu';
 import clsx from 'clsx';
 import layout from '../../css/layout.module.css';
 import styles from '../../css/controls.module.css';
@@ -10,8 +10,8 @@ export const Controls = () => {
     <div className={clsx(layout.controls, styles.controls)}>
       <div className={styles.history}>
         <History className={icon.icon} size="xxl" />
+        <ControlsMenu />
       </div>
-      <Actions />
     </div>
   );
 };

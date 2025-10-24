@@ -7,10 +7,11 @@ import { Outlet } from 'react-router';
 export const Shell = () => {
   return (
     <ModalsProvider modals={modals}>
-      <AppShell header={{ height: 60, offset: true }} padding="md">
-        <AppShell.Header>
-          <Header />
-        </AppShell.Header>
+      <AppShell
+        header={{ height: 'var(--site-header-height)', offset: true }}
+        padding={{ base: 0.1, sm: 20 }}
+      >
+        <AppShell.Header>{<Header />}</AppShell.Header>
         <AppShell.Main className="main-wrap">
           <Outlet />
         </AppShell.Main>

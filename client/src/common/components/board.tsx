@@ -13,5 +13,9 @@ export function Board() {
     };
   }, []);
 
-  return <div className={classes.board} ref={divRef} />;
+  return (
+    <div className={classes.mainboard}>
+      <div className={classes.board} ref={divRef} />
+    </div>
+  );
 }

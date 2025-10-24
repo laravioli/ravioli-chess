@@ -3,9 +3,15 @@ import { observer } from 'mobx-react-lite';
 import { povChances } from 'src/lib/eval/utils';
 import classes from '../../../css/eval.module.css';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRef } from 'react';
 
-export const EvalBar = observer(() => {
+export const MaybeEvalBar = () => {
+  const isMobile = useMediaQuery('(max-width: 765px)');
+  return isMobile ? null : <EvalBar />;
+};
+
+const EvalBar = observer(() => {
   const store = usePageStore<AnalyseStore>();
   const progress = useRef(0);
   const ev = store.node.ceval;

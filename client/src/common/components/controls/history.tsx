@@ -1,12 +1,12 @@
 import { IconChevronsLeft, IconChevronLeft, IconChevronRight, IconChevronsRight } from '@tabler/icons-react';
-import { ActionIcon, type ActionIconProps } from '@mantine/core';
+import { UnstyledButton, type UnstyledButtonProps } from '@mantine/core';
 import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
 
 interface Props {
   className: string;
-  size: ActionIconProps['size'];
+  size: UnstyledButtonProps['size'];
 }
 
 export const History = observer(({ className, size }: Props) => {
@@ -25,9 +25,9 @@ export const History = observer(({ className, size }: Props) => {
   return (
     <>
       {actions.map(({ icon: Icon, action, key }) => (
-        <ActionIcon key={key} className={className} size={size} onClick={action}>
+        <UnstyledButton key={key} className={className} size={size} onClick={action}>
           <Icon size={60} stroke={1.2} />
-        </ActionIcon>
+        </UnstyledButton>
       ))}
     </>
   );
