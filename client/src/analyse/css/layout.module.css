@@ -6,9 +6,13 @@
     'evalbar board . side'
     '. copyables . .';
   grid-template-rows: var(--board-width) auto;
-  grid-template-columns: 1rem var(--board-width) 1rem minmax(24rem, auto);
+  grid-template-columns: 1rem var(--board-width) 1rem minmax(240px, 400px);
 
-  @media (max-width: 765px) and (min-height: 400px) {
+  @media (max-width: 765px) and (orientation: landscape) {
+    grid-template-columns: min-content var(--board-width) 0.2rem minmax(180px, 240px);
+  }
+
+  @media (max-width: 765px) and (orientation: portrait) {
     row-gap: 3px;
     grid-template-areas:
       'board'
@@ -29,7 +33,7 @@
       'tools'
       'controls';
     grid-template-rows: 1fr min-content;
-    @media (max-width: 765px) and (min-height: 400px) {
+    @media (max-width: 765px) and (orientation: portrait) {
       grid-template-areas:
         'controls'
         'tools';

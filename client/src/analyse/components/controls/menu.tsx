@@ -19,7 +19,7 @@ export const ControlsMenu = () => {
   const { currentMenu, navigate } = useMenu({ main: MainMenu, positions: PositionsMenu });
 
   return (
-    <>
+    <div>
       <Menu
         trigger="click"
         position="top"
@@ -34,7 +34,7 @@ export const ControlsMenu = () => {
         </Menu.Target>
         <Menu.Dropdown>{currentMenu}</Menu.Dropdown>
       </Menu>
-    </>
+    </div>
   );
 };
 

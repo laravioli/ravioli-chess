@@ -10,8 +10,8 @@ export const Controls = () => {
     <div className={clsx(layout.controls, styles.controls)}>
       <div className={styles.history}>
         <History className={icon.icon} size="xxl" />
-        <ControlsMenu />
       </div>
+      <ControlsMenu />
     </div>
   );
 };

@@ -21,12 +21,17 @@ body {
   --board-min-width: 200px;
   --board-max-width: 800px;
   --board-width: clamp(var(--board-min-width), 80vmin, var(--board-max-width));
-  --main-margin: 1vw;
-  --main-max-width: auto;
+  --main-margin: 0;
+  --main-max-width: calc(100vh - calc(var(--site-header-height) - 5rem));
 
-  @media (max-width: 765px) and (min-height: 400px) {
-    --main-max-width: calc(100vh - calc(var(--site-header-height) - 5rem));
-    --main-margin: 0;
+  @media (min-width: 765px) and (orientation: landscape) {
+    --main-max-width: auto;
+    --main-margin: 1vw;
+  }
+
+  @media (max-width: 765px) and (orientation: landscape) {
+    --board-width: clamp(var(--board-min-width), 60vw, var(--board-max-width));
+    --main-max-width: calc(100vh - calc(var(--site-header-height) - 15rem));
   }
 }
 

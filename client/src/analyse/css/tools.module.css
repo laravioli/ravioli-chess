@@ -2,6 +2,7 @@
   display: flex;
   flex-flow: column;
   overflow: hidden;
+  width: 100%;
 
   & > .paper {
     --paper-radius: 0;
@@ -14,7 +15,7 @@
 
 .tools {
   background: #282828;
-  @media not (max-width: 765px), not (min-height: 400px) {
+  @media (min-width: 765px), (orientation: landscape) {
     border-top-left-radius: var(--main-bradius);
     border-top-right-radius: var(--main-bradius);
   }
