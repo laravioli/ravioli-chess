@@ -1,55 +1,62 @@
 .analyse {
   grid-area: main;
   display: grid;
-  row-gap: 15px;
+  align-self: start;
+}
+
+.analyse {
   grid-template-areas:
-    'evalbar board . side'
-    '. copyables . .';
-  grid-template-rows: var(--board-width) auto;
-  grid-template-columns: 1rem var(--board-width) 1rem minmax(240px, 400px);
+    'board'
+    'side'
+    'copyables';
+  grid-template-rows: auto minmax(20em, 40vh) min-content;
 
-  @media (max-width: 765px) and (orientation: landscape) {
-    grid-template-columns: min-content var(--board-width) 0.2rem minmax(180px, 240px);
-  }
-
-  @media (max-width: 765px) and (orientation: portrait) {
-    row-gap: 3px;
-    grid-template-areas:
-      'board'
-      'side'
-      'copyables';
-    grid-template-rows: auto minmax(16rem, auto) auto;
-    grid-template-columns: auto;
-  }
-
-  & > .evalbar {
-    grid-area: evalbar;
-  }
-
-  & > .side {
+  & .side {
     grid-area: side;
     display: grid;
+  }
+  & .copyables {
+    grid-area: copyables;
+    align-self: start;
+  }
+
+  @media (orientation: landscape) {
+    grid-template-areas:
+      'evalbar board . side'
+      '. copyables . .';
+    grid-template-rows: var(--board-width);
+    grid-template-columns: 1rem var(--board-width) 1rem minmax(240px, 400px);
+    row-gap: 15px;
+
+    & .evalbar {
+      grid-area: evalbar;
+    }
+  }
+
+  @media (max-width: $mantine-breakpoint-sm) and (orientation: landscape) {
+    grid-template-columns: min-content var(--board-width) 0.2rem minmax(180px, 240px);
+    row-gap: 5px;
+  }
+}
+
+.side {
+  grid-template-areas:
+    'controls'
+    'tools';
+  grid-template-rows: min-content;
+
+  @media (orientation: landscape) {
     grid-template-areas:
       'tools'
       'controls';
     grid-template-rows: 1fr min-content;
-    @media (max-width: 765px) and (orientation: portrait) {
-      grid-template-areas:
-        'controls'
-        'tools';
-      grid-template-rows: min-content 1fr;
-    }
-    & > .tools {
-      grid-area: tools;
-    }
-
-    & > .controls {
-      grid-area: controls;
-    }
   }
 
-  & > .copyables {
-    grid-area: copyables;
-    align-self: start;
+  & .controls {
+    grid-area: controls;
+  }
+
+  & .tools {
+    grid-area: tools;
   }
 }

@@ -1,4 +1,4 @@
-.icon {
+.button {
   --ai-size: calc(1.6rem * var(--mantine-scale));
   border: 0;
   background-color: var(--ai-icon-bg);
@@ -15,8 +15,4 @@
       stroke: inherit;
     }
   }
-}
-
-.iconlobbyside {
-  padding: 0;
 }

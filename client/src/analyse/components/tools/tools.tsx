@@ -1,8 +1,8 @@
-import clsx from 'clsx';
 import { Eval } from './eval/view';
 import { Pvs } from './eval/pvs';
 import { TView } from './tview';
 import { Paper } from '@mantine/core';
+import clsx from 'clsx';
 import layout from '../../css/layout.module.css';
 import classes from '../../css/tools.module.css';
 

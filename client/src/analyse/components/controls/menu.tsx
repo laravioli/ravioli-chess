@@ -22,7 +22,7 @@ export const ControlsMenu = () => {
     <div>
       <Menu
         trigger="click"
-        position="top"
+        position="left-end"
         offset={0}
         radius={2}
         onExitTransitionEnd={() => navigate('main')}

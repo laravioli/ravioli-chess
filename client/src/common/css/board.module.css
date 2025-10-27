@@ -1,4 +1,4 @@
-.mainboard {
+.board-wrap {
   grid-area: board;
   direction: ltr;
   position: relative;

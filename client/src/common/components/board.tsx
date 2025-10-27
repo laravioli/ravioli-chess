@@ -14,7 +14,7 @@ export function Board() {
   }, []);
 
   return (
-    <div className={classes.mainboard}>
+    <div className={classes.boardWrap}>
       <div className={classes.board} ref={divRef} />
     </div>
   );

@@ -15,7 +15,7 @@
 
 .tools {
   background: #282828;
-  @media (min-width: 765px), (orientation: landscape) {
+  @media (min-width: $mantine-breakpoint-sm), (orientation: landscape) {
     border-top-left-radius: var(--main-bradius);
     border-top-right-radius: var(--main-bradius);
   }

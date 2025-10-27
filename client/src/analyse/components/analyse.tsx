@@ -9,13 +9,6 @@ import clsx from 'clsx';
 import layout from '../css/layout.module.css';
 import variables from '../css/variables.module.css';
 
-const Side = () => (
-  <div className={clsx(layout.side)}>
-    <Tools />
-    <Controls />
-  </div>
-);
-
 const Analyse = () => {
   const makeStore = useInitStore();
   return (
@@ -23,7 +16,10 @@ const Analyse = () => {
       <div className={clsx(layout.analyse, variables.analyse)}>
         <MaybeEvalBar />
         <Board />
-        <Side />
+        <div className={clsx(layout.side)}>
+          <Tools />
+          <Controls />
+        </div>
         <div className={layout.copyables}>
           <FenInput />
         </div>

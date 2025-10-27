@@ -24,7 +24,9 @@ cg-board {
   user-select: none;
   line-height: 0;
   background-size: cover;
-  border-radius: 6px;
+  @media (orientation: landscape) {
+    border-radius: 6px;
+  }
 }
 
 .cg-wrap.manipulable cg-board {

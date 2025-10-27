@@ -2,14 +2,13 @@ import { History } from 'src/common/components/controls/history';
 import { ControlsMenu } from './menu';
 import clsx from 'clsx';
 import layout from '../../css/layout.module.css';
-import styles from '../../css/controls.module.css';
-import icon from 'src/common/css/icon.module.css';
+import classes from '../../css/controls.module.css';
 
 export const Controls = () => {
   return (
-    <div className={clsx(layout.controls, styles.controls)}>
-      <div className={styles.history}>
-        <History className={icon.icon} size="xxl" />
+    <div className={clsx(layout.controls, classes.controls)}>
+      <div className={classes.history}>
+        <History />
       </div>
       <ControlsMenu />
     </div>

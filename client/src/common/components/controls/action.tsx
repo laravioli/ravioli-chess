@@ -2,7 +2,7 @@ import { usePageStore } from 'src/main/hooks/hooks';
 import { useToolTipConfig } from './tooltip';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconRepeat, IconReload } from '@tabler/icons-react';
-import classes from '../../css/icon.module.css';
+import classes from '../../css/action.module.css';
 import type { MouseEventHandler, ReactNode } from 'react';
 
 interface ActionsProps {
@@ -23,7 +23,7 @@ export const Action = ({ children, label, onClick, disabled = false }: ActionsPr
 
   return (
     <Tooltip label={label} {...tooltipProps}>
-      <ActionIcon className={classes.icon} data-disabled={disabled} onClick={handler}>
+      <ActionIcon className={classes.button} data-disabled={disabled} onClick={handler}>
         {children}
       </ActionIcon>
     </Tooltip>

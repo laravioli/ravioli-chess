@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    css: { modules: { localsConvention: 'camelCase' } },
     resolve: {
       alias: {
         src: resolve(__dirname, 'src'),
