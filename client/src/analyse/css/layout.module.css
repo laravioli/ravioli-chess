@@ -1,15 +1,12 @@
 .analyse {
   grid-area: main;
   display: grid;
-  align-self: start;
-}
-
-.analyse {
   grid-template-areas:
     'board'
     'side'
     'copyables';
   grid-template-rows: auto minmax(20em, 40vh) min-content;
+  align-self: start;
 
   & .side {
     grid-area: side;
