@@ -2,11 +2,6 @@
   display: flex;
   justify-content: space-evenly;
   width: 100%;
-
-  @media (orientation: landscape) {
-    border-bottom-left-radius: var(--main-bradius);
-    border-bottom-right-radius: var(--main-bradius);
-  }
 }
 
 .controls {
@@ -25,4 +20,11 @@
   --ai-hover-color: var(--ai-color);
   --ai-radius: 0;
   --ai-size: inherit;
+}
+
+@media (orientation: landscape) {
+  .controls {
+    border-bottom-left-radius: var(--main-bradius);
+    border-bottom-right-radius: var(--main-bradius);
+  }
 }

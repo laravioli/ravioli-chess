@@ -15,10 +15,6 @@
 
 .tools {
   background: #282828;
-  @media (min-width: $mantine-breakpoint-sm), (orientation: landscape) {
-    border-top-left-radius: var(--main-bradius);
-    border-top-right-radius: var(--main-bradius);
-  }
   @mixin light {
     background: var(--mantine-color-gray-4);
   }
@@ -32,4 +28,11 @@
 .paper {
   border: none;
   background: inherit;
+}
+
+@media (min-width: $mantine-breakpoint-sm), (orientation: landscape) {
+  .tools {
+    border-top-left-radius: var(--main-bradius);
+    border-top-right-radius: var(--main-bradius);
+  }
 }

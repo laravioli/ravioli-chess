@@ -16,8 +16,25 @@
     grid-area: copyables;
     align-self: start;
   }
+}
 
-  @media (orientation: landscape) {
+.side {
+  grid-template-areas:
+    'controls'
+    'tools';
+  grid-template-rows: min-content;
+
+  & .controls {
+    grid-area: controls;
+  }
+
+  & .tools {
+    grid-area: tools;
+  }
+}
+
+@media (orientation: landscape) {
+  .analyse {
     grid-template-areas:
       'evalbar board . side'
       '. copyables . .';
@@ -29,31 +46,17 @@
       grid-area: evalbar;
     }
   }
-
-  @media (max-width: $mantine-breakpoint-sm) and (orientation: landscape) {
-    grid-template-columns: min-content var(--board-width) 0.2rem minmax(180px, 240px);
-    row-gap: 5px;
-  }
-}
-
-.side {
-  grid-template-areas:
-    'controls'
-    'tools';
-  grid-template-rows: min-content;
-
-  @media (orientation: landscape) {
+  .side {
     grid-template-areas:
       'tools'
       'controls';
     grid-template-rows: 1fr min-content;
   }
 
-  & .controls {
-    grid-area: controls;
-  }
-
-  & .tools {
-    grid-area: tools;
+  @media (max-width: $mantine-breakpoint-sm) {
+    .analyse {
+      grid-template-columns: min-content var(--board-width) 0.2rem minmax(180px, 240px);
+      row-gap: 5px;
+    }
   }
 }
