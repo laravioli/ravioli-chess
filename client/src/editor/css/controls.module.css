@@ -1,9 +1,14 @@
 .controls {
-  border-radius: 0 0 var(--main-bradius) var(--main-bradius);
-  margin-top: 5%;
-  margin-bottom: 5%;
-  padding: 2%;
   background: var(--controls-bg-color);
+  padding-top: 3%;
+  padding-bottom: 3%;
+}
+
+.actions {
+  display: flex;
+  gap: 0.7rem;
+  border: none;
+  background-color: var(--controls-bg-color);
 }
 
 .castle {
@@ -26,4 +31,61 @@
 .select {
   background: var(--controls-bg-color);
   border: light-dark(1px, 2px) solid light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-5));
+}
+
+.button {
+  --ai-bg: var(--controls-bg-color);
+  --ai-hover: none;
+  --ai-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-3)) !important;
+  --ai-hover-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
+  --mantine-color-disabled: var(--ai-bg);
+  --mantine-color-disabled-color: var(--ai-color);
+}
+
+/*root	
+--ai-bg	Controls background
+--ai-hover	Controls background when hovered
+--ai-bd	Controls border
+--ai-color	Controls icon color
+--ai-hover-color	Controls icon color when hovered
+--ai-radius	Controls border-radius
+--ai-size	Controls width, height, min-width and min-height styles*/
+
+@media (min-width: $mantine-breakpoint-sm) {
+  .controls {
+    border-right: var(--side-border);
+    border-left: var(--side-border);
+  }
+
+  @media (orientation: portrait) {
+    .actions {
+      border-right: var(--side-border);
+      border-left: var(--side-border);
+    }
+  }
+}
+
+@media (orientation: portrait) {
+  .actions {
+    justify-content: space-evenly;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0 0 6px 6px;
+    border-bottom: var(--side-border);
+  }
+}
+
+@media (orientation: landscape) {
+  .controls {
+    padding-top: 7%;
+    padding-bottom: 7%;
+  }
+  .actions {
+    flex-direction: column;
+    margin-top: auto;
+    background-color: inherit;
+  }
+  .button {
+    --ai-bg: var(--bg-color);
+  }
 }

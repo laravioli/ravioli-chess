@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { usePageStore } from 'src/main/hooks/hooks';
 import { dragNewPiece } from '@lichess-org/chessground/drag';
 import clsx from 'clsx';
+import layout from '../../css/layout.module.css';
 import classes from '../../css/spare.module.css';
 import type { EditorStore } from 'src/editor/store/editor';
 
@@ -35,4 +36,4 @@ export const SparePieces = observer(({ side }: { side: 'top' | 'bottom' }) => {
 
 const opposite = (color: Color): Color => (color === 'white' ? 'black' : 'white');
 const getClasses = (side: 'top' | 'bottom', color: Color) =>
-  clsx(classes[`spare-${side}`], classes[`spare-${color}`]);
+  clsx(layout[`spare-${side}`], classes[`spare-${side}`], classes[`spare-${color}`]);

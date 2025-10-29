@@ -1,18 +1,21 @@
 .button {
-  --ai-size: calc(1.6rem * var(--mantine-scale));
-  border: 0;
-  background-color: var(--ai-icon-bg);
-  &:hover {
-    background-color: var(--ai-icon-bg-hover);
-  }
+  --ai-bg: var(--controls-bg-color);
+  --ai-hover: none;
+  --ai-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-3)) !important;
+  --ai-hover-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
+}
 
-  & svg {
-    stroke: var(--ai-icon-color);
-    &:hover {
-      stroke: var(--ai-icon-hover);
-    }
-    & path {
-      stroke: inherit;
-    }
+@media (orientation: landscape) {
+  .button {
+    --ai-bg: var(--bg-color);
   }
 }
+
+/*root	
+--ai-bg	Controls background
+--ai-hover	Controls background when hovered
+--ai-bd	Controls border
+--ai-color	Controls icon color
+--ai-hover-color	Controls icon color when hovered
+--ai-radius	Controls border-radius
+--ai-size	Controls width, height, min-width and min-height styles*/

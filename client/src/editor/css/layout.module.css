@@ -2,18 +2,54 @@
   grid-area: main;
   display: grid;
   grid-template-areas:
-    '. board . side'
-    '. copyables . .';
-  grid-template-rows: var(--board-width) auto;
-  grid-template-columns: 1rem var(--board-width) 1rem minmax(24rem, auto);
+    'spare-top'
+    'board'
+    'spare-bottom'
+    'controls'
+    'actions'
+    'copyables';
 
-  & > .side {
-    grid-area: side;
+  & .spare-top {
+    grid-area: spare-top;
+  }
+
+  & .spare-bottom {
+    grid-area: spare-bottom;
+  }
+
+  & .actions {
+    grid-area: actions;
+  }
+
+  & .controls {
+    grid-area: controls;
   }
 
   & > .copyables {
     grid-area: copyables;
     align-self: start;
-    margin-top: 15px;
+  }
+}
+
+@media (orientation: portrait) {
+  .copyables {
+    > * {
+      border-radius: 6px;
+    }
+  }
+}
+
+@media (orientation: landscape) {
+  .editor {
+    grid-template-areas:
+      '. board . side'
+      '. copyables . .';
+    grid-template-rows: var(--board-width) auto;
+    grid-template-columns: 1rem var(--board-width) 1rem minmax(24rem, auto);
+    row-gap: 1rem;
+
+    > .side {
+      grid-area: side;
+    }
   }
 }
