@@ -20,9 +20,9 @@ export const SparePieces = observer(({ side }: { side: 'top' | 'bottom' }) => {
         <React.Fragment key={role}>
           <div
             className={classes.spare}
-            onMouseDown={e =>
-              dragNewPiece(editor.board!.state, { color: color, role: role }, e.nativeEvent, true)
-            }
+            onPointerDown={e => {
+              dragNewPiece(editor.board!.state, { color: color, role: role }, e.nativeEvent, true);
+            }}
           >
             <div>
               <div className={clsx(classes.piece, classes[`${role}`])}></div>

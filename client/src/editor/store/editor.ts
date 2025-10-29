@@ -54,6 +54,13 @@ export class EditorStore {
       fen: this.fen.current,
       orientation: this.opts.orientation,
       autoCastle: false,
+      movable: {
+        free: true,
+        color: 'both',
+      },
+      premovable: {
+        enabled: false,
+      },
       drawable: {
         enabled: true,
       },
@@ -63,7 +70,6 @@ export class EditorStore {
       },
       highlight: {
         lastMove: false,
-        check: false,
       },
       selectable: {
         enabled: false,

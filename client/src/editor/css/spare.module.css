@@ -10,6 +10,7 @@
 .spare {
   height: auto;
   flex: 0 0 12.5%;
+  touch-action: none;
 
   & > div {
     position: relative;
