@@ -1,21 +1,8 @@
 .button {
   --ai-bg: var(--controls-bg-color);
-  --ai-hover: none;
-  --ai-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-3)) !important;
-  --ai-hover-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
+  --ai-hover: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-5));
+  --ai-color: var(--mantine-color-white);
+  --ai-hover-color: light-dark(var(--mantine-color-dark-3), var(--mantine-color-gray-6));
+  --ai-radius: 0;
+  --ai-size: inherit;
 }
-
-@media (orientation: landscape) {
-  .button {
-    --ai-bg: var(--bg-color);
-  }
-}
-
-/*root	
---ai-bg	Controls background
---ai-hover	Controls background when hovered
---ai-bd	Controls border
---ai-color	Controls icon color
---ai-hover-color	Controls icon color when hovered
---ai-radius	Controls border-radius
---ai-size	Controls width, height, min-width and min-height styles*/

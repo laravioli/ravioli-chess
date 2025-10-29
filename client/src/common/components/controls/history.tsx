@@ -1,5 +1,5 @@
 import { IconChevronsLeft, IconChevronLeft, IconChevronRight, IconChevronsRight } from '@tabler/icons-react';
-import { UnstyledButton } from '@mantine/core';
+import { ActionIcon } from '@mantine/core';
 import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
@@ -21,9 +21,9 @@ export const History = observer(() => {
   return (
     <>
       {actions.map(({ icon: Icon, action, key }) => (
-        <UnstyledButton key={key} className={classes.button} onClick={action}>
+        <ActionIcon key={key} className={classes.button} onClick={action}>
           <Icon size="100%" stroke={1.2} style={{ maxWidth: 60, maxHeight: 60 }} />
-        </UnstyledButton>
+        </ActionIcon>
       ))}
     </>
   );
