@@ -2,7 +2,6 @@
   display: flex;
   justify-content: space-evenly;
   width: 100%;
-  gap: 1rem;
 
   @media (orientation: landscape) {
     border-bottom-left-radius: var(--main-bradius);
@@ -17,4 +16,13 @@
 
 .controls-menu {
   align-self: center;
+}
+
+.button {
+  --ai-bg: var(--controls-bg-color);
+  --ai-hover: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-5));
+  --ai-color: var(--mantine-color-white) !important;
+  --ai-hover-color: var(--ai-color);
+  --ai-radius: 0;
+  --ai-size: inherit;
 }

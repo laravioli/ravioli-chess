@@ -4,7 +4,7 @@ import { usePageStore } from 'src/main/hooks/hooks';
 import { useNavigate } from 'react-router';
 import { useMemo } from 'react';
 import { ToolTipConfigProvider } from 'src/common/components/controls/tooltip';
-import { Action } from 'src/common/components/controls/action';
+import { ActionWithToolTip } from 'src/common/components/controls/action';
 import { IconMathMaxMin, IconReload, IconRepeat, IconTrash } from '@tabler/icons-react';
 import { INITIAL_FEN } from 'chessops/fen';
 import { EMPTY_FEN } from 'chessops/fen';
@@ -54,9 +54,14 @@ const BoardControls = () => {
   return (
     <>
       {actions.map(action => (
-        <Action key={action.key} className={classes.button} label={action.label} onClick={action.onClick}>
+        <ActionWithToolTip
+          key={action.key}
+          className={classes.button}
+          label={action.label}
+          onClick={action.onClick}
+        >
           {action.icon}
-        </Action>
+        </ActionWithToolTip>
       ))}
     </>
   );
@@ -73,13 +78,13 @@ const Navigate = observer(() => {
     if (store.fen.legalFen) navigate('/analysis', { replace: true, state: getState() });
   });
   return (
-    <Action
+    <ActionWithToolTip
       className={classes.button}
       label={'analysis board'}
       onClick={onClick}
       disabled={!store.fen.legalFen}
     >
       <IconMathMaxMin size={30} stroke={1.2} />
-    </Action>
+    </ActionWithToolTip>
   );
 });

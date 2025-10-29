@@ -10,7 +10,7 @@ export const Tools = () => {
       <UserStatus />
       <Group className={classes.history} justify="space-evenly">
         <div className="space" />
-        <History />
+        <History className={classes.historyButton} />
       </Group>
       <Button className={classes.button}>Rematch</Button>
       <Button className={classes.button}>New Opponent</Button>

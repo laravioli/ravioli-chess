@@ -7,7 +7,7 @@ import classes from '../../css/controls.module.css';
 export const Controls = () => {
   return (
     <div className={clsx(layout.controls, classes.controls)}>
-      <History />
+      <History className={classes.button} />
       <ControlsMenu />
     </div>
   );

@@ -3,9 +3,8 @@ import { ActionIcon } from '@mantine/core';
 import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
-import classes from '../../css/action.module.css';
 
-export const History = observer(() => {
+export const History = observer(({ className }: { className: string }) => {
   const pageStore = usePageStore<AnalyseStore>();
   const actions = [
     {
@@ -21,7 +20,7 @@ export const History = observer(() => {
   return (
     <>
       {actions.map(({ icon: Icon, action, key }) => (
-        <ActionIcon key={key} className={classes.button} onClick={action}>
+        <ActionIcon key={key} className={className} onClick={action}>
           <Icon size="100%" stroke={1.2} style={{ maxWidth: 60, maxHeight: 60 }} />
         </ActionIcon>
       ))}

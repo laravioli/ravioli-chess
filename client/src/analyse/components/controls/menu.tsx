@@ -2,7 +2,7 @@ import { usePageStore, useHTMLData } from 'src/main/hooks/hooks';
 import { useMenu } from 'src/common/hooks/hooks';
 import { useNavigate } from 'react-router';
 import { useMemo } from 'react';
-import { Menu, UnstyledButton } from '@mantine/core';
+import { ActionIcon, Menu } from '@mantine/core';
 import { INITIAL_FEN } from 'chessops/fen';
 import type { AnalyseStore } from 'src/analyse/store/analyse';
 import type { AnalyseOpts } from 'src/analyse/store/interface';
@@ -16,7 +16,6 @@ import {
   IconMenu,
 } from '@tabler/icons-react';
 import classes from '../../css/controls.module.css';
-import styles from 'src/common/css/action.module.css';
 
 export const ControlsMenu = () => {
   const { currentMenu, navigate } = useMenu({ main: MainMenu, positions: PositionsMenu });
@@ -33,9 +32,9 @@ export const ControlsMenu = () => {
         withArrow
       >
         <Menu.Target>
-          <UnstyledButton className={styles.button}>
+          <ActionIcon className={classes.button}>
             <IconMenu size="100%" stroke={1.2} style={{ maxWidth: 30, maxHeight: 30 }} />
-          </UnstyledButton>
+          </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>{currentMenu}</Menu.Dropdown>
       </Menu>
