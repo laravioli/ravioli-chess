@@ -1,56 +1,37 @@
-import { Box, Drawer, Group, Flex, Button } from '@mantine/core';
-import { AuthenticationForm } from './authentification';
-import { IsAuth } from 'src/user/component/isauth';
-import { PlayMenu } from './menu/play';
+import { Box, Group, Flex, Burger, useDrawersStack } from '@mantine/core';
+import { Navigation, NavDrawer } from './navigation';
+import { AuthDrawer, LoginButton } from './authentification';
 import { UserMenu } from './menu/user';
 import { SearchUsers } from './search';
-import { Link } from 'react-router';
 import { useDisclosure } from '@mantine/hooks';
-import { INITIAL_FEN } from 'chessops/fen';
 import classes from '../../../css/header.module.css';
 
 export const Header = () => {
-  const [openedDrawer, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
+  const [openedAuth, { open: openAuth, close: closeAuth }] = useDisclosure(false);
+  const stack = useDrawersStack(['nav', 'play-random', 'play-friend', 'play-ai']);
   return (
     <Box pb={6}>
       <header className={classes.header}>
         <Flex justify="space-between" h="100%" maw={1800} m="0 auto">
           <Group h="100%" gap="md">
-            <Box mr="xl">Raviolichess</Box>
-
+            <Burger opened={stack.state['nav']} onClick={() => stack.open('nav')} hiddenFrom="sm" />
+            <Box mr="xl" visibleFrom="xs">
+              Raviolichess
+            </Box>
             <Group h="100%" gap={0} visibleFrom="sm">
-              <PlayMenu />
-              <Link
-                to="/analysis"
-                className={classes.link}
-                state={{ fen: INITIAL_FEN, orientation: 'white' }}
-                replace
-              >
-                Analyse
-              </Link>
-              <Link
-                to="/editor"
-                className={classes.link}
-                state={{ fen: INITIAL_FEN, orientation: 'white' }}
-                replace
-              >
-                Edit
-              </Link>
+              <Navigation />
             </Group>
           </Group>
-          <Group h="100%" visibleFrom="sm">
+          <Group h="100%" wrap="nowrap">
             <SearchUsers />
-            <IsAuth showIf={false}>
-              <Button onClick={openDrawer}>Log in</Button>
-            </IsAuth>
+            <LoginButton onClick={openAuth} />
             <UserMenu />
           </Group>
         </Flex>
       </header>
 
-      <Drawer position="right" opened={openedDrawer} onClose={closeDrawer} title="Authentication">
-        <AuthenticationForm close={closeDrawer} />
-      </Drawer>
+      <AuthDrawer opened={openedAuth} onClose={closeAuth} />
+      <NavDrawer stack={stack} />
     </Box>
   );
 };

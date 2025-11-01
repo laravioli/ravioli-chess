@@ -7,8 +7,8 @@ import { useMediaQuery } from '@mantine/hooks';
 import { useRef } from 'react';
 
 export const MaybeEvalBar = () => {
-  const isMobile = useMediaQuery('(max-width: 765px)');
-  return isMobile ? null : <EvalBar />;
+  const isSmallScreen = useMediaQuery('(max-width: 765px)');
+  return isSmallScreen ? null : <EvalBar />;
 };
 
 const EvalBar = observer(() => {

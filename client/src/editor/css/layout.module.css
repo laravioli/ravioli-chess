@@ -45,11 +45,17 @@
       '. board . side'
       '. copyables . .';
     grid-template-rows: var(--board-width) auto;
-    grid-template-columns: 1rem var(--board-width) 1rem minmax(24rem, auto);
+    grid-template-columns: 1rem var(--board-width) 1rem minmax(12rem, 400px);
     row-gap: 1rem;
 
     > .side {
       grid-area: side;
+    }
+  }
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    .editor {
+      grid-template-columns: min-content var(--board-width) 1rem minmax(12rem, 400px);
     }
   }
 }

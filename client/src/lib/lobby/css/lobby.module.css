@@ -1,4 +1,4 @@
-.lobbysideroot {
+.side-root {
   --mantine-color-disabled: var(--mantine-color-body);
   --ai-bg: var(--mantine-color-body);
   --ai-hover: light-dark(var(--mantine-color-gray-3), #292929);

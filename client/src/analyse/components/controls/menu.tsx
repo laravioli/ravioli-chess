@@ -33,7 +33,7 @@ export const ControlsMenu = () => {
       >
         <Menu.Target>
           <ActionIcon className={classes.button}>
-            <IconMenu size="100%" stroke={1.2} style={{ maxWidth: 30, maxHeight: 30 }} />
+            <IconMenu size="100%" stroke={1.5} style={{ maxWidth: 30, maxHeight: 30 }} />
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>{currentMenu}</Menu.Dropdown>

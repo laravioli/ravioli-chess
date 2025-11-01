@@ -8,7 +8,7 @@ import { userLogout, profileBoardUpdate, profilePiecesetUpdate } from 'src/lib/a
 import { ActionIcon, Loader, Menu, MenuItem, UnstyledButton, useMantineColorScheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
-import { PlayModalBody } from '../../../modals/play';
+import { LobbySetup } from 'src/lib/lobby/components/setup';
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -286,7 +286,7 @@ const FriendsMenu = ({ navigate }) => {
                     modal: 'play',
                     title: 'Create a lobby',
                     innerProps: {
-                      modalBody: PlayModalBody,
+                      modalBody: LobbySetup,
                       modalBodyProps: { opponent: 'friend' },
                     },
                   })

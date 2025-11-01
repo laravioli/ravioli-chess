@@ -40,6 +40,7 @@ export const SearchUsers = () => {
       visibleFrom="xs"
       dropdownOpened={opened}
       onBlur={onBlur}
+      comboboxProps={{ withinPortal: false }}
     />
   );
 };

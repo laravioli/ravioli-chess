@@ -1,5 +1,7 @@
-import { Anchor, Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
+import { Anchor, Button, Group, PasswordInput, Stack, TextInput, Drawer } from '@mantine/core';
+import { IsAuth } from 'src/user/component/isauth';
 import { notifications } from '@mantine/notifications';
+import { useMediaQuery } from '@mantine/hooks';
 import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
@@ -7,7 +9,22 @@ import { useGlobalStore } from 'src/main/hooks/hooks';
 import { userLogin, userRegister, type LoginRequest, type RegisterRequestWritable } from 'src/lib/api';
 import { setProfile } from 'src/user/store/utils';
 
-export function AuthenticationForm({ close }) {
+export const AuthDrawer = ({ opened, onClose }: { opened: boolean; onClose: () => void }) => {
+  const isSmallScreen = useMediaQuery('(max-width: 765px)');
+  return (
+    <Drawer
+      position="right"
+      size={isSmallScreen ? '100%' : 'md'}
+      opened={opened}
+      onClose={onClose}
+      title="Authentication"
+    >
+      <AuthenticationForm close={onClose} />
+    </Drawer>
+  );
+};
+
+function AuthenticationForm({ close }) {
   const { userStore } = useGlobalStore();
   const [loading, setLoading] = useState(false);
   const [type, toggle] = useToggle(['login', 'register']);
@@ -118,3 +135,18 @@ export function AuthenticationForm({ close }) {
     </form>
   );
 }
+
+export const LoginButton = ({ onClick }: { onClick: () => void }) => {
+  const isSmallScreen = useMediaQuery('(max-width: 765px)');
+  const screenProps = isSmallScreen
+    ? { variant: 'transparent', color: 'white' }
+    : { variant: 'filled', color: 'cyan' };
+
+  return (
+    <IsAuth showIf={false}>
+      <Button {...screenProps} onClick={onClick}>
+        Log in
+      </Button>
+    </IsAuth>
+  );
+};
