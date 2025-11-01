@@ -4,7 +4,7 @@ import { AuthDrawer, LoginButton } from './authentification';
 import { UserMenu } from './menu/user';
 import { SearchUsersWithCollapse } from './search';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import classes from '../../../css/header.module.css';
+import classes from '../../css/header.module.css';
 
 export const Header = () => {
   const [openedAuth, { open: openAuth, close: closeAuth }] = useDisclosure(false);

@@ -2,7 +2,7 @@ import { modals } from '@mantine/modals';
 import { LobbySetup } from 'src/lib/lobby/components/setup';
 import { Menu } from '@mantine/core';
 import type { Opponent } from 'src/lib/lobby/interface';
-import classes from 'src/common/css/header.module.css';
+import classes from '../../../css/header.module.css';
 
 interface MenuPlayData {
   label?: string;

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useGlobalStore } from 'src/main/hooks/hooks';
-import { useMenu } from '../../../../hooks/hooks';
+import { useMenu } from 'src/common/hooks/hooks';
 import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { friendsListQueryKey, friendsListOptions } from 'src/lib/api/@tanstack/react-query.gen';
@@ -18,7 +18,7 @@ import {
 } from '@tabler/icons-react';
 import type { UserStore } from 'src/user/store/userstore';
 import { setBoardColor, setPieceSet, setProfile, getAnonProfile } from 'src/user/store/utils';
-import classes from 'src/common/css/header.module.css';
+import classes from '../../../css/header.module.css';
 
 export const UserMenu = observer(() => {
   const { userStore } = useGlobalStore();

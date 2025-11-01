@@ -1,4 +1,4 @@
-import { Shell } from 'src/common/components/appshell/appshell';
+import { Shell } from 'src/shell/components/appshell';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import Analyse from 'src/analyse/components/analyse';
 import Editor from 'src/editor/components/editor';

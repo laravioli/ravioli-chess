@@ -3,7 +3,7 @@ import { Drawer, Divider, UnstyledButton, Stack, Group, Button } from '@mantine/
 import { PlayMenu } from './menu/play';
 import { LobbySetup } from 'src/lib/lobby/components/setup';
 import { INITIAL_FEN } from 'chessops/fen';
-import classes from '../../../css/header.module.css';
+import classes from '../../css/header.module.css';
 import type { Opponent } from 'src/lib/lobby/interface';
 
 const defaultState = { fen: INITIAL_FEN, orientation: 'white' };
