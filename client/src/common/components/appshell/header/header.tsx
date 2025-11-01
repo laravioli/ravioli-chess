@@ -2,8 +2,8 @@ import { Box, Group, Flex, Burger, useDrawersStack } from '@mantine/core';
 import { Navigation, NavDrawer } from './navigation';
 import { AuthDrawer, LoginButton } from './authentification';
 import { UserMenu } from './menu/user';
-import { SearchUsers } from './search';
-import { useDisclosure } from '@mantine/hooks';
+import { SearchUsersWithCollapse } from './search';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import classes from '../../../css/header.module.css';
 
 export const Header = () => {
@@ -23,9 +23,7 @@ export const Header = () => {
             </Group>
           </Group>
           <Group h="100%" wrap="nowrap">
-            <SearchUsers />
-            <LoginButton onClick={openAuth} />
-            <UserMenu />
+            <Controls openAuth={openAuth} />
           </Group>
         </Flex>
       </header>
@@ -33,5 +31,22 @@ export const Header = () => {
       <AuthDrawer opened={openedAuth} onClose={closeAuth} />
       <NavDrawer stack={stack} />
     </Box>
+  );
+};
+
+const Controls = ({ openAuth }: { openAuth: () => void }) => {
+  const isSmallScreen = useMediaQuery('(max-width : 455px)');
+  const [opened, { close, toggle }] = useDisclosure(false);
+
+  return (
+    <>
+      <SearchUsersWithCollapse opened={opened} close={close} toggle={toggle} />
+      {!(isSmallScreen && opened) && (
+        <>
+          <LoginButton onClick={openAuth} />
+          <UserMenu />
+        </>
+      )}
+    </>
   );
 };

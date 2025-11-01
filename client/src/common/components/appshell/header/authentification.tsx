@@ -1,7 +1,7 @@
 import { Anchor, Button, Group, PasswordInput, Stack, TextInput, Drawer } from '@mantine/core';
 import { IsAuth } from 'src/user/component/isauth';
 import { notifications } from '@mantine/notifications';
-import { useMediaQuery } from '@mantine/hooks';
+import { useFocusTrap, useMediaQuery } from '@mantine/hooks';
 import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
@@ -28,6 +28,7 @@ function AuthenticationForm({ close }) {
   const { userStore } = useGlobalStore();
   const [loading, setLoading] = useState(false);
   const [type, toggle] = useToggle(['login', 'register']);
+  const focusTrapRef = useFocusTrap(true);
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -85,7 +86,7 @@ function AuthenticationForm({ close }) {
 
   return (
     <form onSubmit={form.onSubmit(type === 'login' ? onLogin : onRegister)}>
-      <Stack>
+      <Stack ref={focusTrapRef} key={type}>
         {type === 'register' && (
           <TextInput
             required
@@ -94,15 +95,16 @@ function AuthenticationForm({ close }) {
             key={form.key('email')}
             {...form.getInputProps('email')}
             radius="md"
+            data-autofocus
           />
         )}
-
         <TextInput
           label="Username"
           placeholder="Your username"
           key={form.key('username')}
           {...form.getInputProps('username')}
           radius="md"
+          {...(type === 'login' ? { 'data-autofocus': true } : {})}
         />
 
         <PasswordInput
