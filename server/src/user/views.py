@@ -9,8 +9,12 @@ from profile.serializers import ProfileSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 
+# todo : add pagination
 class UserListViewSet(generics.ListAPIView, viewsets.GenericViewSet):
+    """view to get a list of users based on username query param"""
+
     queryset = User.objects.all().order_by("username")
+    permission_classes = [permissions.AllowAny]
     serializer_class = UserSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ["^username"]

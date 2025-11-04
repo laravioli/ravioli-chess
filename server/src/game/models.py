@@ -20,7 +20,7 @@ class Game(models.Model):
     )
 
     status = models.CharField(max_length=24, choices=Status)
-    data = models.JSONField(blank=True, null=True)
+    data = models.JSONField(default=dict, blank=True)
     pub_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

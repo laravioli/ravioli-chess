@@ -2,7 +2,7 @@ from .models import FriendRequest, Friend
 from .serializers import FriendRequestSerializer, FriendSerializer
 from api.serializers import EmptyRequestSerializer
 from rest_framework import viewsets, mixins, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from api.pagination import SmallResultsSetPagination
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import action
@@ -107,7 +107,7 @@ class FriendRequestViewSet(
 class FriendViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """End point to list and remove friends"""
 
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = FriendSerializer
     queryset = Friend.objects.all()
     lookup_field = "pk"
@@ -127,7 +127,7 @@ class FriendViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             return self.queryset
 
     @extend_schema(operation_id="friend_remove")
-    @action(methods=["post"], detail=False, permission_classes=[IsAuthenticated])
+    @action(methods=["post"], detail=False)
     def remove(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
