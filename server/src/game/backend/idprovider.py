@@ -1,5 +1,7 @@
 import asyncio
+from .channels import ChanId
 from .pubsub import BackgroundSubscriber
+from functools import cached_property
 from redis.exceptions import LockError, RedisError
 
 
@@ -10,46 +12,45 @@ class SequencerMixin:
         async with self._lock:
             item = await self._get()
             if not item:
-                item = await self._generate(batch=self.batch)
+                item = await self._generate()
             return item
 
 
-class AsyncIdProvider(SequencerMixin, BackgroundSubscriber):
+class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
     """Provide id pulled from a cache backend.
     Use pubsub to synchronise processes"""
 
-    def __init__(
-        self,
-        *,
-        name,
-        generator,
-        layer,
-        batch: int = 512,
-    ):
-        self.name = name
-        self._key = f"ids:{name}"
+    channel_factory = ChanId
+
+    def __init__(self, *, name, layer, generator, batch: int = 512):
+        self.name: str = name
         self._layer = layer
+        self._skey = f"ids:{name}"
+        self._batch = batch
+        self._generator = generator
         self._lock = asyncio.Lock()
         self._event = asyncio.Event()
-        self._generator = generator
-        self.batch = batch
+
+    @cached_property
+    def channel(self):
+        return self.channel_factory(self.name).chan
 
     async def _get(self):
-        return await self._layer.spop(self._key)
+        return await self._layer.spop(self._skey)
 
-    async def _generate(self, batch):
+    async def _generate(self):
         while True:
             try:
                 async with self._layer.lock(
-                    f"generate-{self._key}", blocking=False, timeout=2
+                    f"generate-{self._skey}", blocking=False, timeout=2
                 ):
                     # double-check to prevent stale assumption
                     item = await self._get()
                     if not item:
-                        ids = await self._generator(batch=batch)
+                        ids = await self._generator(batch=self._batch)
                         async with self._layer.pipeline() as pipe:
-                            await pipe.sadd(self._key, *ids)
-                            await pipe.spop(self._key)
+                            await pipe.sadd(self._skey, *ids)
+                            await pipe.spop(self._skey)
                             await pipe.publish(self.channel, "")
                             (
                                 _,
@@ -68,12 +69,7 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber):
             except RedisError:
                 raise
 
-    # Subscribe
-    @property
-    def channel(self):
-        return f"channel-ids-{self.name}"
-
-    async def handler(self, _):
-        """called by Notifier when another process has generate new ids"""
+    async def on_message(self, _):
+        """called by Notifier when another process publish to related chan"""
         self._event.set()
         self._event.clear()

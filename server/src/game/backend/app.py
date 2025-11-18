@@ -1,6 +1,6 @@
 from raviolichess.layers import get_redis_layer
 from channels.layers import get_channel_layer
-from .pubsub import BackgroundListener
+from .pubsub import BackgroundListener, BackgroundRegistry
 from .idprovider import AsyncIdProvider
 from .idgenerator import game_id_generator
 from redis.asyncio import Redis as AsyncRedis
@@ -19,6 +19,7 @@ class App:
         self.services = services
 
     def start(self):
+        BackgroundRegistry.register(self.services.get("game_id"))
         self.listener.start()
 
     async def shutdown(self):
@@ -31,10 +32,11 @@ async def start_app():
     layer = get_redis_layer("async")
     services = {
         "game_id": AsyncIdProvider(
-            name="game", generator=game_id_generator, layer=layer
+            name="game", layer=layer, generator=game_id_generator
         )
     }
-    listener = BackgroundListener(layer=layer, services=services)
+
+    listener = BackgroundListener(layer=layer)
 
     app = App(layer=layer, listener=listener, services=services)
     app.start()

@@ -35,7 +35,7 @@ class RedisLayer:
             return backend(decode_responses=True, db=1)
 
 
-def get_redis_layer(key) -> redis.Redis | aioredis.Redis:
+def get_redis_layer(key):
     return redis_layers[key]
 
 
