@@ -1,6 +1,6 @@
 import asyncio
 from .channels import ChanId
-from .pubsub import BackgroundSubscriber
+from .background import BackgroundSubscriber
 from functools import cached_property
 from redis.exceptions import LockError, RedisError
 
@@ -20,8 +20,6 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
     """Provide id pulled from a cache backend.
     Use pubsub to synchronise processes"""
 
-    channel_factory = ChanId
-
     def __init__(self, *, name, layer, generator, batch: int = 512):
         self.name: str = name
         self._layer = layer
@@ -33,7 +31,7 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
 
     @cached_property
     def channel(self):
-        return self.channel_factory(self.name).chan
+        return ChanId(self.name)
 
     async def _get(self):
         return await self._layer.spop(self._skey)
@@ -51,7 +49,7 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
                         async with self._layer.pipeline() as pipe:
                             await pipe.sadd(self._skey, *ids)
                             await pipe.spop(self._skey)
-                            await pipe.publish(self.channel, "")
+                            await pipe.publish(self.channel.chan, "")
                             (
                                 _,
                                 item,

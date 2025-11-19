@@ -1,56 +1,20 @@
 import asyncio
-from .channels import Channel
-from abc import ABC, abstractmethod
-from typing import Type, TypeVar, ClassVar, Generic
-
-T = TypeVar("T", bound=Channel)
+from .background import BackgroundRegistry
+from redis.asyncio import Redis
 
 
-class BackgroundSubscriber(ABC, Generic[T]):
-    """interface for subscribing to pubsub channel"""
-
-    channel_factory: ClassVar[Type[T]]
-
-    @property
-    @abstractmethod
-    def channel(self) -> str:
-        """return channel.chan"""
-        ...
-
-    @abstractmethod
-    async def on_message(self, message):
-        """callback when a message arrive in a channel"""
-        ...
-
-
-class BackgroundRegistry:
-    _registry = {}
-
-    @classmethod
-    def register(cls, instance):
-        """add a background subscriber to registry"""
-        if not isinstance(instance, BackgroundSubscriber):
-            raise ValueError(
-                f"{instance} is not a background subscriber, it can't be added to background registry"
-            )
-        cls._registry.update({instance.channel: instance.on_message})
-
-    @classmethod
-    def all(cls):
-        return cls._registry
-
-
-class BackgroundListener:
+class ChannelManager:
     """pubsub for process communication"""
 
-    def __init__(self, *, layer):
+    def __init__(self, *, layer: Redis):
         self._pubsub = layer.pubsub(ignore_subscribe_messages=True)
+        self._lock = asyncio.Lock()
 
     def start(self):
         self._task = asyncio.create_task(self.run())
 
     async def run(self):
-        # run must be called after all susbcriber are instantiated
+        # run must be called after all background susbcriber are registered
         p = self._pubsub
         async with p:
             await p.subscribe(**BackgroundRegistry.all())
@@ -65,8 +29,17 @@ class BackgroundListener:
             pass
         finally:
             await self._pubsub.aclose()
-        # if i need gather -> return exeption = True to not leak tasks or TaskGroup
 
+    async def subscribe(self, channel_with_callback):
+        async with self._lock:
+            self._pubsub.subscribe(**channel_with_callback)
+
+    async def unsubscribe(self, channel):
+        async with self._lock:
+            self._pubsub.unsubscribe(channel)
+
+
+# if i need gather -> return exeption = True to not leak tasks or TaskGroup
 
 # Note
 # A new alternative to create and run tasks concurrently and wait for their completion is asyncio.TaskGroup.

@@ -29,8 +29,22 @@ else:
     http_protocol = {}
 
 
+# LIFESPAN
+from channels.layers import get_channel_layer
+
+
+async def lifespan_app(scope, receive, send):
+    while True:
+        message = await receive()
+        if message["type"] == "lifespan.startup":
+            await send({"type": "lifespan.startup.complete"})
+        elif message["type"] == "lifespan.shutdown":
+            await get_channel_layer().close_pools()
+            await send({"type": "lifespan.shutdown.complete"})
+            return
+
+
 # ASGI APP
-from .lifespan import lifespan_app
 from websocket.routing import websocket_urlpatterns
 
 app = ProtocolTypeRouter(

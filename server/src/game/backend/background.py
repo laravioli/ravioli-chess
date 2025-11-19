@@ -1,0 +1,31 @@
+from ipc.channels import Channel
+from abc import ABC, abstractmethod
+from typing import TypeVar, Generic
+
+T = TypeVar("T", bound=Channel)
+
+
+class BackgroundSubscriber(ABC, Generic[T]):
+    """interface for subscribing to a pubsub channel during the application lifetime"""
+
+    @property
+    @abstractmethod
+    def channel(self) -> T: ...
+
+    @abstractmethod
+    async def on_message(self, message) -> None:
+        """callback when a message arrive in a channel"""
+        ...
+
+
+class BackgroundRegistry:
+    _registry = {}
+
+    @classmethod
+    def register(cls, instance: BackgroundSubscriber[T]):
+        """add a background subscriber to registry"""
+        cls._registry[instance.channel.chan] = instance.on_message
+
+    @classmethod
+    def all(cls):
+        return cls._registry
