@@ -1,5 +1,5 @@
 import asyncio
-from .background import BackgroundRegistry
+from .background import Background
 from redis.asyncio import Redis
 
 
@@ -17,7 +17,7 @@ class ChannelManager:
         # run must be called after all background susbcriber are registered
         p = self._pubsub
         async with p:
-            await p.subscribe(**BackgroundRegistry.all())
+            await p.subscribe(**Background.all())
             async for _ in p.listen():
                 pass
 

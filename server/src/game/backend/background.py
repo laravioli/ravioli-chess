@@ -6,7 +6,8 @@ T = TypeVar("T", bound=Channel)
 
 
 class BackgroundSubscriber(ABC, Generic[T]):
-    """interface for subscribing to a pubsub channel during the application lifetime"""
+    """interface for subscribing to a pubsub channel during the application lifetime.
+    In order to be active, a background subscriber need to call Background.register"""
 
     @property
     @abstractmethod
@@ -18,7 +19,7 @@ class BackgroundSubscriber(ABC, Generic[T]):
         ...
 
 
-class BackgroundRegistry:
+class Background:
     _registry = {}
 
     @classmethod
