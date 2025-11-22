@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from game.models import Game
 from ipc.channels import ChanGameCreate
-from ipc.protocol import GameCreateMessage, GameCreatePayload, GameCreateOut
+from ipc.protocol import GameCreatePayload, GameCreateIn, GameCreateOut
 from .background import BackgroundSubscriber
 from .idprovider import AsyncIdProvider
 
@@ -32,14 +32,14 @@ class GameProvider(BackgroundSubscriber[ChanGameCreate]):
         return ChanGameCreate(1)
 
     def on_message(self, message):
-        self._queue.put_nowait(message.data)
+        self._queue.put_nowait(message["data"])
 
     async def get_message(self):
         """return raw data received from pubsub"""
         return await self._queue.get()
 
     async def create_game(self, raw_data):
-        msg = msgspec.json.decode(raw_data, type=GameCreateMessage)
+        msg = msgspec.json.decode(raw_data, type=GameCreateIn)
 
         id = await new_game(
             self.id_provider,
@@ -48,8 +48,8 @@ class GameProvider(BackgroundSubscriber[ChanGameCreate]):
         )
         return id, msg
 
-    async def stop():
-        pass
+    async def stop(self):
+        self._queue.shutdown()
 
 
 class GameManager:
@@ -89,6 +89,7 @@ class GameManager:
         for actor in self._actors:
             actor.cancel()
         await asyncio.gather(*self._actors, return_exceptions=True)
+        self._actors.clear()
 
 
 class GameBase:

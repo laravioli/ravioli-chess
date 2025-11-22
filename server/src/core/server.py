@@ -1,12 +1,49 @@
 import os
 import signal
-import asyncio
+import asyncio, uvloop
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "game.backend.settings")
+# django settings
+from django.conf import settings
+
+from raviolichess.settings import (
+    DEBUG,
+    CHANNEL_LAYERS,
+    DATABASES,
+    LANGUAGE_CODE,
+    TIME_ZONE,
+    USE_TZ,
+    DEFAULT_AUTO_FIELD,
+    LOGGING,
+)
+
+INSTALLED_APPS = [
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "channels",
+    "user",
+    "game",
+]
+
+settings.configure(
+    DEBUG=DEBUG,
+    INSTALLED_APPS=INSTALLED_APPS,
+    CHANNEL_LAYERS=CHANNEL_LAYERS,
+    DATABASES=DATABASES,
+    LANGUAGE_CODE=LANGUAGE_CODE,
+    TIME_ZONE=TIME_ZONE,
+    USE_TZ=USE_TZ,
+    DEFAULT_AUTO_FIELD=DEFAULT_AUTO_FIELD,
+    LOGGING=LOGGING,
+)
+
+
+# django setup
 import django
 
 django.setup(set_prefix=False)
 
+
+# entry point
 from .app import start_app, App
 
 
@@ -35,4 +72,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    uvloop.run(main())

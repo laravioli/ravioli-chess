@@ -3,8 +3,21 @@ import asyncio
 from urllib.parse import parse_qs
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from ipc.layer import get_layer
+from ipc.channels import ChanGameCreate
+from ipc.protocol import GameCreateIn, GameCreatePayload
+import msgspec
+import time
 
-class TaxiConsumer(AsyncWebsocketConsumer):
+channel_test = ChanGameCreate(1).chan
+client = get_layer("redis")
+
+
+class GameConsumer(AsyncWebsocketConsumer):
+    pass
+
+
+class TaxiConsumer(GameConsumer):
     async def connect(self):
         print("connect", self.scope["user"])
         self.sri = parse_qs(self.scope["query_string"].decode("utf8"))["sri"][0]
@@ -14,38 +27,32 @@ class TaxiConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         print("disconnect")
 
-    async def receive(self, text_data):
+    async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         print(text_data_json)
-        type = text_data_json.get("t", None)
-        await self.send(text_data=json.dumps({"message": "pong"}))
-
-    async def test(self):
-        session = self.scope["session"]
-        user = self.scope["user"]
-
-        try:
-            while True:
-                # print(user)
-                await asyncio.sleep(2)
-        except asyncio.CancelledError:
+        m_type = text_data_json.get("t", None)
+        if m_type == "newgame":
+            await self.create_game()
+        else:
             pass
+            # await self.send(text_data=json.dumps({"message": "pong"}))
 
+    async def game_create(self, event):
+        self.t2 = time.perf_counter()
+        print(
+            f"received from gamer server in {(self.t2 - self.t1)*1000}ms :",
+            event["data"],
+        )
+        await self.send(text_data=event["data"].decode())
 
-# r.zadd("online_users", {user_id: time.time()}) heartbeat client update his presence
-# online_count = r.zcount("online_users", time.time() - 60, "+inf") fetch count from redis
-# from celery import Celery
-# import redis
-# import time
+    async def create_game(self):
+        message = GameCreateIn(
+            channel=self.channel_name,
+            payload=GameCreatePayload(),
+        )
+        await client.publish(channel_test, msgspec.json.encode(message))
+        self.t1 = time.perf_counter()
 
-# app = Celery("tasks", broker="redis://localhost:6379/0")
-
-# @app.task
-# def clean_expired_users():
-#    r = redis.Redis()
-#    cutoff = time.time() - 60
-#    r.zremrangebyscore("online_users", 0, cutoff)
-# fuck it go for celery
 
 # websocket communication : since channel group is not 100% delivery
 # use a ACK system : player A group send a move -> Player B receive ? YES: send

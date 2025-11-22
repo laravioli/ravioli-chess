@@ -5,11 +5,11 @@ from pathlib import Path
 
 env.read_env()
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+DEBUG = env.bool("DEBUG", default=False)
 
 SECRET_KEY = env.str("SECRET_KEY")
 
-DEBUG = env.bool("DEBUG", default=False)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
@@ -207,31 +207,37 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
         },
     },
     "handlers": {
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": "../debug.log",
+        "console": {
+            "level": "INFO",
+            "stream": "ext://sys.stdout",
+            "class": "logging.StreamHandler",
         },
+        "django.console": {
+            "level": "INFO",
+            "filters": ["require_debug_true"],
+            "stream": "ext://sys.stdout",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": env.str("RAVIOLICHESS_LOG_LEVEL", default="INFO"),
     },
     "loggers": {
         "django": {
-            "handlers": ["file"],
-            "level": "DEBUG",
-            "propagate": True,
+            "handlers": ["django.console"],
+            "level": env.str("DJANGO_LOG_LEVEL", default="INFO"),
+            "propagate": False,
         },
     },
 }

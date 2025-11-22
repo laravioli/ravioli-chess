@@ -1,8 +1,9 @@
 import asyncio
-from .channels import ChanId
+from ipc.channels import Channel
 from .background import BackgroundSubscriber
 from functools import cached_property
 from redis.exceptions import LockError, RedisError
+from functools import cached_property
 
 
 class SequencerMixin:
@@ -14,6 +15,16 @@ class SequencerMixin:
             if not item:
                 item = await self._generate()
             return item
+
+
+class ChanId(Channel):
+
+    def __init__(self, name):
+        self.name = name
+
+    @cached_property
+    def chan(self) -> str:
+        return f"{self.prefix}:{self.__class__.__qualname__.lower()}:{self.name}"
 
 
 class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
@@ -34,7 +45,8 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
         return ChanId(self.name)
 
     async def _get(self):
-        return await self._layer.spop(self._skey)
+        item = await self._layer.spop(self._skey)
+        return item.decode() if item else None
 
     async def _generate(self):
         while True:
@@ -55,7 +67,7 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
                                 item,
                                 _,
                             ) = await pipe.execute()
-                    return item
+                    return item.decode()
 
             except LockError:
                 try:
