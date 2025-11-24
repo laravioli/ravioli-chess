@@ -1,57 +1,59 @@
-import json
-import asyncio
-from urllib.parse import parse_qs
+import msgspec
+import logging
+import time
 from channels.generic.websocket import AsyncWebsocketConsumer
-
 from ipc.layer import get_layer
 from ipc.channels import ChanGameCreate
-from ipc.protocol import GameCreateIn, GameCreatePayload
-import msgspec
-import time
+from ipc.protocol.client import GameCreateRequest, GameMoveRequest
+from ipc.protocol.game import GameCreateIn
 
-channel_test = ChanGameCreate(1).chan
-client = get_layer("redis")
+logger = logging.getLogger(__name__)
+
+GameRequest = GameCreateRequest | GameMoveRequest
+GameCreateChan = ChanGameCreate(1).chan
 
 
 class GameConsumer(AsyncWebsocketConsumer):
-    pass
 
-
-class TaxiConsumer(GameConsumer):
     async def connect(self):
-        print("connect", self.scope["user"])
-        self.sri = parse_qs(self.scope["query_string"].decode("utf8"))["sri"][0]
         await self.accept()
-        await self.send(text_data=json.dumps({"message": "hello"}))
+        logger.info("ws %s connected", self.channel_name)
 
     async def disconnect(self, close_code):
-        print("disconnect")
+        logger.info("ws %s disconnected", self.channel_name)
 
-    async def receive(self, text_data=None, bytes_data=None):
-        text_data_json = json.loads(text_data)
-        print(text_data_json)
-        m_type = text_data_json.get("t", None)
-        if m_type == "newgame":
-            await self.create_game()
-        else:
-            pass
-            # await self.send(text_data=json.dumps({"message": "pong"}))
+    async def receive(self, text_data=None):
+        req = msgspec.json.decode(text_data, type=GameRequest)
+        await self.handle_request(req)
 
-    async def game_create(self, event):
+    async def handle_request(self, req: GameRequest):
+        """handle game message, transform/proxy it to game server"""
+        match req:
+            case GameCreateRequest(data):
+                msg = GameCreateIn(
+                    channel=self.channel_name,
+                    white_player=data.white_player,
+                    black_player=data.black_player,
+                )
+                await self.publish(GameCreateChan, msg)
+                self.t1 = time.perf_counter()
+            case _:
+                logger.warning("received an unknow request")
+
+    @staticmethod
+    async def publish(chan, msg):
+        layer = get_layer("redis")
+        await layer.publish(chan, msgspec.json.encode(msg))
+
+    # channel layer handlers
+    async def game_created(self, event):
+
         self.t2 = time.perf_counter()
         print(
             f"received from gamer server in {(self.t2 - self.t1)*1000}ms :",
             event["data"],
         )
         await self.send(text_data=event["data"].decode())
-
-    async def create_game(self):
-        message = GameCreateIn(
-            channel=self.channel_name,
-            payload=GameCreatePayload(),
-        )
-        await client.publish(channel_test, msgspec.json.encode(message))
-        self.t1 = time.perf_counter()
 
 
 # websocket communication : since channel group is not 100% delivery

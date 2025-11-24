@@ -1,26 +1,29 @@
+from __future__ import annotations
 from ipc.layer import get_layer
 from channels.layers import get_channel_layer
 from .background import Background
 from .idprovider import AsyncIdProvider
 from .idgenerator import game_id_generator
-from .game import GameProvider, GameManager
+from .game import GameDB, GameQueue, GameManager
 from .pubsub import ChannelManager
 from redis.asyncio import Redis
+from typing import TypedDict
 
 
 class App:
-    def __init__(
-        self, *, layer: Redis, services: dict[str, any], managers: dict[str, any]
-    ):
+    def __init__(self, *, layer: Redis, services: Services, managers: Managers):
         self.layer = layer
         self.services = services
         self.managers = managers
 
     def start(self):
         Background.register(self.services["game_id"])
-        Background.register(self.services["game_provider"])
+        Background.register(self.services["game_queue"])
         self.managers["channel"].start()
-        self.managers["game"].start()
+        self.managers["game"].start(
+            subscribe=self.managers["channel"].subscribe,
+            unsubscribe=self.managers["channel"].unsubscribe,
+        )
 
     async def shutdown(self):
         await self.managers["game"].stop()
@@ -39,19 +42,27 @@ async def start_app():
     return app
 
 
-def create_services(layer):
-    game_id_provider = AsyncIdProvider(
-        name="game", layer=layer, generator=game_id_generator
-    )
-    game_provider = GameProvider(game_id_provider)
+class Services(TypedDict):
+    game_id: AsyncIdProvider
+    game_queue: GameQueue
+
+
+class Managers(TypedDict):
+    game: GameManager
+    channel: ChannelManager
+
+
+def create_services(layer) -> Services:
+    game_id = AsyncIdProvider(name="game", layer=layer, generator=game_id_generator)
+    game_queue = GameQueue(1)
 
     return {
-        "game_id": game_id_provider,
-        "game_provider": game_provider,
+        "game_id": game_id,
+        "game_queue": game_queue,
     }
 
 
-def create_managers(layer, services):
-    game_manager = GameManager(services["game_provider"])
+def create_managers(layer, services) -> Managers:
+    game_manager = GameManager(services["game_queue"], GameDB(services["game_id"]))
     channel_manager = ChannelManager(layer=layer)
     return {"game": game_manager, "channel": channel_manager}

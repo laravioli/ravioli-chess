@@ -1,7 +1,7 @@
 # chat/routing.py
 from django.urls import path
-from . import consumers
+from .consumers import GameConsumer
 
 websocket_urlpatterns = [
-    path("ws/taxi", consumers.TaxiConsumer.as_asgi()),
+    path("ws/taxi", GameConsumer.as_asgi()),
 ]
