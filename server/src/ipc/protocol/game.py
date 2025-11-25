@@ -20,7 +20,7 @@ class GameCreateOut(msgspec.Struct):
 
 
 class GameIn(msgspec.Struct, tag_field="t", tag=str.lower):
-    user_id: str
+    pass
 
 
 class MoveIn(GameIn):
@@ -31,4 +31,20 @@ class Resign(GameIn):
     player: str
 
 
-GameProtocol = MoveIn | Resign
+GameProtocolIn = MoveIn | Resign
+
+
+class GameOut(msgspec.Struct, tag_field="t", tag=str.lower):
+    pass
+
+
+class MoveOut(GameOut):
+    ok: bool
+    san: str
+
+
+class GameEndOut(GameOut):
+    reason: str
+
+
+GameProtocolOut = MoveOut | GameEndOut

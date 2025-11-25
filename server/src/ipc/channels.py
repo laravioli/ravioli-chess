@@ -29,3 +29,21 @@ class ChanGame(Channel):
     @cached_property
     def chan(self):
         return f"{self.prefix}:{self.__class__.__qualname__.lower()}:{self.game_id}"
+
+
+class GroupChannel(ABC):
+    prefix: ClassVar[str] = "group"
+
+    @property
+    @abstractmethod
+    def chan(self) -> str: ...
+
+
+class GroupChanGame(GroupChannel):
+
+    def __init__(self, game_id):
+        self.game_id = game_id
+
+    @cached_property
+    def chan(self):
+        return f"{self.prefix}_game_{self.game_id}"

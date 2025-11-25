@@ -3,9 +3,9 @@ import logging
 import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from ipc.layer import get_layer
-from ipc.channels import ChanGameCreate
-from ipc.protocol.client import GameCreateRequest, GameMoveRequest
-from ipc.protocol.game import GameCreateIn
+from ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
+from ipc.protocol.client import GameCreateRequest, GameCreateResponse, GameMoveRequest
+from ipc.protocol.game import GameCreateIn, MoveIn
 
 logger = logging.getLogger(__name__)
 
@@ -28,22 +28,31 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def handle_request(self, req: GameRequest):
         """handle game message, transform/proxy it to game server"""
-        match req:
-            case GameCreateRequest(data):
-                msg = GameCreateIn(
-                    channel=self.channel_name,
-                    white_player=data.white_player,
-                    black_player=data.black_player,
-                )
-                await self.publish(GameCreateChan, msg)
+        msg, channel = (None, None)
+        try:
+            match req:
+                case GameCreateRequest(data):
+                    msg, channel = (
+                        GameCreateIn(
+                            channel=self.channel_name,
+                            white_player=data.white_player,
+                            black_player=data.black_player,
+                        ),
+                        GameCreateChan,
+                    )
+                case GameMoveRequest(data):
+                    msg, channel = (MoveIn(san=data.san), self.game_channel)
+                case _:
+                    logger.warning("received an unknow request")
+        finally:
+            if msg and channel:
+                await self.publish(channel, msg)
                 self.t1 = time.perf_counter()
-            case _:
-                logger.warning("received an unknow request")
 
     @staticmethod
-    async def publish(chan, msg):
+    async def publish(channel, msg):
         layer = get_layer("redis")
-        await layer.publish(chan, msgspec.json.encode(msg))
+        await layer.publish(channel, msgspec.json.encode(msg))
 
     # channel layer handlers
     async def game_created(self, event):
@@ -53,30 +62,20 @@ class GameConsumer(AsyncWebsocketConsumer):
             f"received from gamer server in {(self.t2 - self.t1)*1000}ms :",
             event["data"],
         )
+        # current impl for testing
+        game_id = msgspec.json.decode(event["data"], type=GameCreateResponse).game_id
+        self.game_channel = ChanGame(game_id).chan
+        logger.info("game channel %s", self.game_channel)
+        await self.channel_layer.group_add(
+            GroupChanGame(game_id).chan, self.channel_name
+        )
+
         await self.send(text_data=event["data"].decode())
 
-
-# websocket communication : since channel group is not 100% delivery
-# use a ACK system : player A group send a move -> Player B receive ? YES: send
-# to channel A a ACK -> send to A client.
-# so if everything right A receive ACK(mean B receive message) and MOVE, B receive MOVE
-# other wise A receive only MOVE AND B Nothing -> prb
-# => resend (from client) and repeat until success(adjust time)
-
-# websocket game memory : dont need to use in-memory hot cache for performance,
-# try
-# a simple collections of redis key to handle the game state
-# game:id:metadata (cold), hash to store metadata
-# game:id:moves (hot), find the right type to store a list of move_number/move/clock
-
-# synchronisation in game (reload)
-# when html load -> ask redis cache for inital board state
-# when ws connect -> refetch data in case a move happened
-# important order on connect:
-# 1)group add
-# 2)fetch game state
-# its safe because its sequential (chess + no other method coro than on_connect
-# can execute before the current coro finish so
-# groupd add -> fetch -> eventually group receive), i see maybe a small race condition
-# where u send 2 ACK for one move (group add , fetch )
-# order on move,  save to redis -> group send
+    async def game_move(self, event):
+        self.t2 = time.perf_counter()
+        print(
+            f"received from gamer server in {(self.t2 - self.t1)*1000}ms :",
+            event["data"],
+        )
+        await self.send(text_data=event["data"].decode())

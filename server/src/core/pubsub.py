@@ -34,11 +34,11 @@ class ChannelManager:
 
     async def subscribe(self, channel_with_callback):
         async with self._lock:
-            self._pubsub.subscribe(**channel_with_callback)
+            await self._pubsub.subscribe(**channel_with_callback)
 
     async def unsubscribe(self, channel):
         async with self._lock:
-            self._pubsub.unsubscribe(channel)
+            await self._pubsub.unsubscribe(channel)
 
 
 # if i need gather -> return exeption = True to not leak tasks or TaskGroup

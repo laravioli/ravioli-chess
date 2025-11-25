@@ -10,9 +10,9 @@ from channels.layers import get_channel_layer
 from .background import BackgroundSubscriber
 from .idprovider import AsyncIdProvider
 from game.models import Game
-from ipc.channels import ChanGameCreate, ChanGame
-from ipc.protocol.game import *
+from ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
 from .exceptions import GameStop
+from ipc.protocol.game import *
 
 user_model = get_user_model()
 
@@ -54,6 +54,8 @@ class GameDB:
         return id
 
 
+# to do: create serialization class
+# to think : eventually decode message here
 class QueueMixin(ABC):
 
     _queue: asyncio.Queue
@@ -130,26 +132,27 @@ class GameManager:
         self._actors.clear()
 
 
+import time
+
+
 class GameActor(QueueMixin):
 
     def __init__(self, *, game_id, white_player, black_player):
-        self.id = game_id
+        self.game_id = game_id
         self.white_player = white_player
         self.black_player = black_player
         self._board = chess.Board()
         self._queue = asyncio.Queue()
-
-    @cached_property
-    def channel(self):
-        return ChanGame(self.id)
+        self.channel = ChanGame(self.game_id).chan
+        self.group_channel = GroupChanGame(self.game_id).chan
 
     async def start(self, send_ready, subscribe):
-        logger.info("starting game actor %s", self.id)
-        await subscribe(**{self.channel.chan: self.on_message})
+        logger.info("Starting game actor %s", self.game_id)
+        await subscribe({self.channel: self.on_message})
         await send_ready(
             {
                 "type": "game.created",
-                "data": msgspec.json.encode(GameCreateOut(self.id)),
+                "data": msgspec.json.encode(GameCreateOut(self.game_id)),
             }
         )
 
@@ -158,22 +161,40 @@ class GameActor(QueueMixin):
         try:
             while True:
                 raw_data = await self.get_message()
-                msgspec.json.decode(raw_data, type=GameProtocol)
-                await self.handle_message()
+                self.t1 = time.perf_counter()
+                await self.handle_message(
+                    msgspec.json.decode(raw_data, type=GameProtocolIn)
+                )
+                self.t2 = time.perf_counter()
+                print(f"handled msg in{(self.t2 - self.t1)*1000}ms :")
+        except asyncio.CancelledError:
+            logger.info("Game actor cancelled %s", self.game_id)
+            raise
         except GameStop:
-            logger.info("stop game actor %s", self.id)
-            pass
+            logger.info("Stop game actor %s", self.game_id)
         finally:
-            unsubscribe(self.channel)
+            await unsubscribe(self.channel)
 
     async def handle_message(self, msg):
-        match msg:
-            case MoveIn(san):
-                try:
-                    logger.info("move played : %s", san)
-                    self._board.push_san(san)
-                except ValueError() as exc:
-                    logger.exception(exc, exc_info=True)
-                    raise GameStop()
-            case _:
-                raise GameStop()
+        response = None
+        try:
+            match msg:
+                case MoveIn(san):
+                    try:
+                        self._board.push_san(san)
+
+                        response = {
+                            "type": "game.move",
+                            "data": msgspec.json.encode(MoveOut(ok=True, san=san)),
+                        }
+                    except ValueError:
+                        response = {
+                            "type": "game.move",
+                            "data": msgspec.json.encode(MoveOut(ok=False, san=san)),
+                        }
+                        raise GameStop from None
+                case _:
+                    logger.warning("Unknown message received: %s", msg)
+        finally:
+            if response is not None:
+                await get_channel_layer().group_send(self.group_channel, response)
