@@ -1,24 +1,23 @@
 import redis.asyncio as aioredis
 from environs import env
 from collections import defaultdict
-from environs.exceptions import EnvError
 from typing import overload, Literal
-
-try:
-    socket_path = env.str("REDIS_SOCKET_PATH")
-except EnvError:
-    socket_path = None
+from functools import partial
 
 
 class Layer:
     "websocket <-> game_backend"
 
     BACKENDS = {
-        "redis": aioredis.Redis,
+        "redis": partial(aioredis.Redis.from_url, env.str("REDIS_URL")),
     }
 
     DEFAULT_CONFIG = {
-        "redis": {"unix_socket_path": socket_path, "decode_responses": False, "db": 1},
+        "redis": {
+            "decode_responses": False,
+            "health_check_interval": 15,
+            "db": 1,
+        },
     }
 
     def __init__(self):

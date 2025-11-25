@@ -29,7 +29,7 @@ class App:
         await self.managers["game"].stop()
         await self.managers["channel"].stop()
         await self.layer.aclose()
-        await get_channel_layer().close_pools()
+        await get_channel_layer().flush()
 
 
 async def start_app():

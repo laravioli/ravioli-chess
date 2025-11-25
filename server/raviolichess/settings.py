@@ -3,13 +3,10 @@ from environs import env
 from environs.exceptions import EnvError
 from pathlib import Path
 
-env.read_env()
-
-DEBUG = env.bool("DEBUG", default=False)
-
-SECRET_KEY = env.str("SECRET_KEY")
-
 BASE_DIR = Path(__file__).resolve().parent.parent
+env.read_env(BASE_DIR / ".env", recurse=False)
+DEBUG = env.bool("DEBUG", default=False)
+SECRET_KEY = env.str("SECRET_KEY")
 
 # Security
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
@@ -18,10 +15,8 @@ CSRF_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_SAMESITE = "Strict"
 CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_HTTPONLY = True
-
-# PROD ONLY
-# CSRF_COOKIE_SECURE = True
-# SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = env.str("CSRF_COOKIE_SECURE", default=False)
+SESSION_COOKIE_SECURE = env.str("SESSION_COOKIE_SECURE", default=False)
 
 # Application definition
 
@@ -35,15 +30,14 @@ INSTALLED_APPS = [
     "channels",
     "rest_framework",
     "drf_spectacular",
-    "user",
-    "profile",
-    "social",
-    "game",
-    "lobby",
-    "web",
-    "websocket",
+    "raviolichess.user",
+    "raviolichess.profile",
+    "raviolichess.social",
+    "raviolichess.game",
+    "raviolichess.lobby",
+    "raviolichess.web",
+    "raviolichess.websocket",
 ]
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -53,9 +47,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 ROOT_URLCONF = "raviolichess.urls"
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -77,33 +69,25 @@ TEMPLATES = [
 ASGI_APPLICATION = "raviolichess.asgi.app"
 WSGI_APPLICATION = "raviolichess.wsgi.app"
 
-# Redis
-try:
-    REDIS_HOST = f"unix://{env.str("REDIS_SOCKET_PATH")}"
-except EnvError:
-    REDIS_HOST = f"redis://{env.str("REDIS_HOST")}:{env.str("REDIS_PORT")}"
-
+# Backend
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
         "CONFIG": {
-            "hosts": [REDIS_HOST],
+            "hosts": [{"address": env.str("REDIS_URL"), "health_check_interval": 15}],
         },
     },
 }
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": REDIS_HOST,
+        "LOCATION": env.str("REDIS_URL"),
         "OPTIONS": {
             "db": 1,
         },
     }
 }
-
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-
-# Database
 default_engine = env.str("DB_ENGINE", default="django.db.backends.sqlite3")
 DATABASES = {
     "default": {
@@ -111,7 +95,6 @@ DATABASES = {
         "NAME": env.str("DB_NAME", default=BASE_DIR / "db.sqlite3"),
     }
 }
-
 if default_engine != "django.db.backends.sqlite3":
     DATABASES["default"].update(
         {
@@ -148,11 +131,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "Europe/Paris"
-
 USE_TZ = True
-
 USE_I18N = True
 
 
@@ -165,13 +145,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "/static/"
-
-STATIC_ROOT = os.path.join(BASE_DIR, "public/static")
-MEDIA_ROOT = os.path.join(BASE_DIR, "public/media")
-
-CLIENT_APP_DIR = os.path.abspath(os.path.join(BASE_DIR, "../../client"))
-
-STATICFILES_DIRS = [("web", os.path.join(CLIENT_APP_DIR, "dist"))]
+STATIC_ROOT = BASE_DIR / "public" / "static"
+MEDIA_ROOT = BASE_DIR / "public" / "media"
+CLIENT_APP_DIR = BASE_DIR.parent / "client"
+STATICFILES_DIRS = [("web", CLIENT_APP_DIR / "dist")]
 
 # Django-vite
 # https://github.com/MrBin99/django-vite
@@ -197,7 +174,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
-
 SPECTACULAR_SETTINGS = {
     "TITLE": "Raviolichess API",
     "DESCRIPTION": "An API for an happy ravioli",
@@ -206,6 +182,7 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
+# Logs
 
 LOGGING = {
     "version": 1,

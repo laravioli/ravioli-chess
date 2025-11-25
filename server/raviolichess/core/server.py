@@ -20,8 +20,8 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "channels",
-    "user",
-    "game",
+    "raviolichess.user",
+    "raviolichess.game",
 ]
 
 settings.configure(

@@ -39,7 +39,7 @@ async def lifespan_app(scope, receive, send):
         if message["type"] == "lifespan.startup":
             await send({"type": "lifespan.startup.complete"})
         elif message["type"] == "lifespan.shutdown":
-            await get_channel_layer().close_pools()
+            await get_channel_layer().flush()
             await send({"type": "lifespan.shutdown.complete"})
             return
 

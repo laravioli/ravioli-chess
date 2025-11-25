@@ -183,7 +183,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-#static
+#public
+public/
 static/
 #personal notes
 notes.txt
