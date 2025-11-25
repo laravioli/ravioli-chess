@@ -145,6 +145,8 @@ class GameActor(QueueMixin):
         self._queue = asyncio.Queue()
         self.channel = ChanGame(self.game_id).chan
         self.group_channel = GroupChanGame(self.game_id).chan
+        self.encoder = msgspec.json.Encoder()
+        self.decoder = msgspec.json.Decoder(GameProtocolIn)
 
     async def start(self, send_ready, subscribe):
         logger.info("Starting game actor %s", self.game_id)
@@ -152,7 +154,7 @@ class GameActor(QueueMixin):
         await send_ready(
             {
                 "type": "game.created",
-                "data": msgspec.json.encode(GameCreateOut(self.game_id)),
+                "data": self.encoder.encode(GameCreateOut(self.game_id)),
             }
         )
 
@@ -162,11 +164,9 @@ class GameActor(QueueMixin):
             while True:
                 raw_data = await self.get_message()
                 self.t1 = time.perf_counter()
-                await self.handle_message(
-                    msgspec.json.decode(raw_data, type=GameProtocolIn)
-                )
+                await self.handle_message(self.decoder.decode(raw_data))
                 self.t2 = time.perf_counter()
-                print(f"handled msg in{(self.t2 - self.t1)*1000}ms :")
+                print(f"handled msg in{(self.t2 - self.t1)*1000} ms")
         except asyncio.CancelledError:
             logger.info("Game actor cancelled %s", self.game_id)
             raise
@@ -185,16 +185,19 @@ class GameActor(QueueMixin):
 
                         response = {
                             "type": "game.move",
-                            "data": msgspec.json.encode(MoveOut(ok=True, san=san)),
+                            "data": self.encoder.encode(MoveOut(ok=True, san=san)),
                         }
                     except ValueError:
                         response = {
                             "type": "game.move",
-                            "data": msgspec.json.encode(MoveOut(ok=False, san=san)),
+                            "data": self.encoder.encode(MoveOut(ok=False, san=san)),
                         }
                         raise GameStop from None
                 case _:
                     logger.warning("Unknown message received: %s", msg)
         finally:
             if response is not None:
+                self.t3 = time.perf_counter()
                 await get_channel_layer().group_send(self.group_channel, response)
+                self.t4 = time.perf_counter()
+                print(f"group send in{(self.t4 - self.t3)*1000} ms")
