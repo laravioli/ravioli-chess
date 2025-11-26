@@ -2,10 +2,14 @@ import msgspec
 import logging
 import time
 from channels.generic.websocket import AsyncWebsocketConsumer
-from ipc.layer import get_layer
-from ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
-from ipc.protocol.client import GameCreateRequest, GameCreateResponse, GameMoveRequest
-from ipc.protocol.game import GameCreateIn, MoveIn
+from raviolichess.ipc.layer import get_layer
+from raviolichess.ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
+from raviolichess.ipc.protocol.client import (
+    GameCreateRequest,
+    GameCreateResponse,
+    GameMoveRequest,
+)
+from raviolichess.ipc.protocol.game import GameCreateIn, MoveIn
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +55,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     @staticmethod
     async def publish(channel, msg):
-        layer = get_layer("redis")
+        layer = get_layer()
         await layer.publish(channel, msgspec.json.encode(msg))
 
     # channel layer handlers

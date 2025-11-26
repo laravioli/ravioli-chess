@@ -1,7 +1,7 @@
-from profile.models import Profile
-from profile.serializers import ProfileSerializer
-from django.core.signing import BadSignature
 from urllib.parse import parse_qsl
+from django.core.signing import BadSignature
+from raviolichess.profile.models import Profile
+from raviolichess.profile.serializers import ProfileSerializer
 
 PIECE_VARS = {
     "---white-pawn": "wP",

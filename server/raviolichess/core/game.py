@@ -7,12 +7,12 @@ from functools import cached_property, partial
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
+from raviolichess.game.models import Game
+from raviolichess.ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
+from raviolichess.ipc.protocol.game import *
 from .background import BackgroundSubscriber
 from .idprovider import AsyncIdProvider
-from game.models import Game
-from ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
 from .exceptions import GameStop
-from ipc.protocol.game import *
 
 user_model = get_user_model()
 

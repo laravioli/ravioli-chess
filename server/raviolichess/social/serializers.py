@@ -1,7 +1,7 @@
-from .models import Friend, FriendRequest
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_serializer
+from .models import Friend, FriendRequest
 
 user_model = get_user_model()
 

@@ -1,6 +1,6 @@
-from typing import ClassVar
-from abc import ABC, abstractmethod
 from functools import cached_property
+from abc import ABC, abstractmethod
+from typing import ClassVar
 
 
 class Channel(ABC):

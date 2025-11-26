@@ -1,6 +1,5 @@
 import os
 from environs import env
-from environs.exceptions import EnvError
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -59,7 +58,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "web.context_processors.base_context",
+                "raviolichess.web.context_processors.base_context",
             ],
         },
     },
@@ -74,9 +73,22 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.pubsub.RedisPubSubChannelLayer",
         "CONFIG": {
-            "hosts": [{"address": env.str("REDIS_URL"), "health_check_interval": 15}],
+            "hosts": [
+                {"address": env.str("REDIS_URL"), "health_check_interval": 15, "db": 0}
+            ],
         },
     },
+}
+RAVIOLI_LAYERS = {
+    "default": {
+        "BACKEND": "redis",
+        "LOCATION": env.str("REDIS_URL"),
+        "OPTIONS": {
+            "decode_responses": False,
+            "health_check_interval": 15,
+            "db": 1,
+        },
+    }
 }
 CACHES = {
     "default": {

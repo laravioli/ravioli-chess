@@ -1,15 +1,15 @@
-from .models import FriendRequest, Friend
-from .serializers import FriendRequestSerializer, FriendSerializer
-from api.serializers import EmptyRequestSerializer
-from rest_framework import viewsets, mixins, status
-from rest_framework.permissions import IsAuthenticated
-from api.pagination import SmallResultsSetPagination
 from django.contrib.auth import get_user_model
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from rest_framework import viewsets, mixins, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
+from raviolichess.api.serializers import EmptyRequestSerializer
+from raviolichess.api.pagination import SmallResultsSetPagination
+from .models import FriendRequest, Friend
+from .serializers import FriendRequestSerializer, FriendSerializer
 
 
 user_model = get_user_model()

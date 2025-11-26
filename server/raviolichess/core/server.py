@@ -8,6 +8,7 @@ from django.conf import settings
 from raviolichess.settings import (
     DEBUG,
     CHANNEL_LAYERS,
+    RAVIOLI_LAYERS,
     DATABASES,
     LANGUAGE_CODE,
     TIME_ZONE,
@@ -28,6 +29,7 @@ settings.configure(
     DEBUG=DEBUG,
     INSTALLED_APPS=INSTALLED_APPS,
     CHANNEL_LAYERS=CHANNEL_LAYERS,
+    RAVIOLI_LAYERS=RAVIOLI_LAYERS,
     DATABASES=DATABASES,
     LANGUAGE_CODE=LANGUAGE_CODE,
     TIME_ZONE=TIME_ZONE,

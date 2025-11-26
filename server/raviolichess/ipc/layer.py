@@ -1,45 +1,36 @@
 import redis.asyncio as aioredis
-from environs import env
-from collections import defaultdict
 from typing import overload, Literal
-from functools import partial
+
+from django.conf import settings
 
 
-class Layer:
-    "websocket <-> game_backend"
+class RavioliLayerManager:
+    "Container that manage (ipc AND cache) client"
 
     BACKENDS = {
-        "redis": partial(aioredis.Redis.from_url, env.str("REDIS_URL")),
-    }
-
-    DEFAULT_CONFIG = {
-        "redis": {
-            "decode_responses": False,
-            "health_check_interval": 15,
-            "db": 1,
-        },
+        "redis": lambda location, options: aioredis.Redis.from_url(location, **options),
     }
 
     def __init__(self):
         self.backends = {}
-        self.config_overrides = defaultdict(dict)
+
+    @property
+    def default_config(self):
+        return getattr(settings, "RAVIOLI_LAYERS", {})
 
     def __getitem__(self, key):
         if key not in self.backends:
-            config = self.DEFAULT_CONFIG.get(key, {}) | self.config_overrides[key]
-            self.backends[key] = self.BACKENDS[key](**config)
+            config = self.default_config[key]
+            self.backends[key] = self.BACKENDS[config["BACKEND"]](
+                config["LOCATION"], config["OPTIONS"]
+            )
         return self.backends[key]
-
-    def set_config(self, key, **kwargs):
-        if key in self.backends:
-            raise RuntimeError("Backend already created, cannot set config")
-        self.config_overrides[key] |= kwargs
 
 
 @overload
 def get_layer(key: Literal["redis"]) -> aioredis.Redis: ...
-def get_layer(key):
+def get_layer(key="default"):
     return layer[key]
 
 
-layer = Layer()
+layer = RavioliLayerManager()

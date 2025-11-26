@@ -1,5 +1,5 @@
-from ipc.channels import Channel
 from abc import ABC, abstractmethod
+from raviolichess.ipc.channels import Channel
 from typing import TypeVar, Generic
 
 T = TypeVar("T", bound=Channel)

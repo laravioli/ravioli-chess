@@ -17,15 +17,15 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-from raviolichess import settings
 from django.conf.urls.static import static
+from raviolichess import settings
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    path("api/", include("api.urls")),
-    path("", include("web.urls")),
+    path("api/", include("raviolichess.api.urls")),
+    path("", include("raviolichess.web.urls")),
 ]
 
 if settings.DEBUG:

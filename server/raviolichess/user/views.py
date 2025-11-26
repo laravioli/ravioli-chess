@@ -1,12 +1,12 @@
-from rest_framework import permissions, generics, views, viewsets
-from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
+from rest_framework import permissions, generics, views, viewsets
+from rest_framework.response import Response
 from rest_framework import status, filters
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
-from api.serializers import DetailResponseSerializer
-from profile.serializers import ProfileSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from raviolichess.api.serializers import DetailResponseSerializer
+from raviolichess.profile.serializers import ProfileSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 
 
 # todo : add pagination

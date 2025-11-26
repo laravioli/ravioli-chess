@@ -45,7 +45,7 @@ async def lifespan_app(scope, receive, send):
 
 
 # ASGI APP
-from websocket.routing import websocket_urlpatterns
+from raviolichess.websocket.routing import websocket_urlpatterns
 
 app = ProtocolTypeRouter(
     http_protocol

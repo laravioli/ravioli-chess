@@ -1,11 +1,10 @@
 import asyncio
-from .background import Background
 from redis.asyncio import Redis
 from redis.asyncio.client import PubSub
-from redis.exceptions import PubSubError
+from .background import Background
 
 
-class ChannelManager:
+class PubSubManager:
     """pubsub for process communication"""
 
     def __init__(self, *, layer: Redis):

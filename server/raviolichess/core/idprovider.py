@@ -1,9 +1,12 @@
+import string
+import random
 import asyncio
-from ipc.channels import Channel
-from .background import BackgroundSubscriber
 from functools import cached_property
+from channels.db import database_sync_to_async
 from redis.exceptions import LockError, RedisError
-from functools import cached_property
+from raviolichess.ipc.channels import Channel
+from raviolichess.game.models import Game
+from .background import BackgroundSubscriber
 
 
 class SequencerMixin:
@@ -83,3 +86,23 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
         """called by Notifier when another process publish to related chan"""
         self._event.set()
         self._event.clear()
+
+
+# GAME ID
+ID_CHARS = string.ascii_letters + string.digits
+
+
+def id8():
+    return "".join(random.choice(ID_CHARS) for _ in range(8))
+
+
+@database_sync_to_async
+def get_collision_ids(ids):
+    return set(Game.objects.filter(game_id__in=ids).values_list("game_id", flat=True))
+
+
+async def game_id_generator(*, batch):
+
+    ids = {id8() for _ in range(batch)}
+    ids_collision_db = await get_collision_ids(ids)
+    return ids - ids_collision_db

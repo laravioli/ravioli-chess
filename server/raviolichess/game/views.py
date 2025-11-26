@@ -1,8 +1,8 @@
 from rest_framework import permissions, generics, viewsets
+from django.db.models import Q
+from raviolichess.api.pagination import LargeResultsSetPagination
 from .models import Game
 from .serializers import GameSerializer
-from api.pagination import LargeResultsSetPagination
-from django.db.models import Q
 
 
 class GameListViewSet(generics.ListAPIView, viewsets.GenericViewSet):

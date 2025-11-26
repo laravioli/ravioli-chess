@@ -1,6 +1,6 @@
 import msgspec
 from typing import Optional
-from ipc.protocol.game import GameCreateOut
+from .game import GameCreateOut
 
 ###-#-#-#-#-#-#-#-#-#-#-#-#-#-###
 # PROTOCOL                      #
