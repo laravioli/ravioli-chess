@@ -4,17 +4,24 @@ import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from raviolichess.ipc.layer import get_layer
 from raviolichess.ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
-from raviolichess.ipc.protocol.client import (
-    GameCreateRequest,
-    GameCreateResponse,
-    GameMoveRequest,
-)
+from raviolichess.ipc.protocol.client import *
 from raviolichess.ipc.protocol.game import GameCreateIn, MoveIn
 
 logger = logging.getLogger(__name__)
 
 GameRequest = GameCreateRequest | GameMoveRequest
 GameCreateChan = ChanGameCreate(1).chan
+
+
+# OSError -> uvicorn client disconnected -> throw if we send but client disconnected
+# BaseException -> uvicorn throw if we dont respect the protocol -> could
+# happen with AsyncWebSocketConsumer + channel_redis
+# because what could happen : (channel) dispatch yield -> we receive a disconnect a frame ->
+# -> because dispatch is sequential -> back to (channel dispatch) -> send -> Error
+# -> the rules are: only one disptatch at a time, the other family can receive a frame if
+# dispatch yield
+# im fine with the OSError, not the RunTimeError because of how django channel handle interaction between 2 pipes of communication
+# so i will create my own base consumer
 
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -83,3 +90,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             event["data"],
         )
         await self.send(text_data=event["data"].decode())
+
+    async def disconnect(self, code):
+        print("then end")

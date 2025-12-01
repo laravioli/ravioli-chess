@@ -1,7 +1,7 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-  input: '../server/openapi.yaml',
+  input: '../openapi.yaml',
   output: {
     format: 'prettier',
     lint: 'eslint',

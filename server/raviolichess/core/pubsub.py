@@ -3,6 +3,10 @@ from redis.asyncio import Redis
 from redis.asyncio.client import PubSub
 from .background import Background
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class PubSubManager:
     """pubsub for process communication"""
