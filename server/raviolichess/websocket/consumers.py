@@ -4,7 +4,7 @@ import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from raviolichess.ipc.layer import get_layer
 from raviolichess.ipc.channels import GameCreateChan, GameChan, GameGroupChan
-from raviolichess.ipc.protocol import clientIN, clientOUT, ravioIN
+from raviolichess.ipc.protocol import clientIN, clientOUT, ravioIN, ravioOUT
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     @staticmethod
     async def publish(channel, msg):
         layer = get_layer()
-        await layer.publish(channel, msgspec.json.encode(msg))
+        await layer.publish(channel, msgspec.msgpack.encode(msg))
 
     # channel layer handlers
     async def game_created(self, event):
@@ -63,12 +63,13 @@ class GameConsumer(AsyncWebsocketConsumer):
             event["data"],
         )
         # current impl for testing
-        game_id = msgspec.json.decode(event["data"], type=clientIN.GameCreate).game_id
+        msg = msgspec.msgpack.decode(event["data"], type=clientIN.GameCreate)
+        game_id = msg.game_id
         self.game_channel = GameChan(game_id)
         logger.info("game channel %s", self.game_channel)
         await self.channel_layer.group_add(GameGroupChan(game_id), self.channel_name)
 
-        await self.send(text_data=event["data"].decode())
+        await self.send(text_data=msgspec.json.encode(msg).decode())
 
     async def game_move(self, event):
         self.t2 = time.perf_counter()
@@ -76,4 +77,5 @@ class GameConsumer(AsyncWebsocketConsumer):
             f"received from gamer server in {(self.t2 - self.t1)*1000}ms :",
             event["data"],
         )
-        await self.send(text_data=event["data"].decode())
+        msg = msgspec.msgpack.decode(event["data"], type=ravioOUT.GameMove)
+        await self.send(msgspec.json.encode(msg).decode())

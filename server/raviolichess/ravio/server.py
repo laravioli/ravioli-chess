@@ -62,7 +62,7 @@ async def main():
 
     print(f"Started server process [{os.getpid()}]")
     print("Waiting for application startup.")
-    app: App = await start_app()
+    app: App = await start_app(1)
     print("Application startup complete.")
 
     await shutdown_event.wait()

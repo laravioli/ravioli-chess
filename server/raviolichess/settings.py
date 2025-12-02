@@ -206,7 +206,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "INFO",
+            "level": "DEBUG",
             "stream": "ext://sys.stdout",
             "class": "logging.StreamHandler",
         },
@@ -219,12 +219,17 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": env.str("RAVIOLICHESS_LOG_LEVEL", default="INFO"),
+        "level": env.str("RAVIOLICHESS_LOG_LEVEL", default="DEBUG"),
     },
     "loggers": {
         "django": {
             "handlers": ["django.console"],
             "level": env.str("DJANGO_LOG_LEVEL", default="INFO"),
+            "propagate": False,
+        },
+        "raviolichess": {
+            "handlers": ["console"],
+            "level": "DEBUG",
             "propagate": False,
         },
     },

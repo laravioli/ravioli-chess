@@ -1,6 +1,6 @@
 from __future__ import annotations
 import msgspec
-from typing import Optional
+from typing import Optional, Union
 
 # ╔══════════════════════════════════════╗
 # ║   PROTOCOL IN : ravio <- ws          ║
@@ -25,4 +25,4 @@ class GameResign(Game):
     player: str
 
 
-Protocol = GameMove | GameResign
+Protocol = Union[GameMove, GameResign]

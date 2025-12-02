@@ -1,5 +1,3 @@
-import msgspec
-from typing import Optional
 from ..protocol import ravioOUT
 
 # ╔══════════════════════════════════════╗

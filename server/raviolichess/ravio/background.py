@@ -19,15 +19,21 @@ class BackgroundSubscriber(ABC, Generic[T]):
         ...
 
 
-class Background:
-    _registry = {}
+class BackgroundRegistry:
 
-    @classmethod
-    def register(cls, instance: BackgroundSubscriber[T]):
+    def __init__(self):
+        self._registry: dict[str, BackgroundSubscriber] = {}
+
+    def register(self, name, instance: BackgroundSubscriber[T]):
         """add a background subscriber to registry"""
         assert isinstance(instance, BackgroundSubscriber)
-        cls._registry[instance.channel] = instance.on_message
+        self._registry[name] = instance
 
-    @classmethod
-    def all(cls):
-        return cls._registry
+    def get_subscriptions(self) -> dict:
+        return {
+            instance.channel: instance.on_message
+            for instance in self._registry.values()
+        }
+
+    def get(self, key):
+        return self._registry[key]

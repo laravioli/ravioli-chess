@@ -1,16 +1,16 @@
 import asyncio
-import msgspec
-import logging
 import chess
-from abc import ABC
-from functools import cached_property, partial
+import functools
+import logging
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from raviolichess.game.models import Game
 from raviolichess.ipc.channels import GameCreateChan, GameChan, GameGroupChan
 from raviolichess.ipc.protocol import ravioIN, ravioOUT
+from raviolichess.ipc.serializers import MsgpackSerializer
 from .background import BackgroundSubscriber
+from .manager import Manager
 from .idprovider import AsyncIdProvider
 from .exceptions import GameStop
 
@@ -29,7 +29,7 @@ class GameDB:
     def create_game_db(game_id, white_player=None, black_player=None):
         usernames = [white_player, black_player]
         qs = user_model.objects.filter(username__in=usernames)
-        players = list(map(partial(GameDB._get_user_from_qs, qs), usernames))
+        players = list(map(functools.partial(GameDB._get_user_from_qs, qs), usernames))
 
         Game.objects.create(
             game_id=game_id,
@@ -55,10 +55,15 @@ class GameDB:
         return id
 
 
-class QueueMixin(ABC):
-    "store encoded message from a pubsub channel"
+class GameQueue(BackgroundSubscriber[GameCreateChan]):
 
-    _queue: asyncio.Queue
+    def __init__(self, pid):
+        self._pid = pid
+        self._queue = asyncio.Queue()
+
+    @functools.cached_property
+    def channel(self):
+        return GameCreateChan(self._pid)
 
     def on_message(self, message):
         "pubsub handler to fill queue"
@@ -69,140 +74,151 @@ class QueueMixin(ABC):
         return await self._queue.get()
 
 
-class GameQueue(QueueMixin, BackgroundSubscriber[GameCreateChan]):
+class GameManager(Manager):
 
-    def __init__(self, pid):
-        self._pid = pid
-        self._queue = asyncio.Queue()
-
-    @cached_property
-    def channel(self):
-        return GameCreateChan(self._pid)
-
-    async def stop(self):
-        self._queue.shutdown()
-
-
-class GameManager:
-
-    def __init__(self, game_queue: GameQueue, game_db: GameDB):
-        self._tasks = set()
-        self._actors = set()
-        self._queue = game_queue
-        self._db = game_db
-
-    def start(self, subscribe, unsubscribe):
+    def __init__(
+        self,
+        serializer: MsgpackSerializer,
+        game_queue: GameQueue,
+        game_db: GameDB,
+        subscribe,
+        unsubscribe,
+    ):
+        self.serializer = serializer
+        self._game_queue = game_queue
+        self._game_db = game_db
         self.subscribe = subscribe
         self.unsubscribe = unsubscribe
-        self._task = asyncio.create_task(self.run())
+        self._start_tasks = set()
+        self._actor_tasks = set()
+        self._actor_channels: dict[str, asyncio.Queue] = {}
+
+    def start(self) -> asyncio.Task:
+        run_task = asyncio.create_task(self.run())
+        return run_task
 
     async def run(self):
-        while True:
-            raw_data = await self._queue.get_message()
-            task = asyncio.create_task(self.start_game(raw_data))
-            self._tasks.add(task)
-            task.add_done_callback(self._tasks.discard)
+        try:
+            while True:
+                raw_msg = await self._game_queue.get_message()
+                task = asyncio.create_task(self.start_one(raw_msg))
+                self._start_tasks.add(task)
+                task.add_done_callback(self._start_tasks.discard)
+        finally:
+            # cleanup
+            await self.stop()
 
-    async def start_game(self, raw_data):
-        msg = msgspec.json.decode(raw_data, type=ravioIN.GameCreate)
-        id = await self._db.create(msg)
-        actor = self.start_game_actor(id, msg)
-        self._actors.add(actor)
-        actor.add_done_callback(self._actors.discard)
+    async def start_one(self, raw_msg):
+        msg: ravioIN.GameCreate = self.serializer.deserialize(
+            raw_msg, type=ravioIN.GameCreate
+        )
+        id = await self._game_db.create(msg)
 
-    def start_game_actor(self, id, msg: ravioIN.GameCreate):
-        game = GameActor(
+        send_channel = GameGroupChan(id)
+        receive_channel = GameChan(id)
+
+        ready = functools.partial(self.ready, msg.channel)
+        send = functools.partial(self.send, send_channel)
+        receive = functools.partial(self.receive, receive_channel)
+        stop_actor = functools.partial(self.stop_actor, receive_channel)
+
+        self._actor_channels[receive_channel] = asyncio.Queue()
+        await self.subscribe(
+            {receive_channel: functools.partial(self.on_message, receive_channel)}
+        )
+
+        game_actor = GameActor(
             game_id=id, white_player=msg.white_player, black_player=msg.black_player
         )
-        ready_signal = partial(get_channel_layer().send, msg.channel)
-        actor = asyncio.create_task(
-            game(ready_signal, self.subscribe, self.unsubscribe)
+
+        actor = asyncio.create_task(game_actor(ready, send, receive, stop_actor))
+        self._actor_tasks.add(actor)
+        actor.add_done_callback(self._actor_tasks.discard)
+
+    async def on_message(self, receive_channel, msg) -> None:
+        if receive_channel in self._actor_channels:
+            self._actor_channels[receive_channel].put_nowait(msg["data"])
+
+    async def ready(self, ws_channel, id) -> None:
+        await get_channel_layer().send(
+            ws_channel,
+            {
+                "type": "game.created",
+                "data": self.serializer.serialize(ravioOUT.GameCreate(id)),
+            },
         )
-        return actor
+
+    async def send(self, send_channel, type: str, msg: ravioOUT.Protocol):
+        data = self.serializer.serialize(msg)
+        await get_channel_layer().group_send(send_channel, {"type": type, "data": data})
+
+    async def receive(self, receive_channel) -> ravioIN.Protocol:
+        msg = await self._actor_channels[receive_channel].get()
+        return self.serializer.deserialize(msg, type=ravioIN.Protocol)
+
+    async def stop_actor(self, receive_channel) -> None:
+        try:
+            await self.unsubscribe(receive_channel)
+        except BaseException:
+            logger.exception("Error while unsubscribing actor")
+        finally:
+            del self._actor_channels[receive_channel]
 
     async def stop(self):
-        self._task.cancel()
-        try:
-            await self._task
-        except asyncio.CancelledError:
-            pass
-        for actor in self._actors:
+        for start_task in self._start_tasks:
+            start_task.cancel()
+        for actor in self._actor_tasks:
             actor.cancel()
-        await asyncio.gather(*self._actors, return_exceptions=True)
-        self._actors.clear()
+        exc = await asyncio.gather(
+            *self._start_tasks, *self._actor_tasks, return_exceptions=True
+        )
+        logger.debug(exc)
 
 
-import time
-
-
-class GameActor(QueueMixin):
+class GameActor:
 
     def __init__(self, *, game_id, white_player, black_player):
         self.game_id = game_id
         self.white_player = white_player
         self.black_player = black_player
         self._board = chess.Board()
-        self._queue = asyncio.Queue()
-        self.from_channel = GameChan(self.game_id)
-        self.to_channel = GameGroupChan(self.game_id)
-        self.encoder = msgspec.json.Encoder()
-        self.decoder = msgspec.json.Decoder(type=ravioIN.Protocol)
 
-    async def start(self, send_ready, subscribe):
-        logger.info("Starting game actor %s", self.game_id)
-        await subscribe({self.from_channel: self.on_message})
-        await send_ready(
-            {
-                "type": "game.created",
-                "data": self.encoder.encode(ravioOUT.GameCreate(self.game_id)),
-            }
-        )
-
-    async def __call__(self, send_ready, subscribe, unsubscribe):
-        await self.start(send_ready=send_ready, subscribe=subscribe)
+    async def __call__(self, ready, send, receive, stop):
         try:
+            await ready(self.game_id)
             while True:
-                raw_data = await self.get_message()
-                self.t1 = time.perf_counter()
-                await self.handle_message(self.decoder.decode(raw_data))
-                self.t2 = time.perf_counter()
-                print(f"handled msg in{(self.t2 - self.t1)*1000} ms")
+                msg = await receive()
+                type, response, should_stop = self.handle_message(msg)
+                if response:
+                    await send(type, response)
+                if should_stop:
+                    raise GameStop()
         except asyncio.CancelledError:
-            logger.info("Game actor cancelled %s", self.game_id)
+            logger.debug("Game actor cancelled %s", self.game_id)
             raise
         except GameStop:
-            logger.info("Stop game actor %s", self.game_id)
+            logger.debug("Stop game actor %s", self.game_id)
         finally:
             # cleanup
-            await unsubscribe(self.from_channel)
+            await stop()
 
-    async def handle_message(self, msg):
-        response = None
-        try:
-            match msg:
-                case ravioIN.GameMove(san):
-                    try:
-                        self._board.push_san(san)
+    def handle_message(
+        self, msg: ravioIN.Protocol
+    ) -> tuple[str, ravioOUT.Protocol, bool]:
+        type, response = None, None
+        should_stop = False
 
-                        response = {
-                            "type": "game.move",
-                            "data": self.encoder.encode(
-                                ravioOUT.GameMove(ok=True, san=san)
-                            ),
-                        }
-                    except ValueError:
-                        response = {
-                            "type": "game.move",
-                            "data": self.encoder.encode(
-                                ravioOUT.GameMove(ok=False, san=san)
-                            ),
-                        }
-                        raise GameStop from None
-                case _:
-                    logger.warning("Unknown message received: %s", msg)
-        finally:
-            if response is not None:
-                self.t3 = time.perf_counter()
-                await get_channel_layer().group_send(self.to_channel, response)
-                self.t4 = time.perf_counter()
-                print(f"group send in{(self.t4 - self.t3)*1000} ms")
+        match msg:
+            case ravioIN.GameMove(san):
+                type = "game.move"
+                try:
+                    self._board.push_san(san)
+                    response = ravioOUT.GameMove(ok=True, san=san)
+                except ValueError:
+                    response = ravioOUT.GameMove(ok=False, san=san)
+                    should_stop = True
+            case _:
+                logger.warning("Unknown message received: %s", msg)
+                should_stop = True
+
+        return type, response, should_stop

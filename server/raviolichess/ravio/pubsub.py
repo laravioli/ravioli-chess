@@ -1,39 +1,38 @@
 import asyncio
+import logging
 from redis.asyncio import Redis
 from redis.asyncio.client import PubSub
-from .background import Background
-
-import logging
+from .manager import Manager
 
 logger = logging.getLogger(__name__)
 
 
-class PubSubManager:
+class PubSubManager(Manager):
     """pubsub for process communication"""
 
-    def __init__(self, *, layer: Redis):
+    def __init__(self, *, layer: Redis, subscriptions: dict):
         self._pubsub: PubSub = layer.pubsub(ignore_subscribe_messages=True)
+        self._subscriptions = subscriptions
         self._lock = asyncio.Lock()
 
     def start(self):
-        self._task = asyncio.create_task(self.run())
+        run_task = asyncio.create_task(self.run())
+        return run_task
 
+    # todo: make run more robust to error
     async def run(self):
-        # run must be called after all background susbcriber are registered
-        p = self._pubsub
-        async with p:
-            await p.subscribe(**Background.all())
-            async for _ in p.listen():
-                pass
+        try:
+            p = self._pubsub
+            async with p:
+                await p.subscribe(**self._subscriptions)
+                async for _ in p.listen():
+                    pass
+        finally:
+            # cleanup
+            await self.stop()
 
     async def stop(self):
-        self._task.cancel()
-        try:
-            await self._task
-        except asyncio.CancelledError:
-            pass
-        finally:
-            await self._pubsub.aclose()
+        await self._pubsub.aclose()
 
     async def subscribe(self, channel_with_callback):
         async with self._lock:
@@ -42,15 +41,3 @@ class PubSubManager:
     async def unsubscribe(self, channel):
         async with self._lock:
             await self._pubsub.unsubscribe(channel)
-
-
-# if i need gather -> return exeption = True to not leak tasks or TaskGroup
-
-# Note
-# A new alternative to create and run tasks concurrently and wait for their completion is asyncio.TaskGroup.
-# TaskGroup provides stronger safety guarantees than gather for scheduling a nesting of subtasks:
-# if a task (or a subtask, a task scheduled by a task) raises an exception,
-# TaskGroup will, while gather will not, cancel the remaining scheduled tasks).
-
-# when masking cancellation (uncancelled)
-# If end-user code is, for some reason, suppressing cancellation by catching CancelledError, it needs to call this method to remove the cancellation state.

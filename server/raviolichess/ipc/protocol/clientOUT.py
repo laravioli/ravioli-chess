@@ -1,5 +1,5 @@
 import msgspec
-from typing import Optional
+from typing import Optional, Union
 
 # ╔══════════════════════════════════════╗
 # ║   PROTOCOL OUT : client -> ws        ║
@@ -24,4 +24,4 @@ class GameMove(TMessage, tag="move"):
     data: Move = msgspec.field(name="d")
 
 
-Protocol = GameCreate | GameMove
+Protocol = Union[GameCreate, GameMove]

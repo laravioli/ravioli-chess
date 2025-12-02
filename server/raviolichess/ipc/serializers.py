@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import json
 import msgspec
-from typing import TypeVar, Generic, Any
+from typing import TypeVar, Generic, Union, Any, get_origin
 
 T = TypeVar("T", bytes, str)
 
@@ -30,11 +30,11 @@ class DefaultDecoder(dict[type, msgspec.json.Decoder]):
             raise ValueError("unsupported serializer format")
 
     def __missing__(self, key):
-        if isinstance(key, type):
+        if isinstance(key, type) or get_origin(key) is Union:
             decoder = self.factory(type=key)
             self[key] = decoder
             return decoder
-        raise ValueError("key must be a type")
+        raise ValueError("key must be a type or a Union")
 
 
 class JsonSerializer(BaseSerializer[str]):
@@ -63,3 +63,22 @@ class MsgpackSerializer(BaseSerializer[bytes]):
 
     def deserialize(self, message: bytes, *, type: type):
         return self._decoders[type].decode(message)
+
+
+class SerializerRegistry:
+    """a container that store serializer instance. not thread safe"""
+
+    def __init__(self):
+        self._registry: dict[str, BaseSerializer] = {}
+
+    def register(self, format, serializer_instance):
+        assert isinstance(serializer_instance, BaseSerializer)
+        self._registry[format] = serializer_instance
+
+    @property
+    def json(self) -> JsonSerializer:
+        return self._registry["json"]
+
+    @property
+    def msgpack(self) -> MsgpackSerializer:
+        return self._registry["msgpack"]

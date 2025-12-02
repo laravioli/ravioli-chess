@@ -1,5 +1,6 @@
 from __future__ import annotations
 import msgspec
+from typing import Union
 
 # ╔══════════════════════════════════════╗
 # ║   PROTOCOL OUT : ravio -> ws         ║
@@ -23,4 +24,4 @@ class GameEnd(Game):
     reason: str
 
 
-Protocol = GameMove | GameEnd
+Protocol = Union[GameMove, GameEnd]
