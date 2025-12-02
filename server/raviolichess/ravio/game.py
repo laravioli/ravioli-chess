@@ -8,8 +8,8 @@ from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from raviolichess.game.models import Game
-from raviolichess.ipc.channels import ChanGameCreate, ChanGame, GroupChanGame
-from raviolichess.ipc.protocol.game import *
+from raviolichess.ipc.channels import GameCreateChan, GameChan, GameGroupChan
+from raviolichess.ipc.protocol import ravioIN, ravioOUT
 from .background import BackgroundSubscriber
 from .idprovider import AsyncIdProvider
 from .exceptions import GameStop
@@ -46,17 +46,17 @@ class GameDB:
                     return user
         return None
 
-    async def create(self, msg: GameCreateIn):
+    async def create(self, msg: ravioIN.GameCreate):
         id = await self._id_provider.one()
         await self.create_game_db(
             game_id=id, white_player=msg.white_player, black_player=msg.black_player
         )
+
         return id
 
 
-# to do: create serialization class
-# to think : eventually decode message here
 class QueueMixin(ABC):
+    "store encoded message from a pubsub channel"
 
     _queue: asyncio.Queue
 
@@ -69,7 +69,7 @@ class QueueMixin(ABC):
         return await self._queue.get()
 
 
-class GameQueue(QueueMixin, BackgroundSubscriber[ChanGameCreate]):
+class GameQueue(QueueMixin, BackgroundSubscriber[GameCreateChan]):
 
     def __init__(self, pid):
         self._pid = pid
@@ -77,7 +77,7 @@ class GameQueue(QueueMixin, BackgroundSubscriber[ChanGameCreate]):
 
     @cached_property
     def channel(self):
-        return ChanGameCreate(self._pid)
+        return GameCreateChan(self._pid)
 
     async def stop(self):
         self._queue.shutdown()
@@ -104,13 +104,13 @@ class GameManager:
             task.add_done_callback(self._tasks.discard)
 
     async def start_game(self, raw_data):
-        msg = msgspec.json.decode(raw_data, type=GameCreateIn)
+        msg = msgspec.json.decode(raw_data, type=ravioIN.GameCreate)
         id = await self._db.create(msg)
         actor = self.start_game_actor(id, msg)
         self._actors.add(actor)
         actor.add_done_callback(self._actors.discard)
 
-    def start_game_actor(self, id, msg: GameCreateIn):
+    def start_game_actor(self, id, msg: ravioIN.GameCreate):
         game = GameActor(
             game_id=id, white_player=msg.white_player, black_player=msg.black_player
         )
@@ -143,18 +143,18 @@ class GameActor(QueueMixin):
         self.black_player = black_player
         self._board = chess.Board()
         self._queue = asyncio.Queue()
-        self.channel = ChanGame(self.game_id).chan
-        self.group_channel = GroupChanGame(self.game_id).chan
+        self.from_channel = GameChan(self.game_id)
+        self.to_channel = GameGroupChan(self.game_id)
         self.encoder = msgspec.json.Encoder()
-        self.decoder = msgspec.json.Decoder(GameProtocolIn)
+        self.decoder = msgspec.json.Decoder(type=ravioIN.Protocol)
 
     async def start(self, send_ready, subscribe):
         logger.info("Starting game actor %s", self.game_id)
-        await subscribe({self.channel: self.on_message})
+        await subscribe({self.from_channel: self.on_message})
         await send_ready(
             {
                 "type": "game.created",
-                "data": self.encoder.encode(GameCreateOut(self.game_id)),
+                "data": self.encoder.encode(ravioOUT.GameCreate(self.game_id)),
             }
         )
 
@@ -173,24 +173,29 @@ class GameActor(QueueMixin):
         except GameStop:
             logger.info("Stop game actor %s", self.game_id)
         finally:
-            await unsubscribe(self.channel)
+            # cleanup
+            await unsubscribe(self.from_channel)
 
     async def handle_message(self, msg):
         response = None
         try:
             match msg:
-                case MoveIn(san):
+                case ravioIN.GameMove(san):
                     try:
                         self._board.push_san(san)
 
                         response = {
                             "type": "game.move",
-                            "data": self.encoder.encode(MoveOut(ok=True, san=san)),
+                            "data": self.encoder.encode(
+                                ravioOUT.GameMove(ok=True, san=san)
+                            ),
                         }
                     except ValueError:
                         response = {
                             "type": "game.move",
-                            "data": self.encoder.encode(MoveOut(ok=False, san=san)),
+                            "data": self.encoder.encode(
+                                ravioOUT.GameMove(ok=False, san=san)
+                            ),
                         }
                         raise GameStop from None
                 case _:
@@ -198,6 +203,6 @@ class GameActor(QueueMixin):
         finally:
             if response is not None:
                 self.t3 = time.perf_counter()
-                await get_channel_layer().group_send(self.group_channel, response)
+                await get_channel_layer().group_send(self.to_channel, response)
                 self.t4 = time.perf_counter()
                 print(f"group send in{(self.t4 - self.t3)*1000} ms")

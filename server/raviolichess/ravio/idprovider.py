@@ -21,13 +21,13 @@ class SequencerMixin:
 
 
 class ChanId(Channel):
+    """
 
-    def __init__(self, name):
-        self.name = name
+    args:
+        chan (str): kind of ids generated.
+    """
 
-    @cached_property
-    def chan(self) -> str:
-        return f"{self.prefix}:{self.__class__.__qualname__.lower()}:{self.name}"
+    name = "ids"
 
 
 class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
@@ -37,14 +37,14 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
     def __init__(self, *, name, layer, generator, batch: int = 512):
         self.name: str = name
         self._layer = layer
-        self._skey = f"ids:{name}"
+        self._skey = f"set:ids:{name}"
         self._batch = batch
         self._generator = generator
         self._lock = asyncio.Lock()
         self._event = asyncio.Event()
 
     @cached_property
-    def channel(self):
+    def channel(self) -> Channel:
         return ChanId(self.name)
 
     async def _get(self):
@@ -64,7 +64,7 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
                         async with self._layer.pipeline() as pipe:
                             await pipe.sadd(self._skey, *ids)
                             await pipe.spop(self._skey)
-                            await pipe.publish(self.channel.chan, "")
+                            await pipe.publish(self.channel, "")
                             (
                                 _,
                                 item,

@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 class RavioliLayerManager:
-    "Container that manage (ipc AND cache) client"
+    "Container that lazily provide an ipc AND cache client"
 
     BACKENDS = {
         "redis": lambda location, options: aioredis.Redis.from_url(location, **options),

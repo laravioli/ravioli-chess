@@ -1,49 +1,55 @@
-from functools import cached_property
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import ClassVar
 
-
-class Channel(ABC):
-    prefix: ClassVar[str] = "channel"
-
-    @property
-    @abstractmethod
-    def chan(self) -> str: ...
+# ╔══════════════════════════════════════╗
+# ║        Game Server Channels          ║
+# ╚══════════════════════════════════════╝
 
 
-class ChanGameCreate(Channel):
+class Channel(str, ABC):
+    name: ClassVar[str]
 
-    def __init__(self, pid):
-        self.pid = pid
-
-    @cached_property
-    def chan(self):
-        return f"{self.prefix}:{self.__class__.__qualname__.lower()}:{self.pid}"
+    def __new__(cls, chan):
+        return super().__new__(cls, f"channel:{cls.name}:{chan}")
 
 
-class ChanGame(Channel):
+class GameCreateChan(Channel):
+    """
 
-    def __init__(self, game_id):
-        self.game_id = game_id
+    args:
+        chan (int): process ID.
+    """
 
-    @cached_property
-    def chan(self):
-        return f"{self.prefix}:{self.__class__.__qualname__.lower()}:{self.game_id}"
-
-
-class GroupChannel(ABC):
-    prefix: ClassVar[str] = "group"
-
-    @property
-    @abstractmethod
-    def chan(self) -> str: ...
+    name = "gamecreate"
 
 
-class GroupChanGame(GroupChannel):
+class GameChan(Channel):
+    """
 
-    def __init__(self, game_id):
-        self.game_id = game_id
+    args:
+        chan (str): game ID.
+    """
 
-    @cached_property
-    def chan(self):
-        return f"{self.prefix}_game_{self.game_id}"
+    name = "game"
+
+
+# ╔══════════════════════════════════════╗
+# ║        Ws Server Channels            ║
+# ╚══════════════════════════════════════╝
+
+
+class GroupChannel(str, ABC):
+    name: ClassVar[str]
+
+    def __new__(cls, chan):
+        return super().__new__(cls, f"group_{cls.name}_{chan}")
+
+
+class GameGroupChan(GroupChannel):
+    """
+
+    args:
+        chan (str): game ID.
+    """
+
+    name = "game"

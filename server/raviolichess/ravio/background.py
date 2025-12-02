@@ -25,7 +25,8 @@ class Background:
     @classmethod
     def register(cls, instance: BackgroundSubscriber[T]):
         """add a background subscriber to registry"""
-        cls._registry[instance.channel.chan] = instance.on_message
+        assert isinstance(instance, BackgroundSubscriber)
+        cls._registry[instance.channel] = instance.on_message
 
     @classmethod
     def all(cls):
