@@ -76,6 +76,7 @@ CHANNEL_LAYERS = {
             "hosts": [
                 {"address": env.str("REDIS_URL"), "health_check_interval": 15, "db": 0}
             ],
+            "serializer_format": "msgpack",
         },
     },
 }
@@ -206,7 +207,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "DEBUG",
+            "level": env.str("RAVIOLICHESS_LOG_LEVEL", default="DEBUG"),
             "stream": "ext://sys.stdout",
             "class": "logging.StreamHandler",
         },

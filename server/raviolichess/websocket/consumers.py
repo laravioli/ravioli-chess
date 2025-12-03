@@ -1,4 +1,3 @@
-import msgspec
 import logging
 import time
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -10,20 +9,30 @@ logger = logging.getLogger(__name__)
 
 create_chan = GameCreateChan(1)
 
+# for testing create serializers here
+from raviolichess.ipc.serializers import (
+    SerializerRegistry,
+    MsgpackSerializer,
+    JsonSerializer,
+)
+
+serializers = SerializerRegistry()
+serializers.register("json", JsonSerializer())
+serializers.register("msgpack", MsgpackSerializer())
+
 
 class GameConsumer(AsyncWebsocketConsumer):
 
     # lifetime
     async def connect(self):
         await self.accept()
-        logger.info("ws %s connected", self.channel_name)
 
     async def disconnect(self, close_code):
-        logger.info("ws %s disconnected with code %i", self.channel_name, close_code)
+        logger.debug("ws disconnected")
 
     # client handlers
-    async def receive(self, text_data=None):
-        req = msgspec.json.decode(text_data, type=clientOUT.Protocol)
+    async def receive(self, text_data: str):
+        req = serializers.json.deserialize(text_data, type=clientOUT.Protocol)
         await self.handle_game_frame(req)
 
     async def handle_game_frame(self, req: clientOUT.Protocol):
@@ -50,32 +59,18 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.t1 = time.perf_counter()
 
     @staticmethod
-    async def publish(channel, msg):
+    async def publish(channel, msg: ravioIN.Protocol):
         layer = get_layer()
-        await layer.publish(channel, msgspec.msgpack.encode(msg))
+        await layer.publish(channel, serializers.msgpack.serialize(msg))
 
     # channel layer handlers
-    async def game_created(self, event):
+    async def game_create(self, event: ravioOUT.GameCreate):
 
-        self.t2 = time.perf_counter()
-        print(
-            f"received from gamer server in {(self.t2 - self.t1)*1000}ms :",
-            event["data"],
-        )
         # current impl for testing
-        msg = msgspec.msgpack.decode(event["data"], type=clientIN.GameCreate)
-        game_id = msg.game_id
+        game_id = event.data.game_id
         self.game_channel = GameChan(game_id)
-        logger.info("game channel %s", self.game_channel)
         await self.channel_layer.group_add(GameGroupChan(game_id), self.channel_name)
+        await self.send(serializers.json.serialize(event.data))
 
-        await self.send(text_data=msgspec.json.encode(msg).decode())
-
-    async def game_move(self, event):
-        self.t2 = time.perf_counter()
-        print(
-            f"received from gamer server in {(self.t2 - self.t1)*1000}ms :",
-            event["data"],
-        )
-        msg = msgspec.msgpack.decode(event["data"], type=ravioOUT.GameMove)
-        await self.send(msgspec.json.encode(msg).decode())
+    async def game_move(self, event: ravioOUT.GameMove):
+        await self.send(text_data=serializers.json.serialize(event.data))

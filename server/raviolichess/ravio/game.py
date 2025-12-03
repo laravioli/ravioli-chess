@@ -56,6 +56,7 @@ class GameDB:
 
 
 class GameQueue(BackgroundSubscriber[GameCreateChan]):
+    """transport layer of game creation request"""
 
     def __init__(self, pid):
         self._pid = pid
@@ -74,7 +75,11 @@ class GameQueue(BackgroundSubscriber[GameCreateChan]):
         return await self._queue.get()
 
 
+import time
+
+
 class GameManager(Manager):
+    """Start actors, handle transport layer from pubsub to actors, clean ressources"""
 
     def __init__(
         self,
@@ -141,18 +146,16 @@ class GameManager(Manager):
 
     async def ready(self, ws_channel, id) -> None:
         await get_channel_layer().send(
-            ws_channel,
-            {
-                "type": "game.created",
-                "data": self.serializer.serialize(ravioOUT.GameCreate(id)),
-            },
+            ws_channel, ravioOUT.GameCreate(data=ravioOUT.GameCreate.Payload(id))
         )
 
-    async def send(self, send_channel, type: str, msg: ravioOUT.Protocol):
-        data = self.serializer.serialize(msg)
-        await get_channel_layer().group_send(send_channel, {"type": type, "data": data})
+    async def send(self, send_channel, msg: ravioOUT.Protocol):
+        "send to asgi consumers, channel redis layer"
+
+        await get_channel_layer().group_send(send_channel, msg)
 
     async def receive(self, receive_channel) -> ravioIN.Protocol:
+        "receive from asgi consumer, ravioli layer"
         msg = await self._actor_channels[receive_channel].get()
         return self.serializer.deserialize(msg, type=ravioIN.Protocol)
 
@@ -188,9 +191,9 @@ class GameActor:
             await ready(self.game_id)
             while True:
                 msg = await receive()
-                type, response, should_stop = self.handle_message(msg)
+                response, should_stop = self.handle_message(msg)
                 if response:
-                    await send(type, response)
+                    await send(response)
                 if should_stop:
                     raise GameStop()
         except asyncio.CancelledError:
@@ -202,23 +205,24 @@ class GameActor:
             # cleanup
             await stop()
 
-    def handle_message(
-        self, msg: ravioIN.Protocol
-    ) -> tuple[str, ravioOUT.Protocol, bool]:
-        type, response = None, None
+    def handle_message(self, msg: ravioIN.Protocol) -> tuple[ravioOUT.Protocol, bool]:
+        response = None
         should_stop = False
 
         match msg:
             case ravioIN.GameMove(san):
-                type = "game.move"
                 try:
                     self._board.push_san(san)
-                    response = ravioOUT.GameMove(ok=True, san=san)
+                    response = ravioOUT.GameMove(
+                        data=ravioOUT.GameMove.Payload(ok=True, san=san)
+                    )
                 except ValueError:
-                    response = ravioOUT.GameMove(ok=False, san=san)
+                    response = ravioOUT.GameMove(
+                        data=ravioOUT.GameMove.Payload(ok=False, san=san)
+                    )
                     should_stop = True
             case _:
                 logger.warning("Unknown message received: %s", msg)
                 should_stop = True
 
-        return type, response, should_stop
+        return response, should_stop

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import json
 import msgspec
 from typing import TypeVar, Generic, Union, Any, get_origin
 
@@ -40,6 +39,8 @@ class DefaultDecoder(dict[type, msgspec.json.Decoder]):
 class JsonSerializer(BaseSerializer[str]):
     """json serializer, not thread-safe"""
 
+    __slots__ = ("_encoder", "_decoders")
+
     def __init__(self):
         self._encoder = msgspec.json.Encoder()
         self._decoders = DefaultDecoder("json")
@@ -54,6 +55,8 @@ class JsonSerializer(BaseSerializer[str]):
 class MsgpackSerializer(BaseSerializer[bytes]):
     """msgpack serializer, not thread-safe"""
 
+    __slots__ = ("_encoder", "_decoders")
+
     def __init__(self):
         self._encoder = msgspec.msgpack.Encoder()
         self._decoders = DefaultDecoder("msgpack")
@@ -61,7 +64,7 @@ class MsgpackSerializer(BaseSerializer[bytes]):
     def serialize(self, obj):
         return self._encoder.encode(obj)
 
-    def deserialize(self, message: bytes, *, type: type):
+    def deserialize(self, message: bytes, *, type):
         return self._decoders[type].decode(message)
 
 
@@ -82,3 +85,29 @@ class SerializerRegistry:
     @property
     def msgpack(self) -> MsgpackSerializer:
         return self._registry["msgpack"]
+
+
+from .protocol import ChannelFrameProtocol
+
+
+class ChannelMsgPackSerializer(BaseSerializer[bytes]):
+    """serializer for channel_redis frame"""
+
+    __slots__ = ("_encoder", "_decoder")
+
+    def __init__(self, **kwargs):
+        self._encoder = msgspec.msgpack.Encoder()
+        self._decoder = msgspec.msgpack.Decoder(type=ChannelFrameProtocol)
+
+    def serialize(self, obj: ChannelFrameProtocol):
+        return self._encoder.encode(obj)
+
+    def deserialize(self, message: bytes) -> ChannelFrameProtocol:
+        return self._decoder.decode(message)
+
+
+def setup_channel_redis_serializer(key: str):
+    """override channel_redis default serializer"""
+    from channels_redis.serializers import registry
+
+    registry.register_serializer(key, ChannelMsgPackSerializer)

@@ -28,8 +28,16 @@ else:
     django.setup(set_prefix=False)
     http_protocol = {}
 
+# replace channel_redis default serializer
 
-# LIFESPAN
+from raviolichess.ipc.serializers import setup_channel_redis_serializer
+
+setup_channel_redis_serializer(
+    settings.CHANNEL_LAYERS["default"]["CONFIG"]["serializer_format"]
+)
+
+
+# Lifespan
 from channels.layers import get_channel_layer
 
 
@@ -44,7 +52,7 @@ async def lifespan_app(scope, receive, send):
             return
 
 
-# ASGI APP
+# ASGI app
 from raviolichess.websocket.routing import websocket_urlpatterns
 
 app = ProtocolTypeRouter(
