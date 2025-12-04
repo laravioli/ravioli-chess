@@ -29,7 +29,7 @@ class RavioliLayerManager:
 
 @overload
 def get_layer(key: Literal["redis"]) -> aioredis.Redis: ...
-def get_layer(key="default"):
+def get_layer(key="default") -> aioredis.Redis:
     return layer[key]
 
 

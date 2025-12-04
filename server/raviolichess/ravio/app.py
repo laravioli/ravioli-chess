@@ -1,6 +1,5 @@
 from __future__ import annotations
 from channels.layers import get_channel_layer
-from raviolichess.ipc.serializers import SerializerRegistry, MsgpackSerializer
 from raviolichess.ipc.layer import get_layer
 from .background import BackgroundRegistry
 from .idprovider import AsyncIdProvider, game_id_generator
@@ -14,7 +13,6 @@ class App:
     def __init__(self, pid: int):
         self.pid = pid
         self.layer = get_layer()
-        self.serializers = SerializerRegistry()
         self.backgrounds = BackgroundRegistry()
         self.managers = ManagerRegistry()
 
@@ -23,7 +21,6 @@ class App:
         self.managers.start()
 
     def wire(self):
-        self.serializers.register("msgpack", MsgpackSerializer())
         self.backgrounds.register(
             "game_id",
             AsyncIdProvider(name="game", layer=self.layer, generator=game_id_generator),
@@ -39,7 +36,6 @@ class App:
         self.managers.register(
             "game",
             GameManager(
-                serializer=self.serializers.msgpack,
                 game_queue=self.backgrounds.get("game_queue"),
                 game_db=GameDB(self.backgrounds.get("game_id")),
                 subscribe=self.managers.get("pubsub").subscribe,

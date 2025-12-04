@@ -30,14 +30,13 @@ else:
 
 # replace channel_redis default serializer
 
-from raviolichess.ipc.serializers import setup_channel_redis_serializer
+from raviolichess.ipc.serializers.msgpack import setup_channel_redis_serializer
 
-setup_channel_redis_serializer(
-    settings.CHANNEL_LAYERS["default"]["CONFIG"]["serializer_format"]
-)
+setup_channel_redis_serializer()
 
 
 # Lifespan
+from raviolichess.ipc.layer import get_layer
 from channels.layers import get_channel_layer
 
 
@@ -45,8 +44,10 @@ async def lifespan_app(scope, receive, send):
     while True:
         message = await receive()
         if message["type"] == "lifespan.startup":
+            scope["state"].update({"layer": get_layer()})
             await send({"type": "lifespan.startup.complete"})
         elif message["type"] == "lifespan.shutdown":
+            await get_layer().aclose()
             await get_channel_layer().flush()
             await send({"type": "lifespan.shutdown.complete"})
             return

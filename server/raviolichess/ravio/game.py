@@ -8,7 +8,7 @@ from channels.layers import get_channel_layer
 from raviolichess.game.models import Game
 from raviolichess.ipc.channels import GameCreateChan, GameChan, GameGroupChan
 from raviolichess.ipc.protocol import ravioIN, ravioOUT
-from raviolichess.ipc.serializers import MsgpackSerializer
+from raviolichess.ipc.serializers import msgpack
 from .background import BackgroundSubscriber
 from .manager import Manager
 from .idprovider import AsyncIdProvider
@@ -75,21 +75,16 @@ class GameQueue(BackgroundSubscriber[GameCreateChan]):
         return await self._queue.get()
 
 
-import time
-
-
 class GameManager(Manager):
     """Start actors, handle transport layer from pubsub to actors, clean ressources"""
 
     def __init__(
         self,
-        serializer: MsgpackSerializer,
         game_queue: GameQueue,
         game_db: GameDB,
         subscribe,
         unsubscribe,
     ):
-        self.serializer = serializer
         self._game_queue = game_queue
         self._game_db = game_db
         self.subscribe = subscribe
@@ -114,9 +109,7 @@ class GameManager(Manager):
             await self.stop()
 
     async def start_one(self, raw_msg):
-        msg: ravioIN.GameCreate = self.serializer.deserialize(
-            raw_msg, type=ravioIN.GameCreate
-        )
+        msg: ravioIN.GameCreate = msgpack.decode(raw_msg, type=ravioIN.GameCreate)
         id = await self._game_db.create(msg)
 
         send_channel = GameGroupChan(id)
@@ -157,7 +150,7 @@ class GameManager(Manager):
     async def receive(self, receive_channel) -> ravioIN.Protocol:
         "receive from asgi consumer, ravioli layer"
         msg = await self._actor_channels[receive_channel].get()
-        return self.serializer.deserialize(msg, type=ravioIN.Protocol)
+        return msgpack.decode(msg, type=ravioIN.Protocol)
 
     async def stop_actor(self, receive_channel) -> None:
         try:

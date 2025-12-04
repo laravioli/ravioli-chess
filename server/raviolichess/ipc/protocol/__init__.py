@@ -1,5 +1,5 @@
-from typing import Union
+from typing import Union, TypeAlias
 from . import ravioOUT
 
 
-ChannelFrameProtocol = Union[ravioOUT.Protocol]
+ChannelFrameProtocol: TypeAlias = Union[ravioOUT.Protocol]

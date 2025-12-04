@@ -1,47 +1,49 @@
 import logging
-import time
+from abc import ABC, abstractmethod
+from redis.asyncio import Redis
 from channels.generic.websocket import AsyncWebsocketConsumer
-from raviolichess.ipc.layer import get_layer
 from raviolichess.ipc.channels import GameCreateChan, GameChan, GameGroupChan
 from raviolichess.ipc.protocol import clientIN, clientOUT, ravioIN, ravioOUT
+from raviolichess.ipc.serializers import json, msgpack
 
 logger = logging.getLogger(__name__)
 
 create_chan = GameCreateChan(1)
 
-# for testing create serializers here
-from raviolichess.ipc.serializers import (
-    SerializerRegistry,
-    MsgpackSerializer,
-    JsonSerializer,
-)
 
-serializers = SerializerRegistry()
-serializers.register("json", JsonSerializer())
-serializers.register("msgpack", MsgpackSerializer())
+class GenericConsumer(AsyncWebsocketConsumer, ABC):
 
-
-class GameConsumer(AsyncWebsocketConsumer):
-
-    # lifetime
     async def connect(self):
         await self.accept()
+        self.ipc: Redis = self.scope["state"]["layer"]
 
-    async def disconnect(self, close_code):
-        logger.debug("ws disconnected")
+    async def send(self, response: clientIN.Protocol, close=False):
+        await super().send(text_data=json.encode(response), close=close)
 
-    # client handlers
-    async def receive(self, text_data: str):
-        req = serializers.json.deserialize(text_data, type=clientOUT.Protocol)
-        await self.handle_game_frame(req)
+    async def receive(self, text_data=None, bytes_data=None):
+        if text_data:
+            await self.handle_message(json.decode(text_data, type=clientOUT.Protocol))
+        else:
+            raise ValueError("No text section for incoming WebSocket frame!")
 
-    async def handle_game_frame(self, req: clientOUT.Protocol):
-        """transform/proxy message to game server"""
-        msg, channel = (None, None)
+    @abstractmethod
+    async def handle_message(msg: clientOUT.Protocol):
+        """handle message receive from client"""
+        ...
+
+    async def publish(self, channel, msg: ravioIN.Protocol):
+
+        await self.ipc.publish(channel, msgpack.encode(msg))
+
+
+class GameConsumer(GenericConsumer):
+
+    async def handle_message(self, req: clientOUT.Protocol):
+        response, channel = (None, None)
         try:
             match req:
                 case clientOUT.GameCreate(data):
-                    msg, channel = (
+                    response, channel = (
                         ravioIN.GameCreate(
                             channel=self.channel_name,
                             white_player=data.white_player,
@@ -50,27 +52,24 @@ class GameConsumer(AsyncWebsocketConsumer):
                         create_chan,
                     )
                 case clientOUT.GameMove(data):
-                    msg, channel = (ravioIN.GameMove(san=data.san), self.game_channel)
+                    response, channel = (
+                        ravioIN.GameMove(san=data.san),
+                        self.game_channel,
+                    )
                 case _:
                     logger.warning("received an unknow request")
-        finally:
-            if msg and channel:
-                await self.publish(channel, msg)
-                self.t1 = time.perf_counter()
+        except Exception:
+            pass
+        else:
+            if response and channel:
+                await self.publish(channel, response)
 
-    @staticmethod
-    async def publish(channel, msg: ravioIN.Protocol):
-        layer = get_layer()
-        await layer.publish(channel, serializers.msgpack.serialize(msg))
-
-    # channel layer handlers
     async def game_create(self, event: ravioOUT.GameCreate):
 
-        # current impl for testing
         game_id = event.data.game_id
         self.game_channel = GameChan(game_id)
         await self.channel_layer.group_add(GameGroupChan(game_id), self.channel_name)
-        await self.send(serializers.json.serialize(event.data))
+        await self.send(event.data)
 
     async def game_move(self, event: ravioOUT.GameMove):
-        await self.send(text_data=serializers.json.serialize(event.data))
+        await self.send(event.data)
