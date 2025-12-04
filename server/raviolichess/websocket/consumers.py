@@ -15,16 +15,13 @@ class GenericConsumer(AsyncWebsocketConsumer, ABC):
 
     async def connect(self):
         await self.accept()
-        self.ipc: Redis = self.scope["state"]["layer"]
+        self.layer: Redis = self.scope["state"]["layer"]
 
     async def send(self, response: clientIN.Protocol, close=False):
         await super().send(text_data=json.encode(response), close=close)
 
-    async def receive(self, text_data=None, bytes_data=None):
-        if text_data:
-            await self.handle_message(json.decode(text_data, type=clientOUT.Protocol))
-        else:
-            raise ValueError("No text section for incoming WebSocket frame!")
+    async def receive(self, text_data=None):
+        await self.handle_message(json.decode(text_data, type=clientOUT.Protocol))
 
     @abstractmethod
     async def handle_message(msg: clientOUT.Protocol):
@@ -32,8 +29,7 @@ class GenericConsumer(AsyncWebsocketConsumer, ABC):
         ...
 
     async def publish(self, channel, msg: ravioIN.Protocol):
-
-        await self.ipc.publish(channel, msgpack.encode(msg))
+        await self.layer.publish(channel, msgpack.encode(msg))
 
 
 class GameConsumer(GenericConsumer):
