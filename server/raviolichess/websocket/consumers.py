@@ -32,6 +32,11 @@ class GenericConsumer(AsyncWebsocketConsumer, ABC):
         await self.layer.publish(channel, msgpack.encode(msg))
 
 
+class SiteConsumer(GenericConsumer):
+    async def handle_message(self, req: clientOUT.Protocol):
+        pass
+
+
 class GameConsumer(GenericConsumer):
 
     async def handle_message(self, req: clientOUT.Protocol):

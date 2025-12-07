@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     "raviolichess.profile",
     "raviolichess.social",
     "raviolichess.game",
-    "raviolichess.lobby",
     "raviolichess.web",
     "raviolichess.websocket",
 ]

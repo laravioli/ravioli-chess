@@ -30,7 +30,7 @@ else:
 
 # replace channel_redis default serializer
 
-from raviolichess.ipc.serializers.msgpack import setup_channel_redis_serializer
+from raviolichess.ipc.serializers import setup_channel_redis_serializer
 
 setup_channel_redis_serializer()
 
