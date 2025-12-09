@@ -41,7 +41,7 @@ class ManagerRegistry:
             self._tasks.append(manager.start())
 
     async def stop(self):
-        for task in reversed(self._tasks):
+        for task in self._tasks:
             task.cancel()
             try:
                 await task

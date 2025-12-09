@@ -1,41 +1,48 @@
 import asyncio
 import chess
 import logging
+from typing import Any
+from abc import ABC, abstractmethod
 from django.contrib.auth import get_user_model
 from raviolichess.ipc.protocol import ravioIN, ravioOUT
-from raviolichess.ravio.exceptions import GameStop
+from raviolichess.ravio.exceptions import StopActor
 
 user_model = get_user_model()
 
 logger = logging.getLogger(__name__)
 
 
-class GameActor:
-
-    def __init__(self, *, game_id, white_player, black_player):
-        self.game_id = game_id
-        self.white_player = white_player
-        self.black_player = black_player
-        self._board = chess.Board()
-
+class Actor(ABC):
     async def __call__(self, ready, send, receive, stop):
         try:
-            await ready(self.game_id)
+            await ready()
             while True:
-                msg = await receive()
-                response, should_stop = self.handle_message(msg)
-                if response:
-                    await send(response)
-                if should_stop:
-                    raise GameStop()
-        except asyncio.CancelledError:
-            logger.debug("Game actor cancelled %s", self.game_id)
-            raise
-        except GameStop:
-            logger.debug("Stop game actor %s", self.game_id)
+                try:
+                    msg = await receive()
+                except asyncio.QueueShutDown:
+                    break
+                else:
+                    response, should_stop = self.handle_message(msg)
+                    if response:
+                        await send(response)
+                    if should_stop:
+                        raise StopActor()
+        except StopActor:
+            pass
         finally:
             # cleanup
             await stop()
+
+    @abstractmethod
+    async def handle_message(msg) -> tuple[Any, bool]: ...
+
+
+class GameActor(Actor):
+
+    def __init__(self, *, white_player, black_player):
+        self.white_player = white_player
+        self.black_player = black_player
+        self._board = chess.Board()
 
     def handle_message(
         self, msg: ravioIN.GameProtocol

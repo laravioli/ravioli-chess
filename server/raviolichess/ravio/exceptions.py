@@ -1,6 +1,6 @@
-class GameStop(Exception):
+class StopActor(Exception):
     """
-    Raised when a game actor wants to stop and close down its application instance.
+    Raised when an actor wants to stop and close down its application instance.
     """
 
     pass

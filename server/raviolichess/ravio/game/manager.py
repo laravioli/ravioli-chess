@@ -47,11 +47,11 @@ class GameManager(Manager):
     ):
         self._game_queue: GameQueue = game_queue
         self._game_db: GameDB = game_db
-        self.subscribe = subscribe
-        self.unsubscribe = unsubscribe
         self._start_tasks: set[asyncio.Task] = set()
         self._actor_tasks: set[asyncio.Task] = set()
         self._actor_channels: dict[str, asyncio.Queue] = {}
+        self.subscribe = subscribe
+        self.unsubscribe = unsubscribe
 
     async def run(self):
         try:
@@ -66,11 +66,12 @@ class GameManager(Manager):
     async def stop(self):
         for task in self._start_tasks:
             task.cancel()
-        for task in self._actor_tasks:
-            task.cancel()
-        exc = await asyncio.gather(
-            *self._start_tasks, *self._actor_tasks, return_exceptions=True
-        )
+        exc = await asyncio.gather(*self._start_tasks, return_exceptions=True)
+        # let actors send their last words
+        for queue in self._actor_channels.values():
+            queue.shutdown()
+        exc += await asyncio.gather(*self._actor_tasks, return_exceptions=True)
+
         logger.debug(exc)
 
     async def start_one(self, raw_msg):
@@ -81,10 +82,10 @@ class GameManager(Manager):
         receive_channel = GameChan(id)
 
         # actor api
-        ready = functools.partial(self.ready, msg.channel)
+        ready = functools.partial(self.ready, msg.channel, id)
         send = functools.partial(self.send, send_channel)
         receive = functools.partial(self.receive, receive_channel)
-        stop_actor = functools.partial(self.stop_actor, receive_channel)
+        stop_actor = functools.partial(self.stop_actor, receive_channel, id)
 
         # actor transport
         self._actor_channels[receive_channel] = asyncio.Queue()
@@ -93,9 +94,7 @@ class GameManager(Manager):
         )
 
         # start actor
-        actor = GameActor(
-            game_id=id, white_player=msg.white_player, black_player=msg.black_player
-        )
+        actor = GameActor(white_player=msg.white_player, black_player=msg.black_player)
         register_coro(self._actor_tasks, actor, ready, send, receive, stop_actor)
 
     async def on_message(self, receive_channel, msg) -> None:
@@ -117,10 +116,12 @@ class GameManager(Manager):
         msg = await self._actor_channels[receive_channel].get()
         return msgpack.decode(msg, type=ravioIN.GameProtocol)
 
-    async def stop_actor(self, receive_channel) -> None:
+    async def stop_actor(self, receive_channel, id) -> None:
         try:
             await self.unsubscribe(receive_channel)
+        # catch all to not swallow termination exception
         except BaseException:
-            logger.exception("Error while unsubscribing actor")
+            logger.exception("Error while stopping actor %s", id)
         finally:
             del self._actor_channels[receive_channel]
+            logger.debug("stop game actor %s", id)
