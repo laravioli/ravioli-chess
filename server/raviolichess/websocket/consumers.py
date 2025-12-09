@@ -8,9 +8,9 @@ from raviolichess.ipc.serializers import json, msgpack
 
 logger = logging.getLogger(__name__)
 
-create_chan = GameCreateChan(1)
 
-
+# todo write a better receive / handle message
+# i may need a router function first that route to the right function to handle message
 class GenericConsumer(AsyncWebsocketConsumer, ABC):
 
     async def connect(self):
@@ -29,16 +29,11 @@ class GenericConsumer(AsyncWebsocketConsumer, ABC):
         ...
 
     async def publish(self, channel, msg: ravioIN.Protocol):
+        """route message to ravio server"""
         await self.layer.publish(channel, msgpack.encode(msg))
 
 
 class SiteConsumer(GenericConsumer):
-    async def handle_message(self, req: clientOUT.Protocol):
-        pass
-
-
-class GameConsumer(GenericConsumer):
-
     async def handle_message(self, req: clientOUT.Protocol):
         response, channel = (None, None)
         try:
@@ -50,12 +45,7 @@ class GameConsumer(GenericConsumer):
                             white_player=data.white_player,
                             black_player=data.black_player,
                         ),
-                        create_chan,
-                    )
-                case clientOUT.GameMove(data):
-                    response, channel = (
-                        ravioIN.GameMove(san=data.san),
-                        self.game_channel,
+                        GameCreateChan(1),
                     )
                 case _:
                     logger.warning("received an unknow request")
@@ -66,11 +56,37 @@ class GameConsumer(GenericConsumer):
                 await self.publish(channel, response)
 
     async def game_create(self, event: ravioOUT.GameCreate):
-
-        game_id = event.data.game_id
-        self.game_channel = GameChan(game_id)
-        await self.channel_layer.group_add(GameGroupChan(game_id), self.channel_name)
         await self.send(event.data)
+
+
+class PlayConsumer(GenericConsumer):
+
+    async def connect(self):
+        await super().connect()
+        self.game_id = self.scope["url_route"]["kwargs"]["game_id"]
+        self.game_chan = GameChan(self.game_id)
+        await self.channel_layer.group_add(
+            GameGroupChan(self.game_id), self.channel_name
+        )
+
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(
+            GameGroupChan(self.game_id), self.channel_name
+        )
+
+    async def handle_message(self, req: clientOUT.Protocol):
+        response = None
+        try:
+            match req:
+                case clientOUT.GameMove(data):
+                    response = ravioIN.GameMove(san=data.san)
+                case _:
+                    logger.warning("received an unknow request")
+        except Exception:
+            logger.exception("error in play consumer message handling")
+        else:
+            if response:
+                await self.publish(self.game_chan, response)
 
     async def game_move(self, event: ravioOUT.GameMove):
         await self.send(event.data)

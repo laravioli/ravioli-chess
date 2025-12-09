@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => {
       },
 
       proxy: {
-        '/ws': {
+        '/socket': {
           target: wsTarget,
           changeOrigin: false,
           ws: true,

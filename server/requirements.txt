@@ -1,7 +1,7 @@
 channels @ git+https://github.com/laravioli/channels.git@ravioli
 channels-redis @ git+https://github.com/laravioli/channels_redis.git@clean_channels
 chess==1.11.2
-Django==5.2.4
+Django==6.0
 django-vite==3.0.6
 djangorestframework==3.16.1
 drf-spectacular==0.28.0

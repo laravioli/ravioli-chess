@@ -1,4 +1,7 @@
 {"[html][django-html]": {
   "editor.defaultFormatter": "monosans.djlint"
 },
+"files.watcherExclude": {
+  "**/target": true
+},
 }

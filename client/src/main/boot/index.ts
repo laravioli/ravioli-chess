@@ -8,7 +8,7 @@ import type { ServerPayload } from './interface';
 export const boot = async () => {
   initSite();
   setApiClient();
-  wsConnect('/ws/taxi');
+  wsConnect('/socket');
   const payload = getHtmlData();
   return makeAppDependencies(payload);
 };

@@ -1,6 +1,6 @@
 import functools
 import msgspec
-from typing import TypeVar
+from typing import TypeVar, Union, Any
 
 T = TypeVar("T")
 
@@ -8,6 +8,9 @@ T = TypeVar("T")
 class Serializer:
     def __init__(self, format, encode_as_bytes=True):
         self._as_bytes = encode_as_bytes
+        self._decoder_cache: dict[
+            Any, Union[msgspec.json.Decoder, msgspec.msgpack.Decoder]
+        ] = {}
         match format:
             case "json":
                 self._module_format = msgspec.json
@@ -22,17 +25,19 @@ class Serializer:
 
     @functools.cached_property
     def encode(self):
+        _encoder = self.encoder
         if self._as_bytes:
-            return lambda obj: self.encoder.encode(obj)
+            return lambda obj: _encoder.encode(obj)
         else:
-            return lambda obj: self.encoder.encode(obj).decode("utf-8")
-
-    @functools.cache
-    def decoder(self, type):
-        return self._module_format.Decoder(type=type)
+            return lambda obj: _encoder.encode(obj).decode("utf-8")
 
     def decode(self, obj, *, type: T) -> T:
-        return self.decoder(type).decode(obj)
+        try:
+            return self._decoder_cache[type].decode(obj)
+        except KeyError:
+            decoder = self._module_format.Decoder(type=type)
+            self._decoder_cache[type] = decoder
+            return decoder.decode(obj)
 
 
 json = Serializer("json", encode_as_bytes=False)
