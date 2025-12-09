@@ -1,11 +1,13 @@
 from __future__ import annotations
 from channels.layers import get_channel_layer
 from raviolichess.ipc.layer import get_layer
+from raviolichess.game.id import game_id_generator
+from .idprovider import AsyncIdProvider
 from .background import BackgroundRegistry
-from .idprovider import AsyncIdProvider, game_id_generator
 from .manager import ManagerRegistry
 from .pubsub import PubSubManager
-from .game import GameManager, GameDB, GameQueue
+from .game.manager import GameQueue, GameManager
+from .game.db import GameDB
 
 
 class App:

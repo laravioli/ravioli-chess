@@ -8,8 +8,10 @@ logger = logging.getLogger(__name__)
 class Manager(ABC):
     """interface that define services with lifecycle method"""
 
-    @abstractmethod
-    def start(self) -> asyncio.Task: ...
+    def start(self) -> asyncio.Task:
+        """main manager task, registry handle termination"""
+        run_task = asyncio.create_task(self.run())
+        return run_task
 
     @abstractmethod
     async def run(self) -> None: ...

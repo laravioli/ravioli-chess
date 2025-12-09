@@ -28,7 +28,7 @@ class GenericConsumer(AsyncWebsocketConsumer, ABC):
         """handle message receive from client"""
         ...
 
-    async def publish(self, channel, msg: ravioIN.Protocol):
+    async def publish(self, channel, msg: ravioIN.GameProtocol):
         """route message to ravio server"""
         await self.layer.publish(channel, msgpack.encode(msg))
 

@@ -4,3 +4,7 @@ class GameStop(Exception):
     """
 
     pass
+
+
+class TooManyRetryException(Exception):
+    """exception to throw on function wrapped by retry decorator"""

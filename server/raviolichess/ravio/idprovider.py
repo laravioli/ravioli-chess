@@ -1,11 +1,7 @@
-import string
-import random
 import asyncio
 from functools import cached_property
-from channels.db import database_sync_to_async
 from redis.exceptions import LockError, RedisError
 from raviolichess.ipc.channels import Channel
-from raviolichess.game.models import Game
 from .background import BackgroundSubscriber
 
 
@@ -31,10 +27,10 @@ class ChanId(Channel):
 
 
 class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
-    """Provide id pulled from a cache backend.
-    Use pubsub to synchronise processes"""
+    """Provide id pulled from a cache backend, ensuring integrity across processes.
+    Use pubsub to synchronise refill"""
 
-    def __init__(self, *, name, layer, generator, batch: int = 512):
+    def __init__(self, *, name, layer, generator, batch: int = 2048):
         self.name: str = name
         self._layer = layer
         self._skey = f"set:ids:{name}"
@@ -79,30 +75,7 @@ class AsyncIdProvider(SequencerMixin, BackgroundSubscriber[ChanId]):
                 except asyncio.TimeoutError:
                     continue
 
-            except RedisError:
-                raise
-
     async def on_message(self, _):
         """called by Notifier when another process publish to related chan"""
         self._event.set()
         self._event.clear()
-
-
-# GAME ID
-ID_CHARS = string.ascii_letters + string.digits
-
-
-def id8():
-    return "".join(random.choice(ID_CHARS) for _ in range(8))
-
-
-@database_sync_to_async
-def get_collision_ids(ids):
-    return set(Game.objects.filter(game_id__in=ids).values_list("game_id", flat=True))
-
-
-async def game_id_generator(*, batch):
-
-    ids = {id8() for _ in range(batch)}
-    ids_collision_db = await get_collision_ids(ids)
-    return ids - ids_collision_db

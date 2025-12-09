@@ -7,22 +7,29 @@ from typing import Optional, Union
 # ╚══════════════════════════════════════╝
 
 
-class GameCreate(msgspec.Struct):
+class TMsg(msgspec.Struct, tag_field="t", tag=str.lower):
+    pass
+
+
+class GameCreate(TMsg):
     channel: str
     white_player: Optional[str] = msgspec.field(name="wp", default=None)
     black_player: Optional[str] = msgspec.field(name="bp", default=None)
 
 
-class Game(msgspec.Struct, tag_field="t", tag=str.lower):
-    pass
+class ChallengeAccepted(TMsg, tag="caccept"):
+    id: str
+    white_player: str = msgspec.field(name="wp")
+    black_player: str = msgspec.field(name="bp")
 
 
-class GameMove(Game):
+class GameMove(TMsg):
     san: str
 
 
-class GameResign(Game):
+class GameResign(TMsg):
     player: str
 
 
-Protocol = Union[GameMove, GameResign]
+GameStart = Union[GameCreate, ChallengeAccepted]
+GameProtocol = Union[GameMove, GameResign]

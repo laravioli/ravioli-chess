@@ -15,10 +15,6 @@ class PubSubManager(Manager):
         self._subscriptions = subscriptions
         self._lock = asyncio.Lock()
 
-    def start(self):
-        run_task = asyncio.create_task(self.run())
-        return run_task
-
     # todo: make run more robust to error
     async def run(self):
         try:
