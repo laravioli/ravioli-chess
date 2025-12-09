@@ -76,26 +76,32 @@ class GameManager(Manager):
 
     async def start_one(self, raw_msg):
         msg: ravioIN.GameCreate = msgpack.decode(raw_msg, type=ravioIN.GameStart)
-        id = await self._game_db.new_game(msg)
 
-        send_channel = GameGroupChan(id)
-        receive_channel = GameChan(id)
+        try:
+            id = await self._game_db.new_game(msg)
+        except BaseException:
+            logger.exception("unable to create a new game")
+        else:
+            send_channel = GameGroupChan(id)
+            receive_channel = GameChan(id)
 
-        # actor api
-        ready = functools.partial(self.ready, msg.channel, id)
-        send = functools.partial(self.send, send_channel)
-        receive = functools.partial(self.receive, receive_channel)
-        stop_actor = functools.partial(self.stop_actor, receive_channel, id)
+            # actor api
+            ready = functools.partial(self.ready, msg.channel, id)
+            send = functools.partial(self.send, send_channel)
+            receive = functools.partial(self.receive, receive_channel)
+            stop_actor = functools.partial(self.stop_actor, receive_channel, id)
 
-        # actor transport
-        self._actor_channels[receive_channel] = asyncio.Queue()
-        await self.subscribe(
-            {receive_channel: functools.partial(self.on_message, receive_channel)}
-        )
+            # actor transport
+            self._actor_channels[receive_channel] = asyncio.Queue()
+            await self.subscribe(
+                {receive_channel: functools.partial(self.on_message, receive_channel)}
+            )
 
-        # start actor
-        actor = GameActor(white_player=msg.white_player, black_player=msg.black_player)
-        register_coro(self._actor_tasks, actor, ready, send, receive, stop_actor)
+            # start actor
+            actor = GameActor(
+                white_player=msg.white_player, black_player=msg.black_player
+            )
+            register_coro(self._actor_tasks, actor, ready, send, receive, stop_actor)
 
     async def on_message(self, receive_channel, msg) -> None:
         if receive_channel in self._actor_channels:

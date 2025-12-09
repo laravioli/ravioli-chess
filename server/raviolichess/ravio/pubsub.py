@@ -2,6 +2,7 @@ import asyncio
 import logging
 from redis.asyncio import Redis
 from redis.asyncio.client import PubSub
+from redis.exceptions import RedisError
 from .manager import Manager
 
 logger = logging.getLogger(__name__)
@@ -22,8 +23,11 @@ class PubSubManager(Manager):
             p = self._pubsub
             async with p:
                 await p.subscribe(**self._subscriptions)
-                async for _ in p.listen():
-                    pass
+                try:
+                    async for _ in p.listen():
+                        pass
+                except RedisError:
+                    logger.exception("redis exception during message handling")
         finally:
             await self.stop()
 

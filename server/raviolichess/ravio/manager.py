@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 class Manager(ABC):
-    """interface that define services with lifecycle method"""
+    """abc that define services with lifecycle method"""
 
     def start(self) -> asyncio.Task:
         """main manager task, registry handle termination"""

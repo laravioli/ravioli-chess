@@ -30,7 +30,7 @@ def async_retry(
                 except retry_exceptions as e:
                     last_exception = e
                     logger.warning(
-                        f"Attempt {attempt}/{max_retries} failed for '{fn.__name__}': {type(e).__name__}"
+                        f"attempt {attempt}/{max_retries} failed for '{fn.__name__}': {type(e).__name__}"
                     )
 
                     if attempt >= max_retries:
@@ -42,15 +42,11 @@ def async_retry(
 
                 except Exception as e:
                     logger.exception(
-                        f"Non-retryable exception occurred in '{fn.__name__}'"
+                        f"non-retryable exception occurred in '{fn.__name__}'"
                     )
                     raise e
-
-            logger.error(
-                f"Function '{fn.__name__}' failed after {max_retries} attempts."
-            )
             raise TooManyRetryException(
-                f"Failed to execute '{fn.__name__}' after {max_retries} retries."
+                f"failed to execute '{fn.__name__}' after {max_retries} retries."
             ) from last_exception
 
         return wrapper
