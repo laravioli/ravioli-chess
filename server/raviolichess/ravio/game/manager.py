@@ -79,6 +79,8 @@ class GameManager(Manager):
 
         try:
             id = await self._game_db.new_game(msg)
+        except asyncio.CancelledError:
+            raise
         except BaseException:
             logger.exception("unable to create a new game")
         else:
@@ -123,6 +125,7 @@ class GameManager(Manager):
         return msgpack.decode(msg, type=ravioIN.GameProtocol)
 
     async def stop_actor(self, receive_channel, id) -> None:
+        """run in finally clause of game actor"""
         try:
             await self.unsubscribe(receive_channel)
         # catch all to not swallow termination exception
