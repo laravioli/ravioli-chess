@@ -36,6 +36,7 @@ class GameDB:
             white_player=msg.white_player,
             black_player=msg.black_player,
         )
+
         return game_id
 
     async def game(self, msg: ravioIN.ChallengeAccepted):
@@ -53,14 +54,13 @@ class GameDB:
         usernames = filter(lambda x: isinstance(x, str), (white_player, black_player))
 
         # silently assign unknow players to None
-        if usernames:
+        if white_player or black_player:
             users.update(
                 {
                     user.username: user
                     for user in user_model.objects.filter(username__in=usernames)
                 }
             )
-
         Game.objects.create(
             game_id=game_id,
             white_player=users.get(white_player),

@@ -10,11 +10,6 @@ def id8():
     return "".join(random.choice(ID_CHARS) for _ in range(8))
 
 
-@database_sync_to_async
-def get_collision_ids(ids):
-    return set(Game.objects.filter(game_id__in=ids).values_list("game_id", flat=True))
-
-
 async def game_id_generator(*, batch, check_collision=False):
 
     ids = {id8() for _ in range(batch)}
@@ -22,3 +17,8 @@ async def game_id_generator(*, batch, check_collision=False):
         ids_collision_db = await get_collision_ids(ids)
         return ids - ids_collision_db
     return ids
+
+
+@database_sync_to_async
+def get_collision_ids(ids):
+    return set(Game.objects.filter(game_id__in=ids).values_list("game_id", flat=True))

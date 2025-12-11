@@ -1,7 +1,7 @@
 import asyncio
 import chess
 import logging
-from typing import Any
+from typing import Any, Union
 from abc import ABC, abstractmethod
 from django.contrib.auth import get_user_model
 from raviolichess.ipc.protocol import ravioIN, ravioOUT
@@ -22,11 +22,9 @@ class Actor(ABC):
                 except asyncio.QueueShutDown:
                     break
                 else:
-                    response, should_stop = self.handle_message(msg)
+                    response = self.handle_message(msg)
                     if response:
                         await send(response)
-                    if should_stop:
-                        raise StopActor()
         except StopActor:
             pass
         finally:
@@ -34,7 +32,15 @@ class Actor(ABC):
             await stop()
 
     @abstractmethod
-    async def handle_message(msg) -> tuple[Any, bool]: ...
+    async def handle_message(msg) -> Any:
+        """
+        Return:
+            A python object message to send back.
+
+        Raise:
+            StopActor.
+        """
+        ...
 
 
 class GameActor(Actor):
@@ -44,11 +50,8 @@ class GameActor(Actor):
         self.black_player = black_player
         self._board = chess.Board()
 
-    def handle_message(
-        self, msg: ravioIN.GameProtocol
-    ) -> tuple[ravioOUT.Protocol, bool]:
+    def handle_message(self, msg: ravioIN.GameProtocol) -> Union[ravioOUT.Protocol]:
         response = None
-        should_stop = False
 
         match msg:
             case ravioIN.GameMove(san):
@@ -57,13 +60,13 @@ class GameActor(Actor):
                     response = ravioOUT.GameMove(
                         data=ravioOUT.GameMove.Payload(ok=True, san=san)
                     )
-                except ValueError:
+                except ValueError as exc:
                     response = ravioOUT.GameMove(
                         data=ravioOUT.GameMove.Payload(ok=False, san=san)
                     )
-                    should_stop = True
+                    raise StopActor from exc
             case _:
                 logger.warning("Unknown message received: %s", msg)
-                should_stop = True
+                raise StopActor
 
-        return response, should_stop
+        return response

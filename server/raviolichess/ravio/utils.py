@@ -4,6 +4,7 @@ import random
 from functools import wraps
 from typing import Callable, Any, Type, Tuple
 from .exceptions import TooManyRetryException
+from channels.db import database_sync_to_async
 
 RETRYABLE_EXCEPTIONS = (asyncio.TimeoutError, IOError)
 
