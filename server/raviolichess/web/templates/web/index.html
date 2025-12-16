@@ -1,6 +1,0 @@
-{% extends "web/base.html" %}
-{% load django_vite %}
-{% block content %}
-    <div id="root"></div>
-    {{ to_json|json_script:"page-init-data" }}
-{% endblock content %}
