@@ -1,5 +1,4 @@
 /production
-compose.yaml
 openapi.yaml
 *.prod*
 .dockerignore
