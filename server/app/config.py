@@ -1,12 +1,12 @@
 import secrets
 from typing import Literal
 
-from pydantic import PostgresDsn, computed_field
+from pydantic import PostgresDsn, RedisDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
@@ -27,6 +27,11 @@ class Settings(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
+
+    @computed_field
+    @property
+    def REDIS_URI(self) -> RedisDsn:
+        return RedisDsn()
 
 
 settings = Settings()

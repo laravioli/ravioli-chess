@@ -1,5 +1,5 @@
-# Import every model file here
+# Import every model here
 
-from .base import Base
-
-__all__ = ["Base"]
+from app.auth.models import User  # noqa: F401
+from app.preference.models import Preference  # noqa: F401
+from app.testdata.models import Item  # noqa: F401

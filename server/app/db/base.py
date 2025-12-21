@@ -1,9 +1,14 @@
-from sqlalchemy import MetaData
+import datetime
+
+from sqlalchemy import TIMESTAMP, MetaData
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(AsyncAttrs, DeclarativeBase):
+    type_annotation_map = {
+        datetime.datetime: TIMESTAMP(timezone=True),
+    }
     metadata = MetaData(
         naming_convention={
             "ix": "ix_%(column_0_label)s",
