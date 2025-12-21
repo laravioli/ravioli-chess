@@ -1,6 +1,14 @@
 from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel, Field, SecretStr, StringConstraints, ValidationInfo
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    EmailStr,
+    Field,
+    SecretStr,
+    StringConstraints,
+    ValidationInfo,
+)
 
 
 def check_passwords_match(value: str, info: ValidationInfo) -> str:
@@ -16,6 +24,7 @@ class UserCreate(BaseModel):
             min_length=3, max_length=150, pattern=r"^[\w.@+-]+$", strip_whitespace=True
         ),
     ]
+    email: EmailStr
     password: Annotated[SecretStr, Field(min_length=6)]
     password_repeat: Annotated[SecretStr, AfterValidator(check_passwords_match)]
 

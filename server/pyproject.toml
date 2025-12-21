@@ -8,6 +8,7 @@ dependencies = [
     "alembic>=1.17.2",
     "asyncpg>=0.31.0",
     "chess>=1.11.2",
+    "email-validator>=2.3.0",
     "fastapi[standard-no-fastapi-cloud-cli]>=0.125.0",
     "jinja2>=3.1.6",
     "msgspec>=0.20.0",

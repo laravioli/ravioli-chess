@@ -12,9 +12,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=list[ItemReturn])
-async def get_items(
-    session: DbSession,
-):
+async def get_items(session: DbSession):
     return await get_all(session)
 
 

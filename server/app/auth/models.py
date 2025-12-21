@@ -12,7 +12,8 @@ if TYPE_CHECKING:
 class User(Base):
     __tablename__ = "user_account"
     id: Mapped[PrimaryKey[int]]
-    username: Mapped[str] = mapped_column(String(150), unique=True)
+    username: Mapped[str] = mapped_column(String(16), unique=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
     password_hash: Mapped[bytes]
     is_staff: Mapped[bool] = mapped_column(default=False)
     is_active: Mapped[bool] = mapped_column(default=True)
