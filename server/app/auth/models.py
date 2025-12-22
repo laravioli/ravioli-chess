@@ -1,3 +1,4 @@
+import uuid
 from typing import TYPE_CHECKING
 
 from app.db.base import Base
@@ -11,10 +12,10 @@ if TYPE_CHECKING:
 
 class User(Base):
     __tablename__ = "user_account"
-    id: Mapped[PrimaryKey[int]]
+    id: Mapped[PrimaryKey[uuid.UUID]] = mapped_column(default=uuid.uuid4)
     username: Mapped[str] = mapped_column(String(16), unique=True)
     email: Mapped[str] = mapped_column(String(255), unique=True)
-    password_hash: Mapped[bytes]
+    hashed_password: Mapped[str]
     is_staff: Mapped[bool] = mapped_column(default=False)
     is_active: Mapped[bool] = mapped_column(default=True)
     joined_at: Mapped[TimestampNow]

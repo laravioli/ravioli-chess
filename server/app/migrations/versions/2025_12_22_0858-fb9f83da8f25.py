@@ -1,8 +1,8 @@
-"""create user and preference table
+"""user and preference table
 
-Revision ID: ffe0fe770708
+Revision ID: fb9f83da8f25
 Revises: 3243a8d1a03b
-Create Date: 2025-12-21 13:16:50.163019
+Create Date: 2025-12-22 08:58:26.360802
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ffe0fe770708'
+revision: str = 'fb9f83da8f25'
 down_revision: Union[str, Sequence[str], None] = '3243a8d1a03b'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,20 +29,22 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id', name=op.f('pk_item'))
     )
     op.create_table('user_account',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('username', sa.String(length=150), nullable=False),
-    sa.Column('password_hash', sa.LargeBinary(), nullable=False),
+    sa.Column('id', sa.Uuid(), nullable=False),
+    sa.Column('username', sa.String(length=16), nullable=False),
+    sa.Column('email', sa.String(length=255), nullable=False),
+    sa.Column('hashed_password', sa.String(), nullable=False),
     sa.Column('is_staff', sa.Boolean(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('joined_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_user_account')),
+    sa.UniqueConstraint('email', name=op.f('uq_user_account_email')),
     sa.UniqueConstraint('username', name=op.f('uq_user_account_username'))
     )
     op.create_table('user_preference',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('board', sa.Enum('WOOD', 'BLUE', 'BLUE2', 'BROWN', name='board'), nullable=False),
     sa.Column('pieceset', sa.Enum('BASE', 'WIKI', name='pieceset'), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Uuid(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user_account.id'], name=op.f('fk_user_preference_user_id_user_account'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_user_preference')),
     sa.UniqueConstraint('user_id', name=op.f('uq_user_preference_user_id'))
@@ -56,4 +58,6 @@ def downgrade() -> None:
     op.drop_table('user_preference')
     op.drop_table('user_account')
     op.drop_table('item')
+    op.execute('DROP TYPE board;')
+    op.execute('DROP TYPE pieceset;')
     # ### end Alembic commands ###
