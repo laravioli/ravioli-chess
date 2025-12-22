@@ -1,10 +1,11 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from app.db.base import Base
-from app.db.types import PrimaryKey, TimestampNow
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import Base
+from app.db.types import PrimaryKey, TimestampNow
 
 if TYPE_CHECKING:
     from app.preference.models import Preference

@@ -1,5 +1,6 @@
-from app.db.core import DbSession
 from fastapi import APIRouter, HTTPException, status
+
+from app.db.session import DbSession
 
 from .schemas import ItemCreate, ItemDeleted, ItemReturn, ItemUpdate
 from .service import delete, get_all, get_one, post, put

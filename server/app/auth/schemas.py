@@ -1,14 +1,23 @@
+import uuid
 from typing import Annotated
 
 from pydantic import (
     AfterValidator,
-    BaseModel,
     EmailStr,
     Field,
     SecretStr,
     StringConstraints,
     ValidationInfo,
 )
+
+from app.core.schemas import BaseSchema
+from app.preference.schemas import Preference
+
+
+# In
+class UserDb(BaseSchema):
+    username: str
+    hashed_password: str
 
 
 def check_passwords_match(value: str, info: ValidationInfo) -> str:
@@ -17,7 +26,7 @@ def check_passwords_match(value: str, info: ValidationInfo) -> str:
     return value
 
 
-class UserCreate(BaseModel):
+class UserCreate(BaseSchema):
     username: Annotated[
         str,
         StringConstraints(
@@ -27,6 +36,16 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: Annotated[SecretStr, Field(min_length=6)]
     password_repeat: Annotated[SecretStr, AfterValidator(check_passwords_match)]
+
+
+# Out
+class User(BaseSchema):
+    id: uuid
+    username: str
+
+
+class UserWithPref(User):
+    preference: Preference
 
 
 # Define once at module level

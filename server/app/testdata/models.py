@@ -1,6 +1,7 @@
-from app.db.base import Base
 from sqlalchemy import Float, String
 from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.base import Base
 
 
 class Item(Base):
