@@ -1,11 +1,10 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from app.db.base import Base
 from app.db.types import PrimaryKey, TimestampNow
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from app.preference.models import Preference
@@ -16,7 +15,7 @@ class User(Base):
     id: Mapped[PrimaryKey[uuid.UUID]] = mapped_column(default=uuid.uuid4)
     username: Mapped[str] = mapped_column(String(16), unique=True)
     email: Mapped[str] = mapped_column(String(255), unique=True)
-    hashed_password: Mapped[str]
+    hashed_password: Mapped[bytes]
     is_staff: Mapped[bool] = mapped_column(default=False)
     is_active: Mapped[bool] = mapped_column(default=True)
     joined_at: Mapped[TimestampNow]

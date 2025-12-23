@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from app.testdata.views import router as test_router
+from app.user.views import router as router_user
 
 router = APIRouter()
-router.include_router(test_router)
+router.include_router(router_user)
 
 
 @router.get("/healthcheck", include_in_schema=False)

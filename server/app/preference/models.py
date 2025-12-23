@@ -9,7 +9,7 @@ from app.db.types import PrimaryKey
 from .enums import Board, PieceSet
 
 if TYPE_CHECKING:
-    from app.auth.models import User
+    from app.user.models import User
 
 
 class Preference(Base):
