@@ -15,11 +15,6 @@ from pydantic import (
 
 
 # In
-class UserDb(BaseSchema):
-    username: str
-    hashed_password: bytes
-
-
 def check_passwords_match(value: str, info: ValidationInfo) -> str:
     if value != info.data["password"]:
         raise ValueError("Passwords do not match")
