@@ -13,6 +13,10 @@ from app.user.models import User
 
 from .security import verify_session
 
+SessionCookie = Annotated[
+    str | None, Cookie(alias=settings.SESSION_COOKIE_NAME, include_in_schema=False)
+]
+
 
 @dataclass
 class Session:
@@ -22,24 +26,24 @@ class Session:
 
 async def get_auth_session(
     redis: RedisClient,
-    session_cookie_id: str | None,
+    session_cookie: SessionCookie = None,
 ) -> Session | None:
-    if not session_cookie_id:
+    if not session_cookie:
         return
-    data = await redis.hgetall(f"session:{session_cookie_id}")
+    data = await redis.hgetall(f"session:{session_cookie}")
     if not data:
         raise InvalidSession()
-    return Session(session_id=session_cookie_id, data=data)
+    return Session(session_id=session_cookie, data=data)
 
 
 async def get_user_or_anon(
     redis: RedisClient,
     db: DbSession,
     response: Response,
-    session_cookie_id: Annotated[str | None, Cookie(alias=settings.SESSION_COOKIE_NAME)] = None,
+    session_cookie: SessionCookie = None,
 ) -> User | None:
     try:
-        auth_session = await get_auth_session(redis, session_cookie_id)
+        auth_session = await get_auth_session(redis, session_cookie)
         if not auth_session:
             return None
 
@@ -52,7 +56,10 @@ async def get_user_or_anon(
 
     except InvalidSession:
         response.delete_cookie(
-            settings.SESSION_COOKIE_NAME, secure=settings.SSL, httponly=True, samesite="lax"
+            key=settings.SESSION_COOKIE_NAME,
+            secure=settings.SSL,
+            httponly=True,
+            samesite="lax",
         )
         return None
 

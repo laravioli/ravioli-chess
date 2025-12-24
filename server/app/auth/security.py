@@ -24,8 +24,6 @@ def verify_password(plain_password: str, hashed_password: bytes) -> bool:
 
 
 def generate_session_hash(hashed_password: bytes) -> bytes:
-    if not hashed_password:
-        raise ValueError("Cannot generate auth hash for empty password")
     return signer.derive_key(secret_key=hashed_password)
 
 

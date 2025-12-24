@@ -1,6 +1,6 @@
-from typing import Annotated
+from datetime import timedelta
 
-from fastapi import APIRouter, Cookie, Depends, status
+from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
 
 from app.core.config import settings
@@ -8,26 +8,34 @@ from app.db.session import DbSession
 from app.exceptions import InvalidCredentials
 from app.ipc.client import RedisClient
 
+from .deps import SessionCookie
 from .schemas import UserLogin, UserSuccess
-from .service import login
+from .service import authenticate, create_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("", response_model=UserSuccess)
-async def login_user(
+@router.post("/login", response_model=UserSuccess)
+async def login(
     redis: RedisClient,
     session: DbSession,
     credentials: UserLogin,
-    session_cookie_id: Annotated[str | None, Cookie(alias=settings.SESSION_COOKIE_NAME)] = None,
+    response: Response,
+    session_cookie: SessionCookie = None,
 ):
-    if session_cookie_id:
-        await redis.delete(f"session:{session_cookie_id}")
     try:
-        user, session_id = await login(redis, session, credentials)
+        user = await authenticate(session, credentials)
     except InvalidCredentials:
-        pass
-    # to finish
-    # i think better here to manualy create a response
-    # would be better for cookie logic
-    # and i should create a cookie.py with setcookie and delete cookie
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    session_id = await create_session(redis, user, session_cookie=session_cookie)
+
+    response.set_cookie(
+        key=settings.SESSION_COOKIE_NAME,
+        value=session_id,
+        max_age=int(timedelta(days=7).total_seconds()),
+        secure=settings.SSL,
+        httponly=True,
+        samesite="lax",
+    )
+    return user

@@ -9,6 +9,7 @@ from app.exceptions import InvalidCredentials
 from app.ipc.client import RedisClient
 from app.user.models import User
 
+from .deps import SessionCookie
 from .schemas import UserLogin
 from .security import generate_session_hash, verify_password
 
@@ -27,8 +28,14 @@ async def authenticate(session: DbSession, credentials: UserLogin):
 
 
 async def create_session(
-    redis: RedisClient, user: User, expires_in: timedelta = timedelta(days=7)
+    redis: RedisClient,
+    user: User,
+    expires_in: timedelta = timedelta(days=7),
+    session_cookie: SessionCookie = None,
 ) -> str:
+    if session_cookie:
+        await redis.delete(f"session:{session_cookie}")
+
     session_id = secrets.token_urlsafe(32)
     session_key = f"session:{session_id}"
 
@@ -37,15 +44,10 @@ async def create_session(
         "auth_hash": generate_session_hash(user.hashed_password),
     }
 
-    async with redis.pipeline(transaction=True) as pipe:
-        await pipe.hset(session_key, mapping=session_data, nx=True)
+    # we could use a LUA script to check existence here instead
+    async with redis.pipeline() as pipe:
+        await pipe.hset(session_key, mapping=session_data)
         await pipe.expire(session_key, expires_in)
         await pipe.execute()
 
     return session_id
-
-
-async def login(redis: RedisClient, session: DbSession, credentials: UserLogin):
-    user = await authenticate(session, credentials)
-    session_id = await create_session(redis, user)
-    return (user, session_id)
