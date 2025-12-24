@@ -4,3 +4,7 @@ class BadRequest(Exception):
 
 class DBError(Exception):
     pass
+
+
+class InvalidSession(Exception):
+    pass

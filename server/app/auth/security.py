@@ -8,14 +8,14 @@ from app.core.config import settings
 
 password_hash = PasswordHash.recommended()
 signer = Signer(
-    secret_key=settings.SECRET_KEY,
+    secret_key=settings.SECRET_KEY.get_secret_value(),
     salt="ravioli.session_auth_hash",
     key_derivation="hmac",
     digest_method=hashlib.sha256,
 )
 
 
-def get_password_hash(password: str) -> bytes:
+def generate_password_hash(password: str) -> bytes:
     return password_hash.hash(password).encode()
 
 

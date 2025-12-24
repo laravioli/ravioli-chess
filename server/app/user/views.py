@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from app.core.exceptions import DBError
 from app.db.session import DbSession
+from app.exceptions import DBError
 from fastapi import APIRouter, Query, status
 from fastapi.exceptions import HTTPException
 from pydantic import UUID4
