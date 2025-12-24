@@ -39,3 +39,21 @@ async def login(
         samesite="lax",
     )
     return user
+
+
+# todo: add openapi schema and eventually handle bad scenario
+@router.post("/logout")
+async def logout(
+    redis: RedisClient,
+    response: Response,
+    session_cookie: SessionCookie = None,
+):
+    if session_cookie:
+        await redis.delete(f"session:{session_cookie}")
+    response.delete_cookie(
+        key=settings.SESSION_COOKIE_NAME,
+        secure=settings.SSL,
+        httponly=True,
+        samesite="lax",
+    )
+    return {"message": "Successfully logged out"}

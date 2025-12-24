@@ -44,7 +44,7 @@ async def create_session(
         "auth_hash": generate_session_hash(user.hashed_password),
     }
 
-    # we could use a LUA script to check existence here instead
+    # todo: use a LUA script to check existence here instead
     async with redis.pipeline() as pipe:
         await pipe.hset(session_key, mapping=session_data)
         await pipe.expire(session_key, expires_in)
