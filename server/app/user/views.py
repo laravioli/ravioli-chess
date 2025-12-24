@@ -9,10 +9,7 @@ from pydantic import UUID4
 from .schemas import UserBase, UserCreate, UserSearch, UserWithPref
 from .service import user_create, user_delete, user_retrieve, user_search
 
-router = APIRouter(
-    prefix="/users",
-    tags=["users"],
-)
+router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/{user_id}", response_model=UserBase)

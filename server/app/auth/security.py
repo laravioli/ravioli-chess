@@ -19,7 +19,7 @@ def generate_password_hash(password: str) -> bytes:
     return password_hash.hash(password).encode()
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, hashed_password: bytes) -> bool:
     return password_hash.verify(plain_password, hashed_password)
 
 

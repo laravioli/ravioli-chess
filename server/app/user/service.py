@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.auth.security import get_password_hash
+from app.auth.security import generate_password_hash
 from app.db.session import DbSession
 from app.exceptions import DBError
 from app.preference.models import Preference
@@ -16,7 +16,7 @@ async def user_create(session: DbSession, data: UserCreate):
     new_user = User(
         username=data.username,
         email=data.email,
-        hashed_password=get_password_hash(data.password.get_secret_value()),
+        hashed_password=generate_password_hash(data.password.get_secret_value()),
         preference=Preference(),
     )
 

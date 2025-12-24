@@ -8,3 +8,7 @@ class DBError(Exception):
 
 class InvalidSession(Exception):
     pass
+
+
+class InvalidCredentials(Exception):
+    pass
