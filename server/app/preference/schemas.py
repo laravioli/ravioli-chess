@@ -1,4 +1,4 @@
-from app.core.schemas import BaseSchema
+from app.api.schemas import BaseSchema
 
 from .enums import Board, PieceSet
 

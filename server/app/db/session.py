@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.core.config import settings
+from app.config import settings
 
 # side-effect import
 engine = create_async_engine(str(settings.SQLALCHEMY_DATABASE_URI), pool_size=10)

@@ -3,7 +3,7 @@ from datetime import timedelta
 from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
 
-from app.core.config import settings
+from app.config import settings
 from app.db.session import DbSession
 from app.exceptions import InvalidCredentials
 from app.ipc.client import RedisClient

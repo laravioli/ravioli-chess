@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from redis.asyncio import Redis
 
-from app.core.config import settings
+from app.config import settings
 from app.db.session import engine
 
 

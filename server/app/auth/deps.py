@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import Cookie, Depends, Response, status
 from fastapi.exceptions import HTTPException
 
-from app.core.config import settings
+from app.config import settings
 from app.db.session import DbSession
 from app.exceptions import InvalidSession
 from app.ipc.client import RedisClient

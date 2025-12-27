@@ -4,7 +4,7 @@ import hmac
 from itsdangerous import Signer
 from pwdlib import PasswordHash
 
-from app.core.config import settings
+from app.config import settings
 
 password_hash = PasswordHash.recommended()
 signer = Signer(

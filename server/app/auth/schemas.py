@@ -1,6 +1,6 @@
 from pydantic import SecretStr
 
-from app.core.schemas import BaseSchema
+from app.api.schemas import BaseSchema
 from app.preference.schemas import Preference
 
 

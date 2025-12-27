@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.core.schemas import BaseSchema
+from app.api.schemas import BaseSchema
 from app.preference.schemas import Preference
 from pydantic import (
     UUID4,
