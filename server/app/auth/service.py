@@ -1,5 +1,4 @@
 import secrets
-from datetime import timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -7,10 +6,11 @@ from sqlalchemy.orm import selectinload
 from app.db.session import DbSession
 from app.exceptions import InvalidCredentials
 from app.ipc.client import RedisClient
+from app.serializers import msgpack
 from app.user.models import User
 
 from .deps import SessionCookie
-from .schemas import UserLogin
+from .schemas import Session, UserLogin
 from .security import generate_session_hash, verify_password
 
 
@@ -30,24 +30,22 @@ async def authenticate(session: DbSession, credentials: UserLogin):
 async def create_session(
     redis: RedisClient,
     user: User,
-    expires_in: timedelta = timedelta(days=7),
+    expires_in: int,
     session_cookie: SessionCookie = None,
 ) -> str:
     if session_cookie:
         await redis.delete(f"session:{session_cookie}")
 
-    session_id = secrets.token_urlsafe(32)
-    session_key = f"session:{session_id}"
-
-    session_data = {
-        "user_id": str(user.id),
-        "auth_hash": generate_session_hash(user.hashed_password),
-    }
-
-    # todo: use a LUA script to check existence here instead
-    async with redis.pipeline() as pipe:
-        await pipe.hset(session_key, mapping=session_data)
-        await pipe.expire(session_key, expires_in)
-        await pipe.execute()
+    while True:
+        session_id = secrets.token_urlsafe(32)
+        session = Session(user_id=user.id, auth_hash=generate_session_hash(user.hashed_password))
+        ok = await redis.set(
+            name=f"session:{session_id}",
+            value=msgpack.encode(session),
+            nx=True,
+            ex=expires_in,
+        )
+        if ok:
+            break
 
     return session_id

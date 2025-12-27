@@ -9,7 +9,7 @@ from app.exceptions import InvalidCredentials
 from app.ipc.client import RedisClient
 
 from .deps import SessionCookie
-from .schemas import UserLogin, UserSuccess
+from .schemas import UserLogin, UserLogout, UserSuccess
 from .service import authenticate, create_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -28,12 +28,16 @@ async def login(
     except InvalidCredentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    session_id = await create_session(redis, user, session_cookie=session_cookie)
+    expire_in = int(timedelta(days=7).total_seconds())
+
+    session_id = await create_session(
+        redis, user, expires_in=expire_in, session_cookie=session_cookie
+    )
 
     response.set_cookie(
         key=settings.SESSION_COOKIE_NAME,
         value=session_id,
-        max_age=int(timedelta(days=7).total_seconds()),
+        max_age=expire_in,
         secure=settings.SSL,
         httponly=True,
         samesite="lax",
@@ -41,8 +45,7 @@ async def login(
     return user
 
 
-# todo: add openapi schema and eventually handle bad scenario
-@router.post("/logout")
+@router.post("/logout", response_model=UserLogout)
 async def logout(
     redis: RedisClient,
     response: Response,
