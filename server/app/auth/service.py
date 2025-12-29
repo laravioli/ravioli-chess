@@ -1,7 +1,7 @@
 import secrets
 
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 
 from app.db.session import DbSession
 from app.exceptions import InvalidCredentials
@@ -18,7 +18,7 @@ async def authenticate(session: DbSession, credentials: UserLogin):
     stmt = (
         select(User)
         .where(User.username == credentials.username)
-        .options(selectinload(User.preference))
+        .options(joinedload(User.preference))
     )
     user = await session.scalar(stmt)
 

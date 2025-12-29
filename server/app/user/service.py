@@ -6,7 +6,7 @@ from app.exceptions import DBError
 from app.preference.models import Preference
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 
 from .models import User
 from .schemas import UserCreate
@@ -32,7 +32,7 @@ async def user_create(session: DbSession, data: UserCreate):
 async def user_retrieve(session: DbSession, id: UUID, withPref=False):
     options = []
     if withPref:
-        options.append(selectinload(User.preference))
+        options.append(joinedload(User.preference))
     user = await session.get(User, id, options=options)
     return user
 
