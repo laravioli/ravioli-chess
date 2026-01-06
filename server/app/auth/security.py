@@ -7,7 +7,8 @@ from pwdlib import PasswordHash
 from app.config import settings
 
 password_hash = PasswordHash.recommended()
-signer = Signer(
+
+auth_signer = Signer(
     secret_key=settings.SECRET_KEY.get_secret_value(),
     salt="ravioli.session_auth_hash",
     key_derivation="hmac",
@@ -24,7 +25,7 @@ def verify_password(plain_password: str, hashed_password: bytes) -> bool:
 
 
 def generate_session_hash(hashed_password: bytes) -> bytes:
-    return signer.derive_key(secret_key=hashed_password)
+    return auth_signer.derive_key(secret_key=hashed_password)
 
 
 def verify_session(hashed_password: bytes, session_auth_hash: bytes) -> bool:

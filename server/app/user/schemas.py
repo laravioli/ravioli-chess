@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from app.api.schemas import BaseSchema
-from app.preference.schemas import Preference
+from app.pref.schemas import Preference
 from pydantic import (
     UUID4,
     AfterValidator,

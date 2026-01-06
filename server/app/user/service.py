@@ -3,7 +3,7 @@ from uuid import UUID
 from app.auth.security import generate_password_hash
 from app.db.session import DbSession
 from app.exceptions import DBError
-from app.preference.models import Preference
+from app.pref.models import Preference
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload

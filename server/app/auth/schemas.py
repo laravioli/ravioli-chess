@@ -1,10 +1,10 @@
 import uuid
 
 import msgspec
-from pydantic import SecretStr
+from pydantic import UUID4, SecretStr
 
 from app.api.schemas import BaseSchema
-from app.preference.schemas import Preference
+from app.pref.schemas import Preference
 
 
 class UserLogin(BaseSchema):
@@ -13,6 +13,7 @@ class UserLogin(BaseSchema):
 
 
 class UserSuccess(BaseSchema):
+    id: UUID4
     username: str
     preference: Preference
 

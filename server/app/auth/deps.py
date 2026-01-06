@@ -1,7 +1,8 @@
 from typing import Annotated
 
-from fastapi import Cookie, Depends, Response, status
+from fastapi import Depends, Response, status
 from fastapi.exceptions import HTTPException
+from fastapi.security import APIKeyCookie
 
 from app.config import settings
 from app.db.session import DbSession
@@ -14,7 +15,8 @@ from .schemas import Session
 from .security import verify_session
 
 SessionCookie = Annotated[
-    str | None, Cookie(alias=settings.SESSION_COOKIE_NAME, include_in_schema=False)
+    str | None,
+    Depends(APIKeyCookie(name=settings.SESSION_COOKIE_NAME, auto_error=False)),
 ]
 
 
@@ -29,7 +31,7 @@ async def get_auth_session(
     return msgpack.decode(data, type=Session)
 
 
-async def get_user_or_anon(
+async def current_user_or_anon(
     redis: RedisClient,
     db: DbSession,
     response: Response,
@@ -55,7 +57,11 @@ async def get_user_or_anon(
         return None
 
 
-async def get_user(user: Annotated[User | None, Depends(get_user_or_anon)]):
+async def current_user(user: Annotated[User | None, Depends(current_user_or_anon)]):
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return user
+
+
+UserOrAnon = Annotated[User | None, Depends(current_user_or_anon)]
+CurrentUser = Annotated[User, Depends(current_user)]

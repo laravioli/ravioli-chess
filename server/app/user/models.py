@@ -7,7 +7,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
-    from app.preference.models import Preference
+    from app.pref.models import Preference
 
 
 class User(Base):

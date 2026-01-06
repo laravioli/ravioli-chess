@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.auth.deps import get_user
+from app.auth.deps import current_user
 from app.db.session import DbSession
 from app.exceptions import DBError
 from fastapi import APIRouter, Depends, Query, status
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserBase)
-async def get_me(me: Annotated[User, Depends(get_user)]):
+async def get_me(me: Annotated[User, Depends(current_user)]):
     return me
 
 
