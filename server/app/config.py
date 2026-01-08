@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
     SSL: bool = True
 
-    ANON_SESSION_COOKIE_NAME: str = "anon_session"
-    SESSION_COOKIE_NAME: str = "session"
+    ANON_COOKIE: str = "anon"
+    SESSION_COOKIE: str = "session"
 
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432

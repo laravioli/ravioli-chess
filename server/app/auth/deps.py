@@ -16,7 +16,7 @@ from .security import verify_session
 
 SessionCookie = Annotated[
     str | None,
-    Depends(APIKeyCookie(name=settings.SESSION_COOKIE_NAME, auto_error=False)),
+    Depends(APIKeyCookie(name=settings.SESSION_COOKIE, auto_error=False)),
 ]
 
 
@@ -49,7 +49,7 @@ async def current_user_or_anon(
 
     except InvalidSession:
         response.delete_cookie(
-            key=settings.SESSION_COOKIE_NAME,
+            key=settings.SESSION_COOKIE,
             secure=settings.SSL,
             httponly=True,
             samesite="lax",

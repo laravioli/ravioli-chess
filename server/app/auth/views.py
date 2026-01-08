@@ -35,9 +35,15 @@ async def login(
     )
 
     response.set_cookie(
-        key=settings.SESSION_COOKIE_NAME,
+        key=settings.SESSION_COOKIE,
         value=session_id,
         max_age=expire_in,
+        secure=settings.SSL,
+        httponly=True,
+        samesite="lax",
+    )
+    response.delete_cookie(
+        key=settings.ANON_COOKIE,
         secure=settings.SSL,
         httponly=True,
         samesite="lax",
@@ -54,7 +60,7 @@ async def logout(
     if session_cookie:
         await redis.delete(f"session:{session_cookie}")
     response.delete_cookie(
-        key=settings.SESSION_COOKIE_NAME,
+        key=settings.SESSION_COOKIE,
         secure=settings.SSL,
         httponly=True,
         samesite="lax",
