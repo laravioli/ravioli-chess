@@ -1,8 +1,8 @@
 """create notification and friendship table
 
-Revision ID: ce6ba0708e19
+Revision ID: 094f079697ca
 Revises: 74819a20a626
-Create Date: 2025-12-29 11:55:25.831929
+Create Date: 2026-01-09 13:24:03.791720
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ce6ba0708e19'
+revision: str = '094f079697ca'
 down_revision: Union[str, Sequence[str], None] = '74819a20a626'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,6 +27,7 @@ def upgrade() -> None:
     sa.Column('friend_id', sa.Uuid(), nullable=False),
     sa.Column('status', sa.Enum('pending', 'accepted', 'blocked', name='friendship_enum'), nullable=False),
     sa.Column('last_update', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.CheckConstraint('user_id != friend_id', name=op.f('ck_friendship_`check_user_not_friend_with_self`')),
     sa.ForeignKeyConstraint(['friend_id'], ['user_account.id'], name=op.f('fk_friendship_friend_id_user_account'), ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['user_account.id'], name=op.f('fk_friendship_user_id_user_account'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_friendship')),
