@@ -5,7 +5,7 @@ from fastapi import Request, Response
 from sqlalchemy import update
 
 from app.config import settings
-from app.db.session import DbSession
+from app.db.deps import DbSession
 from app.user.models import User
 from app.web.cookie import signer
 

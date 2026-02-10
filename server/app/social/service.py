@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from app.db.session import DbSession
+from app.db.deps import DbSession
 from app.user.models import User
 
 from .models import Friendship

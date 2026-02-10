@@ -3,9 +3,9 @@ import secrets
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from app.db.session import DbSession
+from app.db.deps import DbSession
 from app.exceptions import InvalidCredentials
-from app.ipc.client import RedisClient
+from app.ipc.deps import RedisClient
 from app.serializers import msgpack
 from app.user.models import User
 

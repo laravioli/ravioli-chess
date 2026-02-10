@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from app.auth.deps import current_user
-from app.db.session import DbSession
+from app.auth.deps import CurrentUser
+from app.db.deps import DbSession
 from app.exceptions import DBError
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Query, status
 from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
-from .models import User
 from .schemas import UserBase, UserCreate, UserSearch, UserWithPref
 from .service import user_create, user_delete, user_retrieve, user_search
 
@@ -15,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserBase)
-async def get_me(me: Annotated[User, Depends(current_user)]):
+async def get_me(me: CurrentUser):
     return me
 
 

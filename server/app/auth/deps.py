@@ -5,16 +5,16 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import APIKeyCookie
 
 from app.config import settings
-from app.db.session import DbSession
+from app.db.deps import DbSession
 from app.exceptions import InvalidSession
-from app.ipc.client import RedisClient
+from app.ipc.deps import RedisClient
 from app.serializers import msgpack
 from app.user.models import User
 
 from .schemas import Session
 from .security import verify_session
 
-SessionCookie = Annotated[
+type SessionCookie = Annotated[
     str | None,
     Depends(APIKeyCookie(name=settings.SESSION_COOKIE, auto_error=False)),
 ]
@@ -57,11 +57,13 @@ async def current_user_or_anon(
         return None
 
 
-async def current_user(user: Annotated[User | None, Depends(current_user_or_anon)]):
+type UserOrAnon = Annotated[User | None, Depends(current_user_or_anon)]
+
+
+async def current_user(user: UserOrAnon):
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return user
 
 
-UserOrAnon = Annotated[User | None, Depends(current_user_or_anon)]
-CurrentUser = Annotated[User, Depends(current_user)]
+type CurrentUser = Annotated[User, Depends(current_user)]

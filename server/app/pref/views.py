@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 
 from app.auth.deps import UserOrAnon
-from app.db.session import DbSession
+from app.db.deps import DbSession
 
 from .schemas import PreferenceUpdate
 from .service import update_anon_pref, update_user_pref

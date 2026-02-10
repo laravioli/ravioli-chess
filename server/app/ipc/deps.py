@@ -8,4 +8,4 @@ async def get_redis(request: Request) -> Redis:
     return request.state.redis
 
 
-RedisClient = Annotated[Redis, Depends(get_redis)]
+type RedisClient = Annotated[Redis, Depends(get_redis)]

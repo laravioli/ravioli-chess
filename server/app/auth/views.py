@@ -4,9 +4,9 @@ from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
 
 from app.config import settings
-from app.db.session import DbSession
+from app.db.deps import DbSession
 from app.exceptions import InvalidCredentials
-from app.ipc.client import RedisClient
+from app.ipc.deps import RedisClient
 
 from .deps import SessionCookie
 from .schemas import UserLogin, UserLogout, UserSuccess

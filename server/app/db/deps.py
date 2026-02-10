@@ -16,4 +16,4 @@ async def get_session():
         yield session
 
 
-DbSession = Annotated[AsyncSession, Depends(get_session)]
+type DbSession = Annotated[AsyncSession, Depends(get_session)]
