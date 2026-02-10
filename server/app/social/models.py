@@ -4,7 +4,7 @@ from typing import Literal
 from sqlalchemy import CheckConstraint, Enum, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db.base import Base
+from app.db.models import Base
 from app.db.types import TimestampUpdated
 
 Status = Literal["pending", "accepted", "blocked"]

@@ -1,11 +1,12 @@
 from typing import Annotated
 
-from app.auth.deps import CurrentUser
-from app.db.deps import DbSession
-from app.exceptions import DBError
 from fastapi import APIRouter, Query, status
 from fastapi.exceptions import HTTPException
 from pydantic import UUID4
+
+from app.auth.deps import CurrentUser
+from app.db.deps import DbSession
+from app.exceptions import DBError
 
 from .schemas import UserBase, UserCreate, UserSearch, UserWithPref
 from .service import user_create, user_delete, user_retrieve, user_search
