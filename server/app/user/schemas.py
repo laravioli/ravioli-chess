@@ -1,7 +1,5 @@
 from typing import Annotated
 
-from app.api.schemas import BaseSchema
-from app.pref.schemas import Preference
 from pydantic import (
     UUID4,
     AfterValidator,
@@ -12,6 +10,9 @@ from pydantic import (
     StringConstraints,
     ValidationInfo,
 )
+
+from app.api.schemas import BaseSchema
+from app.pref.schemas import Preference
 
 
 # In
