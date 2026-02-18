@@ -1,14 +1,34 @@
-class BadRequest(Exception):
-    pass
+from fastapi import FastAPI, status
+from fastapi.responses import ORJSONResponse
 
 
-class DBError(Exception):
-    pass
+class AppException(Exception):
+    "Error raised during request handling"
+
+    status = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self, detail: str = "An exception occured during request handling"):
+        self.detail = detail
 
 
-class InvalidSession(Exception):
-    pass
+class DBConflict(AppException):
+    """Exception caused by db_data integrity"""
+
+    status = status.HTTP_409_CONFLICT
 
 
-class InvalidCredentials(Exception):
-    pass
+class InvalidSession(AppException):
+    """Exception thrown when user session is invalid"""
+
+    status = status.HTTP_401_UNAUTHORIZED
+
+
+class InvalidCredentials(AppException):
+    status = status.HTTP_401_UNAUTHORIZED
+
+
+def add_exception_handler(app: FastAPI):
+    def exc_handler(request, exc: AppException):  # noqa: ARG001
+        return ORJSONResponse({"detail": exc.detail}, status_code=exc.status)
+
+    app.add_exception_handler(AppException, exc_handler)

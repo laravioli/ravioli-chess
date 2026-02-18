@@ -6,7 +6,6 @@ from pydantic import UUID4
 
 from app.auth.deps import CurrentUser
 from app.db.deps import DbSession
-from app.exceptions import DBError
 
 from .schemas import UserBase, UserCreate, UserSearch, UserWithPref
 from .service import user_create, user_delete, user_retrieve, user_search
@@ -34,12 +33,7 @@ async def list_user(session: DbSession, q: Annotated[str | None, Query()] = None
 
 @router.post("", response_model=UserWithPref, status_code=status.HTTP_201_CREATED)
 async def register_user(session: DbSession, body: UserCreate):
-    try:
-        new_user = await user_create(session, body)
-    except DBError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
-    else:
-        return new_user
+    return await user_create(session, body)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

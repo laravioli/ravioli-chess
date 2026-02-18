@@ -20,6 +20,7 @@ async def update_user_pref(session: DbSession, user: User, pref: PreferenceUpdat
     await session.commit()
 
 
+# todo: fix cookie format prb
 def update_anon_pref(request: Request, pref: PreferenceUpdate, response: Response):
     cookie_data = request.cookies.get(settings.ANON_COOKIE, {})
     if cookie_data:

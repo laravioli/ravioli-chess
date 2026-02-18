@@ -1,12 +1,13 @@
 from uuid import UUID
 
-from app.auth.security import generate_password_hash
-from app.db.deps import DbSession
-from app.exceptions import DBError
-from app.pref.models import Preference
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
+
+from app.auth.security import generate_password_hash
+from app.db.deps import DbSession
+from app.exceptions import DBConflict
+from app.pref.models import Preference
 
 from .models import User
 from .schemas import UserCreate
@@ -24,7 +25,7 @@ async def user_create(session: DbSession, data: UserCreate):
     try:
         await session.commit()
     except IntegrityError as e:
-        raise DBError("User with this username or email already exists") from e
+        raise DBConflict("This username or email already exists") from e
     else:
         return new_user
 
