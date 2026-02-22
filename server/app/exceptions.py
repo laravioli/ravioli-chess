@@ -17,6 +17,10 @@ class DBConflict(AppException):
     status = status.HTTP_409_CONFLICT
 
 
+class DBNotFound(AppException):
+    status = status.HTTP_404_NOT_FOUND
+
+
 class InvalidSession(AppException):
     """Exception thrown when user session is invalid"""
 

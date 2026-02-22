@@ -14,16 +14,17 @@ from .schemas import UserCreate
 
 
 async def user_create(session: DbSession, data: UserCreate):
-    new_user = User(
-        username=data.username,
-        email=data.email,
-        hashed_password=generate_password_hash(data.password.get_secret_value()),
-        preference=Preference(),
-    )
-
-    session.add(new_user)
     try:
-        await session.commit()
+        async with session.begin():
+            new_user = User(
+                username=data.username,
+                email=data.email,
+                hashed_password=generate_password_hash(data.password.get_secret_value()),
+                preference=Preference(),
+            )
+
+            session.add(new_user)
+
     except IntegrityError as e:
         raise DBConflict("This username or email already exists") from e
     else:
@@ -50,8 +51,8 @@ async def user_search(session: DbSession, search_query: str):
 
 
 async def user_delete(session: DbSession, id: UUID) -> bool:
-    stmt = delete(User).where(User.id == id)
-    result = await session.execute(stmt)
-    await session.commit()
+    async with session.begin():
+        stmt = delete(User).where(User.id == id)
+        result = await session.execute(stmt)
 
     return result.rowcount > 0

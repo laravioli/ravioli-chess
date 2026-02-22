@@ -15,9 +15,9 @@ from .schemas import PreferenceUpdate
 
 async def update_user_pref(session: DbSession, user: User, pref: PreferenceUpdate):
     payload = pref.model_dump(exclude_unset=True)
-    stmt = update(Preference).where(Preference.user_id == user.id).values(payload)
-    await session.execute(stmt)
-    await session.commit()
+    async with session.begin():
+        stmt = update(Preference).where(Preference.user_id == user.id).values(payload)
+        await session.execute(stmt)
 
 
 # todo: fix cookie format prb
