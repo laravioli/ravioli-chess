@@ -1,8 +1,8 @@
 """create notification and friendship table
 
-Revision ID: 4910fa015251
+Revision ID: 3f5e3cc97c6d
 Revises: 74819a20a626
-Create Date: 2026-02-17 20:45:47.985452
+Create Date: 2026-02-24 23:04:22.675844
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '4910fa015251'
+revision: str = '3f5e3cc97c6d'
 down_revision: Union[str, Sequence[str], None] = '74819a20a626'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('sender_id', sa.Uuid(), nullable=False),
     sa.Column('receiver_id', sa.Uuid(), nullable=False),
-    sa.Column('status', sa.Enum('pending', 'accepted', 'blocked', name='friendship_enum'), nullable=False),
+    sa.Column('status', sa.Enum('pending', 'accepted', 'blocked', name='friendshipstatus'), nullable=False),
     sa.Column('last_update', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.CheckConstraint('sender_id != receiver_id', name=op.f('ck_friendship_`ck_user_not_friend_with_self`')),
     sa.ForeignKeyConstraint(['receiver_id'], ['user_account.id'], name=op.f('fk_friendship_receiver_id_user_account'), ondelete='CASCADE'),
@@ -52,6 +52,5 @@ def downgrade() -> None:
     op.drop_table('notification')
     op.drop_index('ix_unique_friendship', table_name='friendship')
     op.drop_table('friendship')
-    op.execute("DROP TYPE friendship_enum")
-
+    op.execute("DROP TYPE friendshipstatus")
     # ### end Alembic commands ###

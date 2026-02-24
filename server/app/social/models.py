@@ -1,13 +1,16 @@
 import uuid
-from typing import Literal
+from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, Enum, ForeignKey, Index, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import CheckConstraint, ForeignKey, Index, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.models import Base
 from app.db.types import TimestampUpdated
 
-type Status = Literal["pending", "accepted", "blocked"]
+from .enums import FriendshipStatus
+
+if TYPE_CHECKING:
+    from app.user.models import User
 
 
 class Friendship(Base):
@@ -18,9 +21,9 @@ class Friendship(Base):
     receiver_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user_account.id", ondelete="CASCADE")
     )
-    status: Mapped[Status] = mapped_column(
-        Enum("pending", "accepted", "blocked", name="friendship_enum"), default="pending"
-    )
+    sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id])
+    receiver: Mapped["User"] = relationship("User", foreign_keys=[receiver_id])
+    status: Mapped[FriendshipStatus] = mapped_column(default=FriendshipStatus.pending)
     last_update: Mapped[TimestampUpdated]
 
     __table_args__ = (
