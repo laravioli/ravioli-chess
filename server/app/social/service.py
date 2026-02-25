@@ -13,42 +13,46 @@ from .models import Friendship
 
 async def create_request(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
     try:
-        async with session.begin():
-            request = Friendship(
-                sender_id=current_user_id, receiver_id=target_id, status=FriendshipStatus.pending
-            )
-            session.add(request)
+        request = Friendship(
+            sender_id=current_user_id, receiver_id=target_id, status=FriendshipStatus.pending
+        )
+        session.add(request)
+        await session.commit()
     except IntegrityError:
+        await session.rollback()
         raise DBConflict(detail="Unable to create friend request")
 
 
 async def accept_request(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
-    async with session.begin():
-        stmt = (
-            update(Friendship)
-            .where(
-                Friendship.sender_id == target_id,
-                Friendship.receiver_id == current_user_id,
-                Friendship.status == FriendshipStatus.pending,
-            )
-            .values(status=FriendshipStatus.accepted)
+    stmt = (
+        update(Friendship)
+        .where(
+            Friendship.sender_id == target_id,
+            Friendship.receiver_id == current_user_id,
+            Friendship.status == FriendshipStatus.pending,
         )
-        result = await session.execute(stmt)
+        .values(status=FriendshipStatus.accepted)
+    )
+    result = await session.execute(stmt)
 
     if result.rowcount == 0:
         raise DBNotFound(detail="There is no request to accept")
 
+    await session.commit()
+
 
 async def delete_request(session: DbSession, sender_id: uuid.UUID, receiver_id: uuid.UUID):
-    async with session.begin():
-        stmt = delete(Friendship).where(
-            Friendship.sender_id == sender_id,
-            Friendship.receiver_id == receiver_id,
-            Friendship.status == FriendshipStatus.pending,
-        )
-        result = await session.execute(stmt)
+    stmt = delete(Friendship).where(
+        Friendship.sender_id == sender_id,
+        Friendship.receiver_id == receiver_id,
+        Friendship.status == FriendshipStatus.pending,
+    )
+    result = await session.execute(stmt)
+
     if result.rowcount == 0:
         raise DBNotFound(detail="There is no request to delete")
+
+    await session.commit()
 
 
 async def list_friendship(session: DbSession, user_id: uuid.UUID, status: FriendshipStatus):
@@ -78,13 +82,14 @@ async def list_friendship(session: DbSession, user_id: uuid.UUID, status: Friend
 
 async def delete_friend(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
     low_id, high_id = sorted((current_user_id, target_id))
-    async with session.begin():
-        stmt = delete(Friendship).where(
-            func.least(Friendship.sender_id, Friendship.receiver_id) == low_id,
-            func.greatest(Friendship.sender_id, Friendship.receiver_id) == high_id,
-            Friendship.status == FriendshipStatus.accepted,
-        )
-        result = await session.execute(stmt)
+    stmt = delete(Friendship).where(
+        func.least(Friendship.sender_id, Friendship.receiver_id) == low_id,
+        func.greatest(Friendship.sender_id, Friendship.receiver_id) == high_id,
+        Friendship.status == FriendshipStatus.accepted,
+    )
+    result = await session.execute(stmt)
 
     if result.rowcount == 0:
         raise DBNotFound(detail="friend not found")
+
+    await session.commit()
