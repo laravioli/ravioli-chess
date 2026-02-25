@@ -1,5 +1,8 @@
-from itsdangerous import Signer
+import orjson
+from itsdangerous import URLSafeSerializer
 
 from app.config import settings
 
-signer = Signer(secret_key=settings.SECRET_KEY.get_secret_value(), salt="ravioli.cookie")
+cookie_serializer = URLSafeSerializer(
+    secret_key=settings.SECRET_KEY.get_secret_value(), salt="ravioli.cookie", serializer=orjson
+)
