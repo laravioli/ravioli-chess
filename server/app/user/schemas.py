@@ -28,8 +28,9 @@ class UserCreate(BaseSchema):
         StringConstraints(
             min_length=3, max_length=150, pattern=r"^[\w.@+-]+$", strip_whitespace=True
         ),
+        Field(examples=["ravioli"]),
     ]
-    email: EmailStr
+    email: Annotated[EmailStr, Field(examples=["ravioli@chess.com"])]
     password: Annotated[SecretStr, Field(min_length=6)]
     password_repeat: Annotated[SecretStr, AfterValidator(check_passwords_match)]
 
