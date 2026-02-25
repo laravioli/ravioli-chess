@@ -1,8 +1,7 @@
 import uuid
 
-from sqlalchemy import delete, func, select, union_all, update
+from sqlalchemy import delete, func, literal, select, union_all, update
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import joinedload
 
 from app.db.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
@@ -52,59 +51,40 @@ async def delete_request(session: DbSession, sender_id: uuid.UUID, receiver_id: 
         raise DBNotFound(detail="There is no request to delete")
 
 
-async def send_request(session: DbSession, current_user_id: uuid.UUID):
-    stmt = (
-        select(Friendship)
-        .where(
-            Friendship.sender_id == current_user_id, Friendship.status == FriendshipStatus.pending
-        )
-        .options(joinedload(Friendship.receiver))
-    ).order_by(Friendship.last_update.desc())
-
-    result = await session.scalars(stmt)
-    return result.all()
-
-
-async def receive_request(session: DbSession, current_user_id: uuid.UUID):
-    stmt = (
-        select(Friendship)
-        .where(
-            Friendship.receiver_id == current_user_id, Friendship.status == FriendshipStatus.pending
-        )
-        .options(joinedload(Friendship.sender))
-    ).order_by(Friendship.last_update.desc())
-
-    result = await session.scalars(stmt)
-    return result.all()
-
-
 async def list_friendship(session: DbSession, user_id: uuid.UUID, status: FriendshipStatus):
-    stmt1 = select(Friendship.receiver_id.label("friend_id"), Friendship.last_update).where(
-        Friendship.sender_id == user_id, Friendship.status == status
-    )
-    stmt2 = select(Friendship.sender_id.label("friend_id"), Friendship.last_update).where(
-        Friendship.receiver_id == user_id, Friendship.status == status
-    )
+    stmt1 = select(
+        Friendship.receiver_id.label("friend_id"),
+        Friendship.last_update,
+        literal("outgoing").label("direction"),
+    ).where(Friendship.sender_id == user_id, Friendship.status == status)
+
+    stmt2 = select(
+        Friendship.sender_id.label("friend_id"),
+        Friendship.last_update,
+        literal("incoming").label("direction"),
+    ).where(Friendship.receiver_id == user_id, Friendship.status == status)
+
     subq = union_all(stmt1, stmt2).subquery()
 
-    stmt = select(User.id, User.username, subq.c.last_update).join(
-        subq, User.id == subq.c.friend_id
+    stmt = (
+        select(User.id, User.username, subq.c.last_update, subq.c.direction)
+        .join(subq, User.id == subq.c.friend_id)
+        .order_by(subq.c.last_update.desc())
     )
 
-    res = await session.execute(stmt)
-    return res.all()
+    result = await session.execute(stmt)
+    return result.all()
 
 
-async def delete_friendship(
-    session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID, status: FriendshipStatus
-):
+async def delete_friend(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
     low_id, high_id = sorted((current_user_id, target_id))
     async with session.begin():
         stmt = delete(Friendship).where(
             func.least(Friendship.sender_id, Friendship.receiver_id) == low_id,
             func.greatest(Friendship.sender_id, Friendship.receiver_id) == high_id,
-            Friendship.status == status,
+            Friendship.status == FriendshipStatus.accepted,
         )
         result = await session.execute(stmt)
 
-    return result.rowcount > 0
+    if result.rowcount == 0:
+        raise DBNotFound(detail="friend not found")

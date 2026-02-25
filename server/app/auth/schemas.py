@@ -18,10 +18,6 @@ class UserSuccess(BaseSchema):
     preference: Preference
 
 
-class UserLogout(BaseSchema):
-    message: str
-
-
 class Session(msgspec.Struct):
     user_id: uuid.UUID
     auth_hash: bytes

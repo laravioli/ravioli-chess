@@ -9,7 +9,7 @@ from app.exceptions import InvalidCredentials
 from app.ipc.deps import RedisClient
 
 from .deps import SessionCookie
-from .schemas import UserLogin, UserLogout, UserSuccess
+from .schemas import UserLogin, UserSuccess
 from .service import authenticate, create_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -51,7 +51,7 @@ async def login(
     return user
 
 
-@router.post("/logout", response_model=UserLogout)
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
     redis: RedisClient,
     response: Response,
@@ -65,4 +65,3 @@ async def logout(
         httponly=True,
         samesite="lax",
     )
-    return {"message": "Successfully logged out"}
