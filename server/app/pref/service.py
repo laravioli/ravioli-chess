@@ -1,16 +1,26 @@
 from datetime import timedelta
+from uuid import UUID
 
 from fastapi import Request, Response
 from itsdangerous import BadSignature
-from sqlalchemy import update
+from sqlalchemy import select, update
 
 from app.config import settings
 from app.db.deps import DbSession
+from app.exceptions import DBNotFound
 from app.user.models import User
 from app.web.cookie import cookie_serializer
 
 from .models import Preference
 from .schemas import PreferenceUpdate
+
+
+async def get_user_pref(session: DbSession, user_id: UUID):
+    stmt = select(Preference).where(Preference.user_id == user_id)
+    pref = await session.scalar(stmt)
+    if not pref:
+        raise DBNotFound("could not find user preference")
+    return pref
 
 
 async def update_user_pref(session: DbSession, user: User, pref: PreferenceUpdate):
@@ -20,7 +30,7 @@ async def update_user_pref(session: DbSession, user: User, pref: PreferenceUpdat
     await session.commit()
 
 
-def update_anon_pref(request: Request, pref: PreferenceUpdate, response: Response):
+def extract_cookie_data(request: Request):
     raw_cookie = request.cookies.get(settings.ANON_COOKIE)
     cookie_data = {}
 
@@ -29,7 +39,11 @@ def update_anon_pref(request: Request, pref: PreferenceUpdate, response: Respons
             cookie_data = cookie_serializer.loads(raw_cookie)
         except BadSignature:
             cookie_data = {}
+    return cookie_data
 
+
+def update_anon_pref(request: Request, pref: PreferenceUpdate, response: Response):
+    cookie_data = extract_cookie_data(request)
     pref_data = pref.model_dump(exclude_unset=True, mode="json")
     new_data = {**cookie_data, **pref_data}
 
