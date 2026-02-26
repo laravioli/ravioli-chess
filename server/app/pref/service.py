@@ -8,8 +8,8 @@ from sqlalchemy import select, update
 from app.config import settings
 from app.db.deps import DbSession
 from app.exceptions import DBNotFound
+from app.serializers.signed import cookie_serializer
 from app.user.models import User
-from app.web.cookie import cookie_serializer
 
 from .models import Preference
 from .schemas import PreferenceUpdate
