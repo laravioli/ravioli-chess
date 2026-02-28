@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
     SECRET_KEY: SecretStr = secrets.token_urlsafe(32)
-    ENVIRONMENT: Literal["local", "staging", "production"] = "local"
+    ENVIRONMENT: Literal["local", "staging", "production"] = "production"
     SSL: bool = True
 
     ANON_COOKIE: str = "anon"
