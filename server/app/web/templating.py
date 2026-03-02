@@ -3,6 +3,8 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from jinja_vite import JinjaViteConfig, add_jinja_vite_globals
 from starlette.requests import Request
 
+from .ctx import web_context
+
 env = Environment(
     autoescape=select_autoescape(["html", "htm", "xml"]),
     loader=PackageLoader("app.web", "templates"),
@@ -17,4 +19,4 @@ def user_context(request: Request):
     return {"user": request.state.user}
 
 
-templates = Jinja2Templates(env=env, context_processors=[user_context])
+templates = Jinja2Templates(env=env, context_processors=[web_context])

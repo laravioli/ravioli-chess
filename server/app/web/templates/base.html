@@ -13,6 +13,13 @@
         <script src={{ vite_asset_url('js/scripts.js') }}></script>
         {{ vite_hmr_client() }}
         {{ vite_script('src/main.tsx') }}
+        <style>
+        :root{
+        {% for key, value in pieces.items() %}
+            {{ key }}: url("{{ vite_asset_url('images/pieces/')}}{{user.preference.pieceset.value}}/{{value}}.png");
+        {% endfor %}
+        }
+        </style>
     </head>
     <body{% for key, value in user.preference.model_dump(mode='json').items() %} data-{{ key }}="{{ value }}"{% endfor %}>
         {% block content %}
