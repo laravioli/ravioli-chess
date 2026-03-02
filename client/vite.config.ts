@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   const httpTarget = `http://${BACKEND_DOMAIN}`;
 
   return {
-    base: '/static/web/',
+    base: '/static/',
     plugins: [
       react({
         babel: {
