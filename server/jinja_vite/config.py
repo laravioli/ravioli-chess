@@ -13,15 +13,14 @@ def trailing_slash(value: str) -> str:
 type TrailingSlashStr = Annotated[str, AfterValidator(trailing_slash)]
 
 
-class JinjaViteSettings(BaseSettings):
+class JinjaViteConfig(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
     ENVIRONMENT: Literal["local", "staging", "production"] = "production"
-    VITE_SERVER_PROTOCOL: Literal["http", "https"] = "http"
-    VITE_SERVER_HOST: str = "localhost"
-    VITE_SERVER_PORT: int = 5173
+    VITE_DEV_PROTOCOL: Literal["http", "https"] = "http"
+    VITE_DEV_HOST: str = "localhost"
+    VITE_DEV_PORT: int = 5173
     STATIC_URL: TrailingSlashStr = "static/"
-    URL_SCOPE_PREFIX: Literal[""] | TrailingSlashStr = ""
     MANIFEST_PATH: FilePath | None = None
     LEGACY_POLYFILLS_MOTIF: str = "legacy-polyfills"
     WS_CLIENT_URL: str = "@vite/client"

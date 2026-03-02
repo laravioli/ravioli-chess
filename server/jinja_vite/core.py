@@ -5,12 +5,12 @@ import orjson
 from jinja2 import Environment
 from markupsafe import Markup
 
-from .config import JinjaViteSettings
+from .config import JinjaViteConfig
 
 
 class JinjaViteApp(ABC):
-    def __init__(self, settings: JinjaViteSettings):
-        self.settings = settings
+    def __init__(self, config: JinjaViteConfig):
+        self.config = config
 
     @abstractmethod
     def vite_script(self, path: str, attrs: dict[str, str] | None = None) -> Markup: ...
@@ -36,46 +36,41 @@ class JinjaViteApp(ABC):
 
 
 class DevApp(JinjaViteApp):
-    def _get_dev_server_url(self, path: str):
-        protocol = self.settings.VITE_SERVER_PROTOCOL
-        host = self.settings.VITE_SERVER_HOST
-        port = self.settings.VITE_SERVER_PORT
+    @property
+    def base_url(self):
+        return f"{self.config.VITE_DEV_PROTOCOL}://{self.config.VITE_DEV_HOST}:{self.config.VITE_DEV_PORT}/"
 
-        base_url = f"{protocol}://{host}:{port}/"
-        base_path = self.settings.STATIC_URL + self.settings.URL_SCOPE_PREFIX
-
-        return urljoin(base_url, urljoin(base_path, path))
+    def get_url(self, path: str):
+        return urljoin(self.base_url, urljoin(self.config.STATIC_URL, path))
 
     def vite_script(self, path: str, attrs: dict[str, str] | None = None) -> Markup:
-        src = self._get_dev_server_url(path)
-        return Markup(self.generate_script_tag(src=src, attrs=attrs))
+        return Markup(self.generate_script_tag(src=self.get_url(path), attrs=attrs))
 
     def vite_stylesheet(self, path: str) -> Markup:
-        href = self._get_dev_server_url(path)
-        return Markup(self.generate_stylesheet_tag(href))
+        return Markup(self.generate_stylesheet_tag(href=self.get_url(path)))
 
     def vite_asset_url(self, path: str) -> Markup:
-        return Markup(self._get_dev_server_url(path))
+        return Markup(self.get_url(path))
 
     def vite_hmr_client(self):
-        react_url = self._get_dev_server_url(path=self.settings.REACT_REFRESH_URL)
         react_script = f"""<script type="module">
-            import RefreshRuntime from '{react_url}'
+            import RefreshRuntime from '{self.get_url(self.config.REACT_REFRESH_URL)}'
             RefreshRuntime.injectIntoGlobalHook(window)
             window.$RefreshReg$ = () => {{}}
             window.$RefreshSig$ = () => (type) => type
             window.__vite_plugin_react_preamble_installed__ = true
         </script>"""
 
-        ws_url = self._get_dev_server_url(path=self.settings.WS_CLIENT_URL)
-        ws_script = self.generate_script_tag(ws_url, {"type": "module"})
+        ws_script = self.generate_script_tag(
+            src=self.get_url(self.config.WS_CLIENT_URL), attrs={"type": "module"}
+        )
 
-        return Markup("\n".join((react_script, ws_script)))
+        return Markup("\n        ".join((react_script, ws_script)))
 
 
 class ProdApp(JinjaViteApp):
     def _parse_manifest(self):
-        manifest_path = self.settings.MANIFEST_PATH
+        manifest_path = self.config.MANIFEST_PATH
         with open(manifest_path) as manifest_file:
             content = manifest_file.read()
         try:
@@ -93,14 +88,14 @@ class ProdApp(JinjaViteApp):
         pass
 
 
-def add_jinja_vite_globals(env: Environment, settings: JinjaViteSettings | None = None):
-    if not settings:
-        settings = JinjaViteSettings()
+def add_jinja_vite_globals(env: Environment, config: JinjaViteConfig | None = None):
+    if not config:
+        config = JinjaViteConfig()
 
-    if settings.ENVIRONMENT == "local":
-        jinja_vite = DevApp(settings=settings)
+    if config.ENVIRONMENT == "local":
+        jinja_vite = DevApp(config)
     else:
-        jinja_vite = ProdApp(settings=settings)
+        jinja_vite = ProdApp(config)
 
     env.globals["vite_script"] = jinja_vite.vite_script
     env.globals["vite_stylesheet"] = jinja_vite.vite_stylesheet
