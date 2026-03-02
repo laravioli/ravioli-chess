@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Response, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import APIKeyCookie
+from sqlalchemy.orm import joinedload
 
 from app.config import settings
 from app.db.deps import DbSession
@@ -31,33 +32,40 @@ async def get_auth_session(
     return msgpack.decode(data, type=Session)
 
 
-async def current_user_or_anon(
-    redis: RedisClient,
-    db: DbSession,
-    response: Response,
-    session_cookie: SessionCookie = None,
-) -> User | None:
-    if not session_cookie:
-        return
-    try:
-        session = await get_auth_session(redis, session_cookie)
-        user = await db.get(User, session.user_id)
-        if not (user and verify_session(user.hashed_password, session.auth_hash)):
-            await redis.delete(f"session:{session_cookie}")
-            raise InvalidSession()
-        return user
+def current_user_or_anon(with_pref=False):
+    # note : fastapi deps caching rely on function identity
+    options = [joinedload(User.preference)] if with_pref else None
 
-    except InvalidSession:
-        response.delete_cookie(
-            key=settings.SESSION_COOKIE,
-            secure=settings.SSL,
-            httponly=True,
-            samesite="lax",
-        )
-        return None
+    async def dep(
+        redis: RedisClient,
+        db: DbSession,
+        response: Response,
+        session_cookie: SessionCookie = None,
+    ) -> User | None:
+        if not session_cookie:
+            return
+        try:
+            session = await get_auth_session(redis, session_cookie)
+
+            user = await db.get(User, session.user_id, options=options)
+            if not (user and verify_session(user.hashed_password, session.auth_hash)):
+                await redis.delete(f"session:{session_cookie}")
+                raise InvalidSession()
+            return user
+
+        except InvalidSession:
+            response.delete_cookie(
+                key=settings.SESSION_COOKIE,
+                secure=settings.SSL,
+                httponly=True,
+                samesite="lax",
+            )
+            return None
+
+    return dep
 
 
-type UserOrAnon = Annotated[User | None, Depends(current_user_or_anon)]
+type UserOrAnon = Annotated[User | None, Depends(current_user_or_anon())]
 
 
 async def current_user(user: UserOrAnon):

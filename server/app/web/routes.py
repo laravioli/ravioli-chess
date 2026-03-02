@@ -17,8 +17,6 @@ templates = Jinja2Templates(env=env)
 
 router = APIRouter(prefix="", tags=["web"])
 
-# add context_processor
-
 
 @router.get("/", response_class=HTMLResponse, name="root")
 async def read_item(request: Request):
