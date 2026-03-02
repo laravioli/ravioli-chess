@@ -66,6 +66,7 @@ def current_user_or_anon(with_pref=False):
 
 
 type UserOrAnon = Annotated[User | None, Depends(current_user_or_anon())]
+type UserWithPrefOrAnon = Annotated[User | None, Depends(current_user_or_anon(with_pref=True))]
 
 
 async def current_user(user: UserOrAnon):

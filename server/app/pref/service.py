@@ -1,33 +1,14 @@
 from datetime import timedelta
-from uuid import UUID
 
 from fastapi import Request, Response
 from itsdangerous import BadSignature
-from sqlalchemy import select, update
 
 from app.config import settings
 from app.db.deps import DbSession
-from app.exceptions import DBNotFound
 from app.serializers.signed import cookie_serializer
 from app.user.models import User
 
-from .models import Preference
 from .schemas import PreferenceUpdate
-
-
-async def get_user_pref(session: DbSession, user_id: UUID):
-    stmt = select(Preference).where(Preference.user_id == user_id)
-    pref = await session.scalar(stmt)
-    if not pref:
-        raise DBNotFound("could not find user preference")
-    return pref
-
-
-async def update_user_pref(session: DbSession, user: User, pref: PreferenceUpdate):
-    payload = pref.model_dump(exclude_unset=True)
-    stmt = update(Preference).where(Preference.user_id == user.id).values(payload)
-    await session.execute(stmt)
-    await session.commit()
 
 
 def extract_cookie_data(request: Request):
@@ -40,6 +21,13 @@ def extract_cookie_data(request: Request):
         except BadSignature:
             cookie_data = {}
     return cookie_data
+
+
+async def update_user_pref(session: DbSession, user: User, pref: PreferenceUpdate):
+    payload = pref.model_dump(exclude_unset=True)
+    for key, value in payload.items():
+        setattr(user.preference, key, value)
+    await session.commit()
 
 
 def update_anon_pref(request: Request, pref: PreferenceUpdate, response: Response):

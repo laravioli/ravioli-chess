@@ -1,3 +1,7 @@
-from app.auth.deps import current_user_or_anon
+from fastapi import Request
 
-user_or_anon_with_pref = current_user_or_anon(with_pref=True)
+from app.auth.deps import UserWithPrefOrAnon
+
+
+async def add_user_to_request(request: Request, user: UserWithPrefOrAnon):
+    pass
