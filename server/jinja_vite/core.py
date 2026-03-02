@@ -88,10 +88,7 @@ class ProdApp(JinjaViteApp):
         pass
 
 
-def add_jinja_vite_globals(env: Environment, config: JinjaViteConfig | None = None):
-    if not config:
-        config = JinjaViteConfig()
-
+def add_jinja_vite_globals(env: Environment, config: JinjaViteConfig):
     if config.ENVIRONMENT == "local":
         jinja_vite = DevApp(config)
     else:

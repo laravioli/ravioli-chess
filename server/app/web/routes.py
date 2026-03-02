@@ -1,21 +1,10 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from jinja2 import Environment, PackageLoader, select_autoescape
-from jinja_vite import add_jinja_vite_globals
 
-env = Environment(
-    autoescape=select_autoescape(["html", "htm", "xml"]),
-    loader=PackageLoader("app.web", "templates"),
-    trim_blocks=True,
-    lstrip_blocks=True,
-)
+from .deps import inject_user_or_anon
+from .templating import templates
 
-add_jinja_vite_globals(env=env)
-
-templates = Jinja2Templates(env=env)
-
-router = APIRouter(prefix="", tags=["web"])
+router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(inject_user_or_anon)])
 
 
 @router.get("/", response_class=HTMLResponse, name="root")

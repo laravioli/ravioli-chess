@@ -14,7 +14,7 @@
         {{ vite_hmr_client() }}
         {{ vite_script('src/main.tsx') }}
     </head>
-    <body>
+    <body{% for key, value in user.preference.model_dump(mode='json').items() %} data-{{ key }}="{{ value }}"{% endfor %}>
         {% block content %}
         {% endblock content %}
     </body>
