@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-    {% cache 'header' %}
     <head>
+    {% cache 'header-static' %}
         <meta name="description" content="a chess website for ravioli">
         <meta name="keywords" content="chess, ravioli, tactics, training">
         <meta charset="UTF-8" />
@@ -14,18 +14,21 @@
         <script src={{ vite_asset_url('js/scripts.js') }}></script>
         {{ vite_hmr_client() }}
         {{ vite_script('src/main.tsx') }}
+    {% endcache %}
+    {% cache 'header-' ~ user.pieceset%}
         {% with base_path = vite_asset_url('images/pieces/') %}
         <style>
         :root{
         {% for key, value in pieces.items() %}
-            {{ key }}: url("{{ base_path}}{{wiki}}/{{value}}.png");
+            {{ key }}: url("{{ base_path}}/{{user.piece_style}}/{{value}}.png");
         {% endfor %}
         }
         </style>
         {% endwith %}
-    </head>
     {% endcache %}
-    <body {{user.html_pref | safe}}>
+
+    </head>
+    <body {{user.pref_attr | safe}}>
         {% block content %}
         {% endblock content %}
     </body>

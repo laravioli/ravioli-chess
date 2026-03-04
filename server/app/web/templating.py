@@ -11,8 +11,7 @@ env = Environment(
     lstrip_blocks=True,
 )
 
-jinja_vite_config = JinjaViteConfig()
-load_jinja_vite(env=env, config=jinja_vite_config)
+load_jinja_vite(env=env, config=JinjaViteConfig())
 
 
 templates = Jinja2Templates(env=env, context_processors=[web_context])
