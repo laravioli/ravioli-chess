@@ -68,7 +68,6 @@ class DevApp(JinjaViteApp):
         return Markup("\n        ".join((react_script, ws_script)))
 
 
-# note : explore caching strategy
 class ProdApp(JinjaViteApp):
     def _parse_manifest(self):
         manifest_path = self.config.MANIFEST_PATH
