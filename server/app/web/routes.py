@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 
-from .deps import inject_user_or_anon
+from .deps import user_or_anon
 from .templating import templates
 
-router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(inject_user_or_anon)])
+router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)])
 
 
 @router.get("/", response_class=HTMLResponse, name="root")

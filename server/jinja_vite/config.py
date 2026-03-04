@@ -25,6 +25,7 @@ class JinjaViteConfig(BaseSettings):
     LEGACY_POLYFILLS_MOTIF: str = "legacy-polyfills"
     WS_CLIENT_URL: str = "@vite/client"
     REACT_REFRESH_URL: str = "@react-refresh"
+    JINJA_CACHE_EXTENSION: bool = False
 
     @model_validator(mode="after")
     def check_manifest_path(self) -> Self:

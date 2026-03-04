@@ -7,11 +7,11 @@ from app.pref.service import extract_cookie_data
 from .schemas import User
 
 
-async def inject_user_or_anon(request: Request, user: UserWithPrefOrAnon):
-    if user:
-        user_to_inject = User.model_validate(user)
-        user_to_inject.is_auth = True
+async def user_or_anon(request: Request, auth_user: UserWithPrefOrAnon):
+    if auth_user:
+        user = User.model_validate(auth_user)
+        user.is_auth = True
     else:
-        user_to_inject = User(preference=Preference(**extract_cookie_data(request)), is_auth=False)
+        user = User(preference=Preference(**extract_cookie_data(request)), is_auth=False)
 
-    request.state.user = user_to_inject
+    request.state.user = user

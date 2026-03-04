@@ -16,7 +16,7 @@ async def get_session():
         yield session
 
 
-type DbSession = Annotated[AsyncSession, Depends(get_session)]
+type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
 
 # note : session identity map doesn't update already populated object if you double select.
 # to force update => u2 = session.scalars(select(User).where(User.id == 5).execution_options(populate_existing=True)).one()

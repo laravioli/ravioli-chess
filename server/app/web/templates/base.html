@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% cache 'header' %}
     <head>
         <meta name="description" content="a chess website for ravioli">
         <meta name="keywords" content="chess, ravioli, tactics, training">
@@ -13,15 +14,18 @@
         <script src={{ vite_asset_url('js/scripts.js') }}></script>
         {{ vite_hmr_client() }}
         {{ vite_script('src/main.tsx') }}
+        {% with base_path = vite_asset_url('images/pieces/') %}
         <style>
         :root{
         {% for key, value in pieces.items() %}
-            {{ key }}: url("{{ vite_asset_url('images/pieces/')}}{{user.preference.pieceset.value}}/{{value}}.png");
+            {{ key }}: url("{{ base_path}}{{wiki}}/{{value}}.png");
         {% endfor %}
         }
         </style>
+        {% endwith %}
     </head>
-    <body{% for key, value in user.preference.model_dump(mode='json').items() %} data-{{ key }}="{{ value }}"{% endfor %}>
+    {% endcache %}
+    <body {{user.html_pref | safe}}>
         {% block content %}
         {% endblock content %}
     </body>

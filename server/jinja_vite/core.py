@@ -68,6 +68,7 @@ class DevApp(JinjaViteApp):
         return Markup("\n        ".join((react_script, ws_script)))
 
 
+# note : explore caching strategy
 class ProdApp(JinjaViteApp):
     def _parse_manifest(self):
         manifest_path = self.config.MANIFEST_PATH
@@ -88,7 +89,7 @@ class ProdApp(JinjaViteApp):
         pass
 
 
-def add_jinja_vite_globals(env: Environment, config: JinjaViteConfig):
+def add_globals(env: Environment, config: JinjaViteConfig):
     if config.ENVIRONMENT == "local":
         jinja_vite = DevApp(config)
     else:
