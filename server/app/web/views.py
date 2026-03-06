@@ -11,7 +11,7 @@ router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)]
 
 
 @router.get("/", response_class=HTMLResponse, name="root")
-async def read_item(request: Request, session: DbSession):
+async def root(request: Request, session: DbSession):
     positions = await get_chess_positions(session)
     ctx = {
         "payload": {

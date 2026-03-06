@@ -12,6 +12,6 @@ router.include_router(router_pref)
 router.include_router(router_social)
 
 
-@router.get("/healthcheck", include_in_schema=False)
+@router.get("/healthcheck", include_in_schema=False, tags=["internal"])
 def healthcheck():
     return {"status": "ok"}

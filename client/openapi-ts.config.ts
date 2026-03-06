@@ -1,10 +1,9 @@
 import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
-  input: '../openapi.yaml',
+  input: 'http://localhost:8000/openapi.json',
   output: {
-    format: 'prettier',
-    lint: 'eslint',
+    postProcess: ['eslint', 'prettier'],
     path: './src/lib/api',
   },
   plugins: [
@@ -24,6 +23,7 @@ export default defineConfig({
     },
     {
       name: '@hey-api/sdk',
+      operations: { strategy: 'byTags' },
       transformer: true,
     },
   ],

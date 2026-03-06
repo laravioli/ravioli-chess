@@ -14,12 +14,12 @@ router = APIRouter(prefix="/social", tags=["social"])
 
 
 @router.get("/friends/me", response_model=list[Friend])
-async def list_me(session: DbSession, user: CurrentUser):
+async def list_my_friends(session: DbSession, user: CurrentUser):
     return await list_friendship(session, user.id, status=FriendshipStatus.accepted)
 
 
 @router.get("/friends/{target_id}", response_model=list[Friend])
-async def list_friend(session: DbSession, target_id: UUID4):
+async def list_friends(session: DbSession, target_id: UUID4):
     return await list_friendship(session, target_id, status=FriendshipStatus.accepted)
 
 
@@ -29,7 +29,7 @@ async def remove_friend(session: DbSession, user: CurrentUser, target_id: UUID4)
 
 
 @router.get("/requests", response_model=list[FriendRequest])
-async def list_request(session: DbSession, user: CurrentUser):
+async def list_friend_request(session: DbSession, user: CurrentUser):
     return await list_friendship(session, user.id, status=FriendshipStatus.pending)
 
 
@@ -38,7 +38,7 @@ async def list_request(session: DbSession, user: CurrentUser):
     status_code=status.HTTP_201_CREATED,
     responses={201: {"model": Message}},
 )
-async def send_request(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def send_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
     if user.id == target_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,16 +49,16 @@ async def send_request(session: DbSession, user: CurrentUser, target_id: UUID4):
 
 
 @router.delete("/requests/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def cancel_request(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def cancel_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
     await delete_request(session, sender_id=user.id, receiver_id=target_id)
 
 
 @router.post("/requests/{target_id}/accept", responses={200: {"model": Message}})
-async def accept(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def accept_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
     await accept_request(session, user.id, target_id)
     return {"message": "request accepted"}
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
-async def reject(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def reject_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
     await delete_request(session, sender_id=target_id, receiver_id=user.id)
