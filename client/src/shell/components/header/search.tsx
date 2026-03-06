@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useClickOutside, useDebouncedValue } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
-import { usersListOptions } from 'src/lib/api/@tanstack/react-query.gen';
+import { listUserOptions } from 'src/lib/api/@tanstack/react-query.gen';
 import { ActionIcon, Autocomplete, Collapse, FocusTrap, Group } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 
@@ -30,9 +30,9 @@ const SearchUsers = () => {
   const [debounced] = useDebouncedValue(value, 200);
 
   const { data } = useQuery({
-    ...usersListOptions({ query: { search: debounced } }),
+    ...listUserOptions({ query: { q: debounced } }),
     enabled: debounced.length >= 3,
-    select: data => data.results.map(r => r.username),
+    select: data => data.map(r => r.username),
     placeholderData: prev => prev,
   });
 

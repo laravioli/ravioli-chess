@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
 import { useGlobalStore } from 'src/main/hooks/hooks';
-import { userLogin, userRegister, type LoginRequest, type RegisterRequestWritable } from 'src/lib/api';
-import { setProfile } from 'src/user/store/utils';
+import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from 'src/lib/api';
+import { setPreference } from 'src/user/store/utils';
 
 export const AuthDrawer = ({ opened, onClose }: { opened: boolean; onClose: () => void }) => {
   const isSmallScreen = useMediaQuery('(max-width: 765px)');
@@ -35,6 +35,7 @@ function AuthenticationForm({ close }) {
     initialValues: {
       username: '',
       password: '',
+      password_repeat: '',
       email: '',
     },
 
@@ -45,12 +46,12 @@ function AuthenticationForm({ close }) {
     },
   });
 
-  const onLogin = async (body: LoginRequest) => {
+  const onLogin = async (body: UserLoginWritable) => {
     setLoading(true);
     try {
-      const { data } = await userLogin({ body });
+      const { data } = await Auth.login({ body });
       userStore.login(body);
-      setProfile(data);
+      setPreference(data.preference);
       close();
     } catch (error: any) {
       if (error.detail)
@@ -63,11 +64,11 @@ function AuthenticationForm({ close }) {
     }
   };
 
-  const onRegister = async (body: RegisterRequestWritable) => {
+  const onRegister = async (body: UserCreateWritable) => {
     setLoading(true);
 
     try {
-      await userRegister({ body });
+      await Users.registerUser({ body });
       toggle();
       notifications.show({
         id: 'register',
@@ -115,6 +116,17 @@ function AuthenticationForm({ close }) {
           {...form.getInputProps('password')}
           radius="md"
         />
+
+        {type === 'register' && (
+          <PasswordInput
+            required
+            label="Password"
+            placeholder="Your password"
+            key={form.key('password_repeat')}
+            {...form.getInputProps('password_repeat')}
+            radius="md"
+          />
+        )}
       </Stack>
 
       <Group justify="space-between" mt="xl">

@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import type { BoardEnum, PiecesetEnum, Profile } from 'src/lib/api';
+import type { Board, PieceSet, Preference } from 'src/lib/api';
 
 const pieceVars = [
   ['---white-pawn', 'wP'],
@@ -16,30 +16,30 @@ const pieceVars = [
   ['---black-king', 'bK'],
 ];
 
-function getImageUrl(theme: PiecesetEnum, piece: string) {
+function getImageUrl(theme: PieceSet, piece: string) {
   const base = import.meta.env.BASE_URL;
   return `${base.replace(/\/+$/, '')}/images/pieces/${theme}/${piece}.png`;
 }
 
-function pieceVarRules(theme: PiecesetEnum) {
+function pieceVarRules(theme: PieceSet) {
   for (const [varName, fileName] of pieceVars) {
     const url = getImageUrl(theme, fileName);
     document.body.style.setProperty(varName, `url(${url})`);
   }
 }
 
-export function setPieceSet(theme: PiecesetEnum) {
+export function setPieceSet(theme: PieceSet) {
   document.body.dataset['pieceset'] = theme;
   pieceVarRules(theme);
 }
 
-export function setBoardColor(color: BoardEnum) {
+export function setBoardColor(color: Board) {
   document.body.dataset['board'] = color;
 }
 
-export function setProfile(profile: Profile) {
-  if (profile.board) setBoardColor(profile.board);
-  if (profile.pieceset) setPieceSet(profile.pieceset);
+export function setPreference(preference: Preference) {
+  if (preference.board) setBoardColor(preference.board);
+  if (preference.pieceset) setPieceSet(preference.pieceset);
 }
 
 const ProfileMap = new Map<string, Set<string>>([
@@ -47,11 +47,11 @@ const ProfileMap = new Map<string, Set<string>>([
   ['pieceset', new Set(['base', 'wiki'])],
 ]);
 
-export function getAnonProfile(): Profile {
-  const defaultProfile: Profile = { board: 'wood', pieceset: 'base' };
+export function getAnonPreference(): Preference {
+  const defaultPref: Preference = { board: 'wood', pieceset: 'base' };
   const anonCookie = Cookies.get('anon');
 
-  if (!anonCookie) return defaultProfile;
+  if (!anonCookie) return defaultPref;
 
   let queryString = anonCookie.split(':')[0];
   const params = new URLSearchParams(queryString);
@@ -61,5 +61,5 @@ export function getAnonProfile(): Profile {
     if (ProfileMap.get(key)?.has(value)) obj[key] = value;
   }
 
-  return { ...defaultProfile, ...obj };
+  return { ...defaultPref, ...obj };
 }

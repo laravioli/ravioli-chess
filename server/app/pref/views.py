@@ -6,7 +6,7 @@ from app.db.deps import DbSession
 from .schemas import Preference, PreferenceUpdate
 from .service import extract_cookie_data, update_anon_pref, update_user_pref
 
-router = APIRouter(prefix="/pref", tags=["preference"])
+router = APIRouter(prefix="/pref", tags=["preferences"])
 
 
 @router.get("", response_model=Preference)

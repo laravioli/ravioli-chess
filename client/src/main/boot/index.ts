@@ -1,6 +1,5 @@
 import { initSite } from 'src/lib/site/site';
 import { client } from 'src/lib/api/client.gen';
-import { wsConnect } from 'src/lib/socket/socket';
 import { makeAppDependencies } from '../components/app/config';
 import Cookies from 'js-cookie';
 import type { ServerPayload } from './interface';
@@ -8,7 +7,7 @@ import type { ServerPayload } from './interface';
 export const boot = async () => {
   initSite();
   setApiClient();
-  wsConnect('/socket');
+  //wsConnect('/socket');
   const payload = getHtmlData();
   return makeAppDependencies(payload);
 };

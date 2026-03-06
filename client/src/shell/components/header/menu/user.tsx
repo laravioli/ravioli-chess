@@ -3,8 +3,8 @@ import { useGlobalStore } from 'src/main/hooks/hooks';
 import { useMenu } from 'src/common/hooks/hooks';
 import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { friendsListQueryKey, friendsListOptions } from 'src/lib/api/@tanstack/react-query.gen';
-import { userLogout, profileBoardUpdate, profilePiecesetUpdate } from 'src/lib/api';
+import { listMyFriendsQueryKey, listMyFriendsOptions } from 'src/lib/api/@tanstack/react-query.gen';
+import { Preferences, Auth } from 'src/lib/api';
 import { ActionIcon, Loader, Menu, MenuItem, UnstyledButton, useMantineColorScheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
@@ -17,7 +17,7 @@ import {
   IconBrandGooglePlay,
 } from '@tabler/icons-react';
 import type { UserStore } from 'src/user/store/userstore';
-import { setBoardColor, setPieceSet, setProfile, getAnonProfile } from 'src/user/store/utils';
+import { setBoardColor, setPieceSet, setPreference, getAnonPreference } from 'src/user/store/utils';
 import classes from '../../../css/header.module.css';
 
 export const UserMenu = observer(() => {
@@ -78,20 +78,20 @@ const MainMenu = ({ navigate }) => {
   const queryClient = useQueryClient();
 
   const { isPending, refetch } = useQuery({
-    ...friendsListOptions(),
+    ...listMyFriendsOptions(),
     enabled: false,
   });
 
   const logout = useCallback(async () => {
     try {
-      const { data } = await userLogout();
+      await Auth.logout();
       userStore.logout();
-      queryClient.removeQueries({ queryKey: friendsListQueryKey() });
-      setProfile(getAnonProfile());
+      queryClient.removeQueries({ queryKey: listMyFriendsQueryKey() });
+      setPreference(getAnonPreference());
       notifications.show({
         id: 'logout',
         position: 'bottom-right',
-        message: data?.detail,
+        message: 'successfully logout',
         color: 'red',
         autoClose: 2000,
       });
@@ -199,7 +199,7 @@ const BoardMenu = ({ navigate }) => {
           key={item.key}
           onClick={async () => {
             try {
-              await profileBoardUpdate({ body: { board: item.value } });
+              await Preferences.updatePref({ body: { board: item.value } });
               setBoardColor(item.value);
             } catch (error: any) {
               console.log(error);
@@ -239,7 +239,7 @@ const PieceSetMenu = ({ navigate }) => {
           key={item.key}
           onClick={async () => {
             try {
-              await profilePiecesetUpdate({ body: { pieceset: item.value } });
+              await Preferences.updatePref({ body: { pieceset: item.value } });
               setPieceSet(item.value);
             } catch (error: any) {
               console.log(error);
@@ -256,7 +256,7 @@ const PieceSetMenu = ({ navigate }) => {
 
 const FriendsMenu = ({ navigate }) => {
   const { isFetching, data } = useQuery({
-    ...friendsListOptions(),
+    ...listMyFriendsOptions(),
   });
 
   return (
@@ -272,10 +272,10 @@ const FriendsMenu = ({ navigate }) => {
       <Menu.Divider />
 
       {!isFetching &&
-        data?.results.map(item => (
+        data?.map(item => (
           <Menu.Item
             className={classes.friend}
-            key={item.to_user}
+            key={item.id}
             onClick={() => {}}
             rightSection={
               <IconBrandGooglePlay
@@ -294,7 +294,7 @@ const FriendsMenu = ({ navigate }) => {
               />
             }
           >
-            {item.to_user}
+            {item.username}
           </Menu.Item>
         ))}
     </>
