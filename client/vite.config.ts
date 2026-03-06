@@ -33,12 +33,10 @@ export default defineConfig(({ mode }) => {
     server: {
       origin: 'http://localhost:5173',
       open: '/',
-
       headers: {
-        'cross-origin-opener-policy': 'same-origin',
         'cross-origin-embedder-policy': 'credentialless',
+        'cross-origin-opener-policy': 'same-origin',
       },
-
       proxy: {
         '/socket': {
           target: wsTarget,
@@ -55,7 +53,8 @@ export default defineConfig(({ mode }) => {
           secure: false,
           configure: (proxy, _options) => {
             proxy.on('proxyRes', (_proxyRes, _req, res) => {
-              res.setHeader('cross-origin-embedder-Policy', 'credentialless');
+              res.setHeader('cross-origin-embedder-policy', 'require-corp');
+              res.setHeader('cross-origin-opener-policy', 'same-origin');
             });
           },
         },

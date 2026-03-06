@@ -19,9 +19,17 @@ async def root(request: Request, session: DbSession):
                 "user": {
                     "username": request.state.user.username,
                     "is_auth": request.state.user.is_auth,
-                }
+                },
+                "page": {
+                    "orientation": "white",
+                    "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                },
             },
             "data": {"positions": positions},
         }
     }
-    return templates.TemplateResponse(request=request, name="index.html", context=ctx)
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context=ctx,
+    )

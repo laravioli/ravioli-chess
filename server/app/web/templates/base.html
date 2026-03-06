@@ -14,7 +14,7 @@
         <link rel="stylesheet" href={{ vite_asset_url('src/main/boot/theme.css') }} />
         <script src={{ vite_asset_url('js/scripts.js') }}></script>
         {{ vite_hmr_client() }}
-        {{ vite_script('src/main.tsx') }}
+        {{ vite_script('src/main.tsx', {"type": "module"}) }}
     {% with base_path = vite_asset_url('images/pieces/') %}
         <style>
         :root{

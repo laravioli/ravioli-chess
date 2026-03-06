@@ -39,7 +39,7 @@ export class UserStore {
           this.username = ANON;
         });
       }
-      siteSocket.reload();
+      siteSocket?.reload();
     };
   }
 
@@ -60,7 +60,7 @@ export class UserStore {
         }),
       0,
     );
-    setTimeout(() => siteSocket.reload(), 0);
+    setTimeout(() => siteSocket?.reload(), 0);
   }
 
   @action
@@ -75,6 +75,6 @@ export class UserStore {
         }),
       0,
     );
-    setTimeout(() => siteSocket.reload(), 0);
+    setTimeout(() => siteSocket?.reload(), 0);
   }
 }
