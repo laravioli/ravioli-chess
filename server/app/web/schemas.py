@@ -11,6 +11,10 @@ class User(BaseSchema):
     is_auth: bool = False
     preference: Preference
 
+    @classmethod
+    def anon(cls, pref_data: dict):
+        return cls(preference=Preference(**pref_data))
+
     @cached_property
     def pref_attr(self):
         data = self.preference.model_dump(mode="json", exclude_none=True)

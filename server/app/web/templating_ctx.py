@@ -16,5 +16,5 @@ PIECE_VARS = {
 }
 
 
-def web_context(request: Request):
-    return {"user": request.state.user, "pieces": PIECE_VARS}
+def web_context(request: Request):  # noqa: ARG001
+    return {"pieces": PIECE_VARS}

@@ -2,7 +2,7 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, PackageLoader, select_autoescape
 from jinja_vite import JinjaViteConfig, load_jinja_vite
 
-from .ctx import web_context
+from .templating_ctx import web_context
 
 env = Environment(
     autoescape=select_autoescape(["html", "htm", "xml"]),

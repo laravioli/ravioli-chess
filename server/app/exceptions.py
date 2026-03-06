@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import JSONResponse
 
 
 class AppException(Exception):
@@ -33,6 +33,6 @@ class InvalidCredentials(AppException):
 
 def add_exception_handler(app: FastAPI):
     def exc_handler(request, exc: AppException):  # noqa: ARG001
-        return ORJSONResponse({"detail": exc.detail}, status_code=exc.status)
+        return JSONResponse({"detail": exc.detail}, status_code=exc.status)
 
     app.add_exception_handler(AppException, exc_handler)
