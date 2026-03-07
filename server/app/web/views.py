@@ -11,7 +11,10 @@ router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)]
 
 
 @router.get("/", response_class=HTMLResponse, name="root")
-async def root(request: Request, session: DbSession):
+@router.get("/analysis", response_class=HTMLResponse, name="analyse")
+@router.get("/editor", response_class=HTMLResponse, name="editor")
+@router.get("/play", response_class=HTMLResponse, name="play")
+async def index(request: Request, session: DbSession):
     positions = await get_chess_positions(session)
     ctx = {
         "payload": {
