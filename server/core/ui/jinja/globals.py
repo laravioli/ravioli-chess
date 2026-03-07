@@ -5,11 +5,11 @@ import orjson
 from jinja2 import Environment
 from markupsafe import Markup
 
-from .config import JinjaConfig
+from .config import JinjaExtConfig
 
 
 class JinjaExt(ABC):
-    def __init__(self, config: JinjaConfig):
+    def __init__(self, config: JinjaExtConfig):
         self.config = config
 
     @abstractmethod
@@ -86,7 +86,7 @@ class ProdExt(JinjaExt):
         pass
 
 
-def add_env_globals(env: Environment, config: JinjaConfig):
+def add_env_globals(env: Environment, config: JinjaExtConfig):
     if config.ENVIRONMENT == "local":
         jinja_ext = DevExt(config)
     else:

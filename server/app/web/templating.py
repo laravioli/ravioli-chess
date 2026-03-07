@@ -1,7 +1,8 @@
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from .jinja_ext import JinjaConfig, load_jinja_ext
+from core.ui.jinja import JinjaExtConfig, load_jinja_ext
+
 from .templating_ctx import web_context
 
 env = Environment(
@@ -11,7 +12,7 @@ env = Environment(
     lstrip_blocks=True,
 )
 
-load_jinja_ext(env=env, config=JinjaConfig())
+load_jinja_ext(env=env, config=JinjaExtConfig())
 
 
 templates = Jinja2Templates(env=env, context_processors=[web_context])

@@ -1,11 +1,11 @@
 from jinja2 import Environment
 
 from .cache import FragmentCacheExtension
-from .config import JinjaConfig
+from .config import JinjaExtConfig
 from .globals import add_env_globals
 
 
-def load_jinja_ext(*, env: Environment, config: JinjaConfig):
+def load_jinja_ext(*, env: Environment, config: JinjaExtConfig):
     add_env_globals(env, config)
     if config.JINJA_CACHE_EXTENSION:
         from cachelib import SimpleCache
@@ -14,4 +14,4 @@ def load_jinja_ext(*, env: Environment, config: JinjaConfig):
         env.fragment_cache = SimpleCache()
 
 
-__all__ = ["load_jinja_ext", "JinjaConfig"]
+__all__ = ["load_jinja_ext", "JinjaExtConfig"]
