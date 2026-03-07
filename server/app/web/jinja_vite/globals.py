@@ -36,25 +36,23 @@ class JinjaViteApp(ABC):
 
 
 class DevApp(JinjaViteApp):
-    @property
-    def base_url(self):
-        return f"{self.config.VITE_DEV_PROTOCOL}://{self.config.VITE_DEV_HOST}:{self.config.VITE_DEV_PORT}/"
+    """Helper class to serve ressources from vite server. Urls are relative, you should connect to Vite port"""
 
-    def get_url(self, path: str):
-        return urljoin(self.base_url, urljoin(self.config.STATIC_URL, path))
+    def get_relative_url(self, path: str):
+        return urljoin(self.config.STATIC_BASE_URL, path)
 
     def vite_script(self, path: str, attrs: dict[str, str] | None = None) -> Markup:
-        return Markup(self.generate_script_tag(src=self.get_url(path), attrs=attrs))
+        return Markup(self.generate_script_tag(src=self.get_relative_url(path), attrs=attrs))
 
     def vite_stylesheet(self, path: str) -> Markup:
-        return Markup(self.generate_stylesheet_tag(href=self.get_url(path)))
+        return Markup(self.generate_stylesheet_tag(href=self.get_relative_url(path)))
 
     def vite_asset_url(self, path: str) -> Markup:
-        return Markup(self.get_url(path))
+        return Markup(self.get_relative_url(path))
 
     def vite_hmr_client(self):
         react_script = f"""<script type="module">
-            import RefreshRuntime from '{self.get_url(self.config.REACT_REFRESH_URL)}'
+            import RefreshRuntime from '{self.get_relative_url(self.config.REACT_REFRESH_URL)}'
             RefreshRuntime.injectIntoGlobalHook(window)
             window.$RefreshReg$ = () => {{}}
             window.$RefreshSig$ = () => (type) => type
@@ -62,7 +60,7 @@ class DevApp(JinjaViteApp):
         </script>"""
 
         ws_script = self.generate_script_tag(
-            src=self.get_url(self.config.WS_CLIENT_URL), attrs={"type": "module"}
+            src=self.get_relative_url(self.config.WS_CLIENT_URL), attrs={"type": "module"}
         )
 
         return Markup("\n        ".join((react_script, ws_script)))

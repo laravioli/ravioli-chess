@@ -4,23 +4,20 @@ from pydantic import AfterValidator, FilePath, ValidationError, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def trailing_slash(value: str) -> str:
-    if not value.endswith("/"):
-        raise ValidationError(f'{value} must end with " / "')
+def slash_str(value: str) -> str:
+    if not (value.startswith("/") and value.endswith("/")):
+        raise ValidationError(f'{value} must start and end with " / "')
     return value
 
 
-type TrailingSlashStr = Annotated[str, AfterValidator(trailing_slash)]
+type SlashStr = Annotated[str, AfterValidator(slash_str)]
 
 
 class JinjaViteConfig(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
     ENVIRONMENT: Literal["local", "staging", "production"] = "production"
-    VITE_DEV_PROTOCOL: Literal["http", "https"] = "http"
-    VITE_DEV_HOST: str = "localhost"
-    VITE_DEV_PORT: int = 5173
-    STATIC_URL: TrailingSlashStr = "static/"
+    STATIC_BASE_URL: SlashStr = "/static/"
     MANIFEST_PATH: FilePath | None = None
     LEGACY_POLYFILLS_MOTIF: str = "legacy-polyfills"
     WS_CLIENT_URL: str = "@vite/client"

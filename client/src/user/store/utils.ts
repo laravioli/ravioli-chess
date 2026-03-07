@@ -42,7 +42,7 @@ export function setPreference(preference: Preference) {
   if (preference.pieceset) setPieceSet(preference.pieceset);
 }
 
-const ProfileMap = new Map<string, Set<string>>([
+const PrefMap = new Map<string, Set<string>>([
   ['board', new Set(['wood', 'blue', 'blue2', 'brown'])],
   ['pieceset', new Set(['base', 'wiki'])],
 ]);
@@ -58,7 +58,7 @@ export function getAnonPreference(): Preference {
   const obj = {};
 
   for (const [key, value] of params.entries()) {
-    if (ProfileMap.get(key)?.has(value)) obj[key] = value;
+    if (PrefMap.get(key)?.has(value)) obj[key] = value;
   }
 
   return { ...defaultPref, ...obj };
