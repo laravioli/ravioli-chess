@@ -1,14 +1,20 @@
 from datetime import timedelta
 
+import orjson
 from fastapi import Request, Response
-from itsdangerous import BadSignature
+from itsdangerous import BadSignature, URLSafeSerializer
 
 from app.config import settings
-from app.db.deps import DbSession
-from app.serializers.signed import cookie_serializer
-from app.user.models import User
+from app.deps import DbSession
+from core.db.models import User
 
 from .schemas import PreferenceUpdate
+
+cookie_serializer = URLSafeSerializer(
+    secret_key=settings.SECRET_KEY.get_secret_value(),
+    salt="ravioli.cookie",
+    serializer=orjson,
+)
 
 
 def extract_cookie_data(request: Request):

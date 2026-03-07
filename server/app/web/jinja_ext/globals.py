@@ -5,11 +5,11 @@ import orjson
 from jinja2 import Environment
 from markupsafe import Markup
 
-from .config import JinjaViteConfig
+from .config import JinjaConfig
 
 
-class JinjaViteApp(ABC):
-    def __init__(self, config: JinjaViteConfig):
+class JinjaExt(ABC):
+    def __init__(self, config: JinjaConfig):
         self.config = config
 
     @abstractmethod
@@ -35,7 +35,7 @@ class JinjaViteApp(ABC):
         return f'<link rel="stylesheet" href="{href}" />'
 
 
-class DevApp(JinjaViteApp):
+class DevExt(JinjaExt):
     """Helper class to serve ressources from vite server. Urls are relative, you should connect to Vite port"""
 
     def get_relative_url(self, path: str):
@@ -66,7 +66,7 @@ class DevApp(JinjaViteApp):
         return Markup("\n        ".join((react_script, ws_script)))
 
 
-class ProdApp(JinjaViteApp):
+class ProdExt(JinjaExt):
     def _parse_manifest(self):
         manifest_path = self.config.MANIFEST_PATH
         with open(manifest_path) as manifest_file:
@@ -86,13 +86,13 @@ class ProdApp(JinjaViteApp):
         pass
 
 
-def add_globals(env: Environment, config: JinjaViteConfig):
+def add_env_globals(env: Environment, config: JinjaConfig):
     if config.ENVIRONMENT == "local":
-        jinja_vite = DevApp(config)
+        jinja_ext = DevExt(config)
     else:
-        jinja_vite = ProdApp(config)
+        jinja_ext = ProdExt(config)
 
-    env.globals["vite_script"] = jinja_vite.vite_script
-    env.globals["vite_stylesheet"] = jinja_vite.vite_stylesheet
-    env.globals["vite_asset_url"] = jinja_vite.vite_asset_url
-    env.globals["vite_hmr_client"] = jinja_vite.vite_hmr_client
+    env.globals["vite_script"] = jinja_ext.vite_script
+    env.globals["vite_stylesheet"] = jinja_ext.vite_stylesheet
+    env.globals["vite_asset_url"] = jinja_ext.vite_asset_url
+    env.globals["vite_hmr_client"] = jinja_ext.vite_hmr_client

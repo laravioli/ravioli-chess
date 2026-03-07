@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.db.models import Base
-from app.db.types import PrimaryKey
+from core.db.types import PrimaryKey
+
+from .base import Base
 
 
 class ChessPosition(Base):

@@ -20,8 +20,8 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from app.config import settings  # noqa
-from app.db.models import Base  # noqa
+from core.db.config import DbSettings  # noqa
+from core.db.models.base import Base  # noqa
 
 target_metadata = Base.metadata
 
@@ -30,9 +30,10 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+db_settings = DbSettings()
 
 def get_url():
-    return str(settings.SQLALCHEMY_DATABASE_URI)
+    return str(db_settings.SQLALCHEMY_DATABASE_URI)
 
 
 def run_migrations_offline() -> None:

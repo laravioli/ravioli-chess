@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import ChessPosition
+from core.db.models import ChessPosition
 
 
 # todo: add redis cache

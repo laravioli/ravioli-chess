@@ -4,9 +4,9 @@ from pydantic import UUID4
 
 from app.api.schemas import Message
 from app.auth.deps import CurrentUser
-from app.db.deps import DbSession
+from app.deps import DbSession
+from core.db.models.social import FriendshipStatus
 
-from .enums import FriendshipStatus
 from .schemas import Friend, FriendRequest
 from .service import accept_request, create_request, delete_friend, delete_request, list_friendship
 

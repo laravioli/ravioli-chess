@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 
-from app.db.deps import DbSession
+from app.deps import DbSession
 
 from .deps import user_or_anon
 from .service import get_chess_positions

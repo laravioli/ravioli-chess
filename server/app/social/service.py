@@ -3,12 +3,10 @@ import uuid
 from sqlalchemy import delete, func, literal, select, union_all, update
 from sqlalchemy.exc import IntegrityError
 
-from app.db.deps import DbSession
+from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
-from app.user.models import User
-
-from .enums import FriendshipStatus
-from .models import Friendship
+from core.db.models import Friendship, User
+from core.db.models.social import FriendshipStatus
 
 
 async def create_request(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):

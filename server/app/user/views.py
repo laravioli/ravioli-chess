@@ -7,8 +7,7 @@ from pydantic import UUID4
 from app.api.schemas import Message
 from app.auth.deps import CurrentUser, SessionCookie
 from app.config import settings
-from app.db.deps import DbSession
-from app.ipc.deps import RedisClient
+from app.deps import DbSession, RedisClient
 
 from .schemas import UserBase, UserCreate, UserSearch, UserWithPref
 from .service import user_create, user_delete, user_retrieve, user_search

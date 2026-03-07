@@ -1,16 +1,22 @@
 import uuid
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.models import Base
-from app.db.types import TimestampUpdated
+from core.db.types import TimestampUpdated
 
-from .enums import FriendshipStatus
+from .base import Base
 
 if TYPE_CHECKING:
-    from app.user.models import User
+    from .user import User
+
+
+class FriendshipStatus(StrEnum):
+    pending = "pending"
+    accepted = "accepted"
+    blocked = "blocked"
 
 
 class Friendship(Base):

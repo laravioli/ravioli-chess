@@ -3,8 +3,7 @@ from typing import Self
 from pydantic import model_validator
 
 from app.api.schemas import BaseSchema
-
-from .enums import Board, PieceSet
+from core.db.models.pref import Board, PieceSet
 
 
 # In

@@ -5,11 +5,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.auth.security import generate_password_hash
-from app.db.deps import DbSession
+from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
-from app.pref.models import Preference
+from core.db.models import Preference, User
 
-from .models import User
 from .schemas import UserCreate
 
 

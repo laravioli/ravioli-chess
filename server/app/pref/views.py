@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, status
 
 from app.auth.deps import UserWithPrefOrAnon
-from app.db.deps import DbSession
+from app.deps import DbSession
 
 from .schemas import Preference, PreferenceUpdate
 from .service import extract_cookie_data, update_anon_pref, update_user_pref

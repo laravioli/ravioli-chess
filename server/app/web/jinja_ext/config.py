@@ -13,7 +13,7 @@ def slash_str(value: str) -> str:
 type SlashStr = Annotated[str, AfterValidator(slash_str)]
 
 
-class JinjaViteConfig(BaseSettings):
+class JinjaConfig(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
     ENVIRONMENT: Literal["local", "staging", "production"] = "production"

@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from redis.asyncio import Redis
 
 from app.config import settings
-from app.db.deps import engine
+from app.deps import engine
 
 
 @asynccontextmanager

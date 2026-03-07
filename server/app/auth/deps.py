@@ -6,11 +6,10 @@ from fastapi.security import APIKeyCookie
 from sqlalchemy.orm import joinedload
 
 from app.config import settings
-from app.db.deps import DbSession
+from app.deps import DbSession, RedisClient
 from app.exceptions import InvalidSession
-from app.ipc.deps import RedisClient
-from app.serializers import msgpack
-from app.user.models import User
+from core.db.models import User
+from core.serializers import msgpack
 
 from .schemas import Session
 from .security import verify_session

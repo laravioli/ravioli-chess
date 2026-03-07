@@ -4,11 +4,12 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.models import Base
-from app.db.types import PrimaryKey, TimestampNow
+from core.db.types import PrimaryKey, TimestampNow
+
+from .base import Base
 
 if TYPE_CHECKING:
-    from app.pref.models import Preference
+    from .pref import Preference
 
 
 class User(Base):

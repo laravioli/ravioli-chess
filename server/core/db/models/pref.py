@@ -1,15 +1,27 @@
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.models import Base
-from app.db.types import PrimaryKey
+from core.db.types import PrimaryKey
 
-from .enums import Board, PieceSet
+from .base import Base
 
 if TYPE_CHECKING:
-    from app.user.models import User
+    from .user import User
+
+
+class Board(StrEnum):
+    WOOD = "wood"
+    BLUE = "blue"
+    BLUE2 = "blue2"
+    BROWN = "brown"
+
+
+class PieceSet(StrEnum):
+    BASE = "base"
+    WIKI = "wiki"
 
 
 class Preference(Base):

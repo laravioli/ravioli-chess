@@ -3,11 +3,12 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.models import Base
-from app.db.types import TimestampNow
+from core.db.types import TimestampNow
+
+from .base import Base
 
 if TYPE_CHECKING:
-    from app.social.models import Friendship
+    from .social import Friendship
 
 
 class Notification(Base):
