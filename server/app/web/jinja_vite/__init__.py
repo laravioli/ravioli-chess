@@ -1,8 +1,8 @@
 from jinja2 import Environment
 
-from jinja_vite.cache import FragmentCacheExtension
-from jinja_vite.config import JinjaViteConfig
-from jinja_vite.globals import add_globals
+from .cache import FragmentCacheExtension
+from .config import JinjaViteConfig
+from .globals import add_globals
 
 
 def load_jinja_vite(*, env: Environment, config: JinjaViteConfig):
