@@ -1,5 +1,6 @@
 from enum import StrEnum
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -30,7 +31,7 @@ class Preference(Base):
     id: Mapped[PrimaryKey[int]]
     board: Mapped[Board] = mapped_column(default=Board.WOOD)
     pieceset: Mapped[PieceSet] = mapped_column(default=PieceSet.BASE)
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[UUID] = mapped_column(
         ForeignKey("user_account.id", ondelete="CASCADE"), unique=True
     )
     user: Mapped["User"] = relationship(back_populates="preference")
