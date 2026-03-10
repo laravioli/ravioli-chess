@@ -3,11 +3,12 @@ import { client } from 'src/lib/api/client.gen';
 import { makeAppDependencies } from '../components/app/config';
 import Cookies from 'js-cookie';
 import type { ServerPayload } from './interface';
+import { wsConnect } from 'src/lib/socket/socket';
 
 export const boot = async () => {
   initSite();
   setApiClient();
-  //wsConnect('/socket');
+  wsConnect('/socket');
   const payload = getHtmlData();
   return makeAppDependencies(payload);
 };
