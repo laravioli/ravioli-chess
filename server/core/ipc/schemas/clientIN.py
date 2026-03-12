@@ -8,4 +8,4 @@ from ..schemas import ravioOUT
 GameCreate = ravioOUT.GameCreate
 
 
-type clientIn = GameCreate
+type Protocol = GameCreate

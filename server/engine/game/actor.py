@@ -1,39 +1,26 @@
-import asyncio
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Union
 
 import chess
-from django.contrib.auth import get_user_model
-from raviolichess.ipc.protocol import ravioIN, ravioOUT
-from raviolichess.ravio.exceptions import StopActor
 
-user_model = get_user_model()
+from core.ipc.schemas import ravioIN, ravioOUT
+from engine.exceptions import StopActor
 
 logger = logging.getLogger(__name__)
 
 
 class Actor(ABC):
-    async def __call__(self, ready, send, receive, stop):
+    async def __call__(self, receive, send):
         try:
-            await ready()
-            while True:
-                try:
-                    msg = await receive()
-                except asyncio.QueueShutDown:
-                    break
-                else:
-                    response = self.handle_message(msg)
-                    if response:
-                        await send(response)
+            async for msg in receive():
+                response = self.handle_message(msg)
+                if response:
+                    await send(response)
         except StopActor:
             pass
-        finally:
-            # cleanup
-            await stop()
 
     @abstractmethod
-    async def handle_message(msg) -> Any:
+    async def handle_message(msg):
         """
         Return:
             A python object message to send back.
@@ -50,7 +37,7 @@ class GameActor(Actor):
         self.black_player = black_player
         self._board = chess.Board()
 
-    def handle_message(self, msg: ravioIN.GameProtocol) -> Union[ravioOUT.Protocol]:
+    def handle_message(self, msg: ravioIN.GameProtocol):
         response = None
 
         match msg:

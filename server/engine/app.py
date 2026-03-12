@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from contextlib import AbstractAsyncContextManager
 
 from redis.asyncio import Redis
@@ -12,7 +11,7 @@ from .game.manager import GameManager
 
 
 class App(AbstractAsyncContextManager):
-    def __init__(self, pid: int, shutdown_event: asyncio.Event):
+    def __init__(self, pid: int):
         self.pid = pid
         self.redis = Redis.from_url(settings.REDIS_URL, health_check_interval=15)
         self.broadcast = Broadcast(backend=RedisBackend(self.redis))
@@ -24,4 +23,3 @@ class App(AbstractAsyncContextManager):
 
     async def __aexit__(self):
         await self.game_manager.stop()
-        await self.broadcast.stop()

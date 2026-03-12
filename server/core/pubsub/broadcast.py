@@ -22,28 +22,28 @@ class Broadcast:
         self._backend = backend
         self._background_channels = background_channels
         self._channel_map: dict[str, set[Subscriber]] = {}
-        self._dispatch_task = None
-        self._is_running = asyncio.Event()
+        self.is_running = asyncio.Event()
 
     async def start(self):
-        self._dispatch_task = asyncio.create_task(self._dispatch())
+        self._task = asyncio.create_task(self._dispatch())
         if self._background_channels:
             await self._backend.subscribe(**self._background_channels)
-        self._is_running.set()
+        self.is_running.set()
+
+        return self._task
 
     async def stop(self, immediate=False):
         """
         Args:
             immediate: weither to shutdown queues immediatly or after draining
         """
-        self._is_running.clear()
+        # ensure no subscribers are added
+        self.is_running.clear()
 
         # stop producing message
-        if self._dispatch_task:
-            with suppress(asyncio.CancelledError):
-                self._dispatch_task.cancel()
-                await self._dispatch_task
-            self._dispatch_task = None
+        with suppress(asyncio.CancelledError):
+            self._task.cancel()
+            await self._task
 
         # tell application code we close
         for subscriber in set().union(*self._channel_map.values()):
@@ -62,7 +62,7 @@ class Broadcast:
             args:Each argument represent a channel to subscribe to
         """
         # note: ensure application code doesn't create new subscriber before/after start/stop
-        if not self._is_running.is_set():
+        if not self.is_running.is_set():
             raise RuntimeError("Cannot create subscription: Broadcast service is not running.")
 
         subscriber = Subscriber()

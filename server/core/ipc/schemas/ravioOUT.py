@@ -44,4 +44,4 @@ class GameEnd(ChannelFrame, tag="game.end"):
     data: Payload
 
 
-type ravioOut = GameCreate | GameMove | GameEnd
+type Protocol = GameCreate | GameMove | GameEnd

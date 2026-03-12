@@ -23,4 +23,4 @@ class GameMove(TMessage, tag="move"):
     data: Move = msgspec.field(name="d")
 
 
-type clientOut = GameCreate | GameMove
+type Protocol = GameCreate | GameMove
