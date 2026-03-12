@@ -13,6 +13,7 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
     redis = Redis.from_url(settings.REDIS_URL, health_check_interval=15)
     broadcast = Broadcast(backend=RedisBackend(redis))
     try:
+        await broadcast.start()
         yield {"redis": redis, "broadcast": broadcast}
     finally:
         await broadcast.stop()

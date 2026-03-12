@@ -108,10 +108,6 @@ class Broadcast:
             await self.unsubscribe(subscriber, *args)
 
     async def _dispatch(self):
-        try:
-            async for channel, message in self._backend.stream():
-                for subscriber in self._channel_map.get(channel, ()):
-                    subscriber.put_nowait(message)
-        except Exception:
-            self._is_running.clear()
-            raise
+        async for channel, message in self._backend.stream():
+            for subscriber in self._channel_map.get(channel, ()):
+                subscriber.put_nowait(message)

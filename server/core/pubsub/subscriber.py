@@ -18,5 +18,8 @@ class Subscriber:
 
     async def iter_message(self, type: object) -> AsyncGenerator[object]:
         while True:
-            message = await self._queue.get()
-            yield msgpack.decode(message, type=type)
+            try:
+                message = await self._queue.get()
+                yield msgpack.decode(message, type=type)
+            except asyncio.QueueShutDown:
+                break
