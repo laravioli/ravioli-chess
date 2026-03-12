@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.db.config import DbSettings
 from core.db.utils import create_engine_and_sessionmaker
+from core.pubsub import Broadcast
 
 # Database
 
@@ -29,4 +30,10 @@ async def get_redis(request: Request) -> Redis:
     return request.state.redis
 
 
+async def get_broadcast(request: Request) -> Broadcast:
+    return request.state.broadcast
+
+
 type RedisClient = Annotated[Redis, Depends(get_redis)]
+
+type BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]
