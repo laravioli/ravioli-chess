@@ -1,7 +1,7 @@
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from core.ui.jinja import JinjaExtConfig, load_jinja_ext
+from core.jinja import JinjaExtConfig, load_jinja_ext
 
 from .templating_ctx import web_context
 
