@@ -33,8 +33,6 @@ class GameManager:
             for task in self._start_tasks:
                 task.cancel()
             exc = await asyncio.gather(*self._start_tasks, return_exceptions=True)
-            for sub in self.broadcast.subscribers:
-                sub.shutdown(immediate=False)
             exc += await asyncio.gather(*self._actor_tasks, return_exceptions=True)
             logger.debug(exc)
 

@@ -15,12 +15,15 @@ class Broadcast:
     def __init__(
         self,
         backend: ChannelBackend,
+        immediate_shutdown=False,
     ):
         """
         Args:
             backend: broker to manage message
+            immediate_shutdown: weither to let application consume pending messages in susbcribers
         """
         self._backend = backend
+        self._immediate_shutdown = immediate_shutdown
         self._channel_map: dict[str, set[Subscriber]] = {}
         self.has_subscribers = asyncio.Event()
         self.closed_event = asyncio.Event()
@@ -37,6 +40,8 @@ class Broadcast:
                     for subscriber in self._channel_map.get(channel, ()):
                         subscriber.put_nowait(message)
         finally:
+            for sub in self.subscribers:
+                sub.shutdown(immediate=self._immediate_shutdown)
             self.closed_event.set()
 
     async def start(self):
@@ -106,9 +111,9 @@ class Broadcast:
     @asynccontextmanager
     async def start_subscription(self, *args: str):
         subscriber = await self.subscribe(*args)
-        if self.closed_event.is_set():
-            raise BroadcastClosed()
         try:
+            if self.closed_event.is_set():
+                raise BroadcastClosed()
             yield subscriber
         finally:
             await self.unsubscribe(subscriber, *args)
