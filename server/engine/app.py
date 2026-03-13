@@ -2,24 +2,27 @@ from __future__ import annotations
 
 from contextlib import AbstractAsyncContextManager
 
-from redis.asyncio import Redis
-
+from core.ipc.config import IpcSettings
+from core.ipc.utils import create_async_redis
 from core.pubsub import Broadcast, RedisBackend
 
-from .config import settings
 from .game.manager import GameManager
 
 
 class App(AbstractAsyncContextManager):
     def __init__(self, pid: int):
         self.pid = pid
-        self.redis = Redis.from_url(settings.REDIS_URL, health_check_interval=15)
+        self.redis = create_async_redis(settings=IpcSettings())
         self.broadcast = Broadcast(backend=RedisBackend(self.redis))
-        self.game_manager = GameManager()
+        self.game_manager = GameManager(broadcast=self.broadcast)
 
     async def __aenter__(self):
         await self.broadcast.start()
+
+        await self.game_manager.start()
+
         return self
 
-    async def __aexit__(self):
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.broadcast.stop()
         await self.game_manager.stop()

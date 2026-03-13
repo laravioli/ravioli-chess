@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from contextlib import suppress
 
 from core.ipc.channels import GameChan, GameCreateChan, GameGroupChan
 from core.ipc.schemas import ravioIN, ravioOUT
@@ -23,21 +24,31 @@ class GameManager:
         self._actor_tasks: set[asyncio.Task] = set()
         self._actor_channels: dict[str, asyncio.Queue] = {}
 
+    async def run(self):
+        try:
+            async with self.broadcast.start_subscription(GameCreateChan(1)) as subscriber:
+                async for message in subscriber.iter_message(type=ravioIN.GameStart):
+                    register_coroutine(self._start_tasks, self.start_one, message)
+        finally:
+            for task in self._start_tasks:
+                task.cancel()
+            exc = await asyncio.gather(*self._start_tasks, return_exceptions=True)
+            for sub in self.broadcast.subscribers:
+                sub.shutdown(immediate=False)
+            exc += await asyncio.gather(*self._actor_tasks, return_exceptions=True)
+            logger.debug(exc)
+
     async def start(self):
-        async with self.broadcast.start_subscription(GameCreateChan(1)) as subscriber:
-            async for message in subscriber.iter_message(type=ravioIN.GameStart):
-                register_coroutine(self._start_tasks, self.start_one, message)
+        self._task = asyncio.create_task(self.run())
 
     async def stop(self):
-        for task in self._start_tasks:
-            task.cancel()
-        exc = await asyncio.gather(*self._start_tasks, return_exceptions=True)
-        # let actors drain their queue
-        await self.broadcast.stop(immediate=False)
-        exc += await asyncio.gather(*self._actor_tasks, return_exceptions=True)
-        logger.debug(exc)
+        if self._task:
+            self._task.cancel()
+            with suppress(asyncio.CancelledError):
+                await self._task
 
     async def start_one(self, msg: ravioIN.GameStart):
+        # note: id will be async (result from db)
         id = "AAAAAAAA"
 
         send_channel = GameGroupChan(id)

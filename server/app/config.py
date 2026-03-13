@@ -15,7 +15,5 @@ class Settings(BaseSettings):
     ANON_COOKIE: str = "anon"
     SESSION_COOKIE: str = "session"
 
-    REDIS_URL: str
-
 
 settings = Settings()

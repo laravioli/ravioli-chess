@@ -23,3 +23,6 @@ class Subscriber:
                 yield msgpack.decode(message, type=type)
             except asyncio.QueueShutDown:
                 break
+
+    def shutdown(self, immediate=False):
+        self._queue.shutdown(immediate=immediate)
