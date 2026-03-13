@@ -1,6 +1,7 @@
 from typing import Annotated
 
-from fastapi import Depends, Request
+from fastapi import Depends
+from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,12 +27,12 @@ type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
 
 
 # Redis
-async def get_redis(request: Request) -> Redis:
-    return request.state.redis
+async def get_redis(conn: HTTPConnection) -> Redis:
+    return conn.state.redis
 
 
-async def get_broadcast(request: Request) -> Broadcast:
-    return request.state.broadcast
+async def get_broadcast(conn: HTTPConnection) -> Broadcast:
+    return conn.state.broadcast
 
 
 type RedisClient = Annotated[Redis, Depends(get_redis)]
