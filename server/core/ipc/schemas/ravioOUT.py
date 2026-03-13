@@ -22,14 +22,14 @@ class ChannelFrame(msgspec.Struct, tag_field="type"):
             raise KeyError(key)
 
 
-class GameCreate(ChannelFrame, tag="game.create"):
+class GameCreate(ChannelFrame, tag="game_create"):
     class Payload(msgspec.Struct):
         game_id: str
 
     data: Payload
 
 
-class GameMove(ChannelFrame, tag="game.move"):
+class GameMove(ChannelFrame, tag="game_move"):
     class Payload(msgspec.Struct):
         ok: bool
         san: str
@@ -37,7 +37,7 @@ class GameMove(ChannelFrame, tag="game.move"):
     data: Payload
 
 
-class GameEnd(ChannelFrame, tag="game.end"):
+class GameEnd(ChannelFrame, tag="game_end"):
     class Payload(msgspec.Struct):
         reason: str
 

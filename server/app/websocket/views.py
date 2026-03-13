@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# todo: yesterday i finish the engine side
 # write the websocket side (without db), i think keeping a function rooting like django channels is cool
 # test with ravio-ws
 # write the db layer
