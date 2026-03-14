@@ -18,7 +18,6 @@ class App(AbstractAsyncContextManager):
 
     async def __aenter__(self):
         await self.broadcast.start()
-
         await self.game_manager.start()
 
         return self
@@ -26,3 +25,4 @@ class App(AbstractAsyncContextManager):
     async def __aexit__(self, exc_type, exc, tb):
         await self.broadcast.stop()
         await self.game_manager.stop()
+        await self.redis.aclose()
