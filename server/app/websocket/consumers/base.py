@@ -1,10 +1,11 @@
 import asyncio
+import uuid
 from abc import ABC, abstractmethod
 
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
-from app.websocket.utils import new_channel
+from core.ipc.channels import WsChan
 from core.ipc.schemas import ClientOut, EngineOut
 from core.serializers import json
 
@@ -13,7 +14,7 @@ class BaseConsumer(ABC):
     def __init__(self, websocket: WebSocket, broadcast: BroadCastClient):
         self.websocket = websocket
         self.broadcast = broadcast
-        self.channel_name = new_channel()
+        self.channel_name = WsChan.Socket(uuid.uuid4())
 
     @property
     @abstractmethod

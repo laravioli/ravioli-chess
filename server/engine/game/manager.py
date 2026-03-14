@@ -2,7 +2,7 @@ import asyncio
 import logging
 from contextlib import suppress
 
-from core.ipc.channels import GameChan, GameCreateChan, GameGroupChan
+from core.ipc.channels import EngineChan, WsChan
 from core.ipc.schemas import EngineIn, EngineOut
 from core.pubsub import Broadcast
 from engine.utils import register_coroutine
@@ -26,7 +26,7 @@ class GameManager:
 
     async def run(self):
         try:
-            async with self.broadcast.start_subscription(GameCreateChan(1)) as subscriber:
+            async with self.broadcast.start_subscription(EngineChan.GameCreate(1)) as subscriber:
                 async for message in subscriber.iter_message(type=EngineIn.GameStart):
                     register_coroutine(self._start_tasks, self.start_one, message)
         finally:
@@ -49,8 +49,8 @@ class GameManager:
         # note: id will be async (result from db)
         id = "AAAAAAAA"
 
-        send_channel = GameGroupChan(id)
-        receive_channel = GameChan(id)
+        send_channel = WsChan.Game(id)
+        receive_channel = EngineChan.Game(id)
 
         # actor api
         async def receive():

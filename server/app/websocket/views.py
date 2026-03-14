@@ -9,8 +9,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# push to main -> congrats
-# rewrite the ipc schemas (mainly name that are horrible)
 # write the game db layer in engine and app
 
 

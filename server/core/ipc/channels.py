@@ -2,54 +2,64 @@ from abc import ABC
 from typing import ClassVar
 
 # ╔══════════════════════════════════════╗
-# ║        Game Server Channels          ║
+# ║          Engine Channels             ║
 # ╚══════════════════════════════════════╝
 
 
-class Channel(str, ABC):
+class EngineChanStr(str, ABC):
     name: ClassVar[str]
 
     def __new__(cls, chan):
-        return super().__new__(cls, f"channel:{cls.name}:{chan}")
+        return super().__new__(cls, f"chan:engine:{cls.name}:{chan}")
 
 
-class GameCreateChan(Channel):
-    """
+class EngineChan:
+    class GameCreate(EngineChanStr):
+        """
 
-    args:
-        chan (int): process ID.
-    """
+        args:
+            chan (int): process ID.
+        """
 
-    name = "gamecreate"
+        name = "game:create"
 
+    class Game(EngineChanStr):
+        """
 
-class GameChan(Channel):
-    """
+        args:
+            chan (str): game ID.
+        """
 
-    args:
-        chan (str): game ID.
-    """
-
-    name = "game"
+        name = "game"
 
 
 # ╔══════════════════════════════════════╗
-# ║        Ws Server Channels            ║
+# ║        Websocket Channels            ║
 # ╚══════════════════════════════════════╝
 
 
-class GroupChannel(str, ABC):
+class WsChanStr(str, ABC):
     name: ClassVar[str]
 
     def __new__(cls, chan):
-        return super().__new__(cls, f"group_{cls.name}_{chan}")
+        return super().__new__(cls, f"chan:ws:{cls.name}:{chan}")
 
 
-class GameGroupChan(GroupChannel):
-    """
+class WsChan:
+    class Socket(WsChanStr):
+        """
 
-    args:
-        chan (str): game ID.
-    """
+        args:
+            uuid (str): socket uuid.
+        """
 
-    name = "game"
+        name = "socket"
+
+    class Game(WsChanStr):
+        """
+
+        args:
+            chan (str): game ID.
+        """
+
+        name = "game"

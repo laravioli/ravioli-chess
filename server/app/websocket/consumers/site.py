@@ -1,6 +1,6 @@
 import logging
 
-from core.ipc.channels import GameCreateChan
+from core.ipc.channels import EngineChan
 from core.ipc.schemas import ClientOut, EngineIn, EngineOut
 
 from .base import BaseConsumer
@@ -20,11 +20,11 @@ class SiteConsumer(BaseConsumer):
                 case ClientOut.GameCreate(data):
                     response, channel = (
                         EngineIn.GameCreate(
-                            channel=self.channel_name,
+                            channel=str(self.channel_name),
                             white_player=data.white_player,
                             black_player=data.black_player,
                         ),
-                        GameCreateChan(1),
+                        EngineChan.GameCreate(1),
                     )
                 case _:
                     logger.warning("received an unknow request")
