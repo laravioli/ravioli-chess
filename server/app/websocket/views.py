@@ -1,9 +1,8 @@
 import logging
-from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from .consumers import PlayConsumer, SiteConsumer
+from .deps import PlayDep, SiteDep
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +12,10 @@ router = APIRouter()
 
 
 @router.websocket("/socket")
-async def index(consumer: Annotated[SiteConsumer, Depends()]):
+async def index(consumer: SiteDep):
     await consumer()
 
 
 @router.websocket("/socket/play/{game_id}")
-async def play(consumer: Annotated[PlayConsumer, Depends()]):
+async def play(consumer: PlayDep):
     await consumer()
