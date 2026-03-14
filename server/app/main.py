@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import FastAPI
 
 from app.api.routes import router as api_router
@@ -8,8 +6,9 @@ from app.exceptions import add_exception_handler
 from app.lifespan import lifespan
 from app.web.views import router as web_router
 from app.websocket.views import router as ws_router
+from core.logging import LogSettings, set_logging
 
-logging.basicConfig(level=logging.INFO)
+set_logging(settings=LogSettings())
 
 app = FastAPI(
     title="Raviolichess API",

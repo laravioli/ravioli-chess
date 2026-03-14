@@ -110,8 +110,8 @@ class Broadcast:
 
     @asynccontextmanager
     async def start_subscription(self, *args: str):
-        subscriber = await self.subscribe(*args)
         try:
+            subscriber = await self.subscribe(*args)
             if self.closed_event.is_set():
                 raise BroadcastClosed()
             yield subscriber

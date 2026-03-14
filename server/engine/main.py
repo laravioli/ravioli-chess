@@ -5,10 +5,11 @@ import signal
 
 import uvloop
 
+from core.logging import LogSettings, set_logging
+
 from .app import App
 
-logging.basicConfig(level=logging.INFO)
-
+set_logging(settings=LogSettings())
 logger = logging.getLogger(__name__)
 
 
