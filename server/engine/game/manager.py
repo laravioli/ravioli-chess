@@ -3,7 +3,7 @@ import logging
 from contextlib import suppress
 
 from core.ipc.channels import GameChan, GameCreateChan, GameGroupChan
-from core.ipc.schemas import ravioIN, ravioOUT
+from core.ipc.schemas import EngineIn, EngineOut
 from core.pubsub import Broadcast
 from engine.utils import register_coroutine
 
@@ -27,7 +27,7 @@ class GameManager:
     async def run(self):
         try:
             async with self.broadcast.start_subscription(GameCreateChan(1)) as subscriber:
-                async for message in subscriber.iter_message(type=ravioIN.GameStart):
+                async for message in subscriber.iter_message(type=EngineIn.GameStart):
                     register_coroutine(self._start_tasks, self.start_one, message)
         finally:
             for task in self._start_tasks:
@@ -45,7 +45,7 @@ class GameManager:
             with suppress(asyncio.CancelledError):
                 await self._task
 
-    async def start_one(self, msg: ravioIN.GameStart):
+    async def start_one(self, msg: EngineIn.GameStart):
         # note: id will be async (result from db)
         id = "AAAAAAAA"
 
@@ -55,13 +55,13 @@ class GameManager:
         # actor api
         async def receive():
             await self.broadcast.publish(
-                msg.channel, ravioOUT.GameCreate(data=ravioOUT.GameCreate.Payload(id))
+                msg.channel, EngineOut.GameCreate(data=EngineOut.GameCreate.Payload(id))
             )
             async with self.broadcast.start_subscription(receive_channel) as sub:
-                async for message in sub.iter_message(type=ravioIN.GameProtocol):
+                async for message in sub.iter_message(type=EngineIn.GameProtocol):
                     yield message
 
-        async def send(msg: ravioOUT.Protocol):
+        async def send(msg: EngineOut.GameProtocol):
             await self.broadcast.publish(send_channel, msg)
 
         # start actor

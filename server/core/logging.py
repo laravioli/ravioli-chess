@@ -37,5 +37,5 @@ class LogSettings(BaseSettings):
         }
 
 
-def set_logging(settings: LogSettings):
+def configure_logging(settings: LogSettings):
     config.dictConfig(settings.get_logging_config)

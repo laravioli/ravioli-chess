@@ -1,7 +1,7 @@
 import logging
 
 from core.ipc.channels import GameCreateChan
-from core.ipc.schemas import clientOUT, ravioIN, ravioOUT
+from core.ipc.schemas import ClientOut, EngineIn, EngineOut
 
 from .base import BaseConsumer
 
@@ -17,9 +17,9 @@ class SiteConsumer(BaseConsumer):
         response, channel = (None, None)
         try:
             match msg:
-                case clientOUT.GameCreate(data):
+                case ClientOut.GameCreate(data):
                     response, channel = (
-                        ravioIN.GameCreate(
+                        EngineIn.GameCreate(
                             channel=self.channel_name,
                             white_player=data.white_player,
                             black_player=data.black_player,
@@ -34,7 +34,7 @@ class SiteConsumer(BaseConsumer):
             if response and channel:
                 await self.broadcast.publish(channel, response)
 
-    async def game_create(self, event: ravioOUT.GameCreate):
+    async def game_create(self, event: EngineOut.GameCreate):
         await self.send_json(event.data)
 
     async def disconnect(self):

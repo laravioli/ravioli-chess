@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import chess
 
-from core.ipc.schemas import ravioIN, ravioOUT
+from core.ipc.schemas import EngineIn, EngineOut
 from engine.exceptions import StopActor
 
 logger = logging.getLogger(__name__)
@@ -39,16 +39,18 @@ class GameActor(Actor):
         self.black_player = black_player
         self._board = chess.Board()
 
-    def handle_message(self, msg: ravioIN.GameProtocol):
+    def handle_message(self, msg):
         response = None
 
         match msg:
-            case ravioIN.GameMove(san):
+            case EngineIn.GameMove(san):
                 try:
                     self._board.push_san(san)
-                    response = ravioOUT.GameMove(data=ravioOUT.GameMove.Payload(ok=True, san=san))
+                    response = EngineOut.GameMove(data=EngineOut.GameMove.Payload(ok=True, san=san))
                 except ValueError as exc:
-                    response = ravioOUT.GameMove(data=ravioOUT.GameMove.Payload(ok=False, san=san))
+                    response = EngineOut.GameMove(
+                        data=EngineOut.GameMove.Payload(ok=False, san=san)
+                    )
                     raise StopActor from exc
             case _:
                 logger.warning("Unknown message received: %s", msg)

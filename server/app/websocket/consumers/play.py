@@ -4,7 +4,7 @@ from fastapi import WebSocket
 
 from app.deps import BroadCastClient
 from core.ipc.channels import GameChan, GameGroupChan
-from core.ipc.schemas import clientOUT, ravioIN, ravioOUT
+from core.ipc.schemas import ClientOut, EngineIn, EngineOut
 
 from .base import BaseConsumer
 
@@ -25,8 +25,8 @@ class PlayConsumer(BaseConsumer):
         response = None
         try:
             match msg:
-                case clientOUT.GameMove(data):
-                    response = ravioIN.GameMove(san=data.san)
+                case ClientOut.GameMove(data):
+                    response = EngineIn.GameMove(san=data.san)
                 case _:
                     logger.warning("received an unknow request")
         except Exception:
@@ -35,7 +35,7 @@ class PlayConsumer(BaseConsumer):
             if response:
                 await self.broadcast.publish(self.game_channel, response)
 
-    async def game_move(self, event: ravioOUT.GameMove):
+    async def game_move(self, event: EngineOut.GameMove):
         await self.send_json(event.data)
 
     async def disconnect(self):

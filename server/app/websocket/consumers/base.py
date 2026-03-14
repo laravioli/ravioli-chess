@@ -5,7 +5,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
 from app.websocket.utils import new_channel
-from core.ipc.schemas import clientOUT, ravioOUT
+from core.ipc.schemas import ClientOut, EngineOut
 from core.serializers import json
 
 
@@ -20,7 +20,7 @@ class BaseConsumer(ABC):
     def channels(self) -> tuple[str]: ...
 
     @abstractmethod
-    async def handle_client_msg(self, msg: clientOUT.Protocol): ...
+    async def handle_client_msg(self, msg: ClientOut.Protocol): ...
 
     async def __call__(self):
         await self.websocket.accept()
@@ -28,7 +28,7 @@ class BaseConsumer(ABC):
         try:
             async with asyncio.TaskGroup() as tg:
                 task = tg.create_task(self.handle_broadcast())
-                async for msg in self.receive_iter_json(type=clientOUT.Protocol):
+                async for msg in self.receive_iter_json(type=ClientOut.Protocol):
                     await self.handle_client_msg(msg)
                 task.cancel()
         except* WebSocketDisconnect:
@@ -39,8 +39,8 @@ class BaseConsumer(ABC):
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
-                async for msg in sub.iter_message(type=ravioOUT.Protocol):
-                    handler = getattr(self, msg["type"])
+                async for msg in sub.iter_message(type=EngineOut.Protocol):
+                    handler = getattr(self, msg["t"])
                     await handler(msg)
 
     async def send_json(self, data):
