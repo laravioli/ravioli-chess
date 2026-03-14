@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
+from app.websocket.utils import new_channel
+from core.ipc.schemas import ravioOUT
 from core.serializers import json
 
 
@@ -11,6 +13,7 @@ class BaseConsumer(ABC):
     def __init__(self, websocket: WebSocket, broadcast: BroadCastClient):
         self.websocket = websocket
         self.broadcast = broadcast
+        self.channel_name = new_channel()
 
     async def __call__(self):
         await self.websocket.accept()
@@ -25,6 +28,19 @@ class BaseConsumer(ABC):
         finally:
             await self.disconnect()
 
+    @property
+    @abstractmethod
+    def channels(self) -> list[str]: ...
+
+    @abstractmethod
+    async def handle_client(self): ...
+
+    async def handle_broadcast(self):
+        async with self.broadcast.start_subscription(*self.channels) as sub:
+            async for msg in sub.iter_message(type=ravioOUT.Protocol):
+                handler = getattr(self, msg["type"])
+                await handler(msg)
+
     async def send_json(self, data):
         """send data to websocket client"""
         await self.websocket.send({"type": "websocket.send", "text": json.encode_as_str(data)})
@@ -33,12 +49,6 @@ class BaseConsumer(ABC):
         """receive data from websocket client"""
         msg = await self.websocket.receive_text()
         return json.decode(msg, type=type)
-
-    @abstractmethod
-    async def handle_client(self): ...
-
-    @abstractmethod
-    async def handle_broadcast(self): ...
 
     async def disconnect(self):  # noqa: B027
         pass

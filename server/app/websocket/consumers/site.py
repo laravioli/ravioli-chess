@@ -7,6 +7,10 @@ logger = logging.getLogger(__name__)
 
 
 class SiteConsumer(BaseConsumer):
+    @property
+    def channels(self):
+        return [self.channel_name]
+
     async def handle_client(self):
         await self.websocket.send_json({"message": "pong"})
         while True:
