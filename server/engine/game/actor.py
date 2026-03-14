@@ -18,6 +18,8 @@ class Actor(ABC):
                     await send(response)
         except StopActor:
             pass
+        finally:
+            logger.info("stop game actor")
 
     @abstractmethod
     async def handle_message(msg):

@@ -34,7 +34,7 @@ class GameManager:
                 task.cancel()
             exc = await asyncio.gather(*self._start_tasks, return_exceptions=True)
             exc += await asyncio.gather(*self._actor_tasks, return_exceptions=True)
-            logger.debug(exc)
+            logger.info(exc)
 
     async def start(self):
         self._task = asyncio.create_task(self.run())

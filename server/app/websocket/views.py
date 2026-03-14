@@ -9,11 +9,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# test with ravio-ws
-# check if ive done everything like before
 # push to main -> congrats
 # rewrite the ipc schemas (mainly name that are horrible)
-# write the db layer
+# write the game db layer in engine and app
 
 
 @router.websocket("/socket")
