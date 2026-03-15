@@ -1,7 +1,8 @@
 import logging
 
-from core.ipc.channels import EngineChan
-from core.ipc.schemas import ClientOut, EngineIn, EngineOut
+from core.protocol.channels import engine_chan
+from core.protocol.schemas import client_out, engine_in, engine_out
+from core.protocol.schemas.payload import GameInfo
 
 from .base import BaseConsumer
 
@@ -17,24 +18,25 @@ class SiteConsumer(BaseConsumer):
         response, channel = (None, None)
         try:
             match msg:
-                case ClientOut.GameCreate(data):
+                case client_out.GameCreate(data):
                     response, channel = (
-                        EngineIn.GameCreate(
+                        engine_in.GameCreate(
                             channel=str(self.channel_name),
-                            white_player=data.white_player,
-                            black_player=data.black_player,
+                            payload=GameInfo(
+                                white_player=data.white_player, black_player=data.black_player
+                            ),
                         ),
-                        EngineChan.GameCreate(1),
+                        engine_chan.GameCreate(1),
                     )
                 case _:
                     logger.warning("received an unknow request")
         except Exception:
-            pass
+            raise
         else:
             if response and channel:
                 await self.broadcast.publish(channel, response)
 
-    async def game_create(self, event: EngineOut.GameCreate):
+    async def game_create(self, event: engine_out.GameCreate):
         await self.send_json(event.data)
 
     async def disconnect(self):

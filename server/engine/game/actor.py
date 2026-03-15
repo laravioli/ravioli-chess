@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import chess
 
-from core.ipc.schemas import EngineIn, EngineOut
+from core.protocol.schemas import engine_in, engine_out
 from engine.exceptions import StopActor
 
 logger = logging.getLogger(__name__)
@@ -43,13 +43,15 @@ class GameActor(Actor):
         response = None
 
         match msg:
-            case EngineIn.GameMove(san):
+            case engine_in.GameMove(san):
                 try:
                     self._board.push_san(san)
-                    response = EngineOut.GameMove(data=EngineOut.GameMove.Payload(ok=True, san=san))
+                    response = engine_out.GameMove(
+                        data=engine_out.GameMove.Payload(ok=True, san=san)
+                    )
                 except ValueError as exc:
-                    response = EngineOut.GameMove(
-                        data=EngineOut.GameMove.Payload(ok=False, san=san)
+                    response = engine_out.GameMove(
+                        data=engine_out.GameMove.Payload(ok=False, san=san)
                     )
                     raise StopActor from exc
             case _:

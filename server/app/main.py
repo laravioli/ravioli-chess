@@ -6,7 +6,7 @@ from app.exceptions import add_exception_handler
 from app.lifespan import lifespan
 from app.web.views import router as web_router
 from app.websocket.views import router as ws_router
-from core.logging import LogSettings, configure_logging
+from core.config import LogSettings, configure_logging
 
 configure_logging(settings=LogSettings())
 

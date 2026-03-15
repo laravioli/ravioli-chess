@@ -5,7 +5,7 @@ import signal
 
 import uvloop
 
-from core.logging import LogSettings, configure_logging
+from core.config import LogSettings, configure_logging
 
 from .app import App
 

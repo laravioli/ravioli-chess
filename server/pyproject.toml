@@ -57,7 +57,7 @@ ignore = [
 keep-runtime-typing = true
 
 [tool.ruff.lint.isort]
-known-first-party = ["app", "core", "engine"]
+known-first-party = ["app", "core", "engine", "lib"]
 
 
 

@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
-from core.ipc.channels import WsChan
-from core.ipc.schemas import ClientOut, EngineOut
+from core.protocol.channels import websocket_chan
+from core.protocol.schemas import client_out, engine_out
 from core.serializers import json
 
 
@@ -14,14 +14,14 @@ class BaseConsumer(ABC):
     def __init__(self, websocket: WebSocket, broadcast: BroadCastClient):
         self.websocket = websocket
         self.broadcast = broadcast
-        self.channel_name = WsChan.Socket(uuid.uuid4())
+        self.channel_name = websocket_chan.Socket(uuid.uuid4())
 
     @property
     @abstractmethod
     def channels(self) -> tuple[str]: ...
 
     @abstractmethod
-    async def handle_client_msg(self, msg: ClientOut.Protocol): ...
+    async def handle_client_msg(self, msg: client_out.Protocol): ...
 
     async def __call__(self):
         await self.websocket.accept()
@@ -29,7 +29,7 @@ class BaseConsumer(ABC):
         try:
             async with asyncio.TaskGroup() as tg:
                 task = tg.create_task(self.handle_broadcast())
-                async for msg in self.receive_iter_json(type=ClientOut.Protocol):
+                async for msg in self.receive_iter_json(type=client_out.Protocol):
                     await self.handle_client_msg(msg)
                 task.cancel()
         except* WebSocketDisconnect:
@@ -40,7 +40,7 @@ class BaseConsumer(ABC):
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
-                async for msg in sub.iter_message(type=EngineOut.Protocol):
+                async for msg in sub.iter_message(type=engine_out.Protocol):
                     handler = getattr(self, msg["t"])
                     await handler(msg)
 

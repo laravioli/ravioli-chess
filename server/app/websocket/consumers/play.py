@@ -3,8 +3,8 @@ import logging
 from fastapi import WebSocket
 
 from app.deps import BroadCastClient
-from core.ipc.channels import EngineChan, WsChan
-from core.ipc.schemas import ClientOut, EngineIn, EngineOut
+from core.protocol.channels import engine_chan, websocket_chan
+from core.protocol.schemas import client_out, engine_in, engine_out
 
 from .base import BaseConsumer
 
@@ -15,27 +15,27 @@ class PlayConsumer(BaseConsumer):
     def __init__(self, websocket: WebSocket, broadcast: BroadCastClient, game_id: str):
         super().__init__(websocket, broadcast)
         self.game_id = game_id
-        self.game_channel = EngineChan.Game(game_id)
+        self.game_channel = engine_chan.Game(game_id)
 
     @property
     def channels(self):
-        return (self.channel_name, WsChan.Game(self.game_id))
+        return (self.channel_name, websocket_chan.Game(self.game_id))
 
     async def handle_client_msg(self, msg):
         response = None
         try:
             match msg:
-                case ClientOut.GameMove(data):
-                    response = EngineIn.GameMove(san=data.san)
+                case client_out.GameMove(data):
+                    response = engine_in.GameMove(san=data.san)
                 case _:
                     logger.warning("received an unknow request")
         except Exception:
-            logger.exception("error in play consumer message handling")
+            raise
         else:
             if response:
                 await self.broadcast.publish(self.game_channel, response)
 
-    async def game_move(self, event: EngineOut.GameMove):
+    async def game_move(self, event: engine_out.GameMove):
         await self.send_json(event.data)
 
     async def disconnect(self):

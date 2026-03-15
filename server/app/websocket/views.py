@@ -1,10 +1,6 @@
-import logging
-
 from fastapi import APIRouter
 
 from .deps import PlayDep, SiteDep
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
