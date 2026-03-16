@@ -3,8 +3,8 @@ from contextlib import suppress
 
 from core.protocol.channels import engine_chan, websocket_chan
 from core.protocol.schemas import engine_in, engine_out
-from core.protocol.schemas._base import BroadcastEnvelope
-from core.protocol.schemas._data import GameRouting
+from core.protocol.schemas.base import ServerMsg
+from core.protocol.schemas.data import GameRouting
 from engine.utils import register_coroutine
 from lib.pubsub import Broadcast
 
@@ -44,7 +44,7 @@ class GameManager:
                 await self._task
 
     async def publish(self, channel, msg):
-        await self.broadcast.publish(channel, BroadcastEnvelope(source="engine", msg=msg))
+        await self.broadcast.publish(channel, ServerMsg(source="engine", msg=msg))
 
     async def start_one(self, msg: engine_in.GameStart):
         # note: id will be async (result from db)

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import chess
 
 from core.protocol.schemas import engine_in, engine_out
-from core.protocol.schemas._data import GameInfo, ValidatedMove
+from core.protocol.schemas.data import GameInfo, ValidatedMove
 from engine.exceptions import StopActor
 
 logger = logging.getLogger(__name__)

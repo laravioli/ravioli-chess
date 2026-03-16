@@ -1,12 +1,10 @@
-from ._base import TaggedMsg
+from ..base import TaggedMsg
+from ..data import GameRouting
 
 # ╔══════════════════════════════════════╗
-# ║   APP OUT : ws <- app                ║
+# ║   CLIENT IN : ws -> client           ║
 # ╚══════════════════════════════════════╝
 
 
-class Test(TaggedMsg, tag="test"):
-    data: str
-
-
-type Protocol = Test
+class GameCreate(TaggedMsg, tag="game.created"):
+    data: GameRouting

@@ -1,5 +1,5 @@
-from ._base import TaggedMsg
-from ._data import GameRouting, GameStop, ValidatedMove
+from ..base import TaggedMsg
+from ..data import GameRouting, GameStop, ValidatedMove
 
 # ╔══════════════════════════════════════╗
 # ║   ENGINE OUT : ws <- engine          ║

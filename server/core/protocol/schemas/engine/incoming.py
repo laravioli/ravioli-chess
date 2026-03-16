@@ -1,5 +1,5 @@
-from ._base import TaggedMsg
-from ._data import GameInfo
+from ..base import TaggedMsg
+from ..data import GameInfo
 
 # ╔══════════════════════════════════════╗
 # ║   ENGINE IN : ws -> engine           ║
@@ -22,7 +22,7 @@ class GameResign(TaggedMsg):
 
 # Forwarded Msg
 
-from .client_out import GameMove  # noqa: E402
+from ..client.out import GameMove  # noqa: E402
 
 # Protocol
 

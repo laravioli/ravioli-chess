@@ -7,7 +7,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from app.deps import BroadCastClient
 from core.protocol.channels import websocket_chan
 from core.protocol.schemas import app_out, client_out, engine_out
-from core.protocol.schemas._base import BroadcastEnvelope
+from core.protocol.schemas.base import ServerMsg
 from lib.serializers import json, msgpack
 
 
@@ -47,14 +47,14 @@ class BaseConsumer(ABC):
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
-                async for enveloppe in sub.iter_message(type=BroadcastEnvelope):
-                    if enveloppe.source == "engine":
+                async for server_msg in sub.iter_message(type=ServerMsg):
+                    if server_msg.source == "engine":
                         await self.handle_engine_msg(
-                            msgpack.decode(enveloppe.msg, type=engine_out.Protocol)
+                            msgpack.decode(server_msg.msg, type=engine_out.Protocol)
                         )
-                    elif enveloppe.source == "app":
+                    elif server_msg.source == "app":
                         await self.handle_app_msg(
-                            msgpack.decode(enveloppe.msg, type=app_out.Protocol)
+                            msgpack.decode(server_msg.msg, type=app_out.Protocol)
                         )
                     else:
                         raise ValueError("Invalid message source")
