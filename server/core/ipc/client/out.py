@@ -1,7 +1,6 @@
 import msgspec
 
-from ..base import TaggedMsg
-from ..data import GameInfo, MoveData
+from ..structs import GameInfo, MoveData, TaggedMsg
 
 # ╔══════════════════════════════════════╗
 # ║   CLIENT OUT : ws <- client          ║

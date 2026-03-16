@@ -1,5 +1,4 @@
-from ..base import TaggedMsg
-from ..data import GameInfo
+from ..structs import GameInfo, TaggedMsg
 
 # ╔══════════════════════════════════════╗
 # ║   ENGINE IN : ws -> engine           ║

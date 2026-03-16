@@ -1,11 +1,10 @@
 import asyncio
 from contextlib import suppress
 
-from arbiter.utils import register_coroutine
-from core.protocol.channels import engine_chan, websocket_chan
-from core.protocol.schemas import engine_in, engine_out
-from core.protocol.schemas.base import ServerMsg
-from core.protocol.schemas.data import GameRouting
+from core.ipc import engine_in, engine_out
+from core.ipc.channels import EngineGameChan, EngineGameCreateChan, WsGameChan
+from core.ipc.structs import GameRouting, ServerMsg
+from engine.utils import register_coroutine
 from lib.pubsub import Broadcast
 
 from .actor import GameActor
@@ -25,7 +24,7 @@ class GameManager:
 
     async def run(self):
         try:
-            async with self.broadcast.start_subscription(engine_chan.GameCreate(1)) as subscriber:
+            async with self.broadcast.start_subscription(EngineGameCreateChan(1)) as subscriber:
                 async for message in subscriber.iter_message(type=engine_in.GameStart):
                     register_coroutine(self._start_tasks, self.start_one, message)
         finally:
@@ -50,8 +49,8 @@ class GameManager:
         # note: id will be async (result from db)
         id = "AAAAAAAA"
 
-        send_channel = websocket_chan.Game(id)
-        receive_channel = engine_chan.Game(id)
+        send_channel = WsGameChan(id)
+        receive_channel = EngineGameChan(id)
 
         # actor api
         async def receive():

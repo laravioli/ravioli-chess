@@ -1,5 +1,4 @@
-from ..base import TaggedMsg
-from ..data import GameRouting, GameStop, ValidatedMove
+from ..structs import GameRouting, GameStop, TaggedMsg, ValidatedMove
 
 # ╔══════════════════════════════════════╗
 # ║   ENGINE OUT : ws <- engine          ║

@@ -3,8 +3,8 @@ import logging
 from fastapi import WebSocket
 
 from app.deps import BroadCastClient
-from core.protocol.channels import engine_chan, websocket_chan
-from core.protocol.schemas import client_out, engine_in, engine_out
+from core.ipc import client_out, engine_in, engine_out
+from core.ipc.channels import EngineGameChan, WsGameChan
 
 from .base import BaseConsumer
 
@@ -15,11 +15,11 @@ class PlayConsumer(BaseConsumer):
     def __init__(self, websocket: WebSocket, broadcast: BroadCastClient, game_id: str):
         super().__init__(websocket, broadcast)
         self.game_id = game_id
-        self.game_channel = engine_chan.Game(game_id)
+        self.game_channel = EngineGameChan(game_id)
 
     @property
     def channels(self):
-        return (self.channel_name, websocket_chan.Game(self.game_id))
+        return (self.channel_name, WsGameChan(self.game_id))
 
     async def handle_client_msg(self, msg):
         response = None

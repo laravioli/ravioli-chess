@@ -1,10 +1,12 @@
-from ..base import TaggedMsg
-from ..data import GameRouting
+from ..structs import TaggedMsg
 
 # ╔══════════════════════════════════════╗
-# ║   CLIENT IN : ws -> client           ║
+# ║   APP OUT : websocket <- app         ║
 # ╚══════════════════════════════════════╝
 
 
-class GameCreate(TaggedMsg, tag="game.created"):
-    data: GameRouting
+class Test(TaggedMsg, tag="test"):
+    data: str
+
+
+type Protocol = Test

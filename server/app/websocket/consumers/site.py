@@ -1,7 +1,7 @@
 import logging
 
-from core.protocol.channels import engine_chan
-from core.protocol.schemas import client_out, engine_in, engine_out
+from core.ipc import client_out, engine_in, engine_out
+from core.ipc.channels import EngineGameCreateChan
 
 from .base import BaseConsumer
 
@@ -23,7 +23,7 @@ class SiteConsumer(BaseConsumer):
                             channel=str(self.channel_name),
                             data=data,
                         ),
-                        engine_chan.GameCreate(1),
+                        EngineGameCreateChan(1),
                     )
                 case _:
                     logger.warning("received an unknow request")

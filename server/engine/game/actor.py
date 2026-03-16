@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 
 import chess
 
-from arbiter.exceptions import StopActor
-from core.protocol.schemas import engine_in, engine_out
-from core.protocol.schemas.data import GameInfo, ValidatedMove
+from core.ipc import engine_in, engine_out
+from core.ipc.structs import GameInfo, ValidatedMove
+from engine.exceptions import StopActor
 
 logger = logging.getLogger(__name__)
 

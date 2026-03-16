@@ -5,9 +5,9 @@ from abc import ABC, abstractmethod
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
-from core.protocol.channels import websocket_chan
-from core.protocol.schemas import app_out, client_out, engine_out
-from core.protocol.schemas.base import ServerMsg
+from core.ipc import app_out, client_out, engine_out
+from core.ipc.channels import ConsumerChan
+from core.ipc.structs import ServerMsg
 from lib.serializers import json, msgpack
 
 
@@ -15,7 +15,7 @@ class BaseConsumer(ABC):
     def __init__(self, websocket: WebSocket, broadcast: BroadCastClient):
         self.websocket = websocket
         self.broadcast = broadcast
-        self.channel_name = websocket_chan.Socket(uuid.uuid4())
+        self.channel_name = ConsumerChan(uuid.uuid4())
 
     @property
     @abstractmethod
