@@ -1,11 +1,11 @@
 import asyncio
 from contextlib import suppress
 
+from arbiter.utils import register_coroutine
 from core.protocol.channels import engine_chan, websocket_chan
 from core.protocol.schemas import engine_in, engine_out
 from core.protocol.schemas.base import ServerMsg
 from core.protocol.schemas.data import GameRouting
-from engine.utils import register_coroutine
 from lib.pubsub import Broadcast
 
 from .actor import GameActor
