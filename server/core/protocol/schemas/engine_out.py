@@ -1,32 +1,24 @@
-import msgspec
-
-from .base_schemas import Msg
+from ._base import TaggedMsg
+from ._data import GameRouting, GameStop, ValidatedMove
 
 # ╔══════════════════════════════════════╗
 # ║   ENGINE OUT : ws <- engine          ║
 # ╚══════════════════════════════════════╝
 
 
-class GameCreate(Msg, tag="game_create"):
-    class Payload(msgspec.Struct):
-        game_id: str
-
-    data: Payload
+# note : redefine tag in case of client forwarding
 
 
-class GameMove(Msg, tag="game_move"):
-    class Payload(msgspec.Struct):
-        ok: bool
-        san: str
-
-    data: Payload
+class GameCreate(TaggedMsg, tag="game.create"):
+    data: GameRouting
 
 
-class GameEnd(Msg, tag="game_end"):
-    class Payload(msgspec.Struct):
-        reason: str
+class GameMove(TaggedMsg, tag="game.move"):
+    data: ValidatedMove
 
-    data: Payload
+
+class GameEnd(TaggedMsg, tag="game.end"):
+    data: GameStop
 
 
 type GameStart = GameCreate

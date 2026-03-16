@@ -1,25 +1,19 @@
 import msgspec
 
-from .base_schemas import Frame
+from ._base import TaggedMsg
+from ._data import GameInfo, MoveData
 
 # ╔══════════════════════════════════════╗
 # ║   CLIENT OUT : ws <- client          ║
 # ╚══════════════════════════════════════╝
 
 
-class GameCreate(Frame, tag="newgame"):
-    class Payload(msgspec.Struct):
-        white_player: str | None = msgspec.field(name="wp", default=None)
-        black_player: str | None = msgspec.field(name="bp", default=None)
-
-    data: Payload | None = msgspec.field(name="d", default_factory=Payload)
+class GameCreate(TaggedMsg, tag="game.new"):
+    data: GameInfo = msgspec.field(default_factory=GameInfo)
 
 
-class GameMove(Frame, tag="move"):
-    class Move(msgspec.Struct):
-        san: str
-
-    data: Move = msgspec.field(name="d")
+class GameMove(TaggedMsg, tag="game.move"):
+    data: MoveData
 
 
 type Protocol = GameCreate | GameMove

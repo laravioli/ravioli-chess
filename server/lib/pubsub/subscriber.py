@@ -16,7 +16,7 @@ class Subscriber:
         except asyncio.QueueFull:
             return False
 
-    async def iter_message(self, type: object) -> AsyncGenerator[object]:
+    async def iter_message[T](self, type: T) -> AsyncGenerator[T]:
         while True:
             try:
                 message = await self._queue.get()

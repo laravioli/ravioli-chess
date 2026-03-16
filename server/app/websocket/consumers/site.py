@@ -2,7 +2,6 @@ import logging
 
 from core.protocol.channels import engine_chan
 from core.protocol.schemas import client_out, engine_in, engine_out
-from core.protocol.schemas.payload import GameInfo
 
 from .base import BaseConsumer
 
@@ -22,9 +21,7 @@ class SiteConsumer(BaseConsumer):
                     response, channel = (
                         engine_in.GameCreate(
                             channel=str(self.channel_name),
-                            payload=GameInfo(
-                                white_player=data.white_player, black_player=data.black_player
-                            ),
+                            data=data,
                         ),
                         engine_chan.GameCreate(1),
                     )
@@ -36,8 +33,10 @@ class SiteConsumer(BaseConsumer):
             if response and channel:
                 await self.broadcast.publish(channel, response)
 
-    async def game_create(self, event: engine_out.GameCreate):
-        await self.send_json(event.data)
+    async def handle_engine_msg(self, msg):
+        match msg:
+            case engine_out.GameCreate():
+                await self.send_json(msg)
 
     async def disconnect(self):
         logger.info("disconnected")

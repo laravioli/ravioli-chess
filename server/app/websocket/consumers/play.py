@@ -26,7 +26,7 @@ class PlayConsumer(BaseConsumer):
         try:
             match msg:
                 case client_out.GameMove(data):
-                    response = engine_in.GameMove(san=data.san)
+                    response = engine_in.GameMove(data=data)
                 case _:
                     logger.warning("received an unknow request")
         except Exception:
@@ -35,8 +35,10 @@ class PlayConsumer(BaseConsumer):
             if response:
                 await self.broadcast.publish(self.game_channel, response)
 
-    async def game_move(self, event: engine_out.GameMove):
-        await self.send_json(event.data)
+    async def handle_engine_msg(self, msg):
+        match msg:
+            case engine_out.GameMove():
+                await self.send_json(msg)
 
     async def disconnect(self):
         logger.info("disconnected")

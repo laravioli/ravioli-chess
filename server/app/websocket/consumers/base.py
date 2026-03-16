@@ -6,8 +6,9 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
 from core.protocol.channels import websocket_chan
-from core.protocol.schemas import client_out, engine_out
-from core.serializers import json
+from core.protocol.schemas import app_out, client_out, engine_out
+from core.protocol.schemas._base import BroadcastEnvelope
+from core.serializers import json, msgpack
 
 
 class BaseConsumer(ABC):
@@ -20,8 +21,14 @@ class BaseConsumer(ABC):
     @abstractmethod
     def channels(self) -> tuple[str]: ...
 
+    async def handle_app_msg(self, msg: app_out.Protocol):  # noqa: B027
+        pass
+
     @abstractmethod
     async def handle_client_msg(self, msg: client_out.Protocol): ...
+
+    @abstractmethod
+    async def handle_engine_msg(self, msg: engine_out.Protocol): ...
 
     async def __call__(self):
         await self.websocket.accept()
@@ -40,9 +47,17 @@ class BaseConsumer(ABC):
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
-                async for msg in sub.iter_message(type=engine_out.Protocol):
-                    handler = getattr(self, msg["t"])
-                    await handler(msg)
+                async for enveloppe in sub.iter_message(type=BroadcastEnvelope):
+                    if enveloppe.source == "engine":
+                        await self.handle_engine_msg(
+                            msgpack.decode(enveloppe.msg, type=engine_out.Protocol)
+                        )
+                    elif enveloppe.source == "app":
+                        await self.handle_app_msg(
+                            msgpack.decode(enveloppe.msg, type=app_out.Protocol)
+                        )
+                    else:
+                        raise ValueError("Invalid message source")
 
     async def send_json(self, data):
         """send data to websocket client"""

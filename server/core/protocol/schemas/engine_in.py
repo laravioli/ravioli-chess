@@ -1,28 +1,30 @@
-from .base_schemas import Msg
-from .payload import GameInfo
+from ._base import TaggedMsg
+from ._data import GameInfo
 
 # ╔══════════════════════════════════════╗
 # ║   ENGINE IN : ws -> engine           ║
 # ╚══════════════════════════════════════╝
 
 
-class GameCreate(Msg, tag="game_create"):
+class GameCreate(TaggedMsg):
     channel: str
-    payload: GameInfo
+    data: GameInfo
 
 
-class ChallengeAccepted(Msg, tag="challenge_accepted"):
+class ChallengeAccepted(TaggedMsg):
     id: str
-    payload: GameInfo
+    data: GameInfo
 
 
-class GameMove(Msg, tag="game_move"):
-    san: str
-
-
-class GameResign(Msg, tag="game_resign"):
+class GameResign(TaggedMsg):
     player: str
 
+
+# Forwarded Msg
+
+from .client_out import GameMove  # noqa: E402
+
+# Protocol
 
 type GameStart = GameCreate | ChallengeAccepted
 
