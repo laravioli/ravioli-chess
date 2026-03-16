@@ -9,7 +9,7 @@ from app.config import settings
 from app.deps import DbSession, RedisClient
 from app.exceptions import InvalidSession
 from core.db.models import User
-from core.serializers import msgpack
+from lib.serializers import msgpack
 
 from .schemas import Session
 from .security import verify_session

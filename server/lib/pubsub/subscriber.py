@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import AsyncGenerator
 
-from core.serializers import msgpack
+from lib.serializers import msgpack
 
 
 class Subscriber:

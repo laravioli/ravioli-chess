@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 from app.deps import DbSession, RedisClient
 from app.exceptions import InvalidCredentials
 from core.db.models import User
-from core.serializers import msgpack
+from lib.serializers import msgpack
 
 from .deps import SessionCookie
 from .schemas import Session, UserLogin

@@ -8,7 +8,7 @@ from app.deps import BroadCastClient
 from core.protocol.channels import websocket_chan
 from core.protocol.schemas import app_out, client_out, engine_out
 from core.protocol.schemas._base import BroadcastEnvelope
-from core.serializers import json, msgpack
+from lib.serializers import json, msgpack
 
 
 class BaseConsumer(ABC):

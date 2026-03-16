@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
-from core.serializers import msgpack
+from lib.serializers import msgpack
 
 from .backend import ChannelBackend
 from .subscriber import Subscriber
@@ -9,6 +9,9 @@ from .subscriber import Subscriber
 
 class BroadcastClosed(Exception):
     pass
+
+
+# note: to make it a true library, it should be serializer agnostic
 
 
 class Broadcast:
