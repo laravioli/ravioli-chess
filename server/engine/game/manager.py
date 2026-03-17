@@ -8,6 +8,7 @@ from engine.utils import register_coroutine
 from lib.pubsub import Broadcast
 
 from .actor import GameActor
+from .service import create_game_db
 
 
 class GameManager:
@@ -46,8 +47,7 @@ class GameManager:
         await self.broadcast.publish(channel, ServerMsg(source="engine", msg=msg))
 
     async def start_one(self, msg: engine_in.GameStart):
-        # note: id will be async (result from db)
-        id = "AAAAAAAA"
+        id = await create_game_db(msg)
 
         send_channel = WsGameChan(id)
         receive_channel = EngineGameChan(id)
