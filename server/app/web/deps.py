@@ -1,7 +1,11 @@
-from fastapi import Request
+from typing import Annotated
+
+from fastapi import Depends, Request
 
 from app.auth.deps import UserWithPrefOrAnon
+from app.deps import RedisClient
 from app.pref.service import extract_cookie_data
+from lib.cache import CacheService
 
 from .schemas import User
 
@@ -14,3 +18,10 @@ async def user_or_anon(request: Request, auth_user: UserWithPrefOrAnon):
         user = User.anon(extract_cookie_data(request))
 
     request.state.user = user
+
+
+async def get_web_cache_service(redis: RedisClient):
+    return CacheService(redis, namespace="web", version="v1", default_ttl=60)
+
+
+type WebCache = Annotated[CacheService, Depends(get_web_cache_service)]

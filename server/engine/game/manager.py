@@ -26,7 +26,7 @@ class GameManager:
     async def run(self):
         try:
             async with self.broadcast.start_subscription(EngineGameCreateChan(1)) as subscriber:
-                async for message in subscriber.iter_message(type=engine_in.GameStart):
+                async for message in subscriber.iter_message(type_arg=engine_in.GameStart):
                     register_coroutine(self._start_tasks, self.start_one, message)
         finally:
             for task in self._start_tasks:
@@ -56,7 +56,7 @@ class GameManager:
         async def receive():
             await self.publish(msg.channel, engine_out.GameCreate(data=GameRouting(id)))
             async with self.broadcast.start_subscription(receive_channel) as sub:
-                async for message in sub.iter_message(type=engine_in.GameProtocol):
+                async for message in sub.iter_message(type_arg=engine_in.GameProtocol):
                     yield message
 
         async def send(msg: engine_out.GameProtocol):

@@ -28,7 +28,7 @@ async def get_auth_session(
     if not data:
         raise InvalidSession()
 
-    return msgpack.decode(data, type=Session)
+    return msgpack.decode(data, type_arg=Session)
 
 
 def current_user_or_anon(with_pref=False):

@@ -4,8 +4,6 @@ from .deps import PlayDep, SiteDep
 
 router = APIRouter()
 
-# write the game db layer in engine and app
-
 
 @router.websocket("/socket")
 async def index(consumer: SiteDep):

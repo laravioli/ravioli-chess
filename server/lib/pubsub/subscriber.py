@@ -16,11 +16,11 @@ class Subscriber:
         except asyncio.QueueFull:
             return False
 
-    async def iter_message[T](self, type: type[T]) -> AsyncGenerator[T]:
+    async def iter_message[T](self, type_arg: type[T]) -> AsyncGenerator[T]:
         while True:
             try:
                 message = await self._queue.get()
-                yield msgpack.decode(message, type=type)
+                yield msgpack.decode(message, type_arg=type_arg)
             except asyncio.QueueShutDown:
                 break
 

@@ -62,8 +62,7 @@ class LogSettings(BaseSettings):
                 "": {
                     "handlers": ["console"],
                     "level": self.LOG_LEVEL,
-                },
-                "uvicorn.access": {"level": "INFO", "propagate": False},
+                }
             },
         }
 

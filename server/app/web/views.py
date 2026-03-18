@@ -1,11 +1,15 @@
+import logging
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 
 from app.deps import DbSession
 
-from .deps import user_or_anon
+from .deps import WebCache, user_or_anon
 from .service import get_chess_positions
 from .templating import templates
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)])
 
@@ -14,8 +18,10 @@ router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)]
 @router.get("/analysis", response_class=HTMLResponse, name="analyse")
 @router.get("/editor", response_class=HTMLResponse, name="editor")
 @router.get("/play", response_class=HTMLResponse, name="play")
-async def index(request: Request, session: DbSession):
-    positions = await get_chess_positions(session)
+async def index(request: Request, session: DbSession, cache: WebCache):
+    positions = await cache.get_or_set(
+        "chess:positions", factory=lambda: get_chess_positions(session)
+    )
     ctx = {
         "payload": {
             "cfg": {

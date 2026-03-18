@@ -23,12 +23,12 @@ class Actor(ABC):
             logger.info("stop game actor")
 
     @abstractmethod
-    async def handle_message(msg):
+    def handle_message(msg):
         """
-        Return:
+        **Return**:
             A python object message to send back.
 
-        Raise:
+        **Raise**:
             StopActor.
         """
         ...

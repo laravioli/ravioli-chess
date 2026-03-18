@@ -15,10 +15,7 @@ def id8():
 
 
 async def create_game_db(msg: engine_in.GameStart):
-    if isinstance(msg, engine_in.GameCreate):
-        game_id = id8()
-    else:
-        game_id = msg.id
+    game_id = id8() if isinstance(msg, engine_in.GameCreate) else msg.id
 
     async with LocalSession() as session:
         players = await get_players(session, msg.data)

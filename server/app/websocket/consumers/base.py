@@ -36,7 +36,7 @@ class BaseConsumer(ABC):
         try:
             async with asyncio.TaskGroup() as tg:
                 task = tg.create_task(self.handle_broadcast())
-                async for msg in self.receive_iter_json(type=client_out.Protocol):
+                async for msg in self.receive_iter_json(type_arg=client_out.Protocol):
                     await self.handle_client_msg(msg)
                 task.cancel()
         except* WebSocketDisconnect:
@@ -47,14 +47,14 @@ class BaseConsumer(ABC):
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
-                async for server_msg in sub.iter_message(type=ServerMsg):
+                async for server_msg in sub.iter_message(type_arg=ServerMsg):
                     if server_msg.source == "engine":
                         await self.handle_engine_msg(
-                            msgpack.decode(server_msg.msg, type=engine_out.Protocol)
+                            msgpack.decode(server_msg.msg, type_arg=engine_out.Protocol)
                         )
                     elif server_msg.source == "app":
                         await self.handle_app_msg(
-                            msgpack.decode(server_msg.msg, type=app_out.Protocol)
+                            msgpack.decode(server_msg.msg, type_arg=app_out.Protocol)
                         )
                     else:
                         raise ValueError("Invalid message source")
@@ -63,11 +63,11 @@ class BaseConsumer(ABC):
         """send data to websocket client"""
         await self.websocket.send({"type": "websocket.send", "text": json.encode_as_str(data)})
 
-    async def receive_iter_json[T](self, type: type[T] = object):
+    async def receive_iter_json[T](self, type_arg: type[T] = object):
         """stream received msg from websocket client"""
         while True:
             msg = await self.websocket.receive_text()
-            yield json.decode(msg, type=type)
+            yield json.decode(msg, type_arg=type_arg)
 
     async def disconnect(self):  # noqa: B027
         pass

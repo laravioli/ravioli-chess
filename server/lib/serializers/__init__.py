@@ -17,11 +17,11 @@ def build_serializer(encoder: Encoder, decoder: Decoder):
     def encode_as_str(obj: Any) -> str:
         return _encode(obj).decode()
 
-    def decode[T](data: bytes | str, type: type[T]) -> T:
+    def decode[T](data: bytes | str, type_arg: type[T] | Any = Any) -> T | Any:
         try:
-            return _decode[type](data)
+            return _decode[type_arg](data)
         except KeyError:
-            _decode[type] = decoder(type=type).decode
-            return _decode[type](data)
+            _decode[type_arg] = decoder(type=type_arg).decode
+            return _decode[type_arg](data)
 
     return encode, encode_as_str, decode
