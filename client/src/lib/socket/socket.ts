@@ -1,5 +1,5 @@
-import type { Site } from '../site/site';
-import type { Path } from '../tree/interface';
+import type { Site } from '@/lib/site/site';
+import type { Path } from '@/lib/tree/interface';
 
 export let siteSocket: WsSocket;
 
@@ -13,18 +13,20 @@ class WsSocket {
 
   constructor(path: string) {
     const protocol = location.protocol === 'https' ? 'wss://' : 'ws://';
-    this.url = url(protocol + location.host + path, { sri: window.site.sri });
+    this.url = url(protocol + location.host + path, {
+      sri: window.site.sri,
+    });
     this.connect();
   }
 
   connect = () => {
     const ws = (this.ws = new WebSocket(this.url.toString()));
-    ws.onmessage = e => {
+    ws.onmessage = (e) => {
       const data = JSON.parse(e.data);
       console.log(data);
       setTimeout(() => ws.send(JSON.stringify({ message: 'ping' })), 1000);
     };
-    ws.onclose = _event => {
+    ws.onclose = (_event) => {
       console.error('Chat socket closed unexpectedly');
     };
   };

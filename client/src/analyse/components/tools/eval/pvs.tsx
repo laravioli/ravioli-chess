@@ -1,18 +1,20 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { useLocalStorage, usePageStore } from 'src/main/hooks/hooks';
 import { Position, setupPosition } from 'chessops/variant';
 import { lichessRules } from 'chessops/compat';
 import { makeSanAndPlay } from 'chessops/san';
 import { parseUci } from 'chessops/util';
 import { parseFen } from 'chessops/fen';
-import { getEval } from 'src/lib/eval/utils';
 import { Text, Divider } from '@mantine/core';
-import type { AnalyseStore } from 'src/analyse/store/analyse';
-import type { LocalEval, PvData, Uci } from 'src/lib/eval/interface';
-import classes from '../../../css/eval.module.css';
 
-export const Pvs = observer(() => {
+import { useLocalStorage, usePageStore } from '@/core/hooks/hooks';
+import { getEval } from '@/lib/eval/utils';
+
+import type { AnalyseStore } from '@/analyse/store/analyse';
+import type { LocalEval, PvData, Uci } from '@/lib/eval/interface';
+import classes from '@/analyse/css/eval.module.css';
+
+export const Pvs: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
   const multipv = useLocalStorage().evalStorage.multipv;
   return (
@@ -66,7 +68,10 @@ function renderPvs(evaluation: LocalEval | undefined, multipv: number) {
     <>
       {pvs.map((pv, index) => (
         <React.Fragment key={index}>
-          <Text classNames={{ root: classes.pvs }} lineClamp={1}>
+          <Text
+            classNames={{ root: classes.pvs }}
+            lineClamp={1}
+          >
             {multipv > 1 && (
               <span style={{ opacity: 0.6, marginRight: 6 }}>{pv.eval && getEval(pv.eval)}</span>
             )}

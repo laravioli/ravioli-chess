@@ -1,7 +1,9 @@
+import { action, runInAction } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
-import { action, runInAction } from 'mobx';
-import type { GlobalStore } from 'src/main/store/stores';
+
+import type { GlobalStore } from '@/core/store/stores';
+
 import type { PlayOpts } from './interface';
 
 export class PlayStore {

@@ -1,8 +1,10 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
-type MenuViewFC = React.FC<{
+export type MenuViewFC = React.FC<{
   navigate: Dispatch<SetStateAction<MenuViewKey>>;
-}>;
+}> & {
+  subMenus?: Record<string, MenuViewFC>;
+};
 
 type MenuViewKey = string;
 

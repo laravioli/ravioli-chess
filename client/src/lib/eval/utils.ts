@@ -18,7 +18,11 @@ export const sharedWasmMemory = (lo: number, hi = 32767) => {
   let shrink = 4; // 32767 -> 24576 -> 16384 -> 12288 -> 8192 -> 6144 -> etc
   while (true) {
     try {
-      return new WebAssembly.Memory({ shared: true, initial: lo, maximum: hi });
+      return new WebAssembly.Memory({
+        shared: true,
+        initial: lo,
+        maximum: hi,
+      });
     } catch (e) {
       if (hi <= lo || !(e instanceof RangeError)) throw e;
       hi = Math.max(lo, Math.ceil(hi - hi / shrink));
@@ -78,9 +82,9 @@ export const browserSupport = memoize(() => {
     features.push('wasm');
     // i32x4.dot_i16x8_s, i32x4.trunc_sat_f64x2_u_zero
     const sourceWithSimd = Uint8Array.from([
-      0, 97, 115, 109, 1, 0, 0, 0, 1, 12, 2, 96, 2, 123, 123, 1, 123, 96, 1, 123, 1, 123, 3, 3, 2, 0, 1, 7, 9,
-      2, 1, 97, 0, 0, 1, 98, 0, 1, 10, 19, 2, 9, 0, 32, 0, 32, 1, 253, 186, 1, 11, 7, 0, 32, 0, 253, 253, 1,
-      11,
+      0, 97, 115, 109, 1, 0, 0, 0, 1, 12, 2, 96, 2, 123, 123, 1, 123, 96, 1, 123, 1, 123, 3, 3, 2,
+      0, 1, 7, 9, 2, 1, 97, 0, 0, 1, 98, 0, 1, 10, 19, 2, 9, 0, 32, 0, 32, 1, 253, 186, 1, 11, 7, 0,
+      32, 0, 253, 253, 1, 11,
     ]);
     if (WebAssembly.validate(sourceWithSimd)) features.push('simd');
     if (sharedMemoryTest()) features.push('sharedMem');

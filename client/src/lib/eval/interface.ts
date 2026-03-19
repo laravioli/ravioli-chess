@@ -10,7 +10,11 @@ export type Feature =
 
 export type WinningChances = number;
 export type SearchBy = { movetime: number } | { depth: number } | { nodes: number };
-export type Search = { by: SearchBy; multiPv: number; indeterminate?: boolean };
+export type Search = {
+  by: SearchBy;
+  multiPv: number;
+  indeterminate?: boolean;
+};
 
 export interface Work {
   threads: number;

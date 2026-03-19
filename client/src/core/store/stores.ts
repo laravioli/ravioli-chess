@@ -1,10 +1,11 @@
-import { Ceval } from 'src/lib/eval/ceval';
-import { UserStore } from 'src/user/store/userstore';
-import { AnalyseStore } from 'src/analyse/store/analyse';
-import { EditorStore } from 'src/editor/store/editor';
-import { PlayStore } from 'src/play/store/play';
-import type { LocalEvalStorage } from 'src/lib/eval/localstorage';
-import type { ServerConfig } from '../boot/interface';
+import { UserStore } from '@/user/store/userstore';
+import { AnalyseStore } from '@/analyse/store/analyse';
+import { EditorStore } from '@/editor/store/editor';
+import { PlayStore } from '@/play/store/play';
+import { Ceval } from '@/lib/eval/ceval';
+import type { LocalEvalStorage } from '@/lib/eval/localstorage';
+
+import type { ServerConfig } from '@/core/boot/interface';
 
 /* Global Store */
 

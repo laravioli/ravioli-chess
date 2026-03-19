@@ -1,14 +1,15 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
-import { makeEngine, maxThreads, engineSupported, StockfishWebEngine } from './engine';
-import { CevalState, povChances } from './utils';
-import { type Toggle, toggle, throttle, clamp } from '../common';
-import { parseFen } from 'chessops/fen';
 import { observable, action, runInAction } from 'mobx';
 import { defaultPosition, setupPosition } from 'chessops/variant';
+import { parseFen } from 'chessops/fen';
 import { Result } from '@badrap/result';
+
+import type { Path } from '@/lib/tree/interface';
+import { type Toggle, toggle, throttle, clamp } from '@/lib/common';
 import type { LocalEvalStorage } from './localstorage';
+import { makeEngine, maxThreads, engineSupported, StockfishWebEngine } from './engine';
+import { CevalState, povChances } from './utils';
 import type { CevalOpts, LocalEval, PvData, Search, Started, Step, Work } from './interface';
-import type { Path } from '../tree/interface';
 
 const cevalDisabledSentinel = '1';
 
@@ -42,7 +43,7 @@ export class Ceval {
   init(opts: CevalOpts) {
     this.opts = opts;
     const pos = this.opts.initialFen
-      ? parseFen(this.opts.initialFen).chain(setup => setupPosition('chess', setup))
+      ? parseFen(this.opts.initialFen).chain((setup) => setupPosition('chess', setup))
       : Result.ok(defaultPosition('chess'));
     this.analysable = pos.isOk;
     this.allowed = toggle(this.opts.allowed);

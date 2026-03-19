@@ -1,6 +1,7 @@
-import { useToolTipConfig } from './tooltip';
-import { ActionIcon, Tooltip } from '@mantine/core';
 import type { MouseEventHandler, ReactNode } from 'react';
+import { ActionIcon, Tooltip } from '@mantine/core';
+
+import { useToolTipConfig } from './tooltip';
 
 interface ActionsWithToolTipProps {
   children: ReactNode;
@@ -10,15 +11,15 @@ interface ActionsWithToolTipProps {
   disabled?: boolean;
 }
 
-export const ActionWithToolTip = ({
+export const ActionWithToolTip: React.FC<ActionsWithToolTipProps> = ({
   children,
   className,
   label,
   onClick,
   disabled = false,
-}: ActionsWithToolTipProps) => {
+}) => {
   const handler: MouseEventHandler<HTMLButtonElement> = disabled
-    ? event => {
+    ? (event) => {
         event.preventDefault();
       }
     : onClick;
@@ -26,8 +27,15 @@ export const ActionWithToolTip = ({
   const tooltipProps = useToolTipConfig();
 
   return (
-    <Tooltip label={label} {...tooltipProps}>
-      <ActionIcon classNames={{ root: className }} data-disabled={disabled} onClick={handler}>
+    <Tooltip
+      label={label}
+      {...tooltipProps}
+    >
+      <ActionIcon
+        classNames={{ root: className }}
+        data-disabled={disabled}
+        onClick={handler}
+      >
         {children}
       </ActionIcon>
     </Tooltip>

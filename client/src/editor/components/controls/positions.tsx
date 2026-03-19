@@ -1,31 +1,33 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useHTMLData, usePageStore } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
 import { autorun } from 'mobx';
+import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
-import { short_fen } from './utils';
-import classes from '../../css/controls.module.css';
-import type { EditorStore } from 'src/editor/store/editor';
 
-export const Positions = observer(() => {
+import { useHTMLData, usePageStore } from '@/core/hooks/hooks';
+
+import classes from '@/editor/css/controls.module.css';
+import type { EditorStore } from '@/editor/store/editor';
+import { short_fen } from './utils';
+
+export const Positions: React.FC = observer(() => {
   const editorStore = usePageStore<EditorStore>();
   const { positions } = useHTMLData();
 
   const data = useMemo(
     () => [
       { label: 'select position', value: '' },
-      ...positions.map(obj => ({
+      ...positions.map((obj) => ({
         label: [obj.eco, obj.name].join(' '),
         value: obj.fen,
       })),
     ],
     [positions],
   );
-  const fens = useMemo(() => data.map(obj => short_fen(obj.value)), [data]);
+  const fens = useMemo(() => data.map((obj) => short_fen(obj.value)), [data]);
 
   const matcher = useCallback(
     (fen: FEN) => {
-      const match = fens.findIndex(pos => pos === short_fen(fen));
+      const match = fens.findIndex((pos) => pos === short_fen(fen));
       if (match > 0) {
         return data[match].value;
       } else {
@@ -43,7 +45,7 @@ export const Positions = observer(() => {
     });
   }, []);
 
-  const onChange = event => {
+  const onChange = (event) => {
     const fen = event.currentTarget.value;
     if (fen) {
       editorStore.setFen(fen);
@@ -53,6 +55,11 @@ export const Positions = observer(() => {
   };
 
   return (
-    <NativeSelect value={value} onChange={onChange} data={data} classNames={{ input: classes.select }} />
+    <NativeSelect
+      value={value}
+      onChange={onChange}
+      data={data}
+      classNames={{ input: classes.select }}
+    />
   );
 });

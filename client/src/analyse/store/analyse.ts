@@ -2,15 +2,17 @@
 import { observable, action, runInAction, computed } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
-import { TreePath, TreeOps, Tree } from 'src/lib/tree/tree';
-import { throttle } from 'src/lib/common';
-import { isEvalBetter } from 'src/lib/eval/utils';
-import { makeObservableNode, makeRoot, makeNode } from './node';
 import { uciToMove, opposite } from '@lichess-org/chessground/util';
+
+import { TreePath, TreeOps, Tree } from '@/lib/tree/tree';
+import { throttle } from '@/lib/common';
+import { isEvalBetter } from '@/lib/eval/utils';
+import type { Ceval } from '@/lib/eval/ceval';
+import type { CevalOpts, ClientEval } from '@/lib/eval/interface';
+import type { Node, Path } from '@/lib/tree/interface';
+
+import { makeObservableNode, makeRoot, makeNode } from './node';
 import { makeShapes } from './autoshape';
-import type { Ceval } from 'src/lib/eval/ceval';
-import type { CevalOpts, ClientEval } from 'src/lib/eval/interface';
-import type { Node, Path } from 'src/lib/tree/interface';
 import type { AnalyseOpts, JustCaptured } from './interface';
 
 export class AnalyseStore {
@@ -115,7 +117,7 @@ export class AnalyseStore {
 
   @action
   onNewCeval(ev: ClientEval, path: Path) {
-    this.tree.updateAt(path, node => {
+    this.tree.updateAt(path, (node) => {
       if (ev.fen !== node.fen) return;
       if (!node.ceval || isEvalBetter(ev, node.ceval)) {
         node.ceval = ev;
@@ -150,7 +152,7 @@ export class AnalyseStore {
   @action
   clearEvals() {
     this.ceval?.stop();
-    TreeOps.updateAll(this.tree.root, node => {
+    TreeOps.updateAll(this.tree.root, (node) => {
       node.ceval = undefined;
     });
     this.startCeval();

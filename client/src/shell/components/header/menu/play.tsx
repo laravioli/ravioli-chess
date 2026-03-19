@@ -1,8 +1,10 @@
-import { modals } from '@mantine/modals';
-import { LobbySetup } from 'src/lib/lobby/components/setup';
 import { Menu } from '@mantine/core';
-import type { Opponent } from 'src/lib/lobby/interface';
-import classes from '../../../css/header.module.css';
+import { modals } from '@mantine/modals';
+
+import { LobbySetup } from '@/lib/lobby/components/setup';
+import type { Opponent } from '@/lib/lobby/interface';
+
+import classes from '@/shell/css/header.module.css';
 
 interface MenuPlayData {
   label?: string;
@@ -11,12 +13,20 @@ interface MenuPlayData {
 }
 
 const items: MenuPlayData[] = [
-  { label: 'vs a player', title: 'Create a lobby', opponent: 'random player' },
+  {
+    label: 'vs a player',
+    title: 'Create a lobby',
+    opponent: 'random player',
+  },
   { label: 'with a friend', title: 'Create a lobby', opponent: 'friend' },
-  { label: 'against a computer', title: 'Create a lobby', opponent: 'computer' },
+  {
+    label: 'against a computer',
+    title: 'Create a lobby',
+    opponent: 'computer',
+  },
 ];
 
-export const PlayMenu = () => {
+export const PlayMenu: React.FC = () => {
   return (
     <>
       <Menu
@@ -28,12 +38,15 @@ export const PlayMenu = () => {
         withArrow
       >
         <Menu.Target>
-          <div className={classes.link} onClick={event => event.preventDefault()}>
+          <div
+            className={classes.link}
+            onClick={(event) => event.preventDefault()}
+          >
             Play
           </div>
         </Menu.Target>
         <Menu.Dropdown>
-          {items.map(item => (
+          {items.map((item) => (
             <Menu.Item
               key={item.label}
               onClick={() => {

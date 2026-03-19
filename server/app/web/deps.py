@@ -21,7 +21,7 @@ async def user_or_anon(request: Request, auth_user: UserWithPrefOrAnon):
 
 
 async def get_web_cache_service(redis: RedisClient):
-    return CacheService(redis, namespace="web", version="v1", default_ttl=60)
+    return CacheService(redis, namespace="web", version="v1", default_ttl=900)
 
 
 type WebCache = Annotated[CacheService, Depends(get_web_cache_service)]

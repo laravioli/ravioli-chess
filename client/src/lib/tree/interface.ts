@@ -1,5 +1,6 @@
 import type { SquareName } from 'chessops';
-import type { Ply, Uci, ClientEval } from '../eval/interface';
+
+import type { Ply, Uci, ClientEval } from '@/lib/eval/interface';
 export type Path = string;
 
 type Dests = Map<SquareName, SquareName[]>;

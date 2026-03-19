@@ -1,8 +1,9 @@
 import { action, runInAction, computed, observable } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import { opposite } from '@lichess-org/chessground/util';
-import { Fen } from './fen';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
+
+import { Fen } from './fen';
 import type { EditorOpts } from './interface';
 
 export class EditorStore {

@@ -1,12 +1,14 @@
-import { PageStoreProvider } from 'src/main/context/provider';
-import { Board } from 'src/common/components/board';
-import { Tools } from './tools/tools';
 import clsx from 'clsx';
-import layout from '../css/layout.module.css';
-import variables from '../css/variables.module.css';
-import { useInitStore } from '../store/init';
 
-const Play = () => {
+import { PageStoreProvider } from '@/core/context/provider';
+import { Board } from '@/common/components/board';
+
+import layout from '@/play/css/layout.module.css';
+import variables from '@/play/css/variables.module.css';
+import { useInitStore } from '@/play/store/init';
+import { Tools } from './tools/tools';
+
+const Play: React.FC = () => {
   const makeStore = useInitStore();
   return (
     <PageStoreProvider factory={makeStore}>

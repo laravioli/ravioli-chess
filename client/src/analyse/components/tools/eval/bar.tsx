@@ -1,17 +1,19 @@
-import { usePageStore } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
-import { povChances } from 'src/lib/eval/utils';
-import classes from '../../../css/eval.module.css';
-import type { AnalyseStore } from 'src/analyse/store/analyse';
-import { useMediaQuery } from '@mantine/hooks';
 import { useRef } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useMediaQuery } from '@mantine/hooks';
 
-export const MaybeEvalBar = () => {
+import { usePageStore } from '@/core/hooks/hooks';
+import { povChances } from '@/lib/eval/utils';
+
+import classes from '@/analyse/css/eval.module.css';
+import type { AnalyseStore } from '@/analyse/store/analyse';
+
+export const MaybeEvalBar: React.FC = () => {
   const isSmallScreen = useMediaQuery('(max-width: 765px)');
   return isSmallScreen ? null : <EvalBar />;
 };
 
-const EvalBar = observer(() => {
+const EvalBar: React.FC = observer(() => {
   const store = usePageStore<AnalyseStore>();
   const progress = useRef(0);
   const ev = store.node.ceval;

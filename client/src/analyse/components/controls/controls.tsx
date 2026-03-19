@@ -1,10 +1,12 @@
-import { History } from 'src/common/components/controls/history';
-import { ControlsMenu } from './menu';
 import clsx from 'clsx';
-import layout from '../../css/layout.module.css';
-import classes from '../../css/controls.module.css';
 
-export const Controls = () => {
+import { History } from '@/common/components/controls/history';
+
+import layout from '@/analyse/css/layout.module.css';
+import classes from '@/analyse/css/controls.module.css';
+import { ControlsMenu } from './menu';
+
+export const Controls: React.FC = () => {
   return (
     <div className={clsx(layout.controls, classes.controls)}>
       <History className={classes.button} />

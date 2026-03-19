@@ -1,10 +1,12 @@
 import { observer } from 'mobx-react-lite';
-import { usePageStore } from 'src/main/hooks/hooks';
 import { TextInput } from '@mantine/core';
-import classes from 'src/common/css/fen.module.css';
-import type { AnalyseStore } from 'src/analyse/store/analyse';
 
-export const FenInput = observer(() => {
+import { usePageStore } from '@/core/hooks/hooks';
+import classes from '@/common/css/fen.module.css';
+
+import type { AnalyseStore } from '@/analyse/store/analyse';
+
+export const FenInput: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
 
   return (

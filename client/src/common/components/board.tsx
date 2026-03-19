@@ -1,8 +1,10 @@
-import { useRef, useEffect } from 'react';
-import { usePageStore } from 'src/main/hooks/hooks';
-import classes from '../css/board.module.css';
+import React, { useRef, useEffect } from 'react';
 
-export function Board() {
+import { usePageStore } from '@/core/hooks/hooks';
+
+import classes from '@/common/css/board.module.css';
+
+export const Board: React.FC = () => {
   const divRef = useRef<HTMLDivElement | null>(null);
   const pageStore = usePageStore();
 
@@ -15,7 +17,10 @@ export function Board() {
 
   return (
     <div className={classes.boardWrap}>
-      <div className={classes.board} ref={divRef} />
+      <div
+        className={classes.board}
+        ref={divRef}
+      />
     </div>
   );
-}
+};

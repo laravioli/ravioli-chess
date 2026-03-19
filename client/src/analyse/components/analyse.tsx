@@ -1,15 +1,17 @@
-import { useInitStore } from '../store/init';
-import { PageStoreProvider } from 'src/main/context/provider';
-import { MaybeEvalBar } from './tools/eval/bar';
-import { Board } from 'src/common/components/board';
-import { FenInput } from './underboard/feninput';
-import { Tools } from './tools/tools';
-import { Controls } from './controls/controls';
 import clsx from 'clsx';
-import layout from '../css/layout.module.css';
-import variables from '../css/variables.module.css';
 
-const Analyse = () => {
+import { PageStoreProvider } from '@/core/context/provider';
+import { Board } from '@/common/components/board';
+
+import { useInitStore } from '@/analyse/store/init';
+import layout from '@/analyse/css/layout.module.css';
+import variables from '@/analyse/css/variables.module.css';
+import { Controls } from './controls/controls';
+import { Tools } from './tools/tools';
+import { MaybeEvalBar } from './tools/eval/bar';
+import { FenInput } from './underboard/feninput';
+
+const Analyse: React.FC = () => {
   const makeStore = useInitStore();
   return (
     <PageStoreProvider factory={makeStore}>

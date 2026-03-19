@@ -1,14 +1,16 @@
 import { useEffect, useCallback } from 'react';
-import { usePageStore, useLocalStorage } from 'src/main/hooks/hooks';
-import { observer } from 'mobx-react-lite';
 import { reaction } from 'mobx';
-import { getEval } from 'src/lib/eval/utils';
+import { observer } from 'mobx-react-lite';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
-import classes from '../../../css/eval.module.css';
-import type { AnalyseStore } from 'src/analyse/store/analyse';
 
-export const EvalToggle = observer(() => {
+import { usePageStore, useLocalStorage } from '@/core/hooks/hooks';
+import { getEval } from '@/lib/eval/utils';
+
+import classes from '@/analyse/css/eval.module.css';
+import type { AnalyseStore } from '@/analyse/store/analyse';
+
+export const EvalToggle: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
   const { evalStorage } = useLocalStorage();
 
@@ -35,16 +37,24 @@ export const EvalToggle = observer(() => {
       size="md"
       thumbIcon={
         analyseStore.ceval.enabled ? (
-          <IconCheck size={12} color="var(--mantine-color-teal-6)" stroke={3} />
+          <IconCheck
+            size={12}
+            color="var(--mantine-color-teal-6)"
+            stroke={3}
+          />
         ) : (
-          <IconX size={12} color="var(--mantine-color-red-6)" stroke={3} />
+          <IconX
+            size={12}
+            color="var(--mantine-color-red-6)"
+            stroke={3}
+          />
         )
       }
     />
   );
 });
 
-export const EvalScore = observer(() => {
+export const EvalScore: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
 
   const evaluation = analyseStore.node.ceval;

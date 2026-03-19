@@ -1,14 +1,16 @@
 //https://github.com/lichess-org/lila/blob/master/ui/analyse/src/treeView/columnView.ts
 import React, { useMemo, type MouseEvent, type MouseEventHandler } from 'react';
 import { observer } from 'mobx-react-lite';
-import { usePageStore } from 'src/main/hooks/hooks';
-import { defined } from 'src/lib/common';
-import { getEval } from 'src/lib/eval/utils';
 import clsx from 'clsx';
-import classes from '../../css/tree.module.css';
-import type { AnalyseStore } from 'src/analyse/store/analyse';
-import type { Node, Path } from 'src/lib/tree/interface';
-import type { Ply } from 'src/lib/eval/interface';
+
+import { usePageStore } from '@/core/hooks/hooks';
+import { defined } from '@/lib/common';
+import { getEval } from '@/lib/eval/utils';
+
+import classes from '@/analyse/css/tree.module.css';
+import type { AnalyseStore } from '@/analyse/store/analyse';
+import type { Node, Path } from '@/lib/tree/interface';
+import type { Ply } from '@/lib/eval/interface';
 
 interface Handlers {
   click: MouseEventHandler<HTMLDivElement>;
@@ -20,11 +22,11 @@ interface TreeOpts {
   withIndex?: boolean;
 }
 
-export const TView = observer(() => {
+export const TView: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
   const handlers: Handlers = useMemo(
     () => ({
-      click: e => {
+      click: (e) => {
         const path = eventPath(e);
         if (path) {
           analyseStore.jump(path);
@@ -41,7 +43,10 @@ function renderTree(ctrl: AnalyseStore, handlers: Handlers) {
   const root = ctrl.tree.root;
   const blackStarts = (root.ply & 1) === 1;
   return (
-    <div className={classes.tree} onClick={handlers['click']}>
+    <div
+      className={classes.tree}
+      onClick={handlers['click']}
+    >
       {blackStarts && renderIndex(root.ply, false)}
       {blackStarts && emptyMove()}
       {renderChildrenOf(ctrl, root, {
@@ -103,7 +108,7 @@ function renderChildrenOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
 function renderLines(ctrl: AnalyseStore, nodes: Node[], opts: TreeOpts) {
   return (
     <div className={clsx(classes.lines, !nodes[1] && classes.single)}>
-      {nodes.map(n => (
+      {nodes.map((n) => (
         <React.Fragment key={n.id}>
           <div className={classes.line}>
             <div className={classes.branch} />
@@ -144,13 +149,18 @@ function renderMove(node: Node) {
 }
 
 function renderMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
-  return opts.isMainline ? renderMainlineMoveOf(ctrl, node, opts) : renderVariationMoveOf(ctrl, node, opts);
+  return opts.isMainline
+    ? renderMainlineMoveOf(ctrl, node, opts)
+    : renderVariationMoveOf(ctrl, node, opts);
 }
 
 function renderMainlineMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
   const path = opts.parentPath + node.id;
   return (
-    <div className={moveClasses(path, ctrl.path)} data-p={path}>
+    <div
+      className={moveClasses(path, ctrl.path)}
+      data-p={path}
+    >
       {renderMove(node)}
     </div>
   );
@@ -161,7 +171,10 @@ function renderVariationMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
     path = opts.parentPath + node.id;
 
   return (
-    <div className={moveClasses(path, ctrl.path)} data-p={path}>
+    <div
+      className={moveClasses(path, ctrl.path)}
+      data-p={path}
+    >
       {withIndex && renderIndex(node.ply, true)}
       {node.san}
     </div>

@@ -1,5 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import { makePersistable } from 'mobx-persist-store';
+
 import type { TimeMode, LobbySide } from './interface';
 
 export class LocalLobbyStorage {

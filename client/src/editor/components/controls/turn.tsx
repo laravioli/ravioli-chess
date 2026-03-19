@@ -1,10 +1,12 @@
-import { usePageStore } from 'src/main/hooks/hooks';
 import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
-import classes from '../../css/controls.module.css';
-import type { EditorStore } from 'src/editor/store/editor';
 
-export const TurnToPlay = observer(() => {
+import { usePageStore } from '@/core/hooks/hooks';
+
+import type { EditorStore } from '@/editor/store/editor';
+import classes from '@/editor/css/controls.module.css';
+
+export const TurnToPlay: React.FC = observer(() => {
   const editorStore = usePageStore<EditorStore>();
 
   const data = [
@@ -15,7 +17,7 @@ export const TurnToPlay = observer(() => {
   return (
     <NativeSelect
       value={editorStore.fen.turn}
-      onChange={event => {
+      onChange={(event) => {
         editorStore.fen.setTurn(event.target.value as Color);
       }}
       data={data}

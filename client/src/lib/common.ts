@@ -16,7 +16,10 @@ export const prop = <A>(initialValue: A): Prop<A> => {
   };
 };
 
-export const propWithEffect = <A>(initialValue: A, effect: (value: A) => void): PropWithEffect<A> => {
+export const propWithEffect = <A>(
+  initialValue: A,
+  effect: (value: A) => void,
+): PropWithEffect<A> => {
   let value = initialValue;
   return (v?: A) => {
     if (defined(v)) {
@@ -32,7 +35,10 @@ export interface Toggle extends PropWithEffect<boolean> {
   effect(value: boolean): void;
 }
 
-export const toggle = (initialValue: boolean, effect: (value: boolean) => void = () => {}): Toggle => {
+export const toggle = (
+  initialValue: boolean,
+  effect: (value: boolean) => void = () => {},
+): Toggle => {
   const prop = propWithEffect<boolean>(initialValue, effect) as Toggle;
   prop.toggle = () => prop(!prop());
   prop.effect = effect;
@@ -53,7 +59,7 @@ export function throttle<T extends (...args: any) => void>(
 ): (...args: Parameters<T>) => void {
   return throttlePromise(function (this: any, ...args: Parameters<T>) {
     wrapped.apply(this, args);
-    return new Promise(resolve => setTimeout(resolve, delay));
+    return new Promise((resolve) => setTimeout(resolve, delay));
   });
 }
 
@@ -94,11 +100,11 @@ function throttlePromiseWithResult<R, T extends (...args: any) => Promise<R>>(
       pending = {
         run: () =>
           runCurrent().then(
-            res => {
+            (res) => {
               resolve(res);
               return res;
             },
-            err => {
+            (err) => {
               reject(err);
               throw err;
             },

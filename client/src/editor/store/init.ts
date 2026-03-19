@@ -1,6 +1,7 @@
-import { usePageInitCfg } from 'src/main/hooks/hooks';
+import { usePageInitCfg } from '@/core/hooks/hooks';
+import type { EditorConfig } from '@/core/boot/interface';
+
 import { EditorStore } from './editor';
-import type { EditorConfig } from 'src/main/boot/interface';
 
 export function useInitStore(): () => EditorStore {
   const cfg = usePageInitCfg() as EditorConfig;

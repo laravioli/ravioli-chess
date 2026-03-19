@@ -1,6 +1,7 @@
-import { LocalEvalStorage } from 'src/lib/eval/localstorage';
-import { LocalLobbyStorage } from 'src/lib/lobby/localstorage';
 import { hydrateStore } from 'mobx-persist-store';
+
+import { LocalEvalStorage } from '@/lib/eval/localstorage';
+import { LocalLobbyStorage } from '@/lib/lobby/localstorage';
 
 export interface LocalStorage {
   evalStorage: LocalEvalStorage;

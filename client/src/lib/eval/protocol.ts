@@ -90,7 +90,8 @@ export class Protocol {
           case 'score':
             isMate = parts[++i] === 'mate';
             povEv = parseInt(parts[++i]);
-            if (parts[i + 1] === 'lowerbound' || parts[i + 1] === 'upperbound') evalType = parts[++i];
+            if (parts[i + 1] === 'lowerbound' || parts[i + 1] === 'upperbound')
+              evalType = parts[++i];
             break;
           case 'pv':
             moves = parts.slice(++i);
@@ -105,7 +106,13 @@ export class Protocol {
       // Track max pv index to determine when pv prints are done.
       if (this.expectedPvs < multiPv) this.expectedPvs = multiPv;
 
-      if (nodes === undefined || millis === undefined || isMate === undefined || povEv === undefined) return;
+      if (
+        nodes === undefined ||
+        millis === undefined ||
+        isMate === undefined ||
+        povEv === undefined
+      )
+        return;
 
       const ev = this.work.ply % 2 === 1 ? -povEv : povEv;
 

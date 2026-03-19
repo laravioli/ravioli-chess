@@ -1,7 +1,8 @@
 import { createContext } from 'react';
-import type { GlobalStore, PageStore } from '../store/stores';
-import type { LocalStorage } from '../store/localstorage';
-import type { ProvidedData } from '../boot/interface';
+
+import type { GlobalStore, PageStore } from '@/core/store/stores';
+import type { LocalStorage } from '@/core/store/localstorage';
+import type { ProvidedData } from '@/core/boot/interface';
 
 export const GlobalStoreContext = createContext<GlobalStore | null>(null);
 export const PageStoreContext = createContext<PageStore | null>(null);

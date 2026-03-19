@@ -1,8 +1,9 @@
 import { useRef, useEffect, type ReactNode } from 'react';
+
+import type { GlobalStore, PageStore } from '@/core/store/stores';
+import type { LocalStorage } from '@/core/store/localstorage';
+import type { ProvidedData } from '@/core/boot/interface';
 import { GlobalStoreContext, PageStoreContext, LocalStorageContext, DataContext } from './context';
-import type { GlobalStore, PageStore } from '../store/stores';
-import type { LocalStorage } from '../store/localstorage';
-import type { ProvidedData } from '../boot/interface';
 
 export const LocalStorageProvider = ({
   children,
@@ -17,7 +18,9 @@ export const LocalStorageProvider = ({
     storeRef.current = localStorage;
   }
 
-  return <LocalStorageContext.Provider value={storeRef.current}>{children}</LocalStorageContext.Provider>;
+  return (
+    <LocalStorageContext.Provider value={storeRef.current}>{children}</LocalStorageContext.Provider>
+  );
 };
 
 export const GlobalStoreProvider = ({
@@ -33,7 +36,9 @@ export const GlobalStoreProvider = ({
     storeRef.current = globalStore;
   }
 
-  return <GlobalStoreContext.Provider value={storeRef.current}>{children}</GlobalStoreContext.Provider>;
+  return (
+    <GlobalStoreContext.Provider value={storeRef.current}>{children}</GlobalStoreContext.Provider>
+  );
 };
 
 type PageStoreProviderProps<T extends PageStore> = {
@@ -41,7 +46,10 @@ type PageStoreProviderProps<T extends PageStore> = {
   factory: () => T;
 };
 
-export const PageStoreProvider = <T extends PageStore>({ children, factory }: PageStoreProviderProps<T>) => {
+export const PageStoreProvider = <T extends PageStore>({
+  children,
+  factory,
+}: PageStoreProviderProps<T>) => {
   const storeRef = useRef<T | null>(null);
 
   if (!storeRef.current) {
@@ -57,7 +65,13 @@ export const PageStoreProvider = <T extends PageStore>({ children, factory }: Pa
   return <PageStoreContext.Provider value={storeRef.current}>{children}</PageStoreContext.Provider>;
 };
 
-export const DataProvider = ({ children, data }: { children: React.ReactNode; data: ProvidedData }) => {
+export const DataProvider = ({
+  children,
+  data,
+}: {
+  children: React.ReactNode;
+  data: ProvidedData;
+}) => {
   const dataRef = useRef<ProvidedData | null>(null);
 
   if (!dataRef.current) {

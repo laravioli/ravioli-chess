@@ -1,10 +1,12 @@
-import { ModalsProvider } from '@mantine/modals';
-import { modals } from 'src/common/components/modals';
-import { AppShell } from '@mantine/core';
-import { Header } from './header/header';
 import { Outlet } from 'react-router';
+import { ModalsProvider } from '@mantine/modals';
+import { AppShell } from '@mantine/core';
 
-export const Shell = () => {
+import { modals } from '@/common/components/modals';
+
+import { Header } from './header/header';
+
+export const Shell: React.FC = () => {
   return (
     <ModalsProvider modals={modals}>
       <AppShell

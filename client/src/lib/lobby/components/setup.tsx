@@ -1,9 +1,11 @@
-import { observer } from 'mobx-react-lite';
-import { useLocalStorage } from 'src/main/hooks/hooks';
 import { useCallback, useMemo, memo } from 'react';
+import { observer } from 'mobx-react-lite';
 import { Group, NativeSelect, Slider, Text, ActionIcon } from '@mantine/core';
-import type { Opponent, TimeMode, LobbySide } from 'src/lib/lobby/interface';
-import classes from '../css/lobby.module.css';
+
+import { useLocalStorage } from '@/core/hooks/hooks';
+
+import type { Opponent, TimeMode, LobbySide } from '@/lib/lobby/interface';
+import classes from '@/lib/lobby/css/lobby.module.css';
 
 export interface LobbySetupProps {
   opponent: Opponent;
@@ -40,7 +42,7 @@ const AiLevel = observer(() => {
       <Slider
         pb="1.5rem"
         value={(lobbyStorage.aiLevel - 1) * 14}
-        onChange={event => lobbyStorage.setAiLevel(event / 14 + 1)}
+        onChange={(event) => lobbyStorage.setAiLevel(event / 14 + 1)}
         step={Math.round(100 / 7)}
         label={null}
         marks={marks}
@@ -59,7 +61,7 @@ const TimeMode = observer(() => {
         { label: 'Real Time', value: 'realTime' },
         { label: 'Unlimited', value: 'unlimited' },
       ]}
-      onChange={event => lobbyStorage.setTimeMode(event.currentTarget.value as any)}
+      onChange={(event) => lobbyStorage.setTimeMode(event.currentTarget.value as any)}
     />
   );
 });
@@ -67,13 +69,13 @@ const TimeMode = observer(() => {
 const GameClock = observer(() => {
   const { lobbyStorage } = useLocalStorage();
 
-  const scale = useCallback(x => {
+  const scale = useCallback((x) => {
     if (x <= 20) return x;
     if (x <= 25) return 20 + (x - 20) * 5;
     return 45 + (x - 25) * 15;
   }, []);
 
-  const inverseScale = useCallback(y => {
+  const inverseScale = useCallback((y) => {
     if (y <= 20) return y;
     if (y <= 45) return (y + 80) / 5;
     return (y + 330) / 15;
@@ -89,7 +91,7 @@ const GameClock = observer(() => {
         min={1}
         max={34}
         label={null}
-        onChange={event => {
+        onChange={(event) => {
           lobbyStorage.setTime(scale(event));
         }}
         scale={scale}
@@ -102,7 +104,7 @@ const GameClock = observer(() => {
         value={inverseScale(lobbyStorage.increment)}
         min={0}
         max={34}
-        onChange={event => {
+        onChange={(event) => {
           lobbyStorage.setIncrement(scale(event));
         }}
         label={null}
@@ -135,7 +137,7 @@ const Side = observer(() => {
 
   return (
     <Group justify="center">
-      {sides.map(side => (
+      {sides.map((side) => (
         <ActionIcon
           key={side.key}
           classNames={{ root: classes.sideRoot }}
@@ -152,13 +154,36 @@ const Side = observer(() => {
 const IconChessKnightSharp = memo(({ side }: { side: LobbySide }) => {
   const fill = side === 'random' ? 'url(#sharpBlackWhite)' : side === 'white' ? '#FFFDE7' : 'black';
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 45 45">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="60"
+      height="60"
+      viewBox="0 0 45 45"
+    >
       <defs>
-        <linearGradient id="sharpBlackWhite" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#FFFDE7" />
-          <stop offset="50%" stopColor="#FFFDE7" />
-          <stop offset="50%" stopColor="black" />
-          <stop offset="100%" stopColor="black" />
+        <linearGradient
+          id="sharpBlackWhite"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="0%"
+        >
+          <stop
+            offset="0%"
+            stopColor="#FFFDE7"
+          />
+          <stop
+            offset="50%"
+            stopColor="#FFFDE7"
+          />
+          <stop
+            offset="50%"
+            stopColor="black"
+          />
+          <stop
+            offset="100%"
+            stopColor="black"
+          />
         </linearGradient>
       </defs>
       <path

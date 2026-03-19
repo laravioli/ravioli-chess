@@ -5,9 +5,10 @@ import {
   type MantineProviderProps,
 } from '@mantine/core';
 import { QueryClient } from '@tanstack/react-query';
-import type { ServerPayload, ProvidedData } from 'src/main/boot/interface';
-import { makeLocalStorage, type LocalStorage } from 'src/main/store/localstorage';
-import { makeGlobalStore, type GlobalStore } from 'src/main/store/stores';
+
+import type { ServerPayload, ProvidedData } from '@/core/boot/interface';
+import { makeLocalStorage, type LocalStorage } from '@/core/store/localstorage';
+import { makeGlobalStore, type GlobalStore } from '@/core/store/stores';
 
 /* App config */
 

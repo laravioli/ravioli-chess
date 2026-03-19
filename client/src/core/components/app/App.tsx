@@ -1,11 +1,12 @@
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { GlobalStoreProvider, LocalStorageProvider, DataProvider } from 'src/main/context/provider';
-import { Router } from 'src/main/components/routes/routes';
+
+import { GlobalStoreProvider, LocalStorageProvider, DataProvider } from '@/core/context/provider';
+import { Router } from '@/core/components/routes/routes';
 import type { AppDependencies } from './config';
 
-function App(dep: AppDependencies) {
+const App: React.FC<AppDependencies> = (dep) => {
   return (
     <MantineProvider {...dep.mantineConfig}>
       <Notifications />
@@ -20,6 +21,6 @@ function App(dep: AppDependencies) {
       </QueryClientProvider>
     </MantineProvider>
   );
-}
+};
 
 export default App;

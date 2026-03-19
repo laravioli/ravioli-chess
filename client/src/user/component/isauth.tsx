@@ -1,6 +1,7 @@
-import { observer } from 'mobx-react-lite';
-import { useGlobalStore } from 'src/main/hooks/hooks';
 import type { ReactNode } from 'react';
+import { observer } from 'mobx-react-lite';
+
+import { useGlobalStore } from '@/core/hooks/hooks';
 
 interface IsAuthProps {
   children: ReactNode | (() => ReactNode);
@@ -40,7 +41,7 @@ interface IsAuthProps {
  *   {() => <HeavyComponent />}
  * </IsAuth>
  */
-export const IsAuth = observer(({ children, showIf }: IsAuthProps) => {
+export const IsAuth: React.FC<IsAuthProps> = observer(({ children, showIf }) => {
   const { userStore } = useGlobalStore();
   const shouldRender = userStore.logged === showIf;
 

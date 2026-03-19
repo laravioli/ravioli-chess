@@ -1,9 +1,11 @@
-import { initSite } from 'src/lib/site/site';
-import { client } from 'src/lib/api/client.gen';
-import { makeAppDependencies } from '../components/app/config';
 import Cookies from 'js-cookie';
+
+import { initSite } from '@/lib/site/site';
+import { client } from '@/lib/api/client.gen';
+import { wsConnect } from '@/lib/socket/socket';
+
+import { makeAppDependencies } from '@/core/components/app/config';
 import type { ServerPayload } from './interface';
-import { wsConnect } from 'src/lib/socket/socket';
 
 export const boot = async () => {
   initSite();

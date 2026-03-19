@@ -1,19 +1,29 @@
 import { Link, type To } from 'react-router';
 import { Drawer, Divider, UnstyledButton, Stack, Group, Button } from '@mantine/core';
-import { PlayMenu } from './menu/play';
-import { LobbySetup } from 'src/lib/lobby/components/setup';
 import { INITIAL_FEN } from 'chessops/fen';
-import classes from '../../css/header.module.css';
-import type { Opponent } from 'src/lib/lobby/interface';
+
+import { LobbySetup } from '@/lib/lobby/components/setup';
+import type { Opponent } from '@/lib/lobby/interface';
+
+import classes from '@/shell//css/header.module.css';
+import { PlayMenu } from './menu/play';
 
 const defaultState = { fen: INITIAL_FEN, orientation: 'white' };
 
-export const Navigation = () => {
+export const Navigation: React.FC = () => {
   return (
     <>
       <PlayMenu />
-      <SimpleLink label="Analyse" to="/analysis" state={defaultState} />
-      <SimpleLink label="Edit" to="/editor" state={defaultState} />
+      <SimpleLink
+        label="Analyse"
+        to="/analysis"
+        state={defaultState}
+      />
+      <SimpleLink
+        label="Edit"
+        to="/editor"
+        state={defaultState}
+      />
     </>
   );
 };
@@ -25,7 +35,7 @@ interface SimpleLinkProps {
   onClick?: () => void;
 }
 
-const SimpleLink = ({ label, to, state, onClick }: SimpleLinkProps) => {
+const SimpleLink: React.FC<SimpleLinkProps> = ({ label, to, state, onClick }) => {
   return (
     <Link
       to={to}
@@ -61,27 +71,51 @@ interface LobbyDrawer {
 }
 
 const lobbies: LobbyDrawer[] = [
-  { key: 'play-random', opponent: 'random player', label: ' Play vs a player' },
+  {
+    key: 'play-random',
+    opponent: 'random player',
+    label: ' Play vs a player',
+  },
   { key: 'play-friend', opponent: 'friend', label: ' Play with a friend' },
   { key: 'play-ai', opponent: 'computer', label: 'Play against a computer' },
 ];
 
-export const NavDrawer = ({ stack }: NavDrawerProps) => {
+export const NavDrawer: React.FC<NavDrawerProps> = ({ stack }) => {
   return (
     <Drawer.Stack>
-      <Drawer {...stack.register('nav')} size="100%" padding="md" title="Navigation" hiddenFrom="sm">
+      <Drawer
+        {...stack.register('nav')}
+        size="100%"
+        padding="md"
+        title="Navigation"
+        hiddenFrom="sm"
+      >
         <Divider my="sm" />
-        {lobbies.map(lobby => (
-          <UnstyledButton key={lobby.key} className={classes.link} onClick={() => stack.open(lobby.key)}>
+        {lobbies.map((lobby) => (
+          <UnstyledButton
+            key={lobby.key}
+            className={classes.link}
+            onClick={() => stack.open(lobby.key)}
+          >
             {lobby.label}
           </UnstyledButton>
         ))}
 
-        <SimpleLink label="Analyse" to="/analysis" state={defaultState} onClick={stack.closeAll} />
-        <SimpleLink label="Edit" to="/editor" state={defaultState} onClick={stack.closeAll} />
+        <SimpleLink
+          label="Analyse"
+          to="/analysis"
+          state={defaultState}
+          onClick={stack.closeAll}
+        />
+        <SimpleLink
+          label="Edit"
+          to="/editor"
+          state={defaultState}
+          onClick={stack.closeAll}
+        />
       </Drawer>
 
-      {lobbies.map(lobby => (
+      {lobbies.map((lobby) => (
         <Drawer
           key={lobby.key}
           {...stack.register(lobby.key)}
@@ -93,8 +127,15 @@ export const NavDrawer = ({ stack }: NavDrawerProps) => {
         >
           <Stack>
             <LobbySetup opponent={lobby.opponent} />
-            <Group justify="center" pt={10}>
-              <Button component={Link} onClick={() => stack.closeAll()} to="/play">
+            <Group
+              justify="center"
+              pt={10}
+            >
+              <Button
+                component={Link}
+                onClick={() => stack.closeAll()}
+                to="/play"
+              >
                 Play
               </Button>
             </Group>

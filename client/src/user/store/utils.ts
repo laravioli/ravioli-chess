@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
-import type { Board, PieceSet, Preference } from 'src/lib/api';
+
+import type { Board, PieceSet, Preference } from '@/lib/api';
 
 const pieceVars = [
   ['---white-pawn', 'wP'],

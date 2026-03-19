@@ -1,7 +1,7 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/engines/stockfishWebEngine.ts
+import { clamp } from '@/lib/common';
 import { Protocol } from './protocol';
 import { CevalState, sharedWasmMemory, maxHash, browserSupport, fewerCores } from './utils';
-import { clamp } from '../common';
 import type { BrowserEngineInfo, EngineNotifier, StockfishWeb, Work } from './interface.js';
 
 export class StockfishWebEngine {
@@ -19,7 +19,7 @@ export class StockfishWebEngine {
       }
     };
     this.protocol = new Protocol();
-    this.boot().catch(e => {
+    this.boot().catch((e) => {
       this.failed = e;
       this.status?.({ error: String(e) });
     });
@@ -44,10 +44,12 @@ export class StockfishWebEngine {
           if (!nnueFilename || nnueFilenames.includes(nnueFilename)) break;
           nnueFilenames.push(nnueFilename);
         }
-      (await this.getModels(nnueFilenames)).forEach((nnueBuffer, i) => module.setNnueBuffer(nnueBuffer!, i));
+      (await this.getModels(nnueFilenames)).forEach((nnueBuffer, i) =>
+        module.setNnueBuffer(nnueBuffer!, i),
+      );
     }
-    module.listen = data => this.protocol.received(data);
-    this.protocol.connected(cmd => {
+    module.listen = (data) => this.protocol.received(data);
+    this.protocol.connected((cmd) => {
       //debug
       //console.log(`send : ${cmd}`);
       //
@@ -58,12 +60,12 @@ export class StockfishWebEngine {
 
   getModels(nnueFilenames: string[]): Promise<(Uint8Array | undefined)[]> {
     return Promise.all(
-      nnueFilenames.map(async nnueFilename => {
+      nnueFilenames.map(async (nnueFilename) => {
         const req = new XMLHttpRequest();
 
         req.open('get', `./static/nnue/${nnueFilename}`, true);
         req.responseType = 'arraybuffer';
-        req.onprogress = e => this.status?.({ download: { bytes: e.loaded, total: e.total } });
+        req.onprogress = (e) => this.status?.({ download: { bytes: e.loaded, total: e.total } });
 
         const nnueBuffer = await new Promise<Uint8Array>((resolve, reject) => {
           req.onerror = () => reject(new Error(`fetch '${nnueFilename}' failed: ${req.status}`));
@@ -130,7 +132,7 @@ export const makeEngine = () => {
   return new StockfishWebEngine(sf16);
 };
 
-export const engineSupported = () => sf16.requires.every(req => browserSupport().includes(req));
+export const engineSupported = () => sf16.requires.every((req) => browserSupport().includes(req));
 
 export const getRecommendedThreads = () => {
   return clamp(navigator.hardwareConcurrency - (navigator.hardwareConcurrency % 2 ? 0 : 1), {

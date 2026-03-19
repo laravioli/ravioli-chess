@@ -1,39 +1,51 @@
 import { useState } from 'react';
+import { ActionIcon, Autocomplete, Collapse, FocusTrap, Group } from '@mantine/core';
 import { useClickOutside, useDebouncedValue } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
-import { listUserOptions } from 'src/lib/api/@tanstack/react-query.gen';
-import { ActionIcon, Autocomplete, Collapse, FocusTrap, Group } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 
-export const SearchUsersWithCollapse = ({
-  opened,
-  close,
-  toggle,
-}: {
+import { listUserOptions } from '@/lib/api/@tanstack/react-query.gen';
+
+interface SearchUsersWithCollapseProps {
   opened: boolean;
   close: () => void;
   toggle: () => void;
+}
+export const SearchUsersWithCollapse: React.FC<SearchUsersWithCollapseProps> = ({
+  opened,
+  close,
+  toggle,
 }) => {
   const ref = useClickOutside(close);
   return (
-    <Group ref={ref} wrap="nowrap">
-      <ActionIcon onClick={toggle} h="100%" bg="inherit">
-        <IconSearch size={20} stroke={1.6} />
+    <Group
+      ref={ref}
+      wrap="nowrap"
+    >
+      <ActionIcon
+        onClick={toggle}
+        h="100%"
+        bg="inherit"
+      >
+        <IconSearch
+          size={20}
+          stroke={1.6}
+        />
       </ActionIcon>
       <Collapse in={opened}>{opened && <SearchUsers />}</Collapse>
     </Group>
   );
 };
 
-const SearchUsers = () => {
+const SearchUsers: React.FC = () => {
   const [value, setValue] = useState('');
   const [debounced] = useDebouncedValue(value, 200);
 
   const { data } = useQuery({
     ...listUserOptions({ query: { q: debounced } }),
     enabled: debounced.length >= 3,
-    select: data => data.map(r => r.username),
-    placeholderData: prev => prev,
+    select: (data) => data.map((r) => r.username),
+    placeholderData: (prev) => prev,
   });
 
   const userList = value.length > 2 ? data : [];

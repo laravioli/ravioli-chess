@@ -1,6 +1,7 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/tree/tree.ts
 
 import { observable } from 'mobx';
+
 import type { Path, TOps, TPath, Node, MaybeNode } from './interface';
 
 const head = (path: Path) => path.slice(0, 2);
@@ -11,14 +12,14 @@ export const TreePath: TPath = {
     return path.slice(0, -2);
   },
   fromNodeList(nodes) {
-    return nodes.map(n => n.id).join('');
+    return nodes.map((n) => n.id).join('');
   },
 };
 
 //ops
 
 function findChildById(node: Node, id: string): MaybeNode {
-  return node.children.find(n => n.id === id);
+  return node.children.find((n) => n.id === id);
 }
 
 function collect(from: Node, pickChild: (n: Node) => MaybeNode) {
@@ -45,7 +46,7 @@ export const TreeOps: TOps = {
     update(root);
   },
   mainlineNodeList(from) {
-    return collect(from, node => node.children[0]);
+    return collect(from, (node) => node.children[0]);
   },
 };
 //tree
@@ -82,6 +83,6 @@ export class Tree {
   addNode(node: Node, path: Path) {
     const newPath = path + node.id;
     if (this.findNode(newPath)) return newPath;
-    return this.updateAt(path, n => n.children.push(node)) ? newPath : undefined;
+    return this.updateAt(path, (n) => n.children.push(node)) ? newPath : undefined;
   }
 }

@@ -1,6 +1,7 @@
-import { useGlobalStore, usePageInitCfg } from 'src/main/hooks/hooks';
+import { useGlobalStore, usePageInitCfg } from '@/core/hooks/hooks';
+import type { PlayConfig } from '@/core/boot/interface';
+
 import { PlayStore } from './play';
-import type { PlayConfig } from 'src/main/boot/interface';
 
 export function useInitStore(): () => PlayStore {
   const globalStore = useGlobalStore();

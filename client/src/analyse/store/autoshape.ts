@@ -1,8 +1,9 @@
 // https://github.com/lichess-org/lila/blob/master/ui/analyse/src/autoShape.ts
 import { parseUci, makeSquare } from 'chessops/util';
 import { isDrop } from 'chessops/types';
-import type { AnalyseStore } from './analyse';
 import type { DrawShape } from '@lichess-org/chessground/draw';
+
+import type { AnalyseStore } from './analyse';
 
 function makeShapesFromUci(uci: string, brush: string) {
   const move = parseUci(uci)!;
@@ -22,7 +23,7 @@ export function makeShapes(ctrl: AnalyseStore) {
     const bestEval = ctrl.getBestEval(node);
     if (bestEval) shapes = shapes.concat(makeShapesFromUci(bestEval, 'paleBlue'));
     if (node.ceval && node.ceval.pvs[1]) {
-      node.ceval.pvs.forEach(pv => {
+      node.ceval.pvs.forEach((pv) => {
         if (pv.moves[0] == bestEval) return;
         shapes = shapes.concat(makeShapesFromUci(pv.moves[0], 'paleGrey'));
       });

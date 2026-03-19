@@ -1,5 +1,7 @@
 import { observable, action, runInAction } from 'mobx';
-import { siteSocket } from 'src/lib/socket/socket';
+
+import { siteSocket } from '@/lib/socket/socket';
+
 import type { UserOpts, Credential } from './interface';
 
 const ANON = 'Anonymous';
@@ -25,7 +27,7 @@ export class UserStore {
 
   subscribeTab() {
     this.channel = new BroadcastChannel('syncTab');
-    this.channel.onmessage = event => {
+    this.channel.onmessage = (event) => {
       const data = event.data;
       if (data.type === 'login') {
         runInAction(() => {

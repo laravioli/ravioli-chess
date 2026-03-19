@@ -1,13 +1,20 @@
 import { useContext } from 'react';
 import { useLocation } from 'react-router';
-import { DataContext, LocalStorageContext, GlobalStoreContext, PageStoreContext } from '../context/context';
-import type { PageStore } from '../store/stores';
-import type { PageConfig } from '../boot/interface';
+
+import {
+  DataContext,
+  LocalStorageContext,
+  GlobalStoreContext,
+  PageStoreContext,
+} from '@/core/context/context';
+import type { PageStore } from '@/core/store/stores';
+import type { PageConfig } from '@/core/boot/interface';
 
 /* Hooks to retrieve stores*/
 export const useLocalStorage = () => {
   const localStorage = useContext(LocalStorageContext);
-  if (!localStorage) throw new Error('useLocalStorage hook must be use within a LocalStorageProvider');
+  if (!localStorage)
+    throw new Error('useLocalStorage hook must be use within a LocalStorageProvider');
   return localStorage;
 };
 export const useGlobalStore = () => {

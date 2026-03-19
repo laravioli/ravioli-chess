@@ -1,17 +1,18 @@
 // @ts-ignore
 import 'vite/modulepreload-polyfill';
-import 'src/main/css/index.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { boot } from 'src/main/boot';
-import App from './main/components/app/App';
+
+import '@/core/css/index.css';
+import { boot } from '@/core/boot';
+import App from '@/core/components/app/App';
 
 boot()
-  .then(config =>
+  .then((config) =>
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
         <App {...config} />
       </StrictMode>,
     ),
   )
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));

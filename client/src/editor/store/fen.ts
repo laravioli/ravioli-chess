@@ -1,11 +1,13 @@
 import { observable, computed, action } from 'mobx';
-import { defined } from 'src/lib/common';
-import { castlingsToFen } from './utils';
 import { Board } from 'chessops/board';
 import { setupPosition, Castles } from 'chessops/variant';
 import { makeFen, parseFen, parseCastlingFen } from 'chessops/fen';
 import { type Setup, Material, RemainingChecks } from 'chessops/setup';
 import type { SquareSet } from 'chessops/squareSet';
+
+import { defined } from '@/lib/common';
+
+import { castlingsToFen } from './utils';
 import type { Castlings, CastlingSide } from './interface';
 
 export class Fen {
@@ -34,23 +36,24 @@ export class Fen {
   @computed
   get legalFen() {
     return setupPosition('chess', this.getSetup()).unwrap(
-      pos => makeFen(pos.toSetup()),
-      _ => undefined,
+      (pos) => makeFen(pos.toSetup()),
+      (_) => undefined,
     );
   }
 
   getSetup(): Setup {
     const fen = this.boardFen || this.initialFen;
     const board = parseFen(fen).unwrap(
-      setup => setup.board,
-      _ => Board.empty(),
+      (setup) => setup.board,
+      (_) => Board.empty(),
     );
 
     return {
       board,
       pockets: this.pockets,
       turn: this.turn,
-      castlingRights: this.castlingRights || parseCastlingFen(board, castlingsToFen(this.castlings)).unwrap(),
+      castlingRights:
+        this.castlingRights || parseCastlingFen(board, castlingsToFen(this.castlings)).unwrap(),
       epSquare: undefined,
       remainingChecks: this.remainingChecks,
       halfmoves: this.halfmoves,
@@ -61,12 +64,12 @@ export class Fen {
   @action
   set(fen: FEN, updateBoard?: () => void) {
     parseFen(fen).unwrap(
-      setup => {
+      (setup) => {
         updateBoard?.();
         this.setSetup(setup);
         return true;
       },
-      _ => false,
+      (_) => false,
     );
   }
 

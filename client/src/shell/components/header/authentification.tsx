@@ -1,15 +1,18 @@
-import { Anchor, Button, Group, PasswordInput, Stack, TextInput, Drawer } from '@mantine/core';
-import { IsAuth } from 'src/user/component/isauth';
-import { notifications } from '@mantine/notifications';
-import { useFocusTrap, useMediaQuery } from '@mantine/hooks';
 import { useState } from 'react';
+import { Anchor, Button, Group, PasswordInput, Stack, TextInput, Drawer } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { upperFirst, useToggle } from '@mantine/hooks';
-import { useGlobalStore } from 'src/main/hooks/hooks';
-import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from 'src/lib/api';
-import { setPreference } from 'src/user/store/utils';
+import { notifications } from '@mantine/notifications';
+import { useFocusTrap, useMediaQuery, upperFirst, useToggle } from '@mantine/hooks';
 
-export const AuthDrawer = ({ opened, onClose }: { opened: boolean; onClose: () => void }) => {
+import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from '@/lib/api';
+import { useGlobalStore } from '@/core/hooks/hooks';
+import { IsAuth } from '@/user/component/isauth';
+import { setPreference } from '@/user/store/utils';
+
+export const AuthDrawer: React.FC<{ opened: boolean; onClose: () => void }> = ({
+  opened,
+  onClose,
+}) => {
   const isSmallScreen = useMediaQuery('(max-width: 765px)');
   return (
     <Drawer
@@ -24,7 +27,7 @@ export const AuthDrawer = ({ opened, onClose }: { opened: boolean; onClose: () =
   );
 };
 
-function AuthenticationForm({ close }) {
+const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
   const { userStore } = useGlobalStore();
   const [loading, setLoading] = useState(false);
   const [type, toggle] = useToggle(['login', 'register']);
@@ -40,9 +43,9 @@ function AuthenticationForm({ close }) {
     },
 
     validate: {
-      username: _ => null,
-      email: val => (/^\S+@\S+$/.test(val) || type === 'login' ? null : 'Invalid email'),
-      password: val => (val.length <= 4 ? 'Password should include at least 4 characters' : null),
+      username: (_) => null,
+      email: (val) => (/^\S+@\S+$/.test(val) || type === 'login' ? null : 'Invalid email'),
+      password: (val) => (val.length <= 4 ? 'Password should include at least 4 characters' : null),
     },
   });
 
@@ -87,7 +90,10 @@ function AuthenticationForm({ close }) {
 
   return (
     <form onSubmit={form.onSubmit(type === 'login' ? onLogin : onRegister)}>
-      <Stack ref={focusTrapRef} key={type}>
+      <Stack
+        ref={focusTrapRef}
+        key={type}
+      >
         {type === 'register' && (
           <TextInput
             required
@@ -129,7 +135,10 @@ function AuthenticationForm({ close }) {
         )}
       </Stack>
 
-      <Group justify="space-between" mt="xl">
+      <Group
+        justify="space-between"
+        mt="xl"
+      >
         <Anchor
           component="button"
           type="button"
@@ -140,17 +149,23 @@ function AuthenticationForm({ close }) {
           }}
           size="xs"
         >
-          {type === 'register' ? 'Already have an account? Login' : "Don't have an account? Register"}
+          {type === 'register'
+            ? 'Already have an account? Login'
+            : "Don't have an account? Register"}
         </Anchor>
-        <Button type="submit" radius="xl" loading={loading}>
+        <Button
+          type="submit"
+          radius="xl"
+          loading={loading}
+        >
           {upperFirst(type)}
         </Button>
       </Group>
     </form>
   );
-}
+};
 
-export const LoginButton = ({ onClick }: { onClick: () => void }) => {
+export const LoginButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   const isSmallScreen = useMediaQuery('(max-width: 765px)');
   const screenProps = isSmallScreen
     ? { variant: 'transparent', color: 'white' }
@@ -158,7 +173,10 @@ export const LoginButton = ({ onClick }: { onClick: () => void }) => {
 
   return (
     <IsAuth showIf={false}>
-      <Button {...screenProps} onClick={onClick}>
+      <Button
+        {...screenProps}
+        onClick={onClick}
+      >
         Log in
       </Button>
     </IsAuth>
