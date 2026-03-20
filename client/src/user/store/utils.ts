@@ -1,5 +1,3 @@
-import Cookies from 'js-cookie';
-
 import type { Board, PieceSet, Preference } from '@/lib/api';
 
 const pieceVars = [
@@ -41,26 +39,4 @@ export function setBoardColor(color: Board) {
 export function setPreference(preference: Preference) {
   if (preference.board) setBoardColor(preference.board);
   if (preference.pieceset) setPieceSet(preference.pieceset);
-}
-
-const PrefMap = new Map<string, Set<string>>([
-  ['board', new Set(['wood', 'blue', 'blue2', 'brown'])],
-  ['pieceset', new Set(['base', 'wiki'])],
-]);
-
-export function getAnonPreference(): Preference {
-  const defaultPref: Preference = { board: 'wood', pieceset: 'base' };
-  const anonCookie = Cookies.get('anon');
-
-  if (!anonCookie) return defaultPref;
-
-  let queryString = anonCookie.split(':')[0];
-  const params = new URLSearchParams(queryString);
-  const obj = {};
-
-  for (const [key, value] of params.entries()) {
-    if (PrefMap.get(key)?.has(value)) obj[key] = value;
-  }
-
-  return { ...defaultPref, ...obj };
 }

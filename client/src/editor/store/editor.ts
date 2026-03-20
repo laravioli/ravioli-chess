@@ -1,4 +1,4 @@
-import { action, runInAction, computed, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import { opposite } from '@lichess-org/chessground/util';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
@@ -14,10 +14,8 @@ export class EditorStore {
   @observable accessor isFlipped = false;
 
   constructor(opts: EditorOpts) {
-    runInAction(() => {
-      this.opts = opts;
-      this.fen = new Fen(opts.fen);
-    });
+    this.opts = opts;
+    this.fen = new Fen(opts.fen);
   }
 
   /* Loader */

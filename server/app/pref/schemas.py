@@ -20,5 +20,5 @@ class PreferenceUpdate(BaseSchema):
 
 # Out
 class Preference(BaseSchema):
-    board: Board = Board.WOOD
+    board: Board = Board.BLUE
     pieceset: PieceSet = PieceSet.BASE

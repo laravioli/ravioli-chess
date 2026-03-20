@@ -25,7 +25,7 @@ import { listMyFriendsQueryKey, listMyFriendsOptions } from '@/lib/api/@tanstack
 import { Preferences, Auth } from '@/lib/api';
 import { LobbySetup } from '@/lib/lobby/components/setup';
 import type { UserStore } from '@/user/store/userstore';
-import { setBoardColor, setPieceSet, setPreference, getAnonPreference } from '@/user/store/utils';
+import { setBoardColor, setPieceSet, setPreference } from '@/user/store/utils';
 
 import classes from '@/shell/css/header.module.css';
 
@@ -107,7 +107,7 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
       await Auth.logout();
       userStore.logout();
       queryClient.removeQueries({ queryKey: listMyFriendsQueryKey() });
-      setPreference(getAnonPreference());
+      setPreference({ board: 'blue', pieceset: 'base' });
       notifications.show({
         id: 'logout',
         position: 'bottom-right',

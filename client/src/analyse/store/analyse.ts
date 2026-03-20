@@ -1,5 +1,5 @@
 //https://github.com/lichess-org/lila/blob/master/ui/analyse/src/ctrl.ts
-import { observable, action, runInAction, computed } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 import { uciToMove, opposite } from '@lichess-org/chessground/util';
@@ -30,12 +30,10 @@ export class AnalyseStore {
   @observable accessor isFlipped = false;
 
   constructor(ceval: Ceval, opts: AnalyseOpts) {
-    runInAction(() => {
-      this.opts = opts;
-      this.ceval = ceval;
-      this.initTree(opts.fen);
-      this.initCeval(opts.fen);
-    });
+    this.opts = opts;
+    this.ceval = ceval;
+    this.initTree(opts.fen);
+    this.initCeval(opts.fen);
   }
 
   /* Loader */

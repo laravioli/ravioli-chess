@@ -29,7 +29,7 @@ class Preference(Base):
     __tablename__ = "user_preference"
 
     id: Mapped[PrimaryKey[int]]
-    board: Mapped[Board] = mapped_column(default=Board.WOOD)
+    board: Mapped[Board] = mapped_column(default=Board.BLUE)
     pieceset: Mapped[PieceSet] = mapped_column(default=PieceSet.BASE)
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("user_account.id", ondelete="CASCADE"), unique=True
