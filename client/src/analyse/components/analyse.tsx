@@ -18,10 +18,10 @@ const Analyse: React.FC = () => {
       <div className={clsx(layout.analyse, variables.analyse)}>
         <MaybeEvalBar />
         <Board />
-        <div className={clsx(layout.side)}>
+        <aside className={clsx(layout.side)}>
           <Tools />
           <Controls />
-        </div>
+        </aside>
         <div className={layout.copyables}>
           <FenInput />
         </div>

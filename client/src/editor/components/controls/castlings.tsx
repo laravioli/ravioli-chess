@@ -13,11 +13,7 @@ export const CastlingBoxes: React.FC = () => {
     <>
       <div className={classes.castle}>
         {(['K', 'Q', 'k', 'q'] as const).map((item, index) => (
-          <CastlingBox
-            key={item}
-            id={item}
-            label={labels[index]}
-          />
+          <CastlingBox key={item} id={item} label={labels[index]} />
         ))}
       </div>
     </>

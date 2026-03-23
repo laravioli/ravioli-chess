@@ -43,10 +43,7 @@ function renderTree(ctrl: AnalyseStore, handlers: Handlers) {
   const root = ctrl.tree.root;
   const blackStarts = (root.ply & 1) === 1;
   return (
-    <div
-      className={classes.tree}
-      onClick={handlers['click']}
-    >
+    <div className={classes.tree} onClick={handlers['click']}>
       {blackStarts && renderIndex(root.ply, false)}
       {blackStarts && emptyMove()}
       {renderChildrenOf(ctrl, root, {
@@ -157,10 +154,7 @@ function renderMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
 function renderMainlineMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
   const path = opts.parentPath + node.id;
   return (
-    <div
-      className={moveClasses(path, ctrl.path)}
-      data-p={path}
-    >
+    <div className={moveClasses(path, ctrl.path)} data-p={path}>
       {renderMove(node)}
     </div>
   );
@@ -171,10 +165,7 @@ function renderVariationMoveOf(ctrl: AnalyseStore, node: Node, opts: TreeOpts) {
     path = opts.parentPath + node.id;
 
   return (
-    <div
-      className={moveClasses(path, ctrl.path)}
-      data-p={path}
-    >
+    <div className={moveClasses(path, ctrl.path)} data-p={path}>
       {withIndex && renderIndex(node.ply, true)}
       {node.san}
     </div>

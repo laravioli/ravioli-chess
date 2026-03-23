@@ -35,34 +35,19 @@ const BoardControls: React.FC = () => {
         key: 'flip',
         label: 'flip board',
         onClick: () => store.flip(),
-        icon: (
-          <IconRepeat
-            size={40}
-            stroke={1.2}
-          />
-        ),
+        icon: <IconRepeat size={40} stroke={1.2} />,
       },
       {
         key: 'start',
         label: 'reset board',
         onClick: () => store.setFen(INITIAL_FEN),
-        icon: (
-          <IconReload
-            size={40}
-            stroke={1.2}
-          />
-        ),
+        icon: <IconReload size={40} stroke={1.2} />,
       },
       {
         key: 'clear',
         label: 'clear board',
         onClick: () => store.setFen(EMPTY_FEN),
-        icon: (
-          <IconTrash
-            size={40}
-            stroke={1.2}
-          />
-        ),
+        icon: <IconTrash size={40} stroke={1.2} />,
       },
     ],
     [],
@@ -101,10 +86,7 @@ const Navigate: React.FC = observer(() => {
       onClick={onClick}
       disabled={!store.fen.legalFen}
     >
-      <IconMathMaxMin
-        size={30}
-        stroke={1.2}
-      />
+      <IconMathMaxMin size={30} stroke={1.2} />
     </ActionWithToolTip>
   );
 });

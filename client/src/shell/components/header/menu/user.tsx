@@ -71,24 +71,12 @@ type UserMenuTargetProps = {
 
 const UserMenuTarget: React.FC<UserMenuTargetProps> = observer(({ user, ref, ...rest }) => {
   return user.logged ? (
-    <UnstyledButton
-      ref={ref}
-      {...rest}
-      className={classes.link}
-    >
+    <UnstyledButton ref={ref} {...rest} className={classes.link}>
       {user.username}
     </UnstyledButton>
   ) : (
-    <ActionIcon
-      ref={ref}
-      {...rest}
-      h="100%"
-      bg="inherit"
-    >
-      <IconSettingsFilled
-        color="gray"
-        size={22}
-      />
+    <ActionIcon ref={ref} {...rest} h="100%" bg="inherit">
+      <IconSettingsFilled color="gray" size={22} />
     </ActionIcon>
   );
 });
@@ -125,12 +113,7 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
       <Menu.Item>Profile</Menu.Item>
       <Menu.Item
         onMouseEnter={() => isPending && refetch()}
-        rightSection={
-          <IconChevronRight
-            size={16}
-            stroke={1.5}
-          />
-        }
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
         onClick={() => navigate('friends')}
         closeMenuOnClick={false}
       >
@@ -139,15 +122,7 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
       <Menu.Label>Preferences</Menu.Label>
       <MainMenuPref navigate={navigate} />
       <Menu.Divider />
-      <Menu.Item
-        leftSection={
-          <IconLogout
-            size={16}
-            stroke={1.5}
-          />
-        }
-        onClick={logout}
-      >
+      <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />} onClick={logout}>
         Logout
       </Menu.Item>
     </>
@@ -158,36 +133,21 @@ const MainMenuPref: MenuViewFC = ({ navigate }) => {
   return (
     <>
       <Menu.Item
-        rightSection={
-          <IconChevronRight
-            size={16}
-            stroke={1.5}
-          />
-        }
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
         onClick={() => navigate('theme')}
         closeMenuOnClick={false}
       >
         Theme
       </Menu.Item>
       <Menu.Item
-        rightSection={
-          <IconChevronRight
-            size={16}
-            stroke={1.5}
-          />
-        }
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
         onClick={() => navigate('board')}
         closeMenuOnClick={false}
       >
         Board
       </Menu.Item>
       <Menu.Item
-        rightSection={
-          <IconChevronRight
-            size={16}
-            stroke={1.5}
-          />
-        }
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
         onClick={() => navigate('pieceset')}
         closeMenuOnClick={false}
       >
@@ -203,28 +163,17 @@ const ThemeMenu: MenuViewFC = ({ navigate }) => {
   return (
     <>
       <MenuItem
-        leftSection={
-          <IconChevronLeft
-            size={16}
-            stroke={1.5}
-          />
-        }
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
         onClick={() => navigate('main')}
         closeMenuOnClick={false}
       >
         Theme
       </MenuItem>
       <Menu.Divider />
-      <Menu.Item
-        onClick={() => setColorScheme('dark')}
-        closeMenuOnClick={false}
-      >
+      <Menu.Item onClick={() => setColorScheme('dark')} closeMenuOnClick={false}>
         Dark
       </Menu.Item>
-      <Menu.Item
-        onClick={() => setColorScheme('light')}
-        closeMenuOnClick={false}
-      >
+      <Menu.Item onClick={() => setColorScheme('light')} closeMenuOnClick={false}>
         Light
       </Menu.Item>
     </>
@@ -246,12 +195,7 @@ const BoardMenu: MenuViewFC = ({ navigate }) => {
   return (
     <>
       <MenuItem
-        leftSection={
-          <IconChevronLeft
-            size={16}
-            stroke={1.5}
-          />
-        }
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
         onClick={() => navigate('main')}
         closeMenuOnClick={false}
       >
@@ -291,12 +235,7 @@ const PieceSetMenu: MenuViewFC = ({ navigate }) => {
   return (
     <>
       <MenuItem
-        leftSection={
-          <IconChevronLeft
-            size={16}
-            stroke={1.5}
-          />
-        }
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
         onClick={() => navigate('main')}
         closeMenuOnClick={false}
       >
@@ -333,20 +272,8 @@ const FriendsMenu: MenuViewFC = ({ navigate }) => {
   return (
     <>
       <MenuItem
-        leftSection={
-          <IconChevronLeft
-            size={16}
-            stroke={1.5}
-          />
-        }
-        rightSection={
-          isFetching && (
-            <Loader
-              color="gray"
-              size={22}
-            />
-          )
-        }
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
+        rightSection={isFetching && <Loader color="gray" size={22} />}
         onClick={() => navigate('main')}
         closeMenuOnClick={false}
       >

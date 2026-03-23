@@ -18,12 +18,12 @@ const Editor: React.FC = () => {
     <PageStoreProvider factory={makeStore}>
       <div className={clsx(layout.editor, variables.editor)}>
         <Board />
-        <div className={clsx(layout.side, classes.side)}>
+        <aside className={clsx(layout.side, classes.side)}>
           <SparePieces side="top" />
           <Controls />
           <SparePieces side="bottom" />
           <Actions />
-        </div>
+        </aside>
         <div className={layout.copyables}>
           <FenInput />
         </div>{' '}

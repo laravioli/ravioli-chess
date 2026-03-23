@@ -1,4 +1,4 @@
-import { action, runInAction } from 'mobx';
+import { action } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 
@@ -13,14 +13,14 @@ export class PlayStore {
   opts: PlayOpts;
 
   constructor(globalStore: GlobalStore, opts: PlayOpts) {
-    runInAction(() => {
-      this.opts = opts;
-      this.globalStore = globalStore;
-    });
+    this.opts = opts;
+    this.globalStore = globalStore;
   }
 
   @action
-  onLoad() {}
+  onLoad() {
+    this.globalStore.ceval.destroy();
+  }
 
   @action
   onUnLoad() {}

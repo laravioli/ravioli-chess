@@ -90,10 +90,7 @@ const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
 
   return (
     <form onSubmit={form.onSubmit(type === 'login' ? onLogin : onRegister)}>
-      <Stack
-        ref={focusTrapRef}
-        key={type}
-      >
+      <Stack ref={focusTrapRef} key={type}>
         {type === 'register' && (
           <TextInput
             required
@@ -135,10 +132,7 @@ const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
         )}
       </Stack>
 
-      <Group
-        justify="space-between"
-        mt="xl"
-      >
+      <Group justify="space-between" mt="xl">
         <Anchor
           component="button"
           type="button"
@@ -153,11 +147,7 @@ const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
             ? 'Already have an account? Login'
             : "Don't have an account? Register"}
         </Anchor>
-        <Button
-          type="submit"
-          radius="xl"
-          loading={loading}
-        >
+        <Button type="submit" radius="xl" loading={loading}>
           {upperFirst(type)}
         </Button>
       </Group>
@@ -173,10 +163,7 @@ export const LoginButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
 
   return (
     <IsAuth showIf={false}>
-      <Button
-        {...screenProps}
-        onClick={onClick}
-      >
+      <Button {...screenProps} onClick={onClick}>
         Log in
       </Button>
     </IsAuth>

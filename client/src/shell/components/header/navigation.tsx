@@ -14,16 +14,8 @@ export const Navigation: React.FC = () => {
   return (
     <>
       <PlayMenu />
-      <SimpleLink
-        label="Analyse"
-        to="/analysis"
-        state={defaultState}
-      />
-      <SimpleLink
-        label="Edit"
-        to="/editor"
-        state={defaultState}
-      />
+      <SimpleLink label="Analyse" to="/analysis" state={defaultState} />
+      <SimpleLink label="Edit" to="/editor" state={defaultState} />
     </>
   );
 };
@@ -101,18 +93,8 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({ stack }) => {
           </UnstyledButton>
         ))}
 
-        <SimpleLink
-          label="Analyse"
-          to="/analysis"
-          state={defaultState}
-          onClick={stack.closeAll}
-        />
-        <SimpleLink
-          label="Edit"
-          to="/editor"
-          state={defaultState}
-          onClick={stack.closeAll}
-        />
+        <SimpleLink label="Analyse" to="/analysis" state={defaultState} onClick={stack.closeAll} />
+        <SimpleLink label="Edit" to="/editor" state={defaultState} onClick={stack.closeAll} />
       </Drawer>
 
       {lobbies.map((lobby) => (
@@ -127,15 +109,8 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({ stack }) => {
         >
           <Stack>
             <LobbySetup opponent={lobby.opponent} />
-            <Group
-              justify="center"
-              pt={10}
-            >
-              <Button
-                component={Link}
-                onClick={() => stack.closeAll()}
-                to="/play"
-              >
+            <Group justify="center" pt={10}>
+              <Button component={Link} onClick={() => stack.closeAll()} to="/play">
                 Play
               </Button>
             </Group>

@@ -18,6 +18,7 @@ router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)]
 @router.get("/analysis", response_class=HTMLResponse, name="analyse")
 @router.get("/editor", response_class=HTMLResponse, name="editor")
 @router.get("/play", response_class=HTMLResponse, name="play")
+@router.get("/profile/{username}", response_class=HTMLResponse, name="profile")
 async def index(request: Request, session: DbSession, cache: WebCache):
     positions = await cache.get_or_set(
         "chess:positions", factory=lambda: get_chess_positions(session)

@@ -27,15 +27,8 @@ export const ActionWithToolTip: React.FC<ActionsWithToolTipProps> = ({
   const tooltipProps = useToolTipConfig();
 
   return (
-    <Tooltip
-      label={label}
-      {...tooltipProps}
-    >
-      <ActionIcon
-        classNames={{ root: className }}
-        data-disabled={disabled}
-        onClick={handler}
-      >
+    <Tooltip label={label} {...tooltipProps}>
+      <ActionIcon classNames={{ root: className }} data-disabled={disabled} onClick={handler}>
         {children}
       </ActionIcon>
     </Tooltip>

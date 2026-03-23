@@ -17,10 +17,7 @@ export const Board: React.FC = () => {
 
   return (
     <div className={classes.boardWrap}>
-      <div
-        className={classes.board}
-        ref={divRef}
-      />
+      <div className={classes.board} ref={divRef} />
     </div>
   );
 };

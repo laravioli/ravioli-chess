@@ -8,15 +8,9 @@ import { UserStatus } from './user';
 
 export const Tools = () => {
   return (
-    <Stack
-      gap={0}
-      className={clsx(classes.tools)}
-    >
+    <Stack gap={0} className={clsx(classes.tools)}>
       <UserStatus />
-      <Group
-        className={classes.history}
-        justify="space-evenly"
-      >
+      <Group className={classes.history} justify="space-evenly">
         <div className="space" />
         <History className={classes.historyButton} />
       </Group>

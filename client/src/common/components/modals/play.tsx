@@ -19,15 +19,8 @@ export const PlayModal: React.FC<ContextModalProps<PlayModalProps>> = ({
     <FocusTrap.InitialFocus />
     <Stack>
       <innerProps.modalBody {...innerProps.modalBodyProps} />
-      <Group
-        justify="center"
-        pt={10}
-      >
-        <Button
-          component={Link}
-          onClick={() => context.closeModal(id)}
-          to="/play"
-        >
+      <Group justify="center" pt={10}>
+        <Button component={Link} onClick={() => context.closeModal(id)} to="/play">
           Play
         </Button>
       </Group>

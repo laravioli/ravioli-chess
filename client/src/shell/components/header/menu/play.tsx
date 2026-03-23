@@ -38,10 +38,7 @@ export const PlayMenu: React.FC = () => {
         withArrow
       >
         <Menu.Target>
-          <div
-            className={classes.link}
-            onClick={(event) => event.preventDefault()}
-          >
+          <div className={classes.link} onClick={(event) => event.preventDefault()}>
             Play
           </div>
         </Menu.Target>

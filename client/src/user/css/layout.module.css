@@ -1,0 +1,35 @@
+.profile {
+  margin: 0 auto;
+  max-width: 100rem;
+  width: 100%;
+}
+
+.profile {
+  grid-area: main;
+
+  & .profile-header {
+    display: grid;
+    grid-template-areas: 'avatar info actions' 'avatar details details';
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: repeat(2, min-content);
+    gap: 2.4rem;
+  }
+
+  .profile-header {
+    & .avatar {
+      grid-area: avatar;
+    }
+
+    & .info {
+      grid-area: info;
+    }
+
+    & .actions {
+      grid-area: actions;
+    }
+
+    & .details {
+      grid-area: details;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+.profile-header {
+  background-color: var(--mantine-color-dark-8);
+}
+
+.avatar {
+  aspect-ratio: 1;
+  margin: 0;
+  height: 10rem;
+  width: 10rem;
+  overflow: hidden;
+  > img {
+    display: block;
+    object-fit: cover;
+    height: 10rem;
+    width: 10rem;
+  }
+}
+
+.details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tabs-header {
+  background-color: var(--mantine-color-dark-8);
+  --tabs-radius: 1px !important;
+}

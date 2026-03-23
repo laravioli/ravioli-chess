@@ -154,36 +154,13 @@ const Side = observer(() => {
 const IconChessKnightSharp = memo(({ side }: { side: LobbySide }) => {
   const fill = side === 'random' ? 'url(#sharpBlackWhite)' : side === 'white' ? '#FFFDE7' : 'black';
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="60"
-      height="60"
-      viewBox="0 0 45 45"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 45 45">
       <defs>
-        <linearGradient
-          id="sharpBlackWhite"
-          x1="0%"
-          y1="0%"
-          x2="100%"
-          y2="0%"
-        >
-          <stop
-            offset="0%"
-            stopColor="#FFFDE7"
-          />
-          <stop
-            offset="50%"
-            stopColor="#FFFDE7"
-          />
-          <stop
-            offset="50%"
-            stopColor="black"
-          />
-          <stop
-            offset="100%"
-            stopColor="black"
-          />
+        <linearGradient id="sharpBlackWhite" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#FFFDE7" />
+          <stop offset="50%" stopColor="#FFFDE7" />
+          <stop offset="50%" stopColor="black" />
+          <stop offset="100%" stopColor="black" />
         </linearGradient>
       </defs>
       <path

@@ -13,13 +13,7 @@ export const Settings: React.FC = () => {
   const [opened, setOpened] = useState(false);
 
   return (
-    <Popover
-      opened={opened}
-      onChange={setOpened}
-      position="bottom-start"
-      shadow="md"
-      width={250}
-    >
+    <Popover opened={opened} onChange={setOpened} position="bottom-start" shadow="md" width={250}>
       <Popover.Target>
         <ActionIcon
           className={classes.settings}
@@ -33,38 +27,20 @@ export const Settings: React.FC = () => {
 
       <Popover.Dropdown>
         <Stack gap="sm">
-          <Group
-            align="center"
-            justify="space-between"
-          >
-            <Text
-              size="sm"
-              w={60}
-            >
+          <Group align="center" justify="space-between">
+            <Text size="sm" w={60}>
               Search time
             </Text>
             <SearchTimeSettings />
           </Group>
-          <Group
-            align="center"
-            justify="space-between"
-          >
-            <Text
-              size="sm"
-              w={60}
-            >
+          <Group align="center" justify="space-between">
+            <Text size="sm" w={60}>
               Lines
             </Text>
             <MultiPvSettings />
           </Group>
-          <Group
-            align="center"
-            justify="space-between"
-          >
-            <Text
-              size="sm"
-              w={60}
-            >
+          <Group align="center" justify="space-between">
+            <Text size="sm" w={60}>
               Threads
             </Text>
             <ThreadsSettings />
@@ -118,14 +94,7 @@ const MultiPvSettings: React.FC = observer(() => {
   );
 
   return (
-    <Slider
-      value={multipv}
-      min={1}
-      max={5}
-      step={1}
-      onChange={setMultiPv}
-      style={{ flex: 1 }}
-    />
+    <Slider value={multipv} min={1} max={5} step={1} onChange={setMultiPv} style={{ flex: 1 }} />
   );
 });
 

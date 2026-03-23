@@ -38,11 +38,7 @@ export const ControlsMenu: React.FC = () => {
       >
         <Menu.Target>
           <ActionIcon className={classes.button}>
-            <IconMenu
-              size="100%"
-              stroke={1.5}
-              style={{ maxWidth: 30, maxHeight: 30 }}
-            />
+            <IconMenu size="100%" stroke={1.5} style={{ maxWidth: 30, maxHeight: 30 }} />
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>{currentMenu}</Menu.Dropdown>
@@ -57,24 +53,14 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
   return (
     <>
       <Menu.Item
-        leftSection={
-          <IconRepeat
-            size={22}
-            stroke={1.8}
-          />
-        }
+        leftSection={<IconRepeat size={22} stroke={1.8} />}
         onClick={() => store.flip()}
         closeMenuOnClick={false}
       >
         flip board
       </Menu.Item>
       <Menu.Item
-        leftSection={
-          <IconReload
-            size={22}
-            stroke={1.8}
-          />
-        }
+        leftSection={<IconReload size={22} stroke={1.8} />}
         onClick={() => store.reload(INITIAL_FEN)}
         closeMenuOnClick={false}
       >
@@ -82,12 +68,7 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
       </Menu.Item>
       <Menu.Item
         leftSection={<IconChessRook stroke={1.2}></IconChessRook>}
-        rightSection={
-          <IconChevronRight
-            size={16}
-            stroke={1.5}
-          />
-        }
+        rightSection={<IconChevronRight size={16} stroke={1.5} />}
         onClick={() => navigate('positions')}
         closeMenuOnClick={false}
       >
@@ -119,12 +100,7 @@ const PositionsMenu: MenuViewFC = ({ navigate }) => {
   return (
     <>
       <Menu.Item
-        leftSection={
-          <IconChevronLeft
-            size={16}
-            stroke={1.5}
-          />
-        }
+        leftSection={<IconChevronLeft size={16} stroke={1.5} />}
         onClick={() => navigate('main')}
         closeMenuOnClick={false}
       >
@@ -145,12 +121,7 @@ const Navigate: React.FC = () => {
   });
   return (
     <Menu.Item
-      leftSection={
-        <IconEdit
-          size={22}
-          stroke={1.5}
-        />
-      }
+      leftSection={<IconEdit size={22} stroke={1.5} />}
       onClick={() => navigate('/editor', { replace: true, state: getState() })}
       closeMenuOnClick={false}
     >

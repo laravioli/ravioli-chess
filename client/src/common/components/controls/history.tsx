@@ -39,16 +39,8 @@ export const History: React.FC<{ className: string }> = observer(({ className })
   return (
     <>
       {actions.map(({ icon: Icon, action, key }) => (
-        <ActionIcon
-          key={key}
-          className={className}
-          onClick={action}
-        >
-          <Icon
-            size="100%"
-            stroke={1.2}
-            style={{ maxWidth: 60, maxHeight: 60 }}
-          />
+        <ActionIcon key={key} className={className} onClick={action}>
+          <Icon size="100%" stroke={1.2} style={{ maxWidth: 60, maxHeight: 60 }} />
         </ActionIcon>
       ))}
     </>

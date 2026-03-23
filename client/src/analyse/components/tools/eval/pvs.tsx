@@ -68,10 +68,7 @@ function renderPvs(evaluation: LocalEval | undefined, multipv: number) {
     <>
       {pvs.map((pv, index) => (
         <React.Fragment key={index}>
-          <Text
-            classNames={{ root: classes.pvs }}
-            lineClamp={1}
-          >
+          <Text classNames={{ root: classes.pvs }} lineClamp={1}>
             {multipv > 1 && (
               <span style={{ opacity: 0.6, marginRight: 6 }}>{pv.eval && getEval(pv.eval)}</span>
             )}
