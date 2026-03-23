@@ -1,5 +1,3 @@
-import Cookies from 'js-cookie';
-
 import { initSite } from '@/lib/site/site';
 import { client } from '@/lib/api/client.gen';
 import { wsConnect } from '@/lib/socket/socket';
@@ -19,13 +17,6 @@ const setApiClient = () => {
   client.setConfig({
     baseUrl: import.meta.env.VITE_FRONTEND_DOMAIN,
     credentials: 'same-origin',
-  });
-
-  client.interceptors.request.use((request, options) => {
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method!)) {
-      request.headers.set('X-CSRFToken', Cookies.get('csrftoken'));
-    }
-    return request;
   });
 };
 
