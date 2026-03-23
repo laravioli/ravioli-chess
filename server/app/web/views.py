@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 
 from app.deps import DbSession
 
-from .deps import WebCache, user_or_anon
+from .deps import User, WebCache, user_or_anon
 from .service import get_chess_positions
 from .templating import templates
 
@@ -20,6 +20,8 @@ router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)]
 @router.get("/play", response_class=HTMLResponse, name="play")
 @router.get("/profile/{username}", response_class=HTMLResponse, name="profile")
 async def index(request: Request, session: DbSession, cache: WebCache):
+    user: User = request.state.user
+
     positions = await cache.get_or_set(
         "chess:positions", factory=lambda: get_chess_positions(session)
     )
@@ -27,8 +29,9 @@ async def index(request: Request, session: DbSession, cache: WebCache):
         "payload": {
             "cfg": {
                 "user": {
-                    "username": request.state.user.username,
-                    "is_auth": request.state.user.is_auth,
+                    "id": str(user.id),
+                    "username": user.username,
+                    "is_auth": user.is_auth,
                 },
                 "page": {
                     "orientation": "white",

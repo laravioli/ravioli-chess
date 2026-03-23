@@ -18,6 +18,7 @@ import {
   IconSettingsFilled,
   IconBrandGooglePlay,
 } from '@tabler/icons-react';
+import { useNavigate } from 'react-router';
 
 import { useGlobalStore } from '@/core/hooks/hooks';
 import { useMenu, type MenuViewFC } from '@/common/hooks/hooks';
@@ -84,6 +85,7 @@ const UserMenuTarget: React.FC<UserMenuTargetProps> = observer(({ user, ref, ...
 const MainMenu: MenuViewFC = ({ navigate }) => {
   const { userStore } = useGlobalStore();
   const queryClient = useQueryClient();
+  const routeNav = useNavigate();
 
   const { isPending, refetch } = useQuery({
     ...listMyFriendsOptions(),
@@ -110,7 +112,7 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
 
   return (
     <>
-      <Menu.Item>Profile</Menu.Item>
+      <Menu.Item onClick={() => routeNav(`profile/${userStore.username}`)}>Profile</Menu.Item>
       <Menu.Item
         onMouseEnter={() => isPending && refetch()}
         rightSection={<IconChevronRight size={16} stroke={1.5} />}

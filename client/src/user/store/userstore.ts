@@ -3,25 +3,26 @@ import { observable, action, runInAction } from 'mobx';
 import { siteSocket } from '@/lib/socket/socket';
 
 import type { UserOpts, Credential } from './interface';
+import type { UUID } from 'crypto';
 
 const ANON = 'Anonymous';
 
 export class UserStore {
+  id?: UUID;
   @observable accessor username: string;
   @observable accessor logged: boolean;
 
   channel: BroadcastChannel;
 
   constructor(opts: UserOpts) {
-    runInAction(() => {
-      if (opts.is_auth) {
-        this.username = opts.username;
-        this.logged = true;
-      } else {
-        this.username = ANON;
-        this.logged = false;
-      }
-    });
+    if (opts.is_auth) {
+      this.id = opts.id;
+      this.username = opts.username;
+      this.logged = true;
+    } else {
+      this.username = ANON;
+      this.logged = false;
+    }
     this.subscribeTab();
   }
 
@@ -32,12 +33,14 @@ export class UserStore {
       if (data.type === 'login') {
         runInAction(() => {
           this.logged = true;
+          this.id = data.id;
           this.username = data.username;
         });
       }
       if (data.type == 'logout') {
         runInAction(() => {
           this.logged = false;
+          this.id = undefined;
           this.username = ANON;
         });
       }
@@ -58,6 +61,7 @@ export class UserStore {
       () =>
         this.channel.postMessage({
           type: 'login',
+          id: this.id,
           username: this.username,
         }),
       0,

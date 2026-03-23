@@ -1,3 +1,5 @@
+import type { UUID } from 'crypto';
+
 export interface ServerPayload {
   cfg: ServerConfig;
   data: ServerData;
@@ -13,6 +15,7 @@ export interface ServerConfig {
 /* User config */
 
 export interface UserConfig {
+  id: UUID;
   username: string;
   is_auth?: boolean;
 }

@@ -1,4 +1,7 @@
 from functools import cached_property
+from typing import Literal
+
+from pydantic import UUID4
 
 from app.api.schemas import BaseSchema
 from app.pref.schemas import Preference
@@ -7,6 +10,7 @@ from app.pref.schemas import Preference
 class User(BaseSchema):
     """User schema used in html templates"""
 
+    id: UUID4 | Literal[""] = ""
     username: str = ""
     is_auth: bool = False
     preference: Preference
