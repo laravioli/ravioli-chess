@@ -79,10 +79,8 @@ async def list_friendship(session: DbSession, user_id: uuid.UUID, status: Friend
 
 
 async def delete_friend(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
-    low_id, high_id = sorted((current_user_id, target_id))
     stmt = delete(Friendship).where(
-        func.least(Friendship.sender_id, Friendship.receiver_id) == low_id,
-        func.greatest(Friendship.sender_id, Friendship.receiver_id) == high_id,
+        *friendship_criteria(current_user_id, target_id),
         Friendship.status == FriendshipStatus.accepted,
     )
     result = await session.execute(stmt)
@@ -91,3 +89,10 @@ async def delete_friend(session: DbSession, current_user_id: uuid.UUID, target_i
         raise DBNotFound(detail="friend not found")
 
     await session.commit()
+
+
+def friendship_criteria(id_a, id_b):
+    return [
+        func.least(Friendship.sender_id, Friendship.receiver_id) == func.least(id_a, id_b),
+        func.greatest(Friendship.sender_id, Friendship.receiver_id) == func.greatest(id_a, id_b),
+    ]

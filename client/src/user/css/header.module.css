@@ -1,3 +1,7 @@
+.profile {
+  min-width: 34rem;
+}
+
 .profile-header {
   background-color: var(--mantine-color-dark-8);
 }

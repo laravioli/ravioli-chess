@@ -1,13 +1,14 @@
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import and_, delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.auth.security import generate_password_hash
 from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
-from core.db.models import Preference, User
+from app.social.service import friendship_criteria
+from core.db.models import Friendship, Preference, User
 
 from .schemas import UserCreate
 
@@ -31,11 +32,36 @@ async def user_create(session: DbSession, data: UserCreate):
         return new_user
 
 
-async def user_retrieve(session: DbSession, id: UUID, withPref=False):
+async def user_retrieve(session: DbSession, username: str, withPref=False):
     options = []
     if withPref:
         options.append(joinedload(User.preference))
-    user = await session.get(User, id, options=options)
+    stmt = select(User).where(User.username == username).options(*options)
+    user = await session.scalar(stmt)
+    return user
+
+
+async def user_retrieve_with_friendship(session: DbSession, current_user: User, username: str):
+    stmt = (
+        select(User, Friendship)
+        .outerjoin(
+            Friendship,
+            and_(*friendship_criteria(current_user.id, User.id)),
+        )
+        .where(User.username == username)
+    )
+
+    result = await session.execute(stmt)
+    row = result.first()
+
+    if row is None:
+        return None
+
+    user, friendship = row
+    if friendship:
+        friendship.is_sender = friendship.sender_id == current_user.id
+    user.friendship = friendship
+
     return user
 
 

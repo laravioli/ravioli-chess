@@ -2,15 +2,20 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Response, status
 from fastapi.exceptions import HTTPException
-from pydantic import UUID4
 
 from app.api.schemas import Message
-from app.auth.deps import CurrentUser, SessionCookie
+from app.auth.deps import CurrentUser, SessionCookie, UserOrAnon
 from app.config import settings
 from app.deps import DbSession, RedisClient
 
-from .schemas import UserBase, UserCreate, UserSearch, UserWithPref
-from .service import user_create, user_delete, user_retrieve, user_search
+from .schemas import UserBase, UserCreate, UserProfile, UserSearch, UserWithPref
+from .service import (
+    user_create,
+    user_delete,
+    user_retrieve,
+    user_retrieve_with_friendship,
+    user_search,
+)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -42,9 +47,14 @@ async def delete_user(
     return {"message": "your account has been deleted"}
 
 
-@router.get("/{user_id}", response_model=UserBase)
-async def get_user(session: DbSession, user_id: UUID4):
-    user = await user_retrieve(session, id=user_id)
+@router.get("/{username}", response_model=UserProfile, response_model_exclude_unset=True)
+async def get_user(session: DbSession, current_user: UserOrAnon, username: str):
+
+    user = (
+        await user_retrieve_with_friendship(session, current_user, username)
+        if current_user and (current_user.username != username)
+        else await user_retrieve(session, username=username)
+    )
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
     return user

@@ -13,6 +13,7 @@ from pydantic import (
 
 from app.api.schemas import BaseSchema
 from app.pref.schemas import Preference
+from core.db.models.social import FriendshipStatus
 
 
 # In
@@ -37,13 +38,23 @@ class UserCreate(BaseSchema):
 
 # Out
 class UserBase(BaseSchema):
+    id: UUID4
     username: str
+
+
+class FriendShip(BaseSchema):
+    is_sender: bool
+    status: FriendshipStatus
+
+
+class UserProfile(UserBase):
+    friendship: FriendShip | None = None
     joined_at: AwareDatetime
 
 
 class UserWithPref(UserBase):
-    id: UUID4
     preference: Preference
+    joined_at: AwareDatetime
 
 
 class UserSearch(BaseSchema):

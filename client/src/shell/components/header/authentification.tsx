@@ -6,7 +6,7 @@ import { useFocusTrap, useMediaQuery, upperFirst, useToggle } from '@mantine/hoo
 
 import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from '@/lib/api';
 import { useGlobalStore } from '@/core/hooks/hooks';
-import { IsAuth } from '@/user/component/isauth';
+import { IsAuth } from '@/user/components/isauth';
 import { setPreference } from '@/user/store/utils';
 
 export const AuthDrawer: React.FC<{ opened: boolean; onClose: () => void }> = ({

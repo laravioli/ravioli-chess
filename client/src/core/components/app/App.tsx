@@ -4,7 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router';
 
 import { GlobalStoreProvider, LocalStorageProvider, DataProvider } from '@/core/context/provider';
-import { router } from '@/core/components/routes/routes';
+import { createRouter } from '@/core/components/routes/routes';
 import type { AppDependencies } from './config';
 
 const App: React.FC<AppDependencies> = (dep) => {
@@ -15,7 +15,7 @@ const App: React.FC<AppDependencies> = (dep) => {
         <LocalStorageProvider localStorage={dep.localStorage}>
           <GlobalStoreProvider globalStore={dep.globalStore}>
             <DataProvider data={dep.data}>
-              <RouterProvider router={router} />
+              <RouterProvider router={createRouter(dep.queryClient)} />
             </DataProvider>
           </GlobalStoreProvider>
         </LocalStorageProvider>
