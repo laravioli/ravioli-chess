@@ -7,7 +7,6 @@ import { useFocusTrap, useMediaQuery, upperFirst, useToggle } from '@mantine/hoo
 import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from '@/lib/api';
 import { useGlobalStore } from '@/core/hooks/hooks';
 import { IsAuth } from '@/user/components/isauth';
-import { setPreference } from '@/user/store/utils';
 
 export const AuthDrawer: React.FC<{ opened: boolean; onClose: () => void }> = ({
   opened,
@@ -54,7 +53,6 @@ const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
     try {
       const { data } = await Auth.login({ body });
       userStore.login(data);
-      setPreference(data.preference);
       close();
     } catch (error: any) {
       if (error.detail)

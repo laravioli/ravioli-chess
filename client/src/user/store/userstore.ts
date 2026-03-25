@@ -1,8 +1,10 @@
 import { observable, action } from 'mobx';
 
 import { siteSocket } from '@/lib/socket/socket';
-
 import type { UserInfo } from './interface';
+import type { UserSuccess } from '@/lib/api';
+
+import { setPreference } from './utils';
 
 const ANON = 'Anonymous';
 
@@ -38,12 +40,13 @@ export class UserStore {
       switch (data.type) {
         case 'login':
           this.set_as_logged(data);
+          setPreference(data.preference);
+          siteSocket?.reload();
           break;
         case 'logout':
-          this.set_as_anon();
+          window.location.reload();
           break;
       }
-      siteSocket?.reload();
     };
   }
 
@@ -53,14 +56,14 @@ export class UserStore {
   }
 
   @action
-  login(data: UserInfo) {
+  login(data: UserSuccess) {
     this.set_as_logged(data);
+    setPreference(data.preference);
     setTimeout(
       () =>
         this.channel.postMessage({
           type: 'login',
-          id: data.id,
-          username: data.username,
+          ...data,
         }),
       0,
     );
@@ -69,14 +72,11 @@ export class UserStore {
 
   @action
   logout() {
-    this.set_as_anon();
-    setTimeout(
-      () =>
-        this.channel.postMessage({
-          type: 'logout',
-        }),
-      0,
-    );
-    setTimeout(() => siteSocket?.reload(), 0);
+    setTimeout(() => {
+      this.channel.postMessage({
+        type: 'logout',
+      });
+      window.location.reload();
+    }, 0);
   }
 }

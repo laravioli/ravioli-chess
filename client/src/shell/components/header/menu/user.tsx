@@ -8,9 +8,8 @@ import {
   UnstyledButton,
   useMantineColorScheme,
 } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -22,11 +21,11 @@ import { useNavigate } from 'react-router';
 
 import { useGlobalStore } from '@/core/hooks/hooks';
 import { useMenu, type MenuViewFC } from '@/common/hooks/hooks';
-import { listMyFriendsQueryKey, listMyFriendsOptions } from '@/lib/api/@tanstack/react-query.gen';
+import { listMyFriendsOptions } from '@/lib/api/@tanstack/react-query.gen';
 import { Preferences, Auth } from '@/lib/api';
 import { LobbySetup } from '@/lib/lobby/components/setup';
 import type { UserStore } from '@/user/store/userstore';
-import { setBoardColor, setPieceSet, setPreference } from '@/user/store/utils';
+import { setBoardColor, setPieceSet } from '@/user/store/utils';
 
 import classes from '@/shell/css/header.module.css';
 
@@ -84,7 +83,6 @@ const UserMenuTarget: React.FC<UserMenuTargetProps> = observer(({ user, ref, ...
 
 const MainMenu: MenuViewFC = ({ navigate }) => {
   const { userStore } = useGlobalStore();
-  const queryClient = useQueryClient();
   const routeNav = useNavigate();
 
   const { isPending, refetch } = useQuery({
@@ -96,15 +94,6 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
     try {
       await Auth.logout();
       userStore.logout();
-      queryClient.removeQueries({ queryKey: listMyFriendsQueryKey() });
-      setPreference({ board: 'blue', pieceset: 'base' });
-      notifications.show({
-        id: 'logout',
-        position: 'bottom-right',
-        message: 'successfully logout',
-        color: 'red',
-        autoClose: 2000,
-      });
     } catch (err) {
       console.log(err);
     }

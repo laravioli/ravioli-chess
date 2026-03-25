@@ -6,7 +6,7 @@ import Analyse from '@/analyse/components/analyse';
 import Editor from '@/editor/components/editor';
 import Play from '@/play/components/play';
 import NotFound from './notfound';
-import Profile from '@/user/components/profile';
+import Profile from '@/user/components/profile/page';
 
 import { createLoader } from './loaders';
 
