@@ -2,7 +2,7 @@ import { Button } from '@mantine/core';
 
 import type { UserProfile } from '@/lib/api';
 
-import * as socialHook from '@/user/hooks';
+import * as api from '@/user/api';
 
 interface ActionProps {
   user: UserProfile;
@@ -24,30 +24,20 @@ export const SocialActions: React.FC<{ user: UserProfile }> = ({ user }) => {
   const friendship = user.friendship;
 
   if (!friendship) {
-    return <SocialActionButton user={user} label="Add friend" useHook={socialHook.useAddFriend} />;
+    return <SocialActionButton user={user} label="Add friend" useHook={api.useAddFriend} />;
   }
 
   switch (friendship.status) {
     case 'accepted':
-      return (
-        <SocialActionButton
-          user={user}
-          label="Remove friend"
-          useHook={socialHook.useRemoveFriend}
-        />
-      );
+      return <SocialActionButton user={user} label="Remove friend" useHook={api.useRemoveFriend} />;
 
     case 'pending':
       return friendship.is_sender ? (
-        <SocialActionButton
-          user={user}
-          label="Cancel Request"
-          useHook={socialHook.useCancelRequest}
-        />
+        <SocialActionButton user={user} label="Cancel Request" useHook={api.useCancelRequest} />
       ) : (
         <>
-          <SocialActionButton user={user} label="Accept" useHook={socialHook.useAcceptRequest} />
-          <SocialActionButton user={user} label="Reject" useHook={socialHook.useRejectRequest} />
+          <SocialActionButton user={user} label="Accept" useHook={api.useAcceptRequest} />
+          <SocialActionButton user={user} label="Reject" useHook={api.useRejectRequest} />
         </>
       );
 

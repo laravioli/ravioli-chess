@@ -23,12 +23,12 @@ export const SearchUsersWithCollapse: React.FC<SearchUsersWithCollapseProps> = (
       <ActionIcon onClick={toggle} h="100%" bg="inherit">
         <IconSearch size={20} stroke={1.6} />
       </ActionIcon>
-      <Collapse in={opened}>{opened && <SearchUsers closeCollapse={close} />}</Collapse>
+      <Collapse in={opened}>{opened && <SearchUsers close={close} />}</Collapse>
     </Group>
   );
 };
 
-const SearchUsers: React.FC<{ closeCollapse: () => void }> = ({ closeCollapse }) => {
+const SearchUsers: React.FC<{ close: (() => void) | undefined }> = ({ close = undefined }) => {
   const [value, setValue] = useState('');
   const [debounced] = useDebouncedValue(value, 200);
 
@@ -52,7 +52,7 @@ const SearchUsers: React.FC<{ closeCollapse: () => void }> = ({ closeCollapse })
         onOptionSubmit={(val) => navigate(`/profile/${val}`)}
         onDropdownClose={() => {
           setValue('');
-          closeCollapse();
+          close?.();
         }}
         comboboxProps={{ withinPortal: false }}
       />

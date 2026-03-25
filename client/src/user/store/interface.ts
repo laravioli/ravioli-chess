@@ -1,7 +1,5 @@
-import type { UUID } from 'crypto';
-
-export interface UserOpts {
-  id: UUID;
+export interface UserInfo {
+  id: string;
   username: string;
   is_auth?: boolean;
 }

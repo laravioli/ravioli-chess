@@ -40,10 +40,10 @@ const Header: React.FC<{ user: UserProfile }> = ({ user }) => {
         <div className={l.actions}>
           {userStore.username !== user.username && (
             <Group justify="center" gap={0}>
+              <Button variant="default">Challenge</Button>
               <IsAuth showIf={true}>
                 <SocialActions user={user} />
               </IsAuth>
-              <Button variant="default">Challenge</Button>
             </Group>
           )}
         </div>

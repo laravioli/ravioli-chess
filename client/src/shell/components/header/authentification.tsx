@@ -53,7 +53,7 @@ const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
     setLoading(true);
     try {
       const { data } = await Auth.login({ body });
-      userStore.login(body);
+      userStore.login(data);
       setPreference(data.preference);
       close();
     } catch (error: any) {

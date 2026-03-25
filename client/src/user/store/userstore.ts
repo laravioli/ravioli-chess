@@ -1,48 +1,47 @@
-import { observable, action, runInAction } from 'mobx';
+import { observable, action } from 'mobx';
 
 import { siteSocket } from '@/lib/socket/socket';
 
-import type { UserOpts, Credential } from './interface';
-import type { UUID } from 'crypto';
+import type { UserInfo } from './interface';
 
 const ANON = 'Anonymous';
 
 export class UserStore {
-  id?: UUID;
+  id?: string;
   @observable accessor username: string;
   @observable accessor logged: boolean;
 
   channel: BroadcastChannel;
 
-  constructor(opts: UserOpts) {
-    if (opts.is_auth) {
-      this.id = opts.id;
-      this.username = opts.username;
-      this.logged = true;
-    } else {
-      this.username = ANON;
-      this.logged = false;
-    }
-    this.subscribeTab();
+  constructor(data: UserInfo) {
+    data.is_auth ? this.set_as_logged(data) : this.set_as_anon();
+    this.listen();
   }
 
-  subscribeTab() {
-    this.channel = new BroadcastChannel('syncTab');
+  @action
+  set_as_logged(data: UserInfo) {
+    this.username = data.username;
+    this.logged = true;
+  }
+
+  @action
+  set_as_anon() {
+    this.id = undefined;
+    this.username = ANON;
+    this.logged = false;
+  }
+
+  listen() {
+    this.channel = new BroadcastChannel('UserChannel');
     this.channel.onmessage = (event) => {
       const data = event.data;
-      if (data.type === 'login') {
-        runInAction(() => {
-          this.logged = true;
-          this.id = data.id;
-          this.username = data.username;
-        });
-      }
-      if (data.type == 'logout') {
-        runInAction(() => {
-          this.logged = false;
-          this.id = undefined;
-          this.username = ANON;
-        });
+      switch (data.type) {
+        case 'login':
+          this.set_as_logged(data);
+          break;
+        case 'logout':
+          this.set_as_anon();
+          break;
       }
       siteSocket?.reload();
     };
@@ -54,15 +53,14 @@ export class UserStore {
   }
 
   @action
-  login(credential: Credential) {
-    this.username = credential.username;
-    this.logged = true;
+  login(data: UserInfo) {
+    this.set_as_logged(data);
     setTimeout(
       () =>
         this.channel.postMessage({
           type: 'login',
-          id: this.id,
-          username: this.username,
+          id: data.id,
+          username: data.username,
         }),
       0,
     );
@@ -71,9 +69,7 @@ export class UserStore {
 
   @action
   logout() {
-    this.username = ANON;
-    this.logged = false;
-
+    this.set_as_anon();
     setTimeout(
       () =>
         this.channel.postMessage({
