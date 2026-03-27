@@ -1,82 +1,68 @@
 import { observable, action } from 'mobx';
 
-import { siteSocket } from '@/lib/socket/socket';
-import type { UserInfo } from './interface';
-import type { UserSuccess } from '@/lib/api';
+import type { UserServer } from './interface';
+import type { Preference, UserSuccess } from '@/lib/api';
 
 import { setPreference } from './utils';
 
-const ANON = 'Anonymous';
+const ANON: UserSuccess = {
+  id: '',
+  username: 'Anonymous',
+  preference: { board: 'blue', pieceset: 'base' },
+};
+
+type UserEvent = ({ type: 'login' } & UserSuccess) | { type: 'logout' };
 
 export class UserStore {
   id?: string;
   @observable accessor username: string;
   @observable accessor logged: boolean;
 
-  channel: BroadcastChannel;
+  private channel: BroadcastChannel | undefined;
 
-  constructor(data: UserInfo) {
-    data.is_auth ? this.set_as_logged(data) : this.set_as_anon();
-    this.listen();
+  constructor(data: UserServer) {
+    if (data.is_auth) {
+      this.username = data.username;
+      this.logged = true;
+    } else {
+      this.username = ANON.username;
+      this.logged = false;
+    }
+  }
+
+  private set preference(pref: Preference) {
+    setPreference(pref);
   }
 
   @action
-  set_as_logged(data: UserInfo) {
-    this.username = data.username;
+  login(user: UserSuccess) {
+    this.username = user.username;
+    this.preference = user.preference;
     this.logged = true;
   }
 
   @action
-  set_as_anon() {
-    this.id = undefined;
-    this.username = ANON;
+  logout() {
+    this.username = ANON.username;
+    this.preference = ANON.preference;
     this.logged = false;
   }
 
   listen() {
-    this.channel = new BroadcastChannel('UserChannel');
+    this.channel = new BroadcastChannel('UserStoreChannel');
     this.channel.onmessage = (event) => {
-      const data = event.data;
-      switch (data.type) {
-        case 'login':
-          this.set_as_logged(data);
-          setPreference(data.preference);
-          siteSocket?.reload();
-          break;
-        case 'logout':
-          window.location.reload();
-          break;
-      }
+      const { type, ...data } = event.data;
+      if (type === 'login') this.login(data);
+      if (type === 'logout') this.logout();
     };
   }
 
-  @action
-  setName(username: string) {
-    this.username = username;
+  unlisten() {
+    this.channel?.close();
+    this.channel = undefined;
   }
 
-  @action
-  login(data: UserSuccess) {
-    this.set_as_logged(data);
-    setPreference(data.preference);
-    setTimeout(
-      () =>
-        this.channel.postMessage({
-          type: 'login',
-          ...data,
-        }),
-      0,
-    );
-    setTimeout(() => siteSocket?.reload(), 0);
-  }
-
-  @action
-  logout() {
-    setTimeout(() => {
-      this.channel.postMessage({
-        type: 'logout',
-      });
-      window.location.reload();
-    }, 0);
+  broadcast(event: UserEvent) {
+    this.channel?.postMessage(event);
   }
 }

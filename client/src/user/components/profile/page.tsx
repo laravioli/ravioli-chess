@@ -27,8 +27,6 @@ const Header: React.FC = observer(() => {
     ...getUserOptions({ path: { username: params.username! } }),
   });
 
-  console.log(getUserOptions({ path: { username: params.username! } }));
-
   if (data)
     return (
       <>

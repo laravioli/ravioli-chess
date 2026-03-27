@@ -1,4 +1,8 @@
 import { useRef, useEffect, type ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { reaction } from 'mobx';
+
+import { siteSocket } from '@/lib/socket/socket';
 
 import type { GlobalStore, PageStore } from '@/core/store/stores';
 import type { LocalStorage } from '@/core/store/localstorage';
@@ -35,6 +39,27 @@ export const GlobalStoreProvider = ({
   if (!storeRef.current) {
     storeRef.current = globalStore;
   }
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const dispose = reaction(
+      () => globalStore.userStore.logged,
+      () => {
+        //todo: write a utility function to fire an event once
+        //use this to delay reload on visibility
+        siteSocket.reload();
+        queryClient.resetQueries();
+      },
+    );
+
+    globalStore.userStore.listen();
+
+    return () => {
+      dispose();
+      globalStore.userStore.unlisten();
+    };
+  }, [globalStore, queryClient]);
 
   return (
     <GlobalStoreContext.Provider value={storeRef.current}>{children}</GlobalStoreContext.Provider>

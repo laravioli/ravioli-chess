@@ -8,6 +8,8 @@ import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from '@/
 import { useGlobalStore } from '@/core/hooks/hooks';
 import { IsAuth } from '@/user/components/isauth';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 export const AuthDrawer: React.FC<{ opened: boolean; onClose: () => void }> = ({
   opened,
   onClose,
@@ -28,6 +30,7 @@ export const AuthDrawer: React.FC<{ opened: boolean; onClose: () => void }> = ({
 
 const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
   const { userStore } = useGlobalStore();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [type, toggle] = useToggle(['login', 'register']);
   const focusTrapRef = useFocusTrap(true);
@@ -53,6 +56,15 @@ const AuthenticationForm: React.FC<{ close: () => void }> = ({ close }) => {
     try {
       const { data } = await Auth.login({ body });
       userStore.login(data);
+      setTimeout(
+        () =>
+          userStore.broadcast({
+            type: 'login',
+            ...data,
+          }),
+        0,
+      );
+      queryClient.resetQueries();
       close();
     } catch (error: any) {
       if (error.detail)

@@ -1,4 +1,4 @@
-export interface UserInfo {
+export interface UserServer {
   id: string;
   username: string;
   is_auth?: boolean;

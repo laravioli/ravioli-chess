@@ -94,6 +94,11 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
     try {
       await Auth.logout();
       userStore.logout();
+      setTimeout(() => {
+        userStore.broadcast({
+          type: 'logout',
+        });
+      }, 0);
     } catch (err) {
       console.log(err);
     }
@@ -256,6 +261,7 @@ const PieceSetMenu: MenuViewFC = ({ navigate }) => {
 };
 
 const FriendsMenu: MenuViewFC = ({ navigate }) => {
+  const routeNav = useNavigate();
   const { isFetching, data } = useQuery({
     ...listMyFriendsOptions(),
   });
@@ -277,7 +283,9 @@ const FriendsMenu: MenuViewFC = ({ navigate }) => {
           <Menu.Item
             className={classes.friend}
             key={item.id}
-            onClick={() => {}}
+            onClick={() => {
+              routeNav(`/profile/${item.username}`);
+            }}
             rightSection={
               <IconBrandGooglePlay
                 stroke={1.2}
