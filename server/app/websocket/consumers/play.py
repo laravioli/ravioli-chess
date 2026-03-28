@@ -41,4 +41,4 @@ class PlayConsumer(BaseConsumer):
                 await self.send_json(msg)
 
     async def disconnect(self):
-        logger.info("disconnected")
+        pass

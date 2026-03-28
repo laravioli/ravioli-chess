@@ -27,3 +27,7 @@ class User(BaseSchema):
     @cached_property
     def piece_style(self):
         return self.preference.pieceset.value
+
+    @cached_property
+    def info(self):
+        return {"id": str(self.id), "username": self.username, "is_auth": self.is_auth}

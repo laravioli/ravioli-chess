@@ -1,48 +1,49 @@
-import logging
-
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 
 from app.deps import DbSession
 
-from .deps import User, WebCache, user_or_anon
-from .service import get_chess_positions
+from .deps import WebCache, user_or_anon
 from .templating import templates
-
-logger = logging.getLogger(__name__)
+from .views_ctx import DEFAULT_CONTEXT, analyse_ctx, editor_ctx, index_ctx, play_ctx
 
 router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)])
 
 
-@router.get("/", response_class=HTMLResponse, name="root")
-@router.get("/analysis", response_class=HTMLResponse, name="analyse")
-@router.get("/editor", response_class=HTMLResponse, name="editor")
-@router.get("/play", response_class=HTMLResponse, name="play")
-@router.get("/profile/{username}", response_class=HTMLResponse, name="profile")
-async def index(request: Request, session: DbSession, cache: WebCache):
-    user: User = request.state.user
-
-    positions = await cache.get_or_set(
-        "chess:positions", factory=lambda: get_chess_positions(session)
-    )
-    ctx = {
-        "payload": {
-            "cfg": {
-                "user": {
-                    "id": str(user.id),
-                    "username": user.username,
-                    "is_auth": user.is_auth,
-                },
-                "page": {
-                    "orientation": "white",
-                    "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                },
-            },
-            "data": {"positions": positions},
-        }
-    }
+def generate_page(request: Request, page_ctx: dict[str, any] = DEFAULT_CONTEXT):
+    user = request.state.user
+    ctx = {"payload": {"user": user.info, **page_ctx}}
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context=ctx,
     )
+
+
+@router.get("/", response_class=HTMLResponse, name="root")
+async def index(request: Request, cache: WebCache, session: DbSession):
+    page_ctx = await index_ctx(cache, session)
+    return generate_page(request, page_ctx)
+
+
+@router.get("/analysis", response_class=HTMLResponse, name="analyse")
+async def analysis(request: Request, session: DbSession, cache: WebCache):
+    page_ctx = await analyse_ctx(cache, session)
+    return generate_page(request, page_ctx)
+
+
+@router.get("/editor", response_class=HTMLResponse, name="editor")
+async def editor(request: Request, session: DbSession, cache: WebCache):
+    page_ctx = await editor_ctx(cache, session)
+    return generate_page(request, page_ctx)
+
+
+@router.get("/play", response_class=HTMLResponse, name="play")
+async def play(request: Request):
+    page_ctx = play_ctx()
+    return generate_page(request, page_ctx)
+
+
+@router.get("/profile/{username}", response_class=HTMLResponse, name="profile")
+async def profile(request: Request):
+    return generate_page(request)

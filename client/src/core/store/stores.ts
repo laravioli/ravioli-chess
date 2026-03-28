@@ -5,12 +5,12 @@ import { PlayStore } from '@/play/store/play';
 import { Ceval } from '@/lib/eval/ceval';
 import type { LocalEvalStorage } from '@/lib/eval/localstorage';
 
-import type { ServerConfig } from '@/core/boot/interface';
+import type { ServerPayload } from '@/core/boot/interface';
 
 /* Global Store */
 
 interface GlobalStoreDependencies {
-  userConfig: ServerConfig['user'];
+  userConfig: ServerPayload['user'];
   localEvalStorage: LocalEvalStorage;
 }
 

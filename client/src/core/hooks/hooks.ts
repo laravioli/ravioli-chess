@@ -8,7 +8,7 @@ import {
   PageStoreContext,
 } from '@/core/context/context';
 import type { PageStore } from '@/core/store/stores';
-import type { PageConfig } from '@/core/boot/interface';
+import type { Page } from '@/core/boot/interface';
 
 /* Hooks to retrieve stores*/
 export const useLocalStorage = () => {
@@ -40,8 +40,8 @@ export const usePageInitCfg = () => {
   const { state } = useLocation();
   const payload = useContext(DataContext);
 
-  if (state) return state as PageConfig;
-  if (payload) return payload.page;
+  if (state) return state as Page;
+  if (payload && payload?.page) return payload.page;
 
   throw new Error('missing initial page data');
 };

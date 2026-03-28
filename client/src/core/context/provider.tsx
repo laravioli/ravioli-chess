@@ -46,8 +46,6 @@ export const GlobalStoreProvider = ({
     const dispose = reaction(
       () => globalStore.userStore.logged,
       () => {
-        //todo: write a utility function to fire an event once
-        //use this to delay reload on visibility
         siteSocket.reload();
         queryClient.resetQueries();
       },
@@ -59,7 +57,7 @@ export const GlobalStoreProvider = ({
       dispose();
       globalStore.userStore.unlisten();
     };
-  }, [globalStore, queryClient]);
+  }, []);
 
   return (
     <GlobalStoreContext.Provider value={storeRef.current}>{children}</GlobalStoreContext.Provider>

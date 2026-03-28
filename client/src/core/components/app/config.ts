@@ -24,11 +24,11 @@ export const makeAppDependencies = (payload: ServerPayload): AppDependencies => 
   const localStorage = makeLocalStorage();
   return {
     mantineConfig: makeMantineConfig(),
-    data: { page: payload.cfg.page, data: payload.data },
+    data: { page: payload.page, data: payload.data },
     queryClient: makeQueryClient(),
     localStorage,
     globalStore: makeGlobalStore({
-      userConfig: payload.cfg.user,
+      userConfig: payload.user,
       localEvalStorage: localStorage.evalStorage,
     }),
   };

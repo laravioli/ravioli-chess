@@ -1,40 +1,30 @@
 import type { UUID } from 'crypto';
 
 export interface ServerPayload {
-  cfg: ServerConfig;
-  data: ServerData;
+  user: User;
+  page?: Page;
+  data?: Data;
 }
 
-/* Config */
-
-export interface ServerConfig {
-  user: UserConfig;
-  page: BasePageConfig;
-}
-
-/* User config */
-
-export interface UserConfig {
+interface User {
   id: UUID;
   username: string;
   is_auth?: boolean;
 }
-/* Page config */
 
-export interface BasePageConfig {
+export type Page = AnalyseConfig | EditorConfig | PlayConfig;
+
+interface BasePage {
   orientation: Color;
   fen: FEN;
 }
 
-export interface AnalyseConfig extends BasePageConfig {}
-export interface EditorConfig extends BasePageConfig {}
-export interface PlayConfig extends BasePageConfig {}
-export type PageConfig = AnalyseConfig | EditorConfig | PlayConfig;
+export type AnalyseConfig = BasePage & {};
+export type EditorConfig = BasePage & {};
+export type PlayConfig = BasePage & {};
 
-/* Server data*/
-
-export interface ServerData {
-  positions: PositionData[];
+export interface Data {
+  positions?: PositionData[];
 }
 
 export interface PositionData {
@@ -44,6 +34,6 @@ export interface PositionData {
 }
 
 export interface ProvidedData {
-  page: PageConfig;
-  data: ServerData;
+  page?: Page;
+  data?: Data;
 }
