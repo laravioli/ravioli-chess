@@ -8,7 +8,7 @@ export const createLoader = (queryClient: QueryClient) => {
       const { username } = params;
       const data = await queryClient.fetchQuery({
         ...getUserOptions({ path: { username: username! } }),
-        staleTime: 0,
+        staleTime: 60 * 1000,
       });
       return data;
     },

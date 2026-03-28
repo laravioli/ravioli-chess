@@ -1,17 +1,24 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
 
 import { useHTMLData, usePageStore } from '@/core/hooks/hooks';
-
+import { chessPositionsOptions } from '@/lib/api/@tanstack/react-query.gen';
 import classes from '@/editor/css/controls.module.css';
 import type { EditorStore } from '@/editor/store/editor';
 import { short_fen } from './utils';
 
 export const Positions: React.FC = observer(() => {
+  const [isClicked, setIsClicked] = useState<boolean>(false);
   const editorStore = usePageStore<EditorStore>();
-  const { positions } = useHTMLData();
+  const htmlData = useHTMLData();
+  const { data: positions = [] } = useQuery({
+    ...chessPositionsOptions(),
+    enabled: isClicked,
+    initialData: htmlData?.positions,
+  });
 
   const data = useMemo(
     () => [
@@ -57,6 +64,9 @@ export const Positions: React.FC = observer(() => {
   return (
     <NativeSelect
       value={value}
+      onFocus={() => {
+        if (!isClicked) setIsClicked(true);
+      }}
       onChange={onChange}
       data={data}
       classNames={{ input: classes.select }}

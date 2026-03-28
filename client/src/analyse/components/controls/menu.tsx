@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 import { INITIAL_FEN } from 'chessops/fen';
 import { ActionIcon, Menu } from '@mantine/core';
 import {
@@ -12,6 +13,7 @@ import {
   IconMenu,
 } from '@tabler/icons-react';
 
+import { chessPositionsOptions } from '@/lib/api/@tanstack/react-query.gen';
 import { usePageStore, useHTMLData } from '@/core/hooks/hooks';
 import { useMenu, type MenuViewFC } from '@/common/hooks/hooks';
 
@@ -81,7 +83,11 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
 
 const PositionsMenu: MenuViewFC = ({ navigate }) => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const { positions } = useHTMLData();
+  const htmlData = useHTMLData();
+  const { data: positions = [] } = useQuery({
+    ...chessPositionsOptions(),
+    initialData: htmlData?.positions,
+  });
 
   const options = useMemo(
     () =>
