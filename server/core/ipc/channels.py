@@ -55,6 +55,16 @@ class ConsumerChan(WebsocketChan):
     name = "socket"
 
 
+class UserChan(WebsocketChan):
+    """
+
+    args:
+        uuid (str): user uuid.
+    """
+
+    name = "user"
+
+
 class WsGameChan(WebsocketChan):
     """
 

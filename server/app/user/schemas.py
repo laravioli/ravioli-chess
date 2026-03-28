@@ -57,11 +57,6 @@ class UserWithPref(UserBase):
     joined_at: AwareDatetime
 
 
-class UserSearch(BaseSchema):
-    id: UUID4
-    username: str
-
-
 # Note
 # Define once at module level
 # users_adapter = TypeAdapter(list[User])

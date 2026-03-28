@@ -1,22 +1,21 @@
 import asyncio
 import uuid
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
 from core.ipc import app_out, client_out, engine_out
-from core.ipc.channels import ConsumerChan
+from core.ipc.channels import ConsumerChan, UserChan
 from core.ipc.structs import ServerMsg
 from lib.serializers import json, msgpack
 
+if TYPE_CHECKING:
+    from app.websocket.deps import MaybeUser
 
-class BaseConsumer(ABC):
-    def __init__(self, websocket: WebSocket, broadcast: BroadCastClient):
-        self.websocket = websocket
-        self.broadcast = broadcast
-        self.channel_name = ConsumerChan(uuid.uuid4())
 
+class AbstractBaseConsumer(ABC):
     @property
     @abstractmethod
     def channels(self) -> tuple[str]: ...
@@ -29,6 +28,15 @@ class BaseConsumer(ABC):
 
     @abstractmethod
     async def handle_engine_msg(self, msg: engine_out.Protocol): ...
+
+
+class BaseConsumer(AbstractBaseConsumer):
+    def __init__(self, user: "MaybeUser", websocket: WebSocket, broadcast: BroadCastClient):
+        self.user = user
+        self.websocket = websocket
+        self.broadcast = broadcast
+        self.consumer_channel = ConsumerChan(uuid.uuid4())
+        self.user_channel = UserChan(str(user.id)) if user else None
 
     async def __call__(self):
         await self.websocket.accept()

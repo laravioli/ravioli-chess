@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 
 from core.ipc import client_out, engine_in, engine_out
 from core.ipc.channels import EngineGameCreateChan
@@ -9,9 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 class SiteConsumer(BaseConsumer):
-    @property
+    @cached_property
     def channels(self):
-        return (self.channel_name,)
+        if self.user_channel:
+            return (self.consumer_channel, self.user_channel)
+        return (self.consumer_channel,)
 
     async def handle_client_msg(self, msg):
         response, channel = (None, None)
@@ -20,7 +23,7 @@ class SiteConsumer(BaseConsumer):
                 case client_out.GameCreate(data):
                     response, channel = (
                         engine_in.GameCreate(
-                            channel=str(self.channel_name),
+                            channel=str(self.consumer_channel),
                             data=data,
                         ),
                         EngineGameCreateChan(1),

@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 
 from fastapi import WebSocket
 
@@ -17,9 +18,11 @@ class PlayConsumer(BaseConsumer):
         self.game_id = game_id
         self.game_channel = EngineGameChan(game_id)
 
-    @property
+    @cached_property
     def channels(self):
-        return (self.channel_name, WsGameChan(self.game_id))
+        if self.user_channel:
+            return (self.consumer_channel, self.user_channel, WsGameChan(self.game_id))
+        return (self.consumer_channel, WsGameChan(self.game_id))
 
     async def handle_client_msg(self, msg):
         response = None

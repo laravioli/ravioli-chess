@@ -78,11 +78,12 @@ class Broadcast:
         backend_subscribe = set()
 
         for channel in args:
-            if channel not in self._channel_map:
-                self._channel_map[channel] = set()
-            if not self._channel_map[channel]:
-                backend_subscribe.add(channel)
-            self._channel_map[channel].add(subscriber)
+            if isinstance(channel, str):
+                if channel not in self._channel_map:
+                    self._channel_map[channel] = set()
+                if not self._channel_map[channel]:
+                    backend_subscribe.add(channel)
+                self._channel_map[channel].add(subscriber)
 
         if backend_subscribe:
             await self._backend.subscribe(*backend_subscribe)
@@ -98,13 +99,14 @@ class Broadcast:
         backend_unsubscribe = set()
 
         for channel in args:
-            try:
-                self._channel_map[channel].remove(subscriber)
-            except KeyError:
-                pass
-            if not self._channel_map[channel]:
-                backend_unsubscribe.add(channel)
-                del self._channel_map[channel]
+            if isinstance(channel, str):
+                try:
+                    self._channel_map[channel].remove(subscriber)
+                except KeyError:
+                    pass
+                if not self._channel_map[channel]:
+                    backend_unsubscribe.add(channel)
+                    del self._channel_map[channel]
 
         if backend_unsubscribe:
             await self._backend.unsubscribe(*backend_unsubscribe)

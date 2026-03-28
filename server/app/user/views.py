@@ -8,7 +8,7 @@ from app.auth.deps import CurrentUser, SessionCookie, UserOrAnon
 from app.config import settings
 from app.deps import DbSession, RedisClient
 
-from .schemas import UserBase, UserCreate, UserProfile, UserSearch, UserWithPref
+from .schemas import UserBase, UserCreate, UserProfile, UserWithPref
 from .service import (
     user_create,
     user_delete,
@@ -60,7 +60,7 @@ async def get_user(session: DbSession, current_user: UserOrAnon, username: str):
     return user
 
 
-@router.get("", response_model=list[UserSearch])
+@router.get("", response_model=list[UserBase])
 async def list_user(
     session: DbSession,
     q: Annotated[str | None, Query()] = None,

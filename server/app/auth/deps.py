@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, Response, status
 from fastapi.exceptions import HTTPException
-from fastapi.security import APIKeyCookie
+from fastapi.requests import HTTPConnection
 from sqlalchemy.orm import joinedload
 
 from app.config import settings
@@ -14,15 +14,17 @@ from lib.serializers import msgpack
 from .schemas import Session
 from .security import verify_session
 
-type SessionCookie = Annotated[
-    str | None,
-    Depends(APIKeyCookie(name=settings.SESSION_COOKIE, auto_error=False)),
-]
+
+async def get_session_cookie(conn: HTTPConnection):
+    return conn.cookies.get(settings.SESSION_COOKIE)
+
+
+type SessionCookie = Annotated[str | None, Depends(get_session_cookie)]
 
 
 async def get_auth_session(
     redis: RedisClient,
-    session_cookie: SessionCookie = None,
+    session_cookie: str,
 ) -> Session:
     data = await redis.get(f"session:{session_cookie}")
     if not data:
