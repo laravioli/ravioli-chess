@@ -7,7 +7,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
 from core.ipc import app_out, client_out, engine_out
-from core.ipc.channels import ConsumerChan, UserChan
+from core.ipc.channels import ConsumerChan
 from core.ipc.structs import ServerMsg
 from lib.serializers import json, msgpack
 
@@ -36,7 +36,6 @@ class BaseConsumer(AbstractBaseConsumer):
         self.websocket = websocket
         self.broadcast = broadcast
         self.consumer_channel = ConsumerChan(uuid.uuid4())
-        self.user_channel = UserChan(str(user.id)) if user else None
 
     async def __call__(self):
         await self.websocket.accept()

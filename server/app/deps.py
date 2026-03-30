@@ -35,5 +35,5 @@ async def get_broadcast(conn: HTTPConnection) -> Broadcast:
     return conn.state.broadcast
 
 
-RedisClient = Annotated[Redis, Depends(get_redis)]
-BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]
+type RedisClient = Annotated[Redis, Depends(get_redis)]
+type BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]

@@ -5,8 +5,8 @@ from ..structs import TaggedMsg
 # ╚══════════════════════════════════════╝
 
 
-class Test(TaggedMsg, tag="test"):
+class TestMsg(TaggedMsg, tag="test"):
     data: str
 
 
-type Protocol = Test
+type Protocol = TestMsg

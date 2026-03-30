@@ -1,8 +1,8 @@
 import logging
 from functools import cached_property
 
-from core.ipc import client_out, engine_in, engine_out
-from core.ipc.channels import EngineGameCreateChan
+from core.ipc import app_out, client_out, engine_in, engine_out
+from core.ipc.channels import EngineGameCreateChan, UserChan
 
 from .base import BaseConsumer
 
@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 class SiteConsumer(BaseConsumer):
     @cached_property
     def channels(self):
-        if self.user_channel:
-            return (self.consumer_channel, self.user_channel)
+        if self.user:
+            return (self.consumer_channel, UserChan(str(self.user.id)))
         return (self.consumer_channel,)
 
     async def handle_client_msg(self, msg):
@@ -40,6 +40,11 @@ class SiteConsumer(BaseConsumer):
         match msg:
             case engine_out.GameCreate():
                 await self.send_json(msg)
+
+    async def handle_app_msg(self, msg):
+        match msg:
+            case app_out.TestMsg():
+                logger.info(msg)
 
     async def disconnect(self):
         pass
