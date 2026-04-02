@@ -1,7 +1,7 @@
 import logging
 from functools import cached_property
 
-from core.ipc import app_out, client_out, engine_in, engine_out
+from core.ipc import ClientIn, c_out, p_in, p_out
 from core.ipc.channels import EngineGameCreateChan, UserChan
 
 from .base import BaseConsumer
@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class SiteConsumer(BaseConsumer):
+    c_out_frame = c_out.GameCreate
+    p_out_frame = p_out.GameCreate | p_out.TellSocket
+
     @cached_property
     def channels(self):
         if self.user:
@@ -20,9 +23,9 @@ class SiteConsumer(BaseConsumer):
         response, channel = (None, None)
         try:
             match msg:
-                case client_out.GameCreate(data):
+                case c_out.GameCreate(data):
                     response, channel = (
-                        engine_in.GameCreate(
+                        p_in.GameCreate(
                             channel=str(self.consumer_channel),
                             data=data,
                         ),
@@ -36,15 +39,19 @@ class SiteConsumer(BaseConsumer):
             if response and channel:
                 await self.broadcast.publish(channel, response)
 
-    async def handle_engine_msg(self, msg):
+    async def handle_process_msg(self, msg):
         match msg:
-            case engine_out.GameCreate():
-                await self.send_json(msg)
+            case p_out.GameCreate(data):
+                await self.send_json(ClientIn(type="gameCreate", data=data))
+            case _:
+                await self.handle_app_msg(msg)
 
     async def handle_app_msg(self, msg):
         match msg:
-            case app_out.TestMsg():
+            case p_out.TellSocket():
                 logger.info(msg)
+            case _:
+                logger.warning("received an unknow process msg")
 
     async def disconnect(self):
         pass

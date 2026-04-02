@@ -5,8 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.db.models import Game, User
-from core.ipc import engine_in
-from core.ipc.structs import GameInfo
+from core.ipc import p_in
 from engine.deps import LocalSession
 
 
@@ -14,8 +13,8 @@ def id8():
     return "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
 
 
-async def create_game_db(msg: engine_in.GameStart):
-    game_id = id8() if isinstance(msg, engine_in.GameCreate) else msg.id
+async def create_game_db(msg: p_in.GameStart):
+    game_id = id8() if isinstance(msg, p_in.GameCreate) else msg.id
 
     async with LocalSession() as session:
         players = await get_players(session, msg.data)
@@ -31,7 +30,7 @@ async def create_game_db(msg: engine_in.GameStart):
     return game_id
 
 
-async def get_players(session: AsyncSession, info: GameInfo) -> dict[str, User]:
+async def get_players(session: AsyncSession, info: p_in.GameInfo) -> dict[str, User]:
     usernames = [p for p in (info.white_player, info.black_player) if p is not None]
     players = {}
     if usernames:

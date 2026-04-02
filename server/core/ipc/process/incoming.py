@@ -1,32 +1,38 @@
 from msgspec import Struct, field
 
 # ╔══════════════════════════════════════╗
-# ║   CLIENT OUT : ws <- client          ║
+# ║   ENGINE IN : ws -> engine           ║
 # ╚══════════════════════════════════════╝
 
 
-# todo: add validation
 # Data
 class GameInfo(Struct):
     white_player: str | None = field(name="wp", default=None)
     black_player: str | None = field(name="bp", default=None)
 
 
-class MoveData(Struct):
+# Frame
+class ProcessIn(Struct, tag_field="pi"): ...
+
+
+class GameCreate(ProcessIn):
+    channel: str
+    data: GameInfo
+
+
+class ChallengeAccepted(ProcessIn):
+    id: str
+    data: GameInfo
+
+
+class GameMove(ProcessIn):
     san: str
 
 
-# Frame
-class ClientOut(Struct, tag_field="t", rename={"data": "d"}): ...
-
-
-class GameCreate(ClientOut, tag="newGame"):
-    data: GameInfo = field(default_factory=GameInfo)
-
-
-class GameMove(ClientOut, tag="move"):
-    data: MoveData
+class GameResign(ProcessIn):
+    player: str
 
 
 # types
-type ClientFrameOut = GameCreate | GameMove
+type GameStart = GameCreate | ChallengeAccepted
+type GameUpdate = GameMove | GameResign

@@ -1,9 +1,11 @@
-from ..structs import GameRouting, TaggedMsg
+from msgspec import UNSET, Raw, Struct
 
 # ╔══════════════════════════════════════╗
 # ║   CLIENT IN : ws -> client           ║
 # ╚══════════════════════════════════════╝
 
 
-class GameCreate(TaggedMsg, tag="game.created"):
-    data: GameRouting
+# Frame
+class ClientIn(Struct, rename={"type": "t", "data": "d"}):
+    type: str
+    data: Raw | None = UNSET

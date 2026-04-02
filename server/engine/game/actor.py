@@ -3,8 +3,7 @@ from abc import ABC, abstractmethod
 
 import chess
 
-from core.ipc import engine_in, engine_out
-from core.ipc.structs import GameInfo, ValidatedMove
+from core.ipc import p_in, p_out
 from engine.exceptions import StopActor
 
 logger = logging.getLogger(__name__)
@@ -35,7 +34,7 @@ class Actor(ABC):
 
 
 class GameActor(Actor):
-    def __init__(self, *, info: GameInfo):
+    def __init__(self, *, info: p_in.GameInfo):
         self.white_player = info.white_player
         self.black_player = info.black_player
         self._board = chess.Board()
@@ -44,12 +43,14 @@ class GameActor(Actor):
         response = None
 
         match msg:
-            case engine_in.GameMove(data):
+            case p_in.GameMove(san):
                 try:
-                    self._board.push_san(data.san)
-                    response = engine_out.GameMove(data=ValidatedMove(ok=True, san=data.san))
+                    self._board.push_san(san)
+                    response = p_out.GameUpdate(type="move", data=p_out.GameMove(san))
                 except ValueError as exc:
-                    response = engine_out.GameMove(data=ValidatedMove(ok=False, san=data.san))
+                    response = p_out.GameUpdate(
+                        type="endData", data=p_out.GameEnd(reason="invalid move")
+                    )
                     raise StopActor from exc
             case _:
                 logger.warning("Unknown message received: %s", msg)

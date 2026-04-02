@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import AsyncGenerator
 
-from lib.serializers import msgpack
+from lib.serializers import json
 
 
 class Subscriber:
@@ -20,7 +20,9 @@ class Subscriber:
         while True:
             try:
                 message = await self._queue.get()
-                yield msgpack.decode(message, type_arg=type_arg)
+                # this implicitly means messages are subtype of "T"
+                # i should define explictly what can of message a subscriber is waiting for
+                yield json.decode(message, type_arg=type_arg)
             except asyncio.QueueShutDown:
                 break
 

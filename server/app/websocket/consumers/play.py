@@ -4,7 +4,7 @@ from functools import cached_property
 from fastapi import WebSocket
 
 from app.deps import BroadCastClient
-from core.ipc import client_out, engine_in, engine_out
+from core.ipc import ClientIn, c_out, p_in, p_out
 from core.ipc.channels import EngineGameChan, UserChan, WsGameChan
 
 from .base import BaseConsumer
@@ -13,8 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 class PlayConsumer(BaseConsumer):
-    def __init__(self, websocket: WebSocket, broadcast: BroadCastClient, game_id: str):
-        super().__init__(websocket, broadcast)
+    c_out_frame = c_out.GameMove
+    p_out_frame = p_out.GameUpdate
+
+    def __init__(self, user, websocket: WebSocket, broadcast: BroadCastClient, game_id: str):
+        super().__init__(user, websocket, broadcast)
         self.game_id = game_id
         self.game_channel = EngineGameChan(game_id)
 
@@ -28,8 +31,8 @@ class PlayConsumer(BaseConsumer):
         response = None
         try:
             match msg:
-                case client_out.GameMove(data):
-                    response = engine_in.GameMove(data=data)
+                case c_out.GameMove(data):
+                    response = p_in.GameMove(san=data.san)
                 case _:
                     logger.warning("received an unknow request")
         except Exception:
@@ -38,10 +41,10 @@ class PlayConsumer(BaseConsumer):
             if response:
                 await self.broadcast.publish(self.game_channel, response)
 
-    async def handle_engine_msg(self, msg):
+    async def handle_process_msg(self, msg):
         match msg:
-            case engine_out.GameMove():
-                await self.send_json(msg)
+            case p_out.GameUpdate(type, data):
+                await self.send_json(ClientIn(type, data))
 
     async def disconnect(self):
         pass

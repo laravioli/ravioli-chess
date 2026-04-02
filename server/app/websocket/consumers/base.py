@@ -1,33 +1,32 @@
 import asyncio
 import uuid
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
-from core.ipc import app_out, client_out, engine_out
 from core.ipc.channels import ConsumerChan
-from core.ipc.structs import ServerMsg
-from lib.serializers import json, msgpack
+from core.ipc.types import ClientFrameOut, ProcessFrameOut
+from lib.serializers import json
 
 if TYPE_CHECKING:
     from app.websocket.deps import MaybeUser
 
 
 class AbstractBaseConsumer(ABC):
+    c_out_frame: ClassVar[ClientFrameOut]
+    p_out_frame: ClassVar[ProcessFrameOut]
+
     @property
     @abstractmethod
     def channels(self) -> tuple[str]: ...
 
-    async def handle_app_msg(self, msg: app_out.Protocol):  # noqa: B027
-        pass
+    @abstractmethod
+    async def handle_client_msg(self, msg): ...
 
     @abstractmethod
-    async def handle_client_msg(self, msg: client_out.Protocol): ...
-
-    @abstractmethod
-    async def handle_engine_msg(self, msg: engine_out.Protocol): ...
+    async def handle_process_msg(self, msg): ...
 
 
 class BaseConsumer(AbstractBaseConsumer):
@@ -43,7 +42,7 @@ class BaseConsumer(AbstractBaseConsumer):
         try:
             async with asyncio.TaskGroup() as tg:
                 task = tg.create_task(self.handle_broadcast())
-                async for msg in self.receive_iter_json(type_arg=client_out.Protocol):
+                async for msg in self.receive_iter_json(type_arg=self.c_out_frame):
                     await self.handle_client_msg(msg)
                 task.cancel()
         except* WebSocketDisconnect:
@@ -54,17 +53,8 @@ class BaseConsumer(AbstractBaseConsumer):
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
-                async for server_msg in sub.iter_message(type_arg=ServerMsg):
-                    if server_msg.source == "engine":
-                        await self.handle_engine_msg(
-                            msgpack.decode(server_msg.msg, type_arg=engine_out.Protocol)
-                        )
-                    elif server_msg.source == "app":
-                        await self.handle_app_msg(
-                            msgpack.decode(server_msg.msg, type_arg=app_out.Protocol)
-                        )
-                    else:
-                        raise ValueError("Invalid message source")
+                async for msg in sub.iter_message(type_arg=self.p_out_frame):
+                    await self.handle_process_msg(msg)
 
     async def send_json(self, data):
         """send data to websocket client"""

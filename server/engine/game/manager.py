@@ -1,9 +1,8 @@
 import asyncio
 from contextlib import suppress
 
-from core.ipc import engine_in, engine_out
+from core.ipc import p_in, p_out
 from core.ipc.channels import EngineGameChan, EngineGameCreateChan, WsGameChan
-from core.ipc.structs import GameRouting, ServerMsg
 from engine.utils import register_coroutine
 from lib.pubsub import Broadcast
 
@@ -26,7 +25,7 @@ class GameManager:
     async def run(self):
         try:
             async with self.broadcast.start_subscription(EngineGameCreateChan(1)) as subscriber:
-                async for message in subscriber.iter_message(type_arg=engine_in.GameStart):
+                async for message in subscriber.iter_message(type_arg=p_in.GameStart):
                     register_coroutine(self._start_tasks, self.start_one, message)
         finally:
             for task in self._start_tasks:
@@ -44,9 +43,9 @@ class GameManager:
                 await self._task
 
     async def publish(self, channel, msg):
-        await self.broadcast.publish(channel, ServerMsg(source="engine", msg=msg))
+        await self.broadcast.publish(channel, msg)
 
-    async def start_one(self, msg: engine_in.GameStart):
+    async def start_one(self, msg: p_in.GameStart):
         id = await create_game_db(msg)
 
         send_channel = WsGameChan(id)
@@ -54,12 +53,12 @@ class GameManager:
 
         # actor api
         async def receive():
-            await self.publish(msg.channel, engine_out.GameCreate(data=GameRouting(id)))
+            await self.publish(msg.channel, p_out.GameCreate(data=p_out.GameId(id)))
             async with self.broadcast.start_subscription(receive_channel) as sub:
-                async for message in sub.iter_message(type_arg=engine_in.GameProtocol):
+                async for message in sub.iter_message(type_arg=p_in.GameUpdate):
                     yield message
 
-        async def send(msg: engine_out.GameProtocol):
+        async def send(msg: p_out.GameUpdate):
             await self.publish(send_channel, msg)
 
         # start actor
