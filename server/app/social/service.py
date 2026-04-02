@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
-from core.db.models import Friendship, User
+from core.db.models import FriendRequest, Friendship, User
 from core.db.models.social import FriendshipStatus
 
 
@@ -15,6 +15,14 @@ async def create_request(session: DbSession, current_user_id: uuid.UUID, target_
             sender_id=current_user_id, receiver_id=target_id, status=FriendshipStatus.pending
         )
         session.add(request)
+        await session.flush()
+
+        notification = FriendRequest(
+            user_id=target_id,
+            friendship_id=request.id,
+        )
+        session.add(notification)
+
         await session.commit()
     except IntegrityError:
         await session.rollback()
@@ -30,11 +38,18 @@ async def accept_request(session: DbSession, current_user_id: uuid.UUID, target_
             Friendship.status == FriendshipStatus.pending,
         )
         .values(status=FriendshipStatus.accepted)
+        .returning(Friendship.id)
     )
     result = await session.execute(stmt)
 
-    if result.rowcount == 0:
+    friendship_id = result.scalar_one_or_none()
+
+    if friendship_id is None:
         raise DBNotFound(detail="There is no request to accept")
+
+    delete_stmt = delete(FriendRequest).where(FriendRequest.friendship_id == friendship_id)
+
+    await session.execute(delete_stmt)
 
     await session.commit()
 
