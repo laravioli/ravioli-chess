@@ -2,7 +2,7 @@ import logging
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 from redis.asyncio import Redis
 
 from lib.serializers import msgpack
@@ -15,7 +15,7 @@ from .utils import (
 logger = logging.getLogger(__name__)
 
 
-class CacheService[T: BaseModel]:
+class CacheService[T]:
     """
     Generic caching service for Pydantic models
 
@@ -36,7 +36,8 @@ class CacheService[T: BaseModel]:
         self,
         redis: Redis,
         namespace: str,
-        model: type[T] | None = None,
+        model: BaseModel | None = None,
+        adapter: TypeAdapter[T] | None = None,
         default_ttl: int = 300,
         use_jitter: bool = True,
         prefix: str = "cache",
@@ -45,6 +46,7 @@ class CacheService[T: BaseModel]:
         self.redis = redis
         self.namespace = namespace
         self.model = model
+        self.adapter = adapter
         self.default_ttl = default_ttl
         self.use_jitter = use_jitter
         self.prefix = prefix
@@ -86,7 +88,12 @@ class CacheService[T: BaseModel]:
             if data is None:
                 return None
 
-            return self.model.model_validate_json(data) if self.model else msgpack.decode(data)
+            if self.model:
+                return self.model.model_validate_json(data)
+            elif self.adapter:
+                return self.adapter.validate_json(data)
+            else:
+                return msgpack.decode(data)
         except Exception as e:
             logger.warning(f"Cache get failed for {identifier}: {e}")
             return None
@@ -97,19 +104,28 @@ class CacheService[T: BaseModel]:
         value: T | dict[str, Any] | str,
         ttl: int | None = None,
         params: dict[str, Any] | None = None,
-    ) -> bool:
+    ) -> Any:
         """
         Set cached value with automatic serialization
+
+        **Return** validated value if used with pydantic, else value
         """
         try:
             key = self._build_key(identifier, params)
             effective_ttl = self._get_ttl(ttl)
-            data = (
-                value.model_dump_json() if isinstance(value, BaseModel) else msgpack.encode(value)
-            )
+
+            if self.model:
+                if not isinstance(value, BaseModel):
+                    value = self.model.model_validate(value)
+                data = value.model_dump_json()
+            elif self.adapter:
+                value = self.adapter.validate_python(value)
+                data = self.adapter.dump_json(value)
+            else:
+                data = msgpack.encode(value)
 
             await self.redis.set(key, data, ex=effective_ttl)
-            return True
+            return value
 
         except Exception as e:
             logger.error(f"Cache set failed for {identifier}: {e}")
@@ -160,8 +176,7 @@ class CacheService[T: BaseModel]:
             return cached
 
         value = await factory()
-        await self.set(identifier, value, ttl, params)
-        return value
+        return await self.set(identifier, value, ttl, params)
 
     async def invalidate_pattern(self, pattern: str = "*") -> int:
         """

@@ -6,8 +6,10 @@ from sqlalchemy.orm import joinedload
 from app.deps import DbSession
 from core.db.models import FriendRequest, Friendship, Notification
 
+from .deps import NotifCache
 
-async def get_notifications(session: DbSession, user_id: UUID):
+
+async def db_notifications(session: DbSession, user_id: UUID):
     stmt = (
         select(Notification)
         .options(joinedload(FriendRequest.friendship).joinedload(Friendship.sender))
@@ -18,3 +20,7 @@ async def get_notifications(session: DbSession, user_id: UUID):
     notifications = result.scalars().all()
 
     return notifications
+
+
+async def get_notifications(cache: NotifCache, session: DbSession, user_id: UUID):
+    return await cache.get_or_set(f"{user_id}", factory=lambda: db_notifications(session, user_id))

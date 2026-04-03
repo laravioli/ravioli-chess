@@ -50,6 +50,7 @@ class SiteConsumer(BaseConsumer):
     async def handle_app_msg(self, msg):
         match msg:
             case p_out.TellUser(data):
+                # testing purpose
                 logger.info(json.decode(data))
             case _:
                 logger.warning("received an unknow process msg")
