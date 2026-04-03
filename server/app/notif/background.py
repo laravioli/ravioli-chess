@@ -11,7 +11,7 @@ from .schemas import notification_adapter
 from .service import db_notifications
 
 
-def publish_notifications(publish: Publish, user_id: UUID):
+def push_notifications(publish: Publish, user_id: UUID):
     async def coro():
         async with LocalSession() as session:
             notifications = await db_notifications(session, user_id)

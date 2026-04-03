@@ -5,7 +5,7 @@ from typing import Any
 from pydantic import BaseModel, TypeAdapter
 from redis.asyncio import Redis
 
-from lib.serializers import msgpack
+from lib.serializers import json
 
 from .utils import (
     build_cache_key,
@@ -36,8 +36,7 @@ class CacheService[T]:
         self,
         redis: Redis,
         namespace: str,
-        model: BaseModel | None = None,
-        adapter: TypeAdapter[T] | None = None,
+        model: BaseModel | TypeAdapter | None = None,
         default_ttl: int = 300,
         use_jitter: bool = True,
         prefix: str = "cache",
@@ -46,7 +45,6 @@ class CacheService[T]:
         self.redis = redis
         self.namespace = namespace
         self.model = model
-        self.adapter = adapter
         self.default_ttl = default_ttl
         self.use_jitter = use_jitter
         self.prefix = prefix
@@ -81,55 +79,52 @@ class CacheService[T]:
         """
         Get cached value, deserialize to Pydantic model if configured
         """
-        try:
-            key = self._build_key(identifier, params)
-            data = await self.redis.get(key)
+        key = self._build_key(identifier, params)
+        data = await self.redis.get(key)
 
-            if data is None:
-                return None
-
-            if self.model:
-                return self.model.model_validate_json(data)
-            elif self.adapter:
-                return self.adapter.validate_json(data)
-            else:
-                return msgpack.decode(data)
-        except Exception as e:
-            logger.warning(f"Cache get failed for {identifier}: {e}")
+        if data is None:
             return None
+
+        match self.model:
+            case None:
+                return json.decode(data)
+            case BaseModel():
+                return self.model.model_validate_json(data)
+            case TypeAdapter():
+                return self.model.validate_json(data)
 
     async def set(
         self,
         identifier: str,
-        value: T | dict[str, Any] | str,
+        value: T | dict[str, Any] | bytes | str,
         ttl: int | None = None,
         params: dict[str, Any] | None = None,
     ) -> Any:
         """
         Set cached value with automatic serialization
 
-        **Return** validated value if used with pydantic, else value
         """
-        try:
-            key = self._build_key(identifier, params)
-            effective_ttl = self._get_ttl(ttl)
 
-            if self.model:
-                if not isinstance(value, BaseModel):
-                    value = self.model.model_validate(value)
-                data = value.model_dump_json()
-            elif self.adapter:
-                value = self.adapter.validate_python(value)
-                data = self.adapter.dump_json(value)
-            else:
-                data = msgpack.encode(value)
+        key = self._build_key(identifier, params)
+        effective_ttl = self._get_ttl(ttl)
 
-            await self.redis.set(key, data, ex=effective_ttl)
-            return value
+        to_cache = None
 
-        except Exception as e:
-            logger.error(f"Cache set failed for {identifier}: {e}")
-            return False
+        match value:
+            case bytes():
+                to_cache = value
+            case BaseModel():
+                to_cache = value.model_dump_json()
+            case _:
+                match self.model:
+                    case None:
+                        to_cache = json.encode(value)
+                    case BaseModel():
+                        to_cache = self.model.model_validate(value).model_dump_json()
+                    case TypeAdapter():
+                        to_cache = self.model.dump_json(self.model.validate_python(value))
+
+        await self.redis.set(key, to_cache, ex=effective_ttl)
 
     async def delete(self, identifier: str, params: dict[str, Any] | None = None) -> bool:
         """
@@ -176,7 +171,18 @@ class CacheService[T]:
             return cached
 
         value = await factory()
-        return await self.set(identifier, value, ttl, params)
+        # pydantic: validate here to avoid double-validation with fastapi
+        if self.model:
+            if isinstance(self.model, BaseModel) and not isinstance(value, BaseModel):
+                value = self.model.model_validate(value)
+            if isinstance(self.model, TypeAdapter):
+                # validate here and feed set with bytes
+                value = self.model.validate_python(value)
+                await self.set(identifier, self.model.dump_json(value), ttl, params)
+                return value
+
+        await self.set(identifier, value, ttl, params)
+        return value
 
     async def invalidate_pattern(self, pattern: str = "*") -> int:
         """

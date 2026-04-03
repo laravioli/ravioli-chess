@@ -12,7 +12,7 @@ async def get_notif_cache(redis: RedisClient):
     return CacheService(
         redis,
         namespace="notifications",
-        adapter=notification_adapter,
+        model=notification_adapter,
         version="v1",
         default_ttl=300,
     )

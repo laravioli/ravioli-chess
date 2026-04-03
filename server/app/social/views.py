@@ -6,7 +6,7 @@ from app.api.schemas import Message
 from app.auth.deps import CurrentUser
 from app.background import Publish
 from app.deps import DbSession
-from app.notif.background import publish_notifications
+from app.notif.background import push_notifications
 from core.db.models.social import FriendshipStatus
 
 from .schemas import Friend, FriendRequest
@@ -49,7 +49,7 @@ async def send_friend_request(
             detail="You can't send a friend request to yourself",
         )
     await create_request(session, user.id, target_id)
-    publish_notifications(publish, target_id)
+    push_notifications(publish, target_id)
     return {"message": "request sent"}
 
 
