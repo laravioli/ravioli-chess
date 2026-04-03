@@ -3,6 +3,7 @@ from functools import cached_property
 
 from core.ipc import ClientIn, c_out, p_in, p_out
 from core.ipc.channels import EngineGameCreateChan, UserChan
+from lib.serializers import json
 
 from .base import BaseConsumer
 
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class SiteConsumer(BaseConsumer):
     c_out_frame = c_out.GameCreate
-    p_out_frame = p_out.GameCreate | p_out.TellSocket
+    p_out_frame = p_out.GameCreate | p_out.TellSocket | p_out.TellUser
 
     @cached_property
     def channels(self):
@@ -48,8 +49,8 @@ class SiteConsumer(BaseConsumer):
 
     async def handle_app_msg(self, msg):
         match msg:
-            case p_out.TellSocket():
-                logger.info(msg)
+            case p_out.TellUser(data):
+                logger.info(json.decode(data))
             case _:
                 logger.warning("received an unknow process msg")
 

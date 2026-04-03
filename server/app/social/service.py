@@ -47,9 +47,9 @@ async def accept_request(session: DbSession, current_user_id: uuid.UUID, target_
     if friendship_id is None:
         raise DBNotFound(detail="There is no request to accept")
 
-    delete_stmt = delete(FriendRequest).where(FriendRequest.friendship_id == friendship_id)
+    delete_notif_stmt = delete(FriendRequest).where(FriendRequest.friendship_id == friendship_id)
 
-    await session.execute(delete_stmt)
+    await session.execute(delete_notif_stmt)
 
     await session.commit()
 

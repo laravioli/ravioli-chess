@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, TypeAdapter
 
 from app.api.schemas import BaseSchema
 
@@ -18,3 +18,5 @@ class FriendRequestSchema(NotificationBase):
 
 
 Notification = Annotated[FriendRequestSchema, Field(discriminator="type")]
+
+notification_adapter = TypeAdapter(list[Notification])

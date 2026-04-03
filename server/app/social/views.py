@@ -4,7 +4,9 @@ from pydantic import UUID4
 
 from app.api.schemas import Message
 from app.auth.deps import CurrentUser
+from app.background import Publish
 from app.deps import DbSession
+from app.notif.background import publish_notifications
 from core.db.models.social import FriendshipStatus
 
 from .schemas import Friend, FriendRequest
@@ -38,13 +40,16 @@ async def list_friend_request(session: DbSession, user: CurrentUser):
     status_code=status.HTTP_201_CREATED,
     responses={201: {"model": Message}},
 )
-async def send_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def send_friend_request(
+    session: DbSession, publish: Publish, user: CurrentUser, target_id: UUID4
+):
     if user.id == target_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You can't send a friend request to yourself",
         )
     await create_request(session, user.id, target_id)
+    publish_notifications(publish, target_id)
     return {"message": "request sent"}
 
 
