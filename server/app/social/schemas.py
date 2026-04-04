@@ -1,6 +1,7 @@
 from pydantic import UUID4, AwareDatetime
 
 from app.api.schemas import BaseSchema
+from core.db.models.social import FriendshipStatus
 
 
 # out
@@ -12,3 +13,8 @@ class Friend(BaseSchema):
 
 class FriendRequest(Friend):
     direction: str
+
+
+class FriendShip(BaseSchema):
+    is_sender: bool
+    status: FriendshipStatus

@@ -2,7 +2,6 @@ from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
-from app.api.schemas import Message
 from app.auth.deps import CurrentUser
 from app.background import Publish
 from app.deps import DbSession
@@ -10,7 +9,7 @@ from app.notif.background import refresh_cache_and_push_notifications
 from app.notif.deps import NotifCache
 from core.db.models.social import FriendshipStatus
 
-from .schemas import Friend, FriendRequest
+from .schemas import Friend, FriendRequest, FriendShip
 from .service import accept_request, create_request, delete_friend, delete_request, list_friendship
 
 router = APIRouter(prefix="/social", tags=["social"])
@@ -39,7 +38,7 @@ async def list_friend_request(session: DbSession, user: CurrentUser):
 @router.post(
     "/requests/{target_id}",
     status_code=status.HTTP_201_CREATED,
-    responses={201: {"model": Message}},
+    responses={201: {"model": FriendShip}},
 )
 async def send_friend_request(
     cache: NotifCache,
@@ -55,7 +54,7 @@ async def send_friend_request(
         )
     await create_request(session, user.id, target_id)
     refresh_cache_and_push_notifications(cache, publish, target_id)
-    return {"message": "request sent"}
+    return FriendShip(is_sender=True, status="pending")
 
 
 @router.delete("/requests/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -70,7 +69,7 @@ async def cancel_friend_request(
     refresh_cache_and_push_notifications(cache, publish, target_id)
 
 
-@router.post("/requests/{target_id}/accept", responses={200: {"model": Message}})
+@router.post("/requests/{target_id}/accept", responses={200: {"model": FriendShip}})
 async def accept_friend_request(
     cache: NotifCache,
     session: DbSession,
@@ -81,7 +80,7 @@ async def accept_friend_request(
     await accept_request(session, user.id, target_id)
     refresh_cache_and_push_notifications(cache, publish, user.id)
 
-    return {"message": "request accepted"}
+    return FriendShip(is_sender=False, status="accepted")
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)

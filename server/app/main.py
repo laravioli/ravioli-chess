@@ -22,3 +22,15 @@ app.include_router(web_router)
 app.include_router(ws_router)
 
 add_exception_handler(app)
+
+# todo
+# add http middleware (like cors to secure websocket, cache control etc)
+# fix client -> profile page client cache invalidation (avoid trigger a new profile request)
+# add client notification ui and client websocket notifications code
+# add a read attribute on notification model and implement ui
+# add Paginification
+# rewrite websocket a bit (specially user integration)
+# add an anon session identifier
+# implement a challenge api (it is close to friend request), keep it separate from notif like lichess
+# define game data model(s)
+# implement game ui + websocket
