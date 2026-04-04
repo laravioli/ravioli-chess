@@ -6,7 +6,8 @@ from app.api.schemas import Message
 from app.auth.deps import CurrentUser
 from app.background import Publish
 from app.deps import DbSession
-from app.notif.background import push_notifications
+from app.notif.background import refresh_cache_and_push_notifications
+from app.notif.deps import NotifCache
 from core.db.models.social import FriendshipStatus
 
 from .schemas import Friend, FriendRequest
@@ -41,7 +42,11 @@ async def list_friend_request(session: DbSession, user: CurrentUser):
     responses={201: {"model": Message}},
 )
 async def send_friend_request(
-    session: DbSession, publish: Publish, user: CurrentUser, target_id: UUID4
+    cache: NotifCache,
+    session: DbSession,
+    publish: Publish,
+    user: CurrentUser,
+    target_id: UUID4,
 ):
     if user.id == target_id:
         raise HTTPException(
@@ -49,21 +54,43 @@ async def send_friend_request(
             detail="You can't send a friend request to yourself",
         )
     await create_request(session, user.id, target_id)
-    push_notifications(publish, target_id)
+    refresh_cache_and_push_notifications(cache, publish, target_id)
     return {"message": "request sent"}
 
 
 @router.delete("/requests/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def cancel_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def cancel_friend_request(
+    cache: NotifCache,
+    session: DbSession,
+    publish: Publish,
+    user: CurrentUser,
+    target_id: UUID4,
+):
     await delete_request(session, sender_id=user.id, receiver_id=target_id)
+    refresh_cache_and_push_notifications(cache, publish, target_id)
 
 
 @router.post("/requests/{target_id}/accept", responses={200: {"model": Message}})
-async def accept_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def accept_friend_request(
+    cache: NotifCache,
+    session: DbSession,
+    publish: Publish,
+    user: CurrentUser,
+    target_id: UUID4,
+):
     await accept_request(session, user.id, target_id)
+    refresh_cache_and_push_notifications(cache, publish, user.id)
+
     return {"message": "request accepted"}
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
-async def reject_friend_request(session: DbSession, user: CurrentUser, target_id: UUID4):
+async def reject_friend_request(
+    cache: NotifCache,
+    session: DbSession,
+    publish: Publish,
+    user: CurrentUser,
+    target_id: UUID4,
+):
     await delete_request(session, sender_id=target_id, receiver_id=user.id)
+    refresh_cache_and_push_notifications(cache, publish, user.id)

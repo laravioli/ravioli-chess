@@ -101,7 +101,7 @@ class CacheService[T]:
         params: dict[str, Any] | None = None,
     ) -> Any:
         """
-        Set cached value with automatic serialization
+        Set cached value
 
         """
 
