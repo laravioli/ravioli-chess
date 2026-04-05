@@ -24,8 +24,7 @@ app.include_router(ws_router)
 add_exception_handler(app)
 
 # todo
-# add http middleware (like cors to secure websocket, cache control etc)
-# fix client -> profile page client cache invalidation (avoid trigger a new profile request)
+# add http middleware (like cors to secure websocket)
 # add client notification ui and client websocket notifications code
 # add a read attribute on notification model and implement ui
 # add Paginification

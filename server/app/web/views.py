@@ -15,6 +15,12 @@ def generate_page(request: Request, page_ctx: dict[str, any] = DEFAULT_CONTEXT):
     ctx = {"payload": {"user": user.info, **page_ctx}}
     return templates.TemplateResponse(
         request=request,
+        headers={
+            "cache-control": "no-store",
+            "expires": "0",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-embedder-policy": "require-corp",
+        },
         name="index.html",
         context=ctx,
     )

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.auth.views import router as router_auth
 from app.notif.views import router as router_notif
@@ -7,7 +7,9 @@ from app.social.views import router as router_social
 from app.user.views import router as router_user
 from app.web.views_api import router as router_web
 
-router = APIRouter(prefix="/api")
+from .deps import api_response_headers
+
+router = APIRouter(prefix="/api", dependencies=[Depends(api_response_headers)])
 router.include_router(router_auth)
 router.include_router(router_user)
 router.include_router(router_pref)

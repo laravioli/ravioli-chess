@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
         },
       }),
       tsconfigPaths(),
+      sfPlugin(),
     ],
     css: { modules: { localsConvention: 'camelCase' } },
     resolve: {
@@ -36,10 +37,6 @@ export default defineConfig(({ mode }) => {
     server: {
       origin: 'http://localhost:5173',
       open: '/',
-      headers: {
-        'cross-origin-embedder-policy': 'credentialless',
-        'cross-origin-opener-policy': 'same-origin',
-      },
       proxy: {
         '/socket': {
           target: wsTarget,
@@ -54,12 +51,6 @@ export default defineConfig(({ mode }) => {
           target: httpTarget,
           changeOrigin: true,
           secure: false,
-          configure: (proxy, _options) => {
-            proxy.on('proxyRes', (_proxyRes, _req, res) => {
-              res.setHeader('cross-origin-embedder-policy', 'require-corp');
-              res.setHeader('cross-origin-opener-policy', 'same-origin');
-            });
-          },
         },
       },
     },
@@ -81,4 +72,15 @@ export default defineConfig(({ mode }) => {
       legalComments: 'eof',
     },
   };
+});
+
+const sfPlugin = () => ({
+  name: 'sf-headers',
+  configureServer(server: ViteDevServer) {
+    server.middlewares.use((req, res, next) => {
+      if (req.url?.includes('stockfish'))
+        res.setHeader('cross-origin-embedder-policy', 'require-corp');
+      next();
+    });
+  },
 });

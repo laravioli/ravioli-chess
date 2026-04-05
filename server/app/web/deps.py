@@ -10,6 +10,7 @@ from lib.cache import CacheService
 from .schemas import User
 
 
+# auth
 async def user_or_anon(request: Request, auth_user: UserWithPrefOrAnon):
     if auth_user:
         user = User.model_validate(auth_user)
@@ -20,6 +21,7 @@ async def user_or_anon(request: Request, auth_user: UserWithPrefOrAnon):
     request.state.user = user
 
 
+# cache
 async def get_web_cache(redis: RedisClient):
     return CacheService(redis, namespace="web", version="v1", default_ttl=900)
 
