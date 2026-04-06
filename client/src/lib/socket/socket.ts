@@ -29,6 +29,9 @@ class WsSocket {
     ws.onclose = (_event) => {
       console.error('Chat socket closed unexpectedly');
     };
+    ws.onerror = (_err) => {
+      this.ws?.close();
+    };
   };
 
   reload = () => {

@@ -1,8 +1,8 @@
 import secrets
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import SecretStr, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -11,9 +11,15 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["local", "staging", "production"] = "production"
     SECRET_KEY: SecretStr = secrets.token_urlsafe(32)
     SSL: bool = True
+    ALLOWED_HOSTS: Annotated[list[str], NoDecode]
 
     ANON_COOKIE: str = "anon"
     SESSION_COOKIE: str = "session"
+
+    @field_validator("ALLOWED_HOSTS", mode="before")
+    @classmethod
+    def decode_hosts(cls, v: str) -> list[str]:
+        return [str(s) for s in v.split(",")]
 
 
 settings = Settings()

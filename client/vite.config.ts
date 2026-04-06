@@ -6,6 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(({ mode }) => {
   const { BACKEND_DOMAIN } = loadEnv(mode, process.cwd(), '');
   const wsTarget = `ws://${BACKEND_DOMAIN}`;
+  console.log(wsTarget);
   const httpTarget = `http://${BACKEND_DOMAIN}`;
 
   return {
@@ -36,20 +37,21 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       origin: 'http://localhost:5173',
-      open: '/',
+      open: false,
       proxy: {
         '/socket': {
           target: wsTarget,
-          changeOrigin: true,
+          changeOrigin: false,
           ws: true,
+          //note: http-proxy doesn't proxy http response 403 upstream websocket, neither release the ressource
         },
         '/api': {
           target: httpTarget,
-          changeOrigin: true,
+          changeOrigin: false,
         },
         '^/(\\w+)?(/\\w+)?$': {
           target: httpTarget,
-          changeOrigin: true,
+          changeOrigin: false,
           secure: false,
         },
       },
