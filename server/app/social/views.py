@@ -3,10 +3,8 @@ from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
 from app.auth.deps import CurrentUser
-from app.background import Publish
 from app.deps import DbSession
-from app.notif.background import refresh_cache_and_push_notifications
-from app.notif.deps import NotifCache
+from app.notif.deps import Notifier
 from core.db.models.social import FriendshipStatus
 
 from .schemas import Friend, FriendRequest, FriendShip
@@ -41,10 +39,9 @@ async def list_friend_request(session: DbSession, user: CurrentUser):
     responses={201: {"model": FriendShip}},
 )
 async def send_friend_request(
-    cache: NotifCache,
     session: DbSession,
-    publish: Publish,
     user: CurrentUser,
+    notifier: Notifier,
     target_id: UUID4,
 ):
     if user.id == target_id:
@@ -53,43 +50,40 @@ async def send_friend_request(
             detail="You can't send a friend request to yourself",
         )
     await create_request(session, user.id, target_id)
-    refresh_cache_and_push_notifications(cache, publish, target_id)
+    notifier.add_background_task(target_id)
     return FriendShip(is_sender=True, status="pending")
 
 
 @router.delete("/requests/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def cancel_friend_request(
-    cache: NotifCache,
     session: DbSession,
-    publish: Publish,
+    notifier: Notifier,
     user: CurrentUser,
     target_id: UUID4,
 ):
     await delete_request(session, sender_id=user.id, receiver_id=target_id)
-    refresh_cache_and_push_notifications(cache, publish, target_id)
+    notifier.add_background_task(target_id)
 
 
 @router.post("/requests/{target_id}/accept", responses={200: {"model": FriendShip}})
 async def accept_friend_request(
-    cache: NotifCache,
     session: DbSession,
-    publish: Publish,
+    notifier: Notifier,
     user: CurrentUser,
     target_id: UUID4,
 ):
     await accept_request(session, user.id, target_id)
-    refresh_cache_and_push_notifications(cache, publish, user.id)
+    notifier.add_background_task(user.id)
 
     return FriendShip(is_sender=False, status="accepted")
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
 async def reject_friend_request(
-    cache: NotifCache,
     session: DbSession,
-    publish: Publish,
     user: CurrentUser,
+    notifier: Notifier,
     target_id: UUID4,
 ):
     await delete_request(session, sender_id=target_id, receiver_id=user.id)
-    refresh_cache_and_push_notifications(cache, publish, user.id)
+    notifier.add_background_task(user.id)

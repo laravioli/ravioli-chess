@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     @field_validator("ALLOWED_HOSTS", mode="before")
     @classmethod
     def decode_hosts(cls, v: str) -> list[str]:
-        return [str(s) for s in v.split(",")]
+        return [str(s) for s in v.split(",") if s]
 
 
 settings = Settings()

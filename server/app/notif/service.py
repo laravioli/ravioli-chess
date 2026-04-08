@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 from app.deps import DbSession
 from core.db.models import FriendRequest, Friendship, Notification
 
-from .deps import NotifCache
+from .cache import NotifCache
 
 
 async def db_notifications(session: DbSession, user_id: UUID):
