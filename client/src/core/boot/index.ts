@@ -1,6 +1,5 @@
 import { initSite } from '@/lib/site/site';
 import { client } from '@/lib/api/client.gen';
-import { wsConnect } from '@/lib/socket/socket';
 
 import { makeAppDependencies } from '@/core/components/app/config';
 import type { ServerPayload } from './interface';
@@ -8,7 +7,6 @@ import type { ServerPayload } from './interface';
 export const boot = async () => {
   initSite();
   setApiClient();
-  wsConnect('/socket');
   const payload = getHtmlData();
   return makeAppDependencies(payload);
 };

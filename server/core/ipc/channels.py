@@ -49,7 +49,7 @@ class ConsumerChan(WebsocketChan):
     """
 
     args:
-        uuid (str): socket uuid.
+        sri:user_id (str): socket sri.
     """
 
     name = "socket"

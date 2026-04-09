@@ -43,10 +43,12 @@ class GameEnd(Struct):
 
 
 class TellUser(ProcessOut, tag="t/user"):
+    type: str
     data: Raw
 
 
 class TellSocket(ProcessOut, tag="t/socket"):
+    type: str
     data: Raw
 
 

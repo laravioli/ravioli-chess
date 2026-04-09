@@ -16,8 +16,8 @@ class PlayConsumer(BaseConsumer):
     c_out_frame = c_out.GameMove
     p_out_frame = p_out.GameUpdate
 
-    def __init__(self, user, websocket: WebSocket, broadcast: BroadCastClient, game_id: str):
-        super().__init__(user, websocket, broadcast)
+    def __init__(self, sri, user, websocket: WebSocket, broadcast: BroadCastClient, game_id: str):
+        super().__init__(sri, user, websocket, broadcast)
         self.game_id = game_id
         self.game_channel = EngineGameChan(game_id)
 

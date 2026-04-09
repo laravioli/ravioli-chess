@@ -5,7 +5,7 @@ from .deps import PlayDep, SiteDep
 router = APIRouter()
 
 
-@router.websocket("/socket")
+@router.websocket("/socket/site")
 async def index(consumer: SiteDep):
     await consumer()
 

@@ -14,6 +14,7 @@ import type { Node, Path } from '@/lib/tree/interface';
 import { makeObservableNode, makeRoot, makeNode } from './node';
 import { makeShapes } from './autoshape';
 import type { AnalyseOpts, JustCaptured } from './interface';
+import { wsConnect } from '@/lib/socket/socket';
 
 export class AnalyseStore {
   board: ChessgroundApi | undefined;
@@ -42,6 +43,7 @@ export class AnalyseStore {
   onLoad() {
     /* run AFTER the page is mounted */
     this.startCeval();
+    wsConnect('/socket/site');
   }
 
   @action

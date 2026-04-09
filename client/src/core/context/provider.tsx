@@ -2,7 +2,7 @@ import { useRef, useEffect, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { reaction } from 'mobx';
 
-import { siteSocket } from '@/lib/socket/socket';
+import { wsReload } from '@/lib/socket/socket';
 
 import type { GlobalStore, PageStore } from '@/core/store/stores';
 import type { LocalStorage } from '@/core/store/localstorage';
@@ -46,7 +46,7 @@ export const GlobalStoreProvider = ({
     const dispose = reaction(
       () => globalStore.userStore.logged,
       () => {
-        siteSocket.reload();
+        wsReload();
         queryClient.resetQueries();
       },
     );
@@ -75,14 +75,18 @@ export const PageStoreProvider = <T extends PageStore>({
 }: PageStoreProviderProps<T>) => {
   const storeRef = useRef<T | null>(null);
 
+  //ensure factory is called only once
+  //it may be a high density side-effect bomb
   if (!storeRef.current) {
     storeRef.current = factory();
   }
 
   useEffect(() => {
-    storeRef.current?.onLoad();
+    (storeRef.current as PageStore).onLoad();
     window.history.replaceState({}, '');
-    return () => storeRef.current?.onUnLoad();
+    return () => {
+      (storeRef.current as PageStore).onUnLoad();
+    };
   }, []);
 
   return <PageStoreContext.Provider value={storeRef.current}>{children}</PageStoreContext.Provider>;

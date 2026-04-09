@@ -1,17 +1,15 @@
 import asyncio
 import uuid
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from app.deps import BroadCastClient
+from app.websocket.schemas import MaybeUser, Sri
 from core.ipc.channels import ConsumerChan
 from core.ipc.types import ClientFrameOut, ProcessFrameOut
 from lib.serializers import json
-
-if TYPE_CHECKING:
-    from app.websocket.deps import MaybeUser
 
 
 class AbstractBaseConsumer(ABC):
@@ -30,11 +28,14 @@ class AbstractBaseConsumer(ABC):
 
 
 class BaseConsumer(AbstractBaseConsumer):
-    def __init__(self, user: "MaybeUser", websocket: WebSocket, broadcast: BroadCastClient):
+    def __init__(
+        self, sri: Sri, user: "MaybeUser", websocket: WebSocket, broadcast: BroadCastClient
+    ):
+        self.sri = sri
         self.user = user
         self.websocket = websocket
         self.broadcast = broadcast
-        self.consumer_channel = ConsumerChan(uuid.uuid4())
+        self.consumer_channel = ConsumerChan(f"{sri}:{user.id if user else uuid.uuid4()}")
 
     async def __call__(self):
         await self.websocket.accept()

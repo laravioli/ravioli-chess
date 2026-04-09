@@ -11,4 +11,5 @@ declare global {
   type Callback = () => void;
   type Timeout = ReturnType<typeof setTimeout>;
   type Nullable<T> = T | undefined | null;
+  declare const site: Window['site'];
 }

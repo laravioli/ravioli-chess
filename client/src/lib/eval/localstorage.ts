@@ -29,7 +29,7 @@ export class LocalEvalStorage {
   }
 
   setThreads(nb: number) {
-    this.threads = nb;
+    this.threads = Math.max(1, Math.min(nb, 32));
   }
 
   setSri(sri: string) {

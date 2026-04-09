@@ -7,7 +7,7 @@ from app.auth.deps import UserOrAnon
 from app.deps import BroadCastClient
 
 from .consumers import PlayConsumer, SiteConsumer
-from .schemas import User
+from .schemas import Sri, User
 
 
 async def get_user(user: UserOrAnon):
@@ -15,18 +15,24 @@ async def get_user(user: UserOrAnon):
         return User.model_validate(user)
 
 
-type MaybeUser = Annotated[User | None, Depends(get_user)]
-
-
-# trick to avoid running code in a thread-pool
-async def site_consumer(user: MaybeUser, websocket: WebSocket, broadcast: BroadCastClient):
-    return SiteConsumer(user=user, websocket=websocket, broadcast=broadcast)
-
-
-async def play_consumer(
-    user: MaybeUser, websocket: WebSocket, broadcast: BroadCastClient, game_id: str
+async def get_websocket_params(
+    sri: Sri,
+    user: Annotated[User | None, Depends(get_user)],
+    websocket: WebSocket,
+    broadcast: BroadCastClient,
 ):
-    return PlayConsumer(user=user, websocket=websocket, broadcast=broadcast, game_id=game_id)
+    return {"sri": sri, "user": user, "websocket": websocket, "broadcast": broadcast}
+
+
+type BaseWebsocketParams = Annotated[dict, Depends(get_websocket_params)]
+
+
+async def site_consumer(params: BaseWebsocketParams):
+    return SiteConsumer(**params)
+
+
+async def play_consumer(params: BaseWebsocketParams, game_id: str):
+    return PlayConsumer(**params, game_id=game_id)
 
 
 type SiteDep = Annotated[SiteConsumer, Depends(site_consumer)]

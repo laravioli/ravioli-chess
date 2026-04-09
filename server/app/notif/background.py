@@ -32,7 +32,9 @@ class BackgroundNotifier:
         user_id: UUID,
     ):
         raw_data = await self.refresh_cache_notif(user_id)
-        await self.broadcast.publish(UserChan(str(user_id)), TellUser(data=Raw(raw_data)))
+        await self.broadcast.publish(
+            UserChan(str(user_id)), TellUser(type="notifications", data=Raw(raw_data))
+        )
 
     async def refresh_cache_notif(self, user_id: UUID):
         async with LocalSession() as session:

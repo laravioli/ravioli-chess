@@ -1,5 +1,5 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
-import { observable, action, runInAction } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import { defaultPosition, setupPosition } from 'chessops/variant';
 import { parseFen } from 'chessops/fen';
 import { Result } from '@badrap/result';
@@ -13,11 +13,11 @@ import type { CevalOpts, LocalEval, PvData, Search, Started, Step, Work } from '
 
 const cevalDisabledSentinel = '1';
 
-const enabledAfterDisable = action((ceval: Ceval) => {
+const enabledAfterDisable = (ceval: Ceval) => {
   const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
   const disable = ceval.evalStorage.disable || cevalDisabledSentinel;
   return enabledAfter == disable;
-});
+};
 
 export class Ceval {
   opts: CevalOpts;
@@ -115,6 +115,7 @@ export class Ceval {
   }
 
   destroy() {
+    this.stop();
     this.worker?.destroy();
     this.worker = undefined;
   }
