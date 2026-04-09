@@ -1,13 +1,24 @@
+from dataclasses import dataclass
 from typing import Annotated
+from uuid import UUID
 
-from pydantic import StringConstraints
+from pydantic import BeforeValidator, StringConstraints
 
-from app.user.schemas import UserBase
+from app.api.schemas import BaseSchema
+from core.ipc.channels import EngineGameChan
 
 SRI_PATTERN = r"^[a-zA-Z0-9_]+$"
 
 
-class User(UserBase):
+@dataclass
+class Game:
+    id: str
+    chan: EngineGameChan
+
+
+class User(BaseSchema):
+    id: Annotated[str, BeforeValidator(lambda v: str(v) if isinstance(v, UUID) else v)]
+    username: str
     is_active: bool
     is_staff: bool
 

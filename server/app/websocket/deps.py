@@ -5,9 +5,10 @@ from fastapi.websockets import WebSocket
 
 from app.auth.deps import UserOrAnon
 from app.deps import BroadCastClient
+from core.ipc.channels import EngineGameChan
 
 from .consumers import PlayConsumer, SiteConsumer
-from .schemas import Sri, User
+from .schemas import Game, Sri, User
 
 
 async def get_user(user: UserOrAnon):
@@ -32,7 +33,7 @@ async def site_consumer(params: BaseWebsocketParams):
 
 
 async def play_consumer(params: BaseWebsocketParams, game_id: str):
-    return PlayConsumer(**params, game_id=game_id)
+    return PlayConsumer(**params, game=Game(id=game_id, chan=EngineGameChan(game_id)))
 
 
 type SiteDep = Annotated[SiteConsumer, Depends(site_consumer)]

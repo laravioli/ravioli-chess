@@ -16,12 +16,13 @@ class ProcessIn(Struct, tag_field="pi"): ...
 
 
 class GameCreate(ProcessIn):
-    channel: str
+    sri: str
     data: GameInfo
 
 
 class ChallengeAccepted(ProcessIn):
     id: str
+    sri: str
     data: GameInfo
 
 

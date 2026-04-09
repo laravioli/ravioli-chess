@@ -2,7 +2,7 @@ import asyncio
 from contextlib import suppress
 
 from core.ipc import p_in, p_out
-from core.ipc.channels import EngineGameChan, EngineGameCreateChan, WsGameChan
+from core.ipc.channels import ConsumerChan, EngineGameChan, EngineGameCreateChan, WsGameChan
 from engine.utils import register_coroutine
 from lib.pubsub import Broadcast
 
@@ -53,7 +53,7 @@ class GameManager:
 
         # actor api
         async def receive():
-            await self.publish(msg.channel, p_out.GameCreate(data=p_out.GameId(id)))
+            await self.publish(ConsumerChan(msg.sri), p_out.GameCreate(data=p_out.GameId(id)))
             async with self.broadcast.start_subscription(receive_channel) as sub:
                 async for message in sub.iter_message(type_arg=p_in.GameUpdate):
                     yield message
