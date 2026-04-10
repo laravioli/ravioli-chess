@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, reaction, computed } from 'mobx';
 
 import type { UserServer } from './interface';
 import type { Preference, UserSuccess } from '@/lib/api';
@@ -12,11 +12,12 @@ const ANON: UserSuccess = {
 };
 
 type UserEvent = ({ type: 'login' } & UserSuccess) | { type: 'logout' };
+type AuthReaction = () => void;
 
 export class UserStore {
   id?: string;
   @observable accessor username: string;
-  @observable accessor logged: boolean;
+  @observable private accessor logged: boolean;
 
   private channel: BroadcastChannel | undefined;
 
@@ -33,6 +34,13 @@ export class UserStore {
   private set preference(pref: Preference) {
     setPreference(pref);
   }
+
+  @computed
+  get isAuth() {
+    return this.logged;
+  }
+
+  onAuthchange = (f: AuthReaction) => reaction(() => this.logged, f);
 
   @action
   login(user: UserSuccess) {

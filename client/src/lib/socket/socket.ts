@@ -13,6 +13,16 @@ interface Params extends Record<string, any> {
   readonly sri: Sri;
 }
 
+interface Options {
+  idle: boolean;
+  pongTimeout: number; // time to wait for pong before resetting the connection
+  pingDelay: number; // time between pong and ping
+  autoReconnectDelay: number;
+  protocol: string;
+  debug?: boolean;
+  reloadOnResume?: boolean;
+}
+
 interface Settings {
   params: Params;
 }
@@ -20,30 +30,37 @@ interface Settings {
 export let siteSocket: WsSocket | undefined;
 
 export function wsConnect(path: Path) {
-  //first connection
   if (!siteSocket) siteSocket = new WsSocket(path);
-  //from there -> resilient to shitty strict mode
-  //may change handlers
-  else if (path == siteSocket.getPath()) return siteSocket;
-  //change backend socket
-  else siteSocket.reconnect(path);
+  else if (path !== siteSocket.getPath()) siteSocket.reconnect(path);
   return siteSocket;
 }
 
 export function wsReload() {
   if (siteSocket) siteSocket.connect();
 }
-
+//todo: finish copying lichess
 class WsSocket {
-  ws: WebSocket | undefined;
+  averageLag = 0;
   private path: Path;
-  private readonly protocol: string;
+  private ws: WebSocket | undefined;
+  private readonly options: Options;
   private readonly settings: Settings;
+  private pingSchedule: Timeout;
+  private connectSchedule: Timeout;
+  private lastPingTime: number = performance.now();
+  private pongCount = 0;
   pageReceive: (msg: MsgIn) => void | undefined;
 
   constructor(path: Path) {
+    this.options = {
+      idle: false,
+      debug: false,
+      pongTimeout: 9000,
+      autoReconnectDelay: 3500,
+      protocol: location.protocol === 'https:' ? 'wss:' : 'ws:',
+      pingDelay: 2500,
+    };
     this.path = path;
-    this.protocol = location.protocol === 'https' ? 'wss://' : 'ws://';
     this.settings = { params: { sri: site.sri } };
     this.connect();
   }
@@ -66,6 +83,47 @@ class WsSocket {
     this.connect();
   };
 
+  private readonly scheduleConnect = (delay: number = this.options.pongTimeout): void => {
+    if (this.options.idle) delay = 10 * 1000 + Math.random() * 10 * 1000;
+    clearTimeout(this.pingSchedule);
+    clearTimeout(this.connectSchedule);
+    this.connectSchedule = setTimeout(() => {
+      this.connect();
+    }, delay);
+  };
+
+  private readonly schedulePing = (delay: number): void => {
+    clearTimeout(this.pingSchedule);
+    this.pingSchedule = setTimeout(this.pingNow, delay);
+  };
+
+  private readonly pingNow = (): void => {
+    clearTimeout(this.pingSchedule);
+    clearTimeout(this.connectSchedule);
+    const pingData = 'p';
+    try {
+      this.ws!.send(pingData);
+      this.lastPingTime = performance.now();
+    } catch (e) {
+      this.debug(e, true);
+    }
+    this.scheduleConnect();
+  };
+
+  private readonly computePingDelay = (): number =>
+    this.options.pingDelay + (this.options.idle ? 1000 : 0);
+
+  private readonly pong = (): void => {
+    clearTimeout(this.connectSchedule);
+    this.schedulePing(this.computePingDelay());
+    const currentLag = Math.min(performance.now() - this.lastPingTime, 10000);
+    this.pongCount++;
+
+    // Average first 4 pings, then switch to decaying average.
+    const mix = this.pongCount > 4 ? 0.1 : 1 / this.pongCount;
+    this.averageLag += mix * (currentLag - this.averageLag);
+  };
+
   private readonly handle = (data: MsgIn) => {
     switch (data.t || false) {
       case false:
@@ -75,7 +133,13 @@ class WsSocket {
     }
   };
 
+  private readonly debug = (msg: unknown, always = false): void => {
+    if (always || this.options.debug) console.debug(msg);
+  };
+
   destroy = (): void => {
+    clearTimeout(this.pingSchedule);
+    clearTimeout(this.connectSchedule);
     this.disconnect();
     this.ws = undefined;
   };
@@ -83,13 +147,14 @@ class WsSocket {
   private readonly disconnect = (): void => {
     const ws = this.ws;
     if (ws) {
+      this.debug('Disconnect');
       ws.onerror = ws.onclose = ws.onopen = ws.onmessage = () => {};
       ws.close();
     }
   };
 
   private readonly url = () => {
-    const o = this.protocol + location.host + this.path;
+    const o = this.options.protocol + location.host + this.path;
     const searchParams = new URLSearchParams();
     for (const k of Object.keys(this.settings.params))
       if (this.settings.params[k]) searchParams.append(k, this.settings.params[k]);
@@ -97,7 +162,5 @@ class WsSocket {
     return query ? `${o}?${query}` : o;
   };
 
-  getPath() {
-    return this.path;
-  }
+  getPath = () => this.path;
 }

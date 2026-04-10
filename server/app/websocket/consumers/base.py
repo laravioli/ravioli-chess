@@ -11,6 +11,8 @@ from core.ipc.channels import ConsumerChan, UserChan, WebsocketChan
 from core.ipc.types import ClientFrameOut, ProcessFrameOut
 from lib.serializers import json
 
+from .heartbeat import HeartBeat
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,6 +36,7 @@ class Consumer:
         self.websocket = websocket
         self.broadcast = broadcast
         self.channels: list[WebsocketChan] = [ConsumerChan(sri)]
+        self.heartbeat = HeartBeat(ws=websocket)
 
         if user:
             self.channels.append(UserChan(user.id))

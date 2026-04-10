@@ -33,14 +33,14 @@ export const UserMenu: React.FC = observer(() => {
   const { userStore } = useGlobalStore();
 
   const menus = useMemo(() => {
-    if (userStore.logged)
+    if (userStore.isAuth)
       return {
         main: MainMenu,
         friends: FriendsMenu,
         ...MainMenuPref.subMenus,
       };
     return { main: MainMenuPref, ...MainMenuPref.subMenus };
-  }, [userStore.logged]);
+  }, [userStore.isAuth]);
 
   const { currentMenu, navigate } = useMenu(menus);
 
@@ -70,7 +70,7 @@ type UserMenuTargetProps = {
 } & React.ComponentPropsWithoutRef<'button'>;
 
 const UserMenuTarget: React.FC<UserMenuTargetProps> = observer(({ user, ref, ...rest }) => {
-  return user.logged ? (
+  return user.isAuth ? (
     <UnstyledButton ref={ref} {...rest} className={classes.link}>
       {user.username}
     </UnstyledButton>

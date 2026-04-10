@@ -41,6 +41,6 @@ export class LocalEvalStorage {
   }
 
   get isTab() {
-    return this.sri == window.site.sri;
+    return this.sri == site.sri;
   }
 }

@@ -1,5 +1,5 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
-import { observable, runInAction } from 'mobx';
+import { observable, runInAction, action } from 'mobx';
 import { defaultPosition, setupPosition } from 'chessops/variant';
 import { parseFen } from 'chessops/fen';
 import { Result } from '@badrap/result';
@@ -60,7 +60,7 @@ export class Ceval {
     const step = steps[steps.length - 1];
 
     runInAction(() => {
-      this.evalStorage.setSri(window.site.sri);
+      this.evalStorage.setSri(site.sri);
       this.evalStorage.setDisable(Math.random());
     });
 
@@ -164,6 +164,7 @@ export class Ceval {
     return this.worker?.info.maxHash ?? 16;
   }
 
+  @action
   toggle() {
     if (!this.possible || !this.allowed()) return;
     this.stop();

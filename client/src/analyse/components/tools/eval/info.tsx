@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { Switch } from '@mantine/core';
@@ -14,15 +14,11 @@ export const EvalToggle: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
   const { evalStorage } = useLocalStorage();
 
-  const onClick = useCallback(() => {
-    analyseStore.toggleCeval();
-  }, []);
-
   useEffect(() => {
     const unsub = reaction(
       () => evalStorage.disable,
       () => {
-        if (analyseStore.ceval.enabled && !evalStorage.isTab) onClick();
+        if (analyseStore.ceval.enabled && !evalStorage.isTab) analyseStore.toggleCeval();
       },
     );
     return unsub;
@@ -32,7 +28,7 @@ export const EvalToggle: React.FC = observer(() => {
     <Switch
       classNames={{ track: classes.toggle }}
       checked={analyseStore.ceval.enabled}
-      onClick={onClick}
+      onClick={analyseStore.toggleCeval}
       color="teal"
       size="md"
       thumbIcon={

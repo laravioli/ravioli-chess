@@ -1,6 +1,5 @@
 import { useRef, useEffect, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { reaction } from 'mobx';
 
 import { wsReload } from '@/lib/socket/socket';
 
@@ -43,13 +42,10 @@ export const GlobalStoreProvider = ({
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const dispose = reaction(
-      () => globalStore.userStore.logged,
-      () => {
-        wsReload();
-        queryClient.resetQueries();
-      },
-    );
+    const dispose = globalStore.userStore.onAuthchange(() => {
+      wsReload();
+      queryClient.resetQueries();
+    });
 
     globalStore.userStore.listen();
 

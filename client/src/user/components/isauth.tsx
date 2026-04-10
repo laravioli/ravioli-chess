@@ -43,7 +43,7 @@ interface IsAuthProps {
  */
 export const IsAuth: React.FC<IsAuthProps> = observer(({ children, showIf }) => {
   const { userStore } = useGlobalStore();
-  const shouldRender = userStore.logged === showIf;
+  const shouldRender = userStore.isAuth === showIf;
 
   if (!shouldRender) return null;
 

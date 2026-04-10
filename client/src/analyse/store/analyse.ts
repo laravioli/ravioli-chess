@@ -143,11 +143,11 @@ export class AnalyseStore {
   }
 
   @action
-  toggleCeval() {
+  toggleCeval = () => {
     this.ceval?.toggle();
     this.setAutoShapes();
     this.startCeval();
-  }
+  };
 
   @action
   clearEvals() {

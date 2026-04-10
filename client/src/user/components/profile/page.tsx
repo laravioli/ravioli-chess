@@ -40,7 +40,7 @@ const Header: React.FC = observer(() => {
               <Group justify="center" gap={0}>
                 <Button variant="default">Challenge</Button>
 
-                {userStore.logged && <SocialActions user={data} />}
+                {userStore.isAuth && <SocialActions user={data} />}
               </Group>
             )}
           </div>
