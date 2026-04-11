@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 
 import type { EditorStore } from '@/editor/store/editor';
 import classes from '@/editor/css/controls.module.css';

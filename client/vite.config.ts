@@ -1,34 +1,21 @@
 import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
-import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import react from '@vitejs/plugin-react';
+import babel from '@rolldown/plugin-babel';
 
 export default defineConfig(({ mode }) => {
   const { BACKEND_DOMAIN } = loadEnv(mode, process.cwd(), '');
-  const wsTarget = `ws://${BACKEND_DOMAIN}`;
-  console.log(wsTarget);
-  const httpTarget = `http://${BACKEND_DOMAIN}`;
 
   return {
     base: '/static/',
     plugins: [
-      react({
-        babel: {
-          plugins: [
-            [
-              '@babel/plugin-proposal-decorators',
-              {
-                version: '2023-05',
-              },
-            ],
-          ],
-        },
-      }),
-      tsconfigPaths(),
-      sfPlugin(),
+      react(),
+      babel({ presets: [decoratorPreset({ version: '2023-11' })] }),
+      devServerConfig(),
     ],
     css: { modules: { localsConvention: 'camelCase' } },
     resolve: {
+      tsconfigPaths: true,
       alias: {
         'src': resolve(__dirname, 'src'),
         '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
@@ -40,17 +27,17 @@ export default defineConfig(({ mode }) => {
       open: false,
       proxy: {
         '/socket': {
-          target: wsTarget,
+          target: `ws://${BACKEND_DOMAIN}`,
           changeOrigin: false,
           ws: true,
-          //note: http-proxy doesn't proxy http response 403 upstream websocket, neither release the ressource
+          //leakage if backend return 403
         },
         '/api': {
-          target: httpTarget,
+          target: `http://${BACKEND_DOMAIN}`,
           changeOrigin: false,
         },
         '^/(\\w+)?(/\\w+)?$': {
-          target: httpTarget,
+          target: `http://${BACKEND_DOMAIN}`,
           changeOrigin: false,
           secure: false,
         },
@@ -59,7 +46,7 @@ export default defineConfig(({ mode }) => {
 
     build: {
       manifest: 'manifest.json',
-      rollupOptions: {
+      rolldownOptions: {
         input: { main: 'src/main.tsx', theme: 'src/core/boot/theme.css' },
 
         output: {
@@ -70,14 +57,24 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    esbuild: {
-      legalComments: 'eof',
-    },
   };
 });
 
-const sfPlugin = () => ({
-  name: 'sf-headers',
+function decoratorPreset(options: Record<string, unknown>) {
+  return {
+    preset: () => ({
+      plugins: [['@babel/plugin-proposal-decorators', options]],
+    }),
+    rolldown: {
+      // Only run this transform if the file contains a decorator.
+      filter: {
+        code: '@',
+      },
+    },
+  };
+}
+const devServerConfig = () => ({
+  name: 'dev-server-config',
   configureServer(server: ViteDevServer) {
     server.middlewares.use((req, res, next) => {
       if (req.url?.includes('stockfish'))

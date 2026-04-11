@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 
-import { useGlobalStore } from '@/core/hooks/hooks';
+import { useGlobalStore } from '@/core/hooks';
 
 import classes from '@/play/css/tools.module.css';
 

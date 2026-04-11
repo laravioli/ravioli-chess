@@ -4,27 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { wsReload } from '@/lib/socket/socket';
 
 import type { GlobalStore, PageStore } from '@/core/store/stores';
-import type { LocalStorage } from '@/core/store/localstorage';
 import type { ProvidedData } from '@/core/boot/interface';
-import { GlobalStoreContext, PageStoreContext, LocalStorageContext, DataContext } from './context';
-
-export const LocalStorageProvider = ({
-  children,
-  localStorage,
-}: {
-  children: React.ReactNode;
-  localStorage: LocalStorage;
-}) => {
-  const storeRef = useRef<LocalStorage | null>(null);
-
-  if (!storeRef.current) {
-    storeRef.current = localStorage;
-  }
-
-  return (
-    <LocalStorageContext.Provider value={storeRef.current}>{children}</LocalStorageContext.Provider>
-  );
-};
+import { GlobalStoreContext, PageStoreContext, DataContext } from './context';
 
 export const GlobalStoreProvider = ({
   children,

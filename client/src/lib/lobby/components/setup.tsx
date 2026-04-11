@@ -2,7 +2,7 @@ import { useCallback, useMemo, memo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Group, NativeSelect, Slider, Text, ActionIcon } from '@mantine/core';
 
-import { useLocalStorage } from '@/core/hooks/hooks';
+import { useGlobalStore } from '@/core/hooks';
 
 import type { Opponent, TimeMode, LobbySide } from '@/lib/lobby/interface';
 import classes from '@/lib/lobby/css/lobby.module.css';
@@ -23,7 +23,7 @@ export const LobbySetup = ({ opponent }: LobbySetupProps) => {
 };
 
 const AiLevel = observer(() => {
-  const { lobbyStorage } = useLocalStorage();
+  const { lobbySettings } = useGlobalStore();
 
   const marks = useMemo(
     () =>
@@ -37,12 +37,12 @@ const AiLevel = observer(() => {
   return (
     <>
       <Text size="sm">
-        ai level : <b>{lobbyStorage.aiLevel}</b>
+        ai level : <b>{lobbySettings.aiLevel}</b>
       </Text>
       <Slider
         pb="1.5rem"
-        value={(lobbyStorage.aiLevel - 1) * 14}
-        onChange={(event) => lobbyStorage.setAiLevel(event / 14 + 1)}
+        value={(lobbySettings.aiLevel - 1) * 14}
+        onChange={(event) => lobbySettings.setAiLevel(event / 14 + 1)}
         step={Math.round(100 / 7)}
         label={null}
         marks={marks}
@@ -52,22 +52,22 @@ const AiLevel = observer(() => {
 });
 
 const TimeMode = observer(() => {
-  const { lobbyStorage } = useLocalStorage();
+  const { lobbySettings } = useGlobalStore();
   return (
     <NativeSelect
-      value={lobbyStorage.timeMode}
+      value={lobbySettings.timeMode}
       label="time control"
       data={[
         { label: 'Real Time', value: 'realTime' },
         { label: 'Unlimited', value: 'unlimited' },
       ]}
-      onChange={(event) => lobbyStorage.setTimeMode(event.currentTarget.value as any)}
+      onChange={(event) => lobbySettings.setTimeMode(event.currentTarget.value as any)}
     />
   );
 });
 
 const GameClock = observer(() => {
-  const { lobbyStorage } = useLocalStorage();
+  const { lobbySettings } = useGlobalStore();
 
   const scale = useCallback((x) => {
     if (x <= 20) return x;
@@ -84,32 +84,32 @@ const GameClock = observer(() => {
   return (
     <>
       <Text size="sm">
-        Minutes per sides : <b>{lobbyStorage.time}</b>
+        Minutes per sides : <b>{lobbySettings.time}</b>
       </Text>
       <Slider
-        value={inverseScale(lobbyStorage.time)}
+        value={inverseScale(lobbySettings.time)}
         min={1}
         max={34}
         label={null}
         onChange={(event) => {
-          lobbyStorage.setTime(scale(event));
+          lobbySettings.setTime(scale(event));
         }}
         scale={scale}
-        disabled={lobbyStorage.timeMode !== 'realTime'}
+        disabled={lobbySettings.timeMode !== 'realTime'}
       />
       <Text size="sm">
-        Increment in secondes : <b>{lobbyStorage.increment}</b>
+        Increment in secondes : <b>{lobbySettings.increment}</b>
       </Text>
       <Slider
-        value={inverseScale(lobbyStorage.increment)}
+        value={inverseScale(lobbySettings.increment)}
         min={0}
         max={34}
         onChange={(event) => {
-          lobbyStorage.setIncrement(scale(event));
+          lobbySettings.setIncrement(scale(event));
         }}
         label={null}
         scale={scale}
-        disabled={lobbyStorage.timeMode !== 'realTime'}
+        disabled={lobbySettings.timeMode !== 'realTime'}
       />
     </>
   );
@@ -121,7 +121,7 @@ interface SideOption {
 }
 
 const Side = observer(() => {
-  const { lobbyStorage } = useLocalStorage();
+  const { lobbySettings } = useGlobalStore();
   const sides: SideOption[] = useMemo(
     () => [
       { key: 'w', side: 'white' },
@@ -132,7 +132,7 @@ const Side = observer(() => {
   );
 
   const onClick = (side: LobbySide) => {
-    lobbyStorage.setSide(side);
+    lobbySettings.setSide(side);
   };
 
   return (
@@ -142,7 +142,7 @@ const Side = observer(() => {
           key={side.key}
           classNames={{ root: classes.sideRoot }}
           onClick={() => onClick(side.side)}
-          disabled={side.side === lobbyStorage.side}
+          disabled={side.side === lobbySettings.side}
         >
           <IconChessKnightSharp side={side.side} />
         </ActionIcon>

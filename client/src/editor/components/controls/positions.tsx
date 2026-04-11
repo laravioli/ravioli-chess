@@ -4,7 +4,7 @@ import { autorun } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { NativeSelect } from '@mantine/core';
 
-import { useHTMLData, usePageStore } from '@/core/hooks/hooks';
+import { useHTMLData, usePageStore } from '@/core/hooks';
 import { chessPositionsOptions } from '@/lib/api/@tanstack/react-query.gen';
 import classes from '@/editor/css/controls.module.css';
 import type { EditorStore } from '@/editor/store/editor';

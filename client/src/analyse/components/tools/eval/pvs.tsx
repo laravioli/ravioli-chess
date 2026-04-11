@@ -7,7 +7,7 @@ import { parseUci } from 'chessops/util';
 import { parseFen } from 'chessops/fen';
 import { Text, Divider } from '@mantine/core';
 
-import { useLocalStorage, usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 import { getEval } from '@/lib/eval/utils';
 
 import type { AnalyseStore } from '@/analyse/store/analyse';
@@ -16,12 +16,11 @@ import classes from '@/analyse/css/eval.module.css';
 
 export const Pvs: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const multipv = useLocalStorage().evalStorage.multipv;
   return (
     <>
-      {analyseStore.ceval.enabled &&
+      {analyseStore.ceval.isActive &&
         !analyseStore.node.outcome &&
-        renderPvs(analyseStore.node.ceval, multipv)}
+        renderPvs(analyseStore.node.ceval, analyseStore.ceval.settings.multipv)}
     </>
   );
 });

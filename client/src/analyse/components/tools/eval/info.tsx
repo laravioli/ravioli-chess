@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
-import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { Switch } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
-import { usePageStore, useLocalStorage } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 import { getEval } from '@/lib/eval/utils';
 
 import classes from '@/analyse/css/eval.module.css';
@@ -12,27 +11,19 @@ import type { AnalyseStore } from '@/analyse/store/analyse';
 
 export const EvalToggle: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const { evalStorage } = useLocalStorage();
 
-  useEffect(() => {
-    const unsub = reaction(
-      () => evalStorage.disable,
-      () => {
-        if (analyseStore.ceval.enabled && !evalStorage.isTab) analyseStore.toggleCeval();
-      },
-    );
-    return unsub;
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <Switch
+      checked={analyseStore.ceval.isActive}
       classNames={{ track: classes.toggle }}
-      checked={analyseStore.ceval.enabled}
-      onClick={analyseStore.toggleCeval}
+      disabled={analyseStore.ceval.isDisabled}
+      onChange={(e) => analyseStore.toggleCeval(e.target.checked)}
       color="teal"
       size="md"
       thumbIcon={
-        analyseStore.ceval.enabled ? (
+        analyseStore.ceval.isActive ? (
           <IconCheck size={12} color="var(--mantine-color-teal-6)" stroke={3} />
         ) : (
           <IconX size={12} color="var(--mantine-color-red-6)" stroke={3} />
@@ -52,7 +43,7 @@ export const EvalScore: React.FC = observer(() => {
     score = getEval(evaluation);
   }
 
-  if (analyseStore.node.outcome && analyseStore.ceval.enabled) {
+  if (analyseStore.node.outcome && analyseStore.ceval.isActive) {
     score = '-';
   }
 

@@ -1,46 +1,36 @@
-import { makeAutoObservable } from 'mobx';
-import { makePersistable } from 'mobx-persist-store';
-
+import { observable, action } from 'mobx';
+import { persist } from '@/core/store/utils';
 import { getRecommendedThreads } from './engine';
 
-export class LocalEvalStorage {
-  multipv = 1;
-  searchms = 3000;
-  threads: number = getRecommendedThreads();
-  hashsize = 16;
-  sri: string | undefined;
-  disable?: number;
+@persist('engine.settings', ['multipv', 'searchms', 'threads', 'hashsize'], { sync: true })
+export class EngineSettings {
+  @observable accessor multipv = 1;
+  @observable accessor searchms = 3000;
+  @observable accessor threads: number = getRecommendedThreads();
+  @observable accessor hashsize = 16;
 
-  constructor() {
-    makeAutoObservable(this);
-    makePersistable(this, {
-      name: 'eval-storage',
-      properties: ['multipv', 'searchms', 'threads', 'hashsize', 'sri', 'disable'],
-      storage: window.localStorage,
-    });
-  }
-
+  @action
   setMultiPv(nb: number) {
     this.multipv = nb;
   }
 
+  @action
   setSearchMs(millis: number) {
     this.searchms = millis;
   }
 
+  @action
   setThreads(nb: number) {
     this.threads = Math.max(1, Math.min(nb, 32));
   }
+}
 
-  setSri(sri: string) {
-    this.sri = sri;
-  }
+@persist('engine.state', ['active'])
+export class EngineState {
+  @observable accessor active: boolean = false;
 
-  setDisable(nb: number) {
-    this.disable = nb;
-  }
-
-  get isTab() {
-    return this.sri == site.sri;
+  @action
+  setActive(active: boolean) {
+    this.active = active;
   }
 }

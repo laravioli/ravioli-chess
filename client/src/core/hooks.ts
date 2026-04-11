@@ -1,22 +1,10 @@
 import { useContext } from 'react';
 import { useLocation } from 'react-router';
 
-import {
-  DataContext,
-  LocalStorageContext,
-  GlobalStoreContext,
-  PageStoreContext,
-} from '@/core/context/context';
+import { DataContext, GlobalStoreContext, PageStoreContext } from '@/core/context/context';
 import type { PageStore } from '@/core/store/stores';
 import type { Page } from '@/core/boot/interface';
 
-/* Hooks to retrieve stores*/
-export const useLocalStorage = () => {
-  const localStorage = useContext(LocalStorageContext);
-  if (!localStorage)
-    throw new Error('useLocalStorage hook must be use within a LocalStorageProvider');
-  return localStorage;
-};
 export const useGlobalStore = () => {
   const store = useContext(GlobalStoreContext);
   if (!store) throw new Error('useGlobalStore hook must be use within a GlobalStoreProvider');
@@ -29,7 +17,6 @@ export const usePageStore = <T extends PageStore>(): T => {
   return store as T;
 };
 
-/* Hook to retrieve data from the inital html*/
 export const useHTMLData = () => {
   const payload = useContext(DataContext);
   if (!payload) throw new Error('missing initial server data');

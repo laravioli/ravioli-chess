@@ -7,7 +7,6 @@ import {
 import { QueryClient } from '@tanstack/react-query';
 
 import type { ServerPayload, ProvidedData } from '@/core/boot/interface';
-import { makeLocalStorage, type LocalStorage } from '@/core/store/localstorage';
 import { makeGlobalStore, type GlobalStore } from '@/core/store/stores';
 
 /* App config */
@@ -16,20 +15,16 @@ export interface AppDependencies {
   mantineConfig: MantineProviderProps;
   data: ProvidedData;
   queryClient: QueryClient;
-  localStorage: LocalStorage;
   globalStore: GlobalStore;
 }
 
 export const makeAppDependencies = (payload: ServerPayload): AppDependencies => {
-  const localStorage = makeLocalStorage();
   return {
     mantineConfig: makeMantineConfig(),
     data: { page: payload.page, data: payload.data },
     queryClient: makeQueryClient(),
-    localStorage,
     globalStore: makeGlobalStore({
       userConfig: payload.user,
-      localEvalStorage: localStorage.evalStorage,
     }),
   };
 };

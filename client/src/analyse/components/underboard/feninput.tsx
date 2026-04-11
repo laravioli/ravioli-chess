@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { TextInput } from '@mantine/core';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 import classes from '@/common/css/fen.module.css';
 
 import type { AnalyseStore } from '@/analyse/store/analyse';

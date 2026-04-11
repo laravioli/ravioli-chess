@@ -1,4 +1,4 @@
-import { usePageInitCfg } from '@/core/hooks/hooks';
+import { usePageInitCfg } from '@/core/hooks';
 import type { EditorConfig } from '@/core/boot/interface';
 
 import { EditorStore } from './editor';

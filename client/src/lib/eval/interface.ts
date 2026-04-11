@@ -1,5 +1,7 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/types.ts
 
+import type { Path } from '../tree/interface';
+
 export type Feature =
   | 'wasm'
   | 'sharedMem'
@@ -112,14 +114,19 @@ export interface Step {
 }
 
 export interface Started {
-  path: string;
+  path: Path;
   steps: Step[];
   gameId: string | undefined;
 }
 
 export interface CevalOpts {
   allowed: boolean;
+  listening: boolean;
   initialFen?: string;
   emit: (ev: LocalEval, work: Work) => void;
   search?: Search;
+}
+
+export interface CevalEvent extends MessageEvent {
+  data: { type: 'stop' };
 }

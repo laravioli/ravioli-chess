@@ -7,7 +7,7 @@ import { INITIAL_FEN } from 'chessops/fen';
 import { EMPTY_FEN } from 'chessops/fen';
 import { IconMathMaxMin, IconReload, IconRepeat, IconTrash } from '@tabler/icons-react';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 import { ToolTipConfigProvider } from '@/common/components/controls/tooltip';
 import { ActionWithToolTip } from '@/common/components/controls/action';
 

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 
 import classes from '@/common/css/board.module.css';
 

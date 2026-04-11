@@ -18,7 +18,7 @@ export function makeShapes(ctrl: AnalyseStore) {
   const engine = ctrl.ceval;
   let shapes: DrawShape[] = [];
 
-  if (engine.enabled && engine.search.multiPv) {
+  if (ctrl.cevalEnabled && engine.search.multiPv) {
     const node = ctrl.node;
     const bestEval = ctrl.getBestEval(node);
     if (bestEval) shapes = shapes.concat(makeShapesFromUci(bestEval, 'paleBlue'));

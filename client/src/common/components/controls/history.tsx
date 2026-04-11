@@ -7,7 +7,7 @@ import {
   IconChevronsRight,
 } from '@tabler/icons-react';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 
 import type { AnalyseStore } from '@/analyse/store/analyse';
 

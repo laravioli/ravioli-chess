@@ -3,7 +3,7 @@ import { AnalyseStore } from '@/analyse/store/analyse';
 import { EditorStore } from '@/editor/store/editor';
 import { PlayStore } from '@/play/store/play';
 import { Ceval } from '@/lib/eval/ceval';
-import type { LocalEvalStorage } from '@/lib/eval/localstorage';
+import { LobbySettings } from '@/lib/lobby/localstorage';
 
 import type { ServerPayload } from '@/core/boot/interface';
 
@@ -11,18 +11,19 @@ import type { ServerPayload } from '@/core/boot/interface';
 
 interface GlobalStoreDependencies {
   userConfig: ServerPayload['user'];
-  localEvalStorage: LocalEvalStorage;
 }
 
 export interface GlobalStore {
   userStore: UserStore;
   ceval: Ceval;
+  lobbySettings: LobbySettings;
 }
 
 export function makeGlobalStore(dep: GlobalStoreDependencies) {
   const globalStore = {
+    ceval: new Ceval(),
+    lobbySettings: new LobbySettings(),
     userStore: new UserStore(dep.userConfig),
-    ceval: new Ceval(dep.localEvalStorage),
   };
 
   return globalStore;

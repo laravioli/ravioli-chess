@@ -5,7 +5,6 @@ import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 import { uciToMove, opposite } from '@lichess-org/chessground/util';
 
 import { TreePath, TreeOps, Tree } from '@/lib/tree/tree';
-import { throttle } from '@/lib/common';
 import { isEvalBetter } from '@/lib/eval/utils';
 import type { Ceval } from '@/lib/eval/ceval';
 import type { CevalOpts, ClientEval } from '@/lib/eval/interface';
@@ -41,8 +40,8 @@ export class AnalyseStore {
 
   @action
   onLoad() {
-    /* run AFTER the page is mounted */
     this.startCeval();
+    /* run AFTER the page is mounted */
     wsConnect('/socket/site');
   }
 
@@ -107,6 +106,7 @@ export class AnalyseStore {
   initCeval(fen: FEN) {
     const opts: CevalOpts = {
       allowed: true,
+      listening: true,
       initialFen: fen,
       emit: (ev, work) => {
         this.onNewCeval(ev, work.path);
@@ -126,15 +126,15 @@ export class AnalyseStore {
     });
   }
 
-  startCeval = throttle(800, () => {
-    if (this.ceval?.enabled) {
+  startCeval = () => {
+    if (this.ceval.isActive) {
       if (this.tree && !this.node.outcome) {
         this.ceval.start(this.path, this.nodeList, undefined);
       } else {
         this.ceval.stop();
       }
     }
-  });
+  };
 
   @action
   restartCeval() {
@@ -143,10 +143,14 @@ export class AnalyseStore {
   }
 
   @action
-  toggleCeval = () => {
-    this.ceval?.toggle();
+  toggleCeval = (enable: boolean) => {
+    const snap = this.ceval.isActive;
+    this.ceval.state.setActive(enable);
+    if (enable && this.ceval.isPaused) this.ceval.resume();
+    if (enable !== snap) {
+      enable ? this.startCeval() : this.ceval.stop();
+    }
     this.setAutoShapes();
-    this.startCeval();
   };
 
   @action

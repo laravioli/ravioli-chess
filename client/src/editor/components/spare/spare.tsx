@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
 import { dragNewPiece } from '@lichess-org/chessground/drag';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 
 import layout from '@/editor/css/layout.module.css';
 import classes from '@/editor/css/spare.module.css';

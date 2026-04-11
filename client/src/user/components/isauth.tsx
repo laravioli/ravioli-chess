@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { useGlobalStore } from '@/core/hooks/hooks';
+import { useGlobalStore } from '@/core/hooks';
 
 interface IsAuthProps {
   children: ReactNode | (() => ReactNode);

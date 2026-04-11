@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { Checkbox } from '@mantine/core';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 
 import classes from '@/editor/css/controls.module.css';
 import type { EditorStore } from '@/editor/store/editor';

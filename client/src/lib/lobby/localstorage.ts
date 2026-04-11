@@ -1,40 +1,37 @@
-import { makeAutoObservable } from 'mobx';
-import { makePersistable } from 'mobx-persist-store';
+import { observable, action } from 'mobx';
+import { persist } from '@/core/store/utils';
 
 import type { TimeMode, LobbySide } from './interface';
 
-export class LocalLobbyStorage {
-  timeMode: TimeMode = 'realTime';
-  time: number = 5;
-  increment: number = 0;
-  aiLevel: number = 3;
-  side: LobbySide = 'random';
+@persist('lobby.settings', ['timeMode', 'time', 'increment', 'aiLevel', 'side'], { sync: true })
+export class LobbySettings {
+  @observable accessor timeMode: TimeMode = 'realTime';
+  @observable accessor time: number = 5;
+  @observable accessor increment: number = 0;
+  @observable accessor aiLevel: number = 3;
+  @observable accessor side: LobbySide = 'random';
 
-  constructor() {
-    makeAutoObservable(this);
-    makePersistable(this, {
-      name: 'lobby-storage',
-      properties: ['timeMode', 'time', 'increment', 'aiLevel', 'side'],
-      storage: window.localStorage,
-    });
-  }
-
+  @action
   setTimeMode(string: TimeMode) {
     this.timeMode = string;
   }
 
+  @action
   setTime(minutes: number) {
     this.time = minutes;
   }
 
+  @action
   setIncrement(secondes: number) {
     this.increment = secondes;
   }
 
+  @action
   setAiLevel(level: number) {
     this.aiLevel = level;
   }
 
+  @action
   setSide(side: LobbySide) {
     this.side = side;
   }

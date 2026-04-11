@@ -1,4 +1,4 @@
-import { useGlobalStore, usePageInitCfg } from '@/core/hooks/hooks';
+import { useGlobalStore, usePageInitCfg } from '@/core/hooks';
 import type { PlayConfig } from '@/core/boot/interface';
 
 import { PlayStore } from './play';

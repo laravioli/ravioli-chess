@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Group, Button, Tabs } from '@mantine/core';
 import { useParams } from 'react-router';
 
-import { useGlobalStore } from '@/core/hooks/hooks';
+import { useGlobalStore } from '@/core/hooks';
 import { getUserOptions } from '@/lib/api/@tanstack/react-query.gen';
 
 import { dateFormatter } from '@/user/utils';

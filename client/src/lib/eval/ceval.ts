@@ -1,39 +1,41 @@
 //https://github.com/lichess-org/lila/blob/master/ui/lib/src/ceval/ctrl.ts
-import { observable, runInAction, action } from 'mobx';
 import { defaultPosition, setupPosition } from 'chessops/variant';
 import { parseFen } from 'chessops/fen';
 import { Result } from '@badrap/result';
+import { observable, computed, action } from 'mobx';
 
 import type { Path } from '@/lib/tree/interface';
-import { type Toggle, toggle, throttle, clamp } from '@/lib/common';
-import type { LocalEvalStorage } from './localstorage';
+import { throttle, clamp } from '@/lib/common';
+import { EngineSettings, EngineState } from './localstorage';
 import { makeEngine, maxThreads, engineSupported, StockfishWebEngine } from './engine';
 import { CevalState, povChances } from './utils';
-import type { CevalOpts, LocalEval, PvData, Search, Started, Step, Work } from './interface';
-
-const cevalDisabledSentinel = '1';
-
-const enabledAfterDisable = (ceval: Ceval) => {
-  const enabledAfter = window.sessionStorage.getItem('ceval.enabled-after');
-  const disable = ceval.evalStorage.disable || cevalDisabledSentinel;
-  return enabledAfter == disable;
-};
+import type {
+  CevalOpts,
+  LocalEval,
+  PvData,
+  Search,
+  Started,
+  Step,
+  Work,
+  CevalEvent,
+} from './interface';
 
 export class Ceval {
+  @observable private accessor analysable: boolean;
+  @observable private accessor allowed: boolean;
+  @observable.ref private accessor worker: StockfishWebEngine | undefined;
+  @observable.ref private accessor lastStarted: Started | false = false;
+
+  private readonly possible: boolean = engineSupported();
+
+  private channel: BroadcastChannel | undefined;
+  readonly settings: EngineSettings;
+  readonly state: EngineState;
   opts: CevalOpts;
-  possible: boolean;
-  analysable: boolean;
-  allowed: Toggle;
-  @observable accessor enabled: boolean;
 
-  lastStarted: Started | false = false;
-  evalStorage: LocalEvalStorage;
-
-  private worker: StockfishWebEngine | undefined;
-
-  constructor(evalStorage: LocalEvalStorage) {
-    this.evalStorage = evalStorage;
-    this.possible = engineSupported();
+  constructor() {
+    this.settings = new EngineSettings();
+    this.state = new EngineState();
   }
 
   setOpts(opts: Partial<CevalOpts>) {
@@ -46,8 +48,50 @@ export class Ceval {
       ? parseFen(this.opts.initialFen).chain((setup) => setupPosition('chess', setup))
       : Result.ok(defaultPosition('chess'));
     this.analysable = pos.isOk;
-    this.allowed = toggle(this.opts.allowed);
-    this.enabled = this.possible && this.analysable && this.allowed() && enabledAfterDisable(this);
+    this.allowed = this.opts.allowed;
+    this.opts.listening ? this.startListening() : this.stopListening();
+  }
+
+  @computed
+  get isPaused(): boolean {
+    return !this.worker && !!this.lastStarted;
+  }
+
+  @computed
+  get isDisabled(): boolean {
+    return !(this.possible && this.allowed && this.analysable);
+  }
+
+  @computed
+  get isActive(): boolean {
+    return !(this.isDisabled || this.isPaused) && this.state.active;
+  }
+
+  startListening() {
+    if (this.channel) return;
+    this.channel = new BroadcastChannel('ceval');
+    this.channel.addEventListener('message', (event: CevalEvent) => {
+      if (event.data['type'] === 'stop') this.destroy();
+    });
+  }
+
+  stopListening() {
+    this.channel?.close();
+    this.channel = undefined;
+  }
+
+  sendTabMessage(msg: object) {
+    this.channel?.postMessage(msg);
+  }
+
+  @action
+  resume(work?: Work): void {
+    try {
+      this.worker ??= makeEngine();
+      if (work) this.worker.start(work);
+    } catch (e) {
+      alert((e as Error).message);
+    }
   }
 
   onEmit = throttle(200, (ev: LocalEval, work: Work) => {
@@ -55,80 +99,71 @@ export class Ceval {
     this.opts.emit(ev, work);
   });
 
-  doStart(path: Path, steps: Step[], gameId: string | undefined) {
-    if (!this.enabled || !this.possible || !enabledAfterDisable(this)) return;
-    const step = steps[steps.length - 1];
-
-    runInAction(() => {
-      this.evalStorage.setSri(site.sri);
-      this.evalStorage.setDisable(Math.random());
-    });
-
-    window.sessionStorage.setItem('ceval.enabled-after', this.evalStorage.disable!.toString());
+  private readonly doStart = (s: Started) => {
+    if (document.hidden) {
+      this.lastStarted = s;
+      return;
+    }
+    const step = s.steps[s.steps.length - 1];
 
     if ('movetime' in this.search.by && (step.ceval?.millis ?? 0) >= this.search.by.movetime) {
-      this.lastStarted = { path, steps, gameId };
+      this.lastStarted = s;
       return;
     }
 
     const work: Work = {
       threads: this.threads,
       hashSize: this.hashSize,
-      gameId,
+      gameId: s.gameId,
       stopRequested: false,
-      initialFen: steps[0].fen,
+      initialFen: s.steps[0].fen,
       moves: [],
       currentFen: step.fen,
-      path,
+      path: s.path,
       ply: step.ply,
       search: this.search.by,
       multiPv: this.search.multiPv,
-      emit: (ev: LocalEval) => {
-        if (!this.enabled) return;
-        this.onEmit(ev, work);
-      },
+      emit: (ev: LocalEval) => this.onEmit(ev, work),
     };
 
     // send fen after latest castling move and the following moves
-    for (let i = 1; i < steps.length; i++) {
-      const s = steps[i];
-      work.moves.push(s.uci!);
+    for (let i = 1; i < s.steps.length; i++) {
+      const si = s.steps[i];
+      work.moves.push(si.uci!);
     }
 
-    if (!this.worker) this.worker = makeEngine();
+    this.sendTabMessage({ type: 'stop' });
 
-    this.worker.start(work);
+    this.resume(work);
 
-    this.lastStarted = {
-      path,
-      steps,
-      gameId,
-    };
-  }
+    this.lastStarted = s;
+  };
 
   start(path: Path, steps: Step[], gameId: string | undefined) {
-    this.doStart(path, steps, gameId);
+    if (!this.allowed || this.isPaused) return;
+    this.doStart({ path, steps, gameId });
   }
 
   stop() {
     this.worker?.stop();
   }
 
+  @action
   destroy() {
     this.stop();
     this.worker?.destroy();
     this.worker = undefined;
   }
 
-  get state() {
+  get workerState() {
     return this.worker?.getState() ?? CevalState.Initial;
   }
 
   get search() {
     const s = {
-      multiPv: this.evalStorage.multipv,
+      multiPv: this.settings.multipv,
       by: {
-        movetime: Math.min(this.evalStorage.searchms, Number.POSITIVE_INFINITY),
+        movetime: Math.min(this.settings.searchms, Number.POSITIVE_INFINITY),
       },
     } as Search;
     if (this.isInfinite) s.by = { depth: 99 };
@@ -136,7 +171,7 @@ export class Ceval {
   }
 
   get safeMovetime() {
-    return Math.min(this.evalStorage.searchms, Number.POSITIVE_INFINITY);
+    return Math.min(this.settings.searchms, Number.POSITIVE_INFINITY);
   }
 
   get isInfinite() {
@@ -144,11 +179,11 @@ export class Ceval {
   }
 
   get isComputing() {
-    return this.state === CevalState.Computing;
+    return this.workerState === CevalState.Computing;
   }
 
   get threads() {
-    const stored = this.evalStorage.threads;
+    const stored = this.settings.threads;
     return clamp(stored, {
       min: this.worker?.info.minThreads ?? 1,
       max: maxThreads(),
@@ -156,26 +191,12 @@ export class Ceval {
   }
 
   get hashSize() {
-    const stored = this.evalStorage.hashsize;
+    const stored = this.settings.hashsize;
     return Math.min(this.maxHash, stored ?? 16);
   }
 
   get maxHash() {
     return this.worker?.info.maxHash ?? 16;
-  }
-
-  @action
-  toggle() {
-    if (!this.possible || !this.allowed()) return;
-    this.stop();
-    if (!this.enabled && !document.hidden) {
-      const disable = this.evalStorage.disable || cevalDisabledSentinel;
-      if (disable) window.sessionStorage.setItem('ceval.enabled-after', disable.toString());
-      this.enabled = true;
-    } else {
-      window.sessionStorage.setItem('ceval.enabled-after', '');
-      this.enabled = false;
-    }
   }
 
   lastEmitFen = null;

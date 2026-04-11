@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 
-import { usePageStore, useLocalStorage } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 import { getRecommendedThreads } from '@/lib/eval/engine';
 
 import classes from '@/analyse/css/eval.module.css';
@@ -53,13 +53,12 @@ export const Settings: React.FC = () => {
 
 const SearchTimeSettings: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const { evalStorage } = useLocalStorage();
-  const searchms = evalStorage.searchms;
+  const searchms = analyseStore.ceval.settings.searchms;
 
   const setSearchTime = useCallback(
-    (value) => {
+    (value: number) => {
       if (value != searchms / 1000) {
-        evalStorage.setSearchMs(value * 1000);
+        analyseStore.ceval.settings.setSearchMs(value * 1000);
         analyseStore.restartCeval();
       }
     },
@@ -80,13 +79,12 @@ const SearchTimeSettings: React.FC = observer(() => {
 
 const MultiPvSettings: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const { evalStorage } = useLocalStorage();
-  const multipv = evalStorage.multipv;
+  const multipv = analyseStore.ceval.settings.multipv;
 
   const setMultiPv = useCallback(
     (value: number) => {
       if (value !== multipv) {
-        evalStorage.setMultiPv(value);
+        analyseStore.ceval.settings.setMultiPv(value);
         analyseStore.clearEvals();
       }
     },
@@ -100,21 +98,20 @@ const MultiPvSettings: React.FC = observer(() => {
 
 const ThreadsSettings: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const { evalStorage } = useLocalStorage();
-  const threads = evalStorage.threads;
+  const settings = analyseStore.ceval.settings;
 
   const setThreads = useCallback(
-    (value) => {
-      if (value != threads) {
-        evalStorage.setThreads(value);
+    (value: number) => {
+      if (value != settings.threads) {
+        settings.setThreads(value);
         analyseStore.restartCeval();
       }
     },
-    [threads],
+    [settings.threads],
   );
   return (
     <Slider
-      value={threads}
+      value={settings.threads}
       min={2}
       max={24}
       marks={[

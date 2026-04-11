@@ -19,8 +19,8 @@ import {
 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 
-import { useGlobalStore } from '@/core/hooks/hooks';
-import { useMenu, type MenuViewFC } from '@/common/hooks/hooks';
+import { useGlobalStore } from '@/core/hooks';
+import { useMenu, type MenuViewFC } from '@/common/hooks';
 import { listMyFriendsOptions } from '@/lib/api/@tanstack/react-query.gen';
 import { Preferences, Auth } from '@/lib/api';
 import { LobbySetup } from '@/lib/lobby/components/setup';

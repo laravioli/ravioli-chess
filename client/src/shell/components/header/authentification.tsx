@@ -5,7 +5,7 @@ import { notifications } from '@mantine/notifications';
 import { useFocusTrap, useMediaQuery, upperFirst, useToggle } from '@mantine/hooks';
 
 import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from '@/lib/api';
-import { useGlobalStore } from '@/core/hooks/hooks';
+import { useGlobalStore } from '@/core/hooks';
 import { IsAuth } from '@/user/components/isauth';
 
 import { useQueryClient } from '@tanstack/react-query';

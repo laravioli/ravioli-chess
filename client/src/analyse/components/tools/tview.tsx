@@ -3,7 +3,7 @@ import React, { useMemo, type MouseEvent, type MouseEventHandler } from 'react';
 import { observer } from 'mobx-react-lite';
 import clsx from 'clsx';
 
-import { usePageStore } from '@/core/hooks/hooks';
+import { usePageStore } from '@/core/hooks';
 import { defined } from '@/lib/common';
 import { getEval } from '@/lib/eval/utils';
 

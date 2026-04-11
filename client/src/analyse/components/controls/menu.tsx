@@ -14,8 +14,8 @@ import {
 } from '@tabler/icons-react';
 
 import { chessPositionsOptions } from '@/lib/api/@tanstack/react-query.gen';
-import { usePageStore, useHTMLData } from '@/core/hooks/hooks';
-import { useMenu, type MenuViewFC } from '@/common/hooks/hooks';
+import { usePageStore, useHTMLData } from '@/core/hooks';
+import { useMenu, type MenuViewFC } from '@/common/hooks';
 
 import type { AnalyseStore } from '@/analyse/store/analyse';
 import type { AnalyseOpts } from '@/analyse/store/interface';

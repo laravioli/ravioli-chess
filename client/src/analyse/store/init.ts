@@ -1,4 +1,4 @@
-import { useGlobalStore, usePageInitCfg } from '@/core/hooks/hooks';
+import { useGlobalStore, usePageInitCfg } from '@/core/hooks';
 import type { AnalyseConfig } from '@/core/boot/interface';
 
 import { AnalyseStore } from './analyse';
