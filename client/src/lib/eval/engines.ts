@@ -34,11 +34,12 @@ export class Engines {
   engineMap: Map<string, WithMake>;
   engineArrayInfo: Array<BrowserEngineInfo>;
   private selected: BrowserEngineInfo | undefined;
-
+  readonly available: boolean;
   constructor() {
     this.engineMap = this.makeEngineMap();
     this.engineArrayInfo = [...this.engineMap.values()].map((e) => e.info);
     this.selected = this.engineArrayInfo[0];
+    this.available = this.engineArrayInfo.length > 0;
   }
 
   makeEngineMap = (): Map<string, WithMake> => {

@@ -38,7 +38,6 @@ export function wsConnect(path: Path) {
 export function wsReload() {
   if (siteSocket) siteSocket.connect();
 }
-//todo: finish copying lichess
 class WsSocket {
   averageLag = 0;
   private path: Path;

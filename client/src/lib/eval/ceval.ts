@@ -35,10 +35,15 @@ export class Ceval {
   opts: CevalOpts;
 
   constructor() {
-    this.settings = new EngineSettings();
     this.state = new EngineState();
     this.engines = new Engines();
-    this.possible = this.engines.engineArrayInfo.length > 0;
+
+    const possible = this.engines.available;
+    this.possible = possible;
+    this.settings = new EngineSettings({
+      possible,
+      info: this.engines.getSelected(),
+    });
   }
 
   setOpts(opts: Partial<CevalOpts>) {

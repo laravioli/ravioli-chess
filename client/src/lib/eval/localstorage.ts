@@ -1,12 +1,23 @@
 import { observable, action } from 'mobx';
 import { persist } from '@/core/store/utils';
+import { BrowserEngineInfo } from './interface';
+import { getRecommendedThreads } from './engines';
+
+interface SettingsOpts {
+  possible: boolean;
+  info: BrowserEngineInfo | undefined;
+}
 
 @persist('engine.settings', ['multipv', 'searchms', 'threads', 'hashsize'], { sync: true })
 export class EngineSettings {
   @observable accessor multipv = 1;
   @observable accessor searchms = 3000;
-  @observable accessor threads: number = 7; //todo: replace with getRecommendedThreads
+  @observable accessor threads: number;
   @observable accessor hashsize = 16;
+
+  constructor(opts: SettingsOpts) {
+    this.threads = opts.possible ? getRecommendedThreads(opts.info!) : 2;
+  }
 
   @action
   setMultiPv(nb: number) {
