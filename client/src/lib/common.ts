@@ -49,6 +49,14 @@ export function clamp(value, bounds) {
   return Math.max(bounds.min ?? -Infinity, Math.min(value, bounds.max ?? Infinity));
 }
 
+export const memoize = <A>(compute: () => A): (() => A) => {
+  let computed: A;
+  return () => {
+    if (computed === undefined) computed = compute();
+    return computed;
+  };
+};
+
 /**
  * Ensures calls to the wrapped function are spaced by the given delay.
  * Any extra calls are dropped, except the last one, which waits for the delay.
@@ -125,3 +133,12 @@ function throttlePromise<T extends (...args: any) => Promise<void>>(
     return throttler.apply(this, args).catch(() => {});
   };
 }
+
+export const randomToken = () => {
+  try {
+    const data = globalThis.crypto.getRandomValues(new Uint8Array(9));
+    return btoa(String.fromCharCode(...data)).replace(/[/+]/g, '_');
+  } catch (_) {
+    return Math.random().toString(36).slice(2, 12);
+  }
+};

@@ -9,16 +9,24 @@
 
 .eval {
   background: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-6));
-  border-bottom: light-dark(1px solid var(--mantine-color-gray-3), 1px solid var(--mantine-color-dark-5));
+  border-bottom: light-dark(
+    1px solid var(--mantine-color-gray-3),
+    1px solid var(--mantine-color-dark-5)
+  );
 }
 
 .score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 1 0 auto;
-  line-height: 25px;
+  height: 25px;
+  min-width: 25px;
   font-size: 1.2em;
-  text-align: center;
   font-weight: bold;
+  line-height: 1;
 }
+
 .info {
   flex: 2 1;
 }
@@ -62,7 +70,7 @@
 }
 
 .pvs {
-  --text-fz: 13px;
+  --text-fz: 15px;
   --text-lh: 2em;
   min-height: 2em;
 }

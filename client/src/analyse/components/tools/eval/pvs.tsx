@@ -13,6 +13,7 @@ import { getEval } from '@/lib/eval/utils';
 import type { AnalyseStore } from '@/analyse/store/analyse';
 import type { LocalEval, PvData, Uci } from '@/lib/eval/interface';
 import classes from '@/analyse/css/eval.module.css';
+import type { Ceval } from '@/lib/eval/ceval';
 
 export const Pvs: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
@@ -20,7 +21,7 @@ export const Pvs: React.FC = observer(() => {
     <>
       {analyseStore.ceval.isActive &&
         !analyseStore.node.outcome &&
-        renderPvs(analyseStore.node.ceval, analyseStore.ceval.settings.multipv)}
+        renderPvs(analyseStore.node.ceval, analyseStore.ceval)}
     </>
   );
 });
@@ -48,15 +49,16 @@ interface Pv {
   eval?: PvData;
 }
 
-function renderPvs(evaluation: LocalEval | undefined, multipv: number) {
+function renderPvs(evaluation: LocalEval | undefined, ceval: Ceval) {
+  const multipv = ceval.settings.multipv;
   let pvs: Pv[];
-  if (!evaluation) pvs = new Array(multipv).fill({});
+  if (!evaluation) pvs = new Array(multipv).fill({ moves: '' });
   else {
     const setup = parseFen(evaluation.fen).unwrap();
     const pos = setupPosition(lichessRules('standard'), setup);
     pvs = Array.from({ length: multipv }, (_, i) => {
       const pvData = evaluation.pvs?.[i];
-      if (!pvData || !pos) return {};
+      if (!pvData || !pos) return { moves: '' };
       return {
         moves: parsePv(pvData.moves, pos.isOk ? pos.value.clone() : undefined),
         eval: pvData,
@@ -73,7 +75,7 @@ function renderPvs(evaluation: LocalEval | undefined, multipv: number) {
             )}
             {pv.moves}
           </Text>
-          <Divider classNames={{ root: classes.divider }} />
+          {index < pvs.length - 1 && <Divider classNames={{ root: classes.divider }} />}
         </React.Fragment>
       ))}
     </>

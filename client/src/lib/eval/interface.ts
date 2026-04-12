@@ -51,10 +51,10 @@ export interface BrowserEngineInfo extends BaseEngineInfo {
   minMem?: number;
   assets: {
     root?: string;
-    js?: string;
+    js: string;
     wasm?: string;
     version?: string;
-    nnue?: string[];
+    nnue: string[];
   };
   requires: Feature[];
   obsoletedBy?: Feature;
@@ -131,7 +131,7 @@ export interface CevalEngine {
 }
 
 export interface CevalOpts {
-  id: string;
+  id?: string;
   allowed: boolean;
   listening: boolean;
   initialFen?: string;

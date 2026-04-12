@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Switch } from '@mantine/core';
+import { Switch, Loader } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
 import { usePageStore } from '@/core/hooks';
@@ -37,17 +37,22 @@ export const EvalScore: React.FC = observer(() => {
   const analyseStore = usePageStore<AnalyseStore>();
 
   const evaluation = analyseStore.node.ceval;
-  let score = '';
+  const isActive = analyseStore.ceval.isActive;
+  let score: string | null = null;
 
-  if (evaluation) {
+  if (evaluation && !analyseStore.node.outcome) {
     score = getEval(evaluation);
   }
 
-  if (analyseStore.node.outcome && analyseStore.ceval.isActive) {
+  if (analyseStore.node.outcome && isActive) {
     score = '-';
   }
 
-  return <span className={classes.score}>{score}</span>;
+  return (
+    <span className={classes.score}>
+      {isActive && !score ? <Loader color="gray" type="dots" /> : score}
+    </span>
+  );
 });
 
 export const Depth = observer(() => {

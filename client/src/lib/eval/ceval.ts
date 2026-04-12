@@ -7,8 +7,8 @@ import { observable, computed, action } from 'mobx';
 import type { Path } from '@/lib/tree/interface';
 import { throttle, clamp } from '@/lib/common';
 import { EngineSettings, EngineState } from './localstorage';
-import { getEngineInfo, makeEngine } from './engines';
-import { engineSupported, maxThreads, povChances } from './utils';
+import { Engines } from './engines';
+import { maxThreads, povChances } from './utils';
 import type {
   CevalEngine,
   CevalOpts,
@@ -26,16 +26,19 @@ export class Ceval {
   @observable private accessor allowed: boolean;
   @observable.ref private accessor worker: CevalEngine | undefined;
   @observable.ref private accessor lastStarted: Started | false = false;
-  private possible: boolean;
+  private readonly possible: boolean;
 
   private channel: BroadcastChannel | undefined;
   readonly settings: EngineSettings;
   readonly state: EngineState;
+  readonly engines: Engines;
   opts: CevalOpts;
 
   constructor() {
     this.settings = new EngineSettings();
     this.state = new EngineState();
+    this.engines = new Engines();
+    this.possible = this.engines.engineArrayInfo.length > 0;
   }
 
   setOpts(opts: Partial<CevalOpts>) {
@@ -47,10 +50,12 @@ export class Ceval {
     const pos = this.opts.initialFen
       ? parseFen(this.opts.initialFen).chain((setup) => setupPosition('chess', setup))
       : Result.ok(defaultPosition('chess'));
-    this.possible = engineSupported(getEngineInfo(this.opts.id));
     this.analysable = pos.isOk;
     this.allowed = this.opts.allowed;
-    this.opts.listening ? this.startListening() : this.stopListening();
+    const id = this.opts.id;
+    if (id) this.engines.select(id);
+    if (opts.listening === true) this.startListening();
+    else if (opts.listening === false) this.stopListening();
   }
 
   @computed
@@ -88,7 +93,7 @@ export class Ceval {
   @action
   resume(work?: Work): void {
     try {
-      this.worker ??= makeEngine(this.opts.id);
+      this.worker ??= this.engines.make();
       if (work) this.worker.start(work);
     } catch (e) {
       alert((e as Error).message);
@@ -188,7 +193,7 @@ export class Ceval {
     const info = this.worker?.getInfo();
     return clamp(stored, {
       min: info?.minThreads ?? 1,
-      max: maxThreads(info),
+      max: maxThreads(info?.maxThreads),
     });
   }
 

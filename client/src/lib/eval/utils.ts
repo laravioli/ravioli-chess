@@ -2,13 +2,7 @@
 /*-----ENGINE-----*/
 /*----------------*/
 
-import type {
-  Feature,
-  EvalScore,
-  WinningChances,
-  ClientEval,
-  BrowserEngineInfo,
-} from './interface';
+import type { Feature, EvalScore, WinningChances, ClientEval } from './interface';
 
 export const sharedWasmMemory = (lo: number, hi = 32767): WebAssembly.Memory => {
   let shrink = 4; // 32767 -> 24576 -> 16384 -> 12288 -> 8192 -> 6144 -> etc
@@ -103,17 +97,14 @@ export const features: () => readonly Feature[] = memoize<readonly Feature[]>(()
   return Object.freeze(features);
 });
 
-export const engineSupported = (info: BrowserEngineInfo) =>
-  info.requires.every((req) => features().includes(req));
-
 /*----------------*/
 /*-----THREADS----*/
 /*----------------*/
 
-export const maxThreads = (info: BrowserEngineInfo | undefined) => {
+export const maxThreads = (maxThreads: number | undefined) => {
   return fewerCores()
-    ? Math.min(info?.maxThreads ?? 32, navigator.hardwareConcurrency)
-    : (info?.maxThreads ?? 32);
+    ? Math.min(maxThreads ?? 32, navigator.hardwareConcurrency)
+    : (maxThreads ?? 32);
 };
 const isMobile = () => isAndroid() || isIos();
 
@@ -166,7 +157,7 @@ export const getEval = (evaluation: EvalScore) => {
     return '#' + evaluation.mate;
   } else if (evaluation.cp) {
     return renderEval(evaluation.cp);
-  } else return '';
+  } else return null;
 };
 
 function renderEval(e: number) {

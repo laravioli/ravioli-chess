@@ -18,7 +18,7 @@ const EvalBar: React.FC = observer(() => {
   const progress = useRef(0);
   const ev = store.node.ceval;
 
-  if (!store.cenabled || store.node.outcome) return null;
+  if (!store.ceval.isActive || store.node.outcome) return null;
 
   if (ev) {
     progress.current = povChances('white', ev);

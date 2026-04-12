@@ -2,7 +2,6 @@ import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
 import { resolve } from 'path';
 import react from '@vitejs/plugin-react';
 import babel from '@rolldown/plugin-babel';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode }) => {
   const { BACKEND_DOMAIN } = loadEnv(mode, process.cwd(), '');
@@ -13,10 +12,10 @@ export default defineConfig(({ mode }) => {
       react(),
       babel({ presets: [decoratorPreset({ version: '2023-11' })] }),
       devServerConfig(),
-      tsconfigPaths(),
     ],
     css: { modules: { localsConvention: 'camelCase' } },
     resolve: {
+      tsconfigPaths: true,
       alias: {
         'src': resolve(__dirname, 'src'),
         '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',

@@ -116,7 +116,7 @@ const ThreadsSettings: React.FC = observer(() => {
       max={24}
       marks={[
         {
-          value: getRecommendedThreads(analyseStore.engine),
+          value: analyseStore.engineInfo ? getRecommendedThreads(analyseStore.engineInfo) : 0,
         },
       ]}
       step={1}
