@@ -7,9 +7,10 @@ import { observable, computed, action } from 'mobx';
 import type { Path } from '@/lib/tree/interface';
 import { throttle, clamp } from '@/lib/common';
 import { EngineSettings, EngineState } from './localstorage';
-import { makeEngine, maxThreads, engineSupported, StockfishWebEngine } from './engine';
-import { CevalState, povChances } from './utils';
+import { getEngineInfo, makeEngine } from './engines';
+import { engineSupported, maxThreads, povChances } from './utils';
 import type {
+  CevalEngine,
   CevalOpts,
   LocalEval,
   PvData,
@@ -23,10 +24,9 @@ import type {
 export class Ceval {
   @observable private accessor analysable: boolean;
   @observable private accessor allowed: boolean;
-  @observable.ref private accessor worker: StockfishWebEngine | undefined;
+  @observable.ref private accessor worker: CevalEngine | undefined;
   @observable.ref private accessor lastStarted: Started | false = false;
-
-  private readonly possible: boolean = engineSupported();
+  private possible: boolean;
 
   private channel: BroadcastChannel | undefined;
   readonly settings: EngineSettings;
@@ -47,6 +47,7 @@ export class Ceval {
     const pos = this.opts.initialFen
       ? parseFen(this.opts.initialFen).chain((setup) => setupPosition('chess', setup))
       : Result.ok(defaultPosition('chess'));
+    this.possible = engineSupported(getEngineInfo(this.opts.id));
     this.analysable = pos.isOk;
     this.allowed = this.opts.allowed;
     this.opts.listening ? this.startListening() : this.stopListening();
@@ -87,7 +88,7 @@ export class Ceval {
   @action
   resume(work?: Work): void {
     try {
-      this.worker ??= makeEngine();
+      this.worker ??= makeEngine(this.opts.id);
       if (work) this.worker.start(work);
     } catch (e) {
       alert((e as Error).message);
@@ -156,7 +157,7 @@ export class Ceval {
   }
 
   get workerState() {
-    return this.worker?.getState() ?? CevalState.Initial;
+    return this.worker?.getState() ?? 'Initial';
   }
 
   get search() {
@@ -179,14 +180,15 @@ export class Ceval {
   }
 
   get isComputing() {
-    return this.workerState === CevalState.Computing;
+    return this.workerState === 'Computing';
   }
 
   get threads() {
     const stored = this.settings.threads;
+    const info = this.worker?.getInfo();
     return clamp(stored, {
-      min: this.worker?.info.minThreads ?? 1,
-      max: maxThreads(),
+      min: info?.minThreads ?? 1,
+      max: maxThreads(info),
     });
   }
 
@@ -196,7 +198,7 @@ export class Ceval {
   }
 
   get maxHash() {
-    return this.worker?.info.maxHash ?? 16;
+    return this.worker?.getInfo().maxHash ?? 16;
   }
 
   lastEmitFen = null;

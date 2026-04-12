@@ -4,7 +4,7 @@ import { ActionIcon, Popover, Slider, Stack, Text, Group } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 
 import { usePageStore } from '@/core/hooks';
-import { getRecommendedThreads } from '@/lib/eval/engine';
+import { getRecommendedThreads } from '@/lib/eval/engines';
 
 import classes from '@/analyse/css/eval.module.css';
 import type { AnalyseStore } from '@/analyse/store/analyse';
@@ -116,7 +116,7 @@ const ThreadsSettings: React.FC = observer(() => {
       max={24}
       marks={[
         {
-          value: getRecommendedThreads(),
+          value: getRecommendedThreads(analyseStore.engine),
         },
       ]}
       step={1}

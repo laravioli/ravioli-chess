@@ -7,7 +7,7 @@ export const Eval: React.FC = () => {
     <div className={classes.eval}>
       <EvalToggle />
       <EvalScore />
-      <span className={classes.info}>SF 16</span>
+      <span className={classes.info}>SF 18</span>
       <Depth />
       <Settings />
     </div>

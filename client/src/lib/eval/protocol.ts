@@ -52,16 +52,26 @@ export class Protocol {
     if (parts[0] === 'uciok') {
       // Analyse without contempt.
       this.setOption('UCI_AnalyseMode', 'true');
+      this.setOption('Analysis Contempt', 'Off');
+      this.setOption('UCI_Chess960', 'false');
 
       this.send?.('ucinewgame');
       this.send?.('isready');
-    } else if (parts[0] === 'readyok') {
-      this.swapWork();
-    } else if (parts[0] === 'id' && parts[1] === 'name') {
-      this.engineName = parts.slice(2).join(' ');
-    } else if (parts[0] === 'bestmove') {
-      if (this.work && this.currentEval) this.work.emit(this.currentEval);
+    } else if (parts[0] === 'readyok') this.swapWork();
+    else if (parts[0] === 'id' && parts[1] === 'name') this.engineName = parts.slice(2).join(' ');
+    else if (parts[0] === 'bestmove') {
+      const work = this.work;
       this.work = undefined;
+      if (work) {
+        const ceval = this.currentEval ?? {
+          millis: 0,
+          fen: work.currentFen,
+          depth: 0,
+          nodes: 0,
+          pvs: [],
+        };
+        work.emit(ceval);
+      }
       this.swapWork();
       return;
     } else if (this.work && !this.work.stopRequested && parts[0] === 'info') {
@@ -138,7 +148,8 @@ export class Protocol {
           pvs: [pvData],
         };
       } else if (this.currentEval) {
-        this.currentEval.pvs.push(pvData);
+        if (this.currentEval.pvs.length < multiPv) this.currentEval.pvs.push(pvData);
+        else this.currentEval.pvs[multiPv - 1] = pvData;
         this.currentEval.depth = Math.min(this.currentEval.depth, depth);
       }
 

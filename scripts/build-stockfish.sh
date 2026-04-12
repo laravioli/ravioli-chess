@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION="sf16-7"
+VERSION="sf_18_smallnet"
 DEST="./client/src/lib/eval/stockfish"
 
 if [[ -f "$DEST/$VERSION.js" && -f "$DEST/$VERSION.wasm" ]]; then

@@ -1,12 +1,11 @@
 import { observable, action } from 'mobx';
 import { persist } from '@/core/store/utils';
-import { getRecommendedThreads } from './engine';
 
 @persist('engine.settings', ['multipv', 'searchms', 'threads', 'hashsize'], { sync: true })
 export class EngineSettings {
   @observable accessor multipv = 1;
   @observable accessor searchms = 3000;
-  @observable accessor threads: number = getRecommendedThreads();
+  @observable accessor threads: number = 7; //todo: replace with getRecommendedThreads
   @observable accessor hashsize = 16;
 
   @action

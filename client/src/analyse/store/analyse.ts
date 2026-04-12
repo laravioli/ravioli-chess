@@ -18,7 +18,9 @@ import { wsConnect } from '@/lib/socket/socket';
 export class AnalyseStore {
   board: ChessgroundApi | undefined;
   ceval: Ceval;
-
+  engine: string = '__sf_18_smallnet_relaxed-simd';
+  //__sf16nnue7
+  //__sf_18_smallnet_relaxed-simd
   tree: Tree;
   path: Path;
   nodeList: Node[];
@@ -105,6 +107,7 @@ export class AnalyseStore {
 
   initCeval(fen: FEN) {
     const opts: CevalOpts = {
+      id: this.engine,
       allowed: true,
       listening: true,
       initialFen: fen,

@@ -6,6 +6,7 @@ export type Feature =
   | 'wasm'
   | 'sharedMem'
   | 'simd'
+  | 'relaxedSimd'
   | 'dynamicImportFromWorker'
   | 'bigint'
   | 'structuredClone';
@@ -119,7 +120,18 @@ export interface Started {
   gameId: string | undefined;
 }
 
+export type CevalState = 'Initial' | 'Loading' | 'Idle' | 'Computing' | 'Failed';
+
+export interface CevalEngine {
+  getInfo(): BrowserEngineInfo;
+  getState(): CevalState;
+  start(work: Work): void;
+  stop(): void;
+  destroy(): void;
+}
+
 export interface CevalOpts {
+  id: string;
   allowed: boolean;
   listening: boolean;
   initialFen?: string;

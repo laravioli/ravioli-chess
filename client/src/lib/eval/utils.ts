@@ -2,27 +2,19 @@
 /*-----ENGINE-----*/
 /*----------------*/
 
-import type { Feature, EvalScore, WinningChances, ClientEval } from './interface';
+import type {
+  Feature,
+  EvalScore,
+  WinningChances,
+  ClientEval,
+  BrowserEngineInfo,
+} from './interface';
 
-export type CevalState = (typeof CevalState)[keyof typeof CevalState];
-
-export const CevalState = {
-  Initial: 'Initial',
-  Loading: 'Loading',
-  Idle: 'Idle',
-  Computing: 'Computing',
-  Failed: 'Failed',
-} as const;
-
-export const sharedWasmMemory = (lo: number, hi = 32767) => {
+export const sharedWasmMemory = (lo: number, hi = 32767): WebAssembly.Memory => {
   let shrink = 4; // 32767 -> 24576 -> 16384 -> 12288 -> 8192 -> 6144 -> etc
   while (true) {
     try {
-      return new WebAssembly.Memory({
-        shared: true,
-        initial: lo,
-        maximum: hi,
-      });
+      return new WebAssembly.Memory({ shared: true, initial: lo, maximum: hi });
     } catch (e) {
       if (hi <= lo || !(e instanceof RangeError)) throw e;
       hi = Math.max(lo, Math.ceil(hi - hi / shrink));
@@ -55,25 +47,28 @@ function maxHashMB() {
 }
 export const maxHash = maxHashMB();
 
-function sharedMemoryTest() {
-  if (typeof Atomics !== 'object') return false;
-  if (typeof SharedArrayBuffer !== 'function') return false;
+const lowerAgent = navigator.userAgent.toLowerCase();
+
+function sharedMemoryTest(): boolean {
+  // Avoid WebKit crash: https://bugs.webkit.org/show_bug.cgi?id=303387
+  if (lowerAgent.includes('version/26.2')) return false;
+
+  if (typeof Atomics !== 'object' || typeof SharedArrayBuffer !== 'function') return false;
 
   let mem;
   try {
     mem = new WebAssembly.Memory({ shared: true, initial: 1, maximum: 2 });
-
     if (!(mem.buffer instanceof SharedArrayBuffer)) return false;
-
     window.postMessage(mem.buffer, '*');
+    return true;
   } catch {
     return false;
   }
-  return mem.buffer instanceof SharedArrayBuffer;
 }
-
-export const browserSupport = memoize(() => {
+export const features: () => readonly Feature[] = memoize<readonly Feature[]>(() => {
   const features: Feature[] = [];
+  if (typeof BigInt === 'function') features.push('bigint');
+  if (typeof structuredClone !== 'undefined') features.push('structuredClone');
   if (
     typeof WebAssembly === 'object' &&
     typeof WebAssembly.validate === 'function' &&
@@ -87,6 +82,12 @@ export const browserSupport = memoize(() => {
       32, 0, 253, 253, 1, 11,
     ]);
     if (WebAssembly.validate(sourceWithSimd)) features.push('simd');
+    // i32x4.dot_i8x16_i7x16_add_s
+    const sourceWithRelaxedSimd = Uint8Array.from([
+      0, 97, 115, 109, 1, 0, 0, 0, 1, 8, 1, 96, 3, 123, 123, 123, 1, 123, 3, 2, 1, 0, 7, 5, 1, 1,
+      99, 0, 0, 10, 13, 1, 11, 0, 32, 0, 32, 1, 32, 2, 253, 147, 2, 11,
+    ]);
+    if (WebAssembly.validate(sourceWithRelaxedSimd)) features.push('relaxedSimd');
     if (sharedMemoryTest()) features.push('sharedMem');
   }
   try {
@@ -98,17 +99,22 @@ export const browserSupport = memoize(() => {
       ),
     ).terminate();
     features.push('dynamicImportFromWorker');
-  } catch (error) {
-    console.error('Worker creation failed:', error);
-  }
-
+  } catch {}
   return Object.freeze(features);
 });
+
+export const engineSupported = (info: BrowserEngineInfo) =>
+  info.requires.every((req) => features().includes(req));
 
 /*----------------*/
 /*-----THREADS----*/
 /*----------------*/
 
+export const maxThreads = (info: BrowserEngineInfo | undefined) => {
+  return fewerCores()
+    ? Math.min(info?.maxThreads ?? 32, navigator.hardwareConcurrency)
+    : (info?.maxThreads ?? 32);
+};
 const isMobile = () => isAndroid() || isIos();
 
 export const fewerCores = memoize(() => isMobile() || navigator.userAgent.includes('CrOS'));
