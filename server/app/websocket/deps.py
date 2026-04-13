@@ -8,6 +8,7 @@ from app.deps import BroadCastClient
 from core.ipc.channels import EngineGameChan
 
 from .consumers import PlayConsumer, SiteConsumer
+from .heartbeat import HeartBeat
 from .schemas import Game, Sri, User
 
 
@@ -22,7 +23,13 @@ async def get_websocket_params(
     websocket: WebSocket,
     broadcast: BroadCastClient,
 ):
-    return {"sri": sri, "user": user, "websocket": websocket, "broadcast": broadcast}
+    return {
+        "sri": sri,
+        "user": user,
+        "websocket": websocket,
+        "broadcast": broadcast,
+        "heartbeat": HeartBeat(websocket=websocket),
+    }
 
 
 type BaseWebsocketParams = Annotated[dict, Depends(get_websocket_params)]

@@ -3,6 +3,7 @@ import logging
 from fastapi import WebSocket
 
 from app.deps import BroadCastClient
+from app.websocket.heartbeat import HeartBeat
 from app.websocket.schemas import Game
 from core.ipc import ClientIn, c_out, p_in, p_out
 from core.ipc.channels import WsGameChan
@@ -13,11 +14,19 @@ logger = logging.getLogger(__name__)
 
 
 class PlayConsumer(Consumer):
-    c_out_frame = c_out.GameMove
-    p_out_frame = p_out.GameUpdate
+    CLIENT_OUT_FRAME = c_out.GameMove
+    PROCESS_OUT_FRAME = p_out.GameUpdate
 
-    def __init__(self, sri, user, websocket: WebSocket, broadcast: BroadCastClient, game: Game):
-        super().__init__(sri, user, websocket, broadcast)
+    def __init__(
+        self,
+        sri,
+        user,
+        websocket: WebSocket,
+        broadcast: BroadCastClient,
+        heartbeat: HeartBeat,
+        game: Game,
+    ):
+        super().__init__(sri, user, websocket, broadcast, heartbeat)
         self.game = game
         self.channels.append(WsGameChan(self.game.id))
 

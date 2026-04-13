@@ -3,7 +3,7 @@ from typing import Literal
 from msgspec import Raw, Struct
 
 
-class ProcessOut(Struct, tag_field="po", rename={"type": "t", "data": "d"}):
+class ProcessOUT(Struct, tag_field="po", rename={"type": "t", "data": "d"}):
     pass
 
 
@@ -13,12 +13,12 @@ class ProcessOut(Struct, tag_field="po", rename={"type": "t", "data": "d"}):
 
 
 # Frame
-class GameUpdate(ProcessOut, tag="g/update"):
+class GameUpdate(ProcessOUT, tag="g/update"):
     type: Literal["move", "takeback", "draw", "resign", "endData"]
     data: Raw
 
 
-class GameCreate(ProcessOut, tag="g/create"):
+class GameCreate(ProcessOUT, tag="g/create"):
     data: Raw  # GameId
 
 
@@ -42,17 +42,16 @@ class GameEnd(Struct):
 # ╚══════════════════════════════════════╝
 
 
-class TellUser(ProcessOut, tag="t/user"):
+class TellUser(ProcessOUT, tag="t/user"):
     type: str
     data: Raw
 
 
-class TellSocket(ProcessOut, tag="t/socket"):
+class TellSocket(ProcessOUT, tag="t/socket"):
     type: str
     data: Raw
 
 
 # types
-type EngineFrameOut = GameUpdate | GameUpdate
-type AppFrameOut = TellUser | TellSocket
-type ProcessFrameOut = EngineFrameOut | AppFrameOut
+type EngineOUT = GameUpdate | GameUpdate
+type AppOUT = TellUser | TellSocket

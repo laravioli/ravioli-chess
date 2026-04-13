@@ -17,14 +17,14 @@ class MoveData(Struct):
 
 
 # Frame
-class ClientOut(Struct, tag_field="t", rename={"data": "d"}): ...
+class ClientOUT(Struct, tag_field="t", rename={"data": "d"}): ...
 
 
-class GameCreate(ClientOut, tag="newGame"):
+class GameCreate(ClientOUT, tag="newGame"):
     data: GameInfo = field(default_factory=GameInfo)
 
 
-class GameMove(ClientOut, tag="move"):
+class GameMove(ClientOUT, tag="move"):
     data: MoveData
 
 

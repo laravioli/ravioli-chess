@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class SiteConsumer(Consumer):
-    c_out_frame = c_out.GameCreate
-    p_out_frame = p_out.GameCreate
+    CLIENT_OUT_FRAME = c_out.GameCreate
+    PROCESS_OUT_FRAME = p_out.GameCreate
 
     async def handle_client_msg(self, msg):
         response, channel = (None, None)

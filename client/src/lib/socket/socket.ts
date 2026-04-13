@@ -145,7 +145,7 @@ class WsSocket {
   private readonly pingNow = (): void => {
     clearTimeout(this.pingSchedule);
     clearTimeout(this.connectSchedule);
-    const pingData = 'p';
+    const pingData = '"p"';
     try {
       this.ws!.send(pingData);
       this.lastPingTime = performance.now();
