@@ -11,12 +11,11 @@ from core.ipc.channels import ConsumerChan, UserChan, WebsocketChan
 from core.ipc.types import ClientFrameOut, ProcessFrameOut
 from lib.serializers import json
 
-from .heartbeat import HeartBeat
-
 logger = logging.getLogger(__name__)
 
 
 class Consumer:
+    ## INIT ##
     c_out_frame: ClassVar[ClientFrameOut]
     p_out_frame: ClassVar[ProcessFrameOut]
 
@@ -36,12 +35,11 @@ class Consumer:
         self.websocket = websocket
         self.broadcast = broadcast
         self.channels: list[WebsocketChan] = [ConsumerChan(sri)]
-        self.heartbeat = HeartBeat(ws=websocket)
 
         if user:
             self.channels.append(UserChan(user.id))
 
-    # main coroutine
+    ## LOOP ##
     async def __call__(self):
         await self.websocket.accept()
 
@@ -56,7 +54,7 @@ class Consumer:
         finally:
             await self.disconnect()
 
-    # process
+    ## PROCESS FRAME ##
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
@@ -71,7 +69,7 @@ class Consumer:
             case _:
                 logger.info("receive unknow process msg")
 
-    # client
+    ## CLIENT FRAME ##
     async def handle_client_msg(self, msg):
         """common message received from client"""
         match msg:
