@@ -6,17 +6,20 @@ import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 import { wsConnect } from '@/lib/socket';
 
 import { Fen } from './fen';
-import type { EditorOpts } from './interface';
+import type { EditorOpts, EditorSettings } from './interface';
 
 export class EditorStore {
-  opts: EditorOpts;
   board: ChessgroundApi | undefined;
   fen: Fen;
 
   @observable accessor isFlipped = false;
 
-  constructor(opts: EditorOpts) {
+  private readonly opts: EditorOpts;
+  private readonly settings: EditorSettings;
+
+  constructor(opts: EditorOpts, settings: EditorSettings) {
     this.opts = opts;
+    this.settings = settings;
     this.fen = new Fen(opts.fen);
   }
 
@@ -24,7 +27,7 @@ export class EditorStore {
 
   @action
   onLoad() {
-    wsConnect('/socket/site');
+    wsConnect('/socket/site', { receive: this.settings.socketReceive });
   }
 
   @action

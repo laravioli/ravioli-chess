@@ -4,6 +4,8 @@ import { EditorStore } from '@/editor/store/editor';
 import { PlayStore } from '@/play/store/play';
 import { Ceval } from '@/lib/eval/ceval';
 import { LobbySettings } from '@/lobby/localstorage';
+import { QueryClient } from '@tanstack/react-query';
+import { globalHandlers } from '@/common/socket';
 
 import type { ServerPayload } from '@/core/boot/interface';
 
@@ -11,23 +13,22 @@ import type { ServerPayload } from '@/core/boot/interface';
 
 interface GlobalStoreDependencies {
   userConfig: ServerPayload['user'];
+  queryClient: QueryClient;
 }
 
 export interface GlobalStore {
   userStore: UserStore;
   ceval: Ceval;
   lobbySettings: LobbySettings;
+  socketReceive: (t: string, d: any) => void;
 }
 
-export function makeGlobalStore(dep: GlobalStoreDependencies) {
-  const globalStore = {
-    ceval: new Ceval(),
-    lobbySettings: new LobbySettings(),
-    userStore: new UserStore(dep.userConfig),
-  };
-
-  return globalStore;
-}
+export const makeGlobalStore = (dep: GlobalStoreDependencies) => ({
+  ceval: new Ceval(),
+  lobbySettings: new LobbySettings(),
+  userStore: new UserStore(dep.userConfig),
+  socketReceive: globalHandlers(dep.queryClient),
+});
 
 /* Note on Transition */
 

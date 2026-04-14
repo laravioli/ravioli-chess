@@ -19,12 +19,14 @@ export interface AppDependencies {
 }
 
 export const makeAppDependencies = (payload: ServerPayload): AppDependencies => {
+  const queryClient = makeQueryClient();
   return {
     mantineConfig: makeMantineConfig(),
     data: { page: payload.page, data: payload.data },
-    queryClient: makeQueryClient(),
+    queryClient,
     globalStore: makeGlobalStore({
       userConfig: payload.user,
+      queryClient,
     }),
   };
 };

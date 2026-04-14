@@ -5,23 +5,25 @@ import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 import type { GlobalStore } from '@/core/store/stores';
 import { wsConnect } from '@/lib/socket';
 
-import type { PlayOpts } from './interface';
+import type { PlayOpts, PlaySettings } from './interface';
 
 export class PlayStore {
   globalStore: GlobalStore;
   board: ChessgroundApi | undefined;
 
   opts: PlayOpts;
+  private readonly settings: PlaySettings;
 
-  constructor(globalStore: GlobalStore, opts: PlayOpts) {
+  constructor(globalStore: GlobalStore, opts: PlayOpts, settings: PlaySettings) {
     this.opts = opts;
+    this.settings = settings;
     this.globalStore = globalStore;
   }
 
   @action
   onLoad() {
     this.globalStore.ceval.destroy();
-    wsConnect('/socket/play/123');
+    wsConnect('/socket/play/123', { receive: this.settings.socketReceive });
   }
 
   @action

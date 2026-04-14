@@ -7,5 +7,5 @@ export function useInitStore(): () => PlayStore {
   const globalStore = useGlobalStore();
   const cfg = usePageInitCfg() as PlayConfig;
 
-  return () => new PlayStore(globalStore, cfg);
+  return () => new PlayStore(globalStore, cfg, { socketReceive: globalStore.socketReceive });
 }
