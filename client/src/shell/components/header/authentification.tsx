@@ -6,7 +6,6 @@ import { useFocusTrap, useMediaQuery, upperFirst, useToggle } from '@mantine/hoo
 
 import { Auth, Users, type UserLoginWritable, type UserCreateWritable } from '@/lib/api';
 import { useGlobalStore } from '@/core/hooks';
-import { IsAuth } from '@/user/components/isauth';
 
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -172,10 +171,8 @@ export const LoginButton: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     : { variant: 'filled', color: 'cyan' };
 
   return (
-    <IsAuth showIf={false}>
-      <Button {...screenProps} onClick={onClick}>
-        Log in
-      </Button>
-    </IsAuth>
+    <Button {...screenProps} onClick={onClick}>
+      Log in
+    </Button>
   );
 };

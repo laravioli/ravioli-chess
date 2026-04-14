@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
 
 from app.api.routes import router as api_router
 from app.api.utils import custom_generate_unique_id
@@ -17,6 +18,7 @@ app = FastAPI(
     lifespan=lifespan,
     generate_unique_id_function=custom_generate_unique_id,
 )
+add_pagination(app)
 app.add_middleware(CSRFMiddleWare)
 
 app.include_router(api_router)

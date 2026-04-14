@@ -4,9 +4,10 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import classes from '@/shell/css/header.module.css';
 import { Navigation, NavDrawer } from './navigation';
 import { SearchUsersWithCollapse } from './search';
-import { Notifications } from '@/notif/components/notif';
+import { Notifications } from './notif';
 import { AuthDrawer, LoginButton } from './authentification';
 import { UserMenu } from './menu/user';
+import { useGlobalStore } from '@/core/hooks';
 
 export const Header: React.FC = () => {
   const [openedAuth, { open: openAuth, close: closeAuth }] = useDisclosure(false);
@@ -37,6 +38,7 @@ export const Header: React.FC = () => {
 };
 
 const Controls: React.FC<{ openAuth: () => void }> = ({ openAuth }) => {
+  const { userStore } = useGlobalStore();
   const isSmallScreen = useMediaQuery('(max-width : 455px)');
   const [opened, { close, toggle }] = useDisclosure(false);
 
@@ -45,8 +47,8 @@ const Controls: React.FC<{ openAuth: () => void }> = ({ openAuth }) => {
       <SearchUsersWithCollapse opened={opened} close={close} toggle={toggle} />
       {!(isSmallScreen && opened) && (
         <>
-          <Notifications />
-          <LoginButton onClick={openAuth} />
+          {userStore.isAuth && <Notifications />}
+          {!userStore.isAuth && <LoginButton onClick={openAuth} />}
           <UserMenu />
         </>
       )}

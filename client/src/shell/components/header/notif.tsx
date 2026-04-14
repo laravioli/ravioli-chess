@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { listNotifOptions } from '@/lib/api/@tanstack/react-query.gen';
 import { FriendRequestSchema } from '@/lib/api';
 import { useAcceptRequest, useRejectRequest } from '@/social/hooks';
-import classes from '@/notif/css/notif.module.css';
+import classes from '@/shell/css/notif.module.css';
 
 const BaseNotification: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
