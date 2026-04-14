@@ -1,0 +1,23 @@
+.card {
+  border-radius: 0;
+  background-color: var(--mantine-color-dark-7);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  background-color: var(--mantine-color-dark-8);
+}
+
+/* Hide actions by default */
+.actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none; /* Prevents clicking them while invisible */
+}
+
+/* Show actions when the card is hovered */
+.card:hover .actions {
+  opacity: 1;
+  pointer-events: all;
+}

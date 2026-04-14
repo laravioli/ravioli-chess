@@ -62,13 +62,13 @@ class Consumer:
         finally:
             await self.disconnect()
 
-    ## PROCESS FRAME ##
     async def handle_broadcast(self):
         if self.channels:
             async with self.broadcast.start_subscription(*self.channels) as sub:
                 async for msg in sub.iter_message(type_arg=self.PROCESS_OUT_FRAME):
                     await self.handle_process_msg(msg)
 
+    ## PROCESS FRAME ##
     async def handle_process_msg(self, msg):
         match msg:
             case p_out.TellUser(type, data):

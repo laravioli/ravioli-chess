@@ -1,5 +1,6 @@
 .eval {
   display: flex;
+  flex-wrap: nowrap;
   flex: 0 0 30px;
   column-gap: 6px;
   align-items: stretch;

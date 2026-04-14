@@ -35,10 +35,6 @@ class FriendRequest(Notification):
     )
     friendship: Mapped["Friendship"] = relationship(lazy="raise")
 
-    @property
-    def sender(self):
-        return self.friendship.sender.username
-
 
 # Note that the mappers for the derived classes Manager and Engineer omit the __tablename__,
 # indicating they do not have a mapped table of their own.

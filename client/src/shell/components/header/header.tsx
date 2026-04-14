@@ -3,9 +3,10 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 import classes from '@/shell/css/header.module.css';
 import { Navigation, NavDrawer } from './navigation';
+import { SearchUsersWithCollapse } from './search';
+import { Notifications } from '@/notif/components/notif';
 import { AuthDrawer, LoginButton } from './authentification';
 import { UserMenu } from './menu/user';
-import { SearchUsersWithCollapse } from './search';
 
 export const Header: React.FC = () => {
   const [openedAuth, { open: openAuth, close: closeAuth }] = useDisclosure(false);
@@ -44,6 +45,7 @@ const Controls: React.FC<{ openAuth: () => void }> = ({ openAuth }) => {
       <SearchUsersWithCollapse opened={opened} close={close} toggle={toggle} />
       {!(isSmallScreen && opened) && (
         <>
+          <Notifications />
           <LoginButton onClick={openAuth} />
           <UserMenu />
         </>
