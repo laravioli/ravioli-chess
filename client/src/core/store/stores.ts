@@ -3,7 +3,7 @@ import { AnalyseStore } from '@/analyse/store/analyse';
 import { EditorStore } from '@/editor/store/editor';
 import { PlayStore } from '@/play/store/play';
 import { Ceval } from '@/lib/eval/ceval';
-import { LobbySettings } from '@/lib/lobby/localstorage';
+import { LobbySettings } from '@/lobby/localstorage';
 
 import type { ServerPayload } from '@/core/boot/interface';
 

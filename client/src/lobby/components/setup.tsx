@@ -4,8 +4,8 @@ import { Group, NativeSelect, Slider, Text, ActionIcon } from '@mantine/core';
 
 import { useGlobalStore } from '@/core/hooks';
 
-import type { Opponent, TimeMode, LobbySide } from '@/lib/lobby/interface';
-import classes from '@/lib/lobby/css/lobby.module.css';
+import type { Opponent, TimeMode, LobbySide } from '@/lobby/interface';
+import classes from '@/lobby/css/lobby.module.css';
 
 export interface LobbySetupProps {
   opponent: Opponent;

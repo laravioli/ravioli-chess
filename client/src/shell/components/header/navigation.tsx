@@ -2,8 +2,8 @@ import { Link, type To } from 'react-router';
 import { Drawer, Divider, UnstyledButton, Stack, Group, Button } from '@mantine/core';
 import { INITIAL_FEN } from 'chessops/fen';
 
-import { LobbySetup } from '@/lib/lobby/components/setup';
-import type { Opponent } from '@/lib/lobby/interface';
+import { LobbySetup } from '@/lobby/components/setup';
+import type { Opponent } from '@/lobby/interface';
 
 import classes from '@/shell//css/header.module.css';
 import { PlayMenu } from './menu/play';

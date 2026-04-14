@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { type ComponentType } from 'react';
 import type { ContextModalProps } from '@mantine/modals';
 
-import type { LobbySetupProps } from '@/lib/lobby/components/setup';
+import type { LobbySetupProps } from '@/lobby/components/setup';
 
 interface PlayModalProps {
   modalBody: ComponentType<LobbySetupProps>;

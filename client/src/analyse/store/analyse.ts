@@ -12,8 +12,8 @@ import type { Node, Path } from '@/lib/tree/interface';
 
 import { makeObservableNode, makeRoot, makeNode } from './node';
 import { makeShapes } from './autoshape';
-import type { AnalyseOpts, JustCaptured } from './interface';
-import { wsConnect } from '@/lib/socket/socket';
+import type { AnalyseOpts, AnalyseSettings, JustCaptured } from './interface';
+import { wsConnect } from '@/lib/socket';
 
 export class AnalyseStore {
   board: ChessgroundApi | undefined;
@@ -24,12 +24,14 @@ export class AnalyseStore {
   mainline: Node[];
   @observable.ref accessor node: Node;
 
-  opts: AnalyseOpts;
+  private readonly opts: AnalyseOpts;
+  private readonly settings: AnalyseSettings;
 
   @observable accessor isFlipped = false;
 
-  constructor(ceval: Ceval, opts: AnalyseOpts) {
+  constructor(ceval: Ceval, opts: AnalyseOpts, settings: AnalyseSettings) {
     this.opts = opts;
+    this.settings = settings;
     this.ceval = ceval;
     this.initTree(opts.fen);
     this.initCeval(opts.fen);
@@ -41,7 +43,7 @@ export class AnalyseStore {
   onLoad() {
     this.startCeval();
     /* run AFTER the page is mounted */
-    wsConnect('/socket/site');
+    wsConnect('/socket/site', { receive: this.settings.socketReceive });
   }
 
   @action

@@ -3,7 +3,7 @@ import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 
 import type { GlobalStore } from '@/core/store/stores';
-import { wsConnect } from '@/lib/socket/socket';
+import { wsConnect } from '@/lib/socket';
 
 import type { PlayOpts } from './interface';
 
@@ -21,12 +21,11 @@ export class PlayStore {
   @action
   onLoad() {
     this.globalStore.ceval.destroy();
+    wsConnect('/socket/play/123');
   }
 
   @action
-  onUnLoad() {
-    wsConnect('/socket/play/123');
-  }
+  onUnLoad() {}
 
   mountBoard(div: HTMLElement) {
     const config = this.makeBoardCfg();

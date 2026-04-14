@@ -6,6 +6,6 @@ export interface Site {
   sri: RandomToken;
 }
 
-export const initSite = () => {
+export const initGlobals = () => {
   window.site = { sri: randomToken() };
 };

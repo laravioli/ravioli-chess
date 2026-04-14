@@ -23,7 +23,7 @@ import { useGlobalStore } from '@/core/hooks';
 import { useMenu, type MenuViewFC } from '@/common/hooks';
 import { listMyFriendsOptions } from '@/lib/api/@tanstack/react-query.gen';
 import { Preferences, Auth } from '@/lib/api';
-import { LobbySetup } from '@/lib/lobby/components/setup';
+import { LobbySetup } from '@/lobby/components/setup';
 import type { UserStore } from '@/user/store/userstore';
 import { setBoardColor, setPieceSet } from '@/user/store/utils';
 

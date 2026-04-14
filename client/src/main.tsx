@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 
 import '@/core/css/index.css';
 import { boot } from '@/core/boot';
-import App from '@/core/components/app/App';
+import App from '@/core/app/App';
 
 boot()
   .then((config) =>

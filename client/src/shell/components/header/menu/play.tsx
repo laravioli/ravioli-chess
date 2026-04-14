@@ -1,8 +1,8 @@
 import { Menu } from '@mantine/core';
 import { modals } from '@mantine/modals';
 
-import { LobbySetup } from '@/lib/lobby/components/setup';
-import type { Opponent } from '@/lib/lobby/interface';
+import { LobbySetup } from '@/lobby/components/setup';
+import type { Opponent } from '@/lobby/interface';
 
 import classes from '@/shell/css/header.module.css';
 

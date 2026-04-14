@@ -3,7 +3,7 @@ import { Chessground } from '@lichess-org/chessground';
 import { opposite } from '@lichess-org/chessground/util';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 
-import { wsConnect } from '@/lib/socket/socket';
+import { wsConnect } from '@/lib/socket';
 
 import { Fen } from './fen';
 import type { EditorOpts } from './interface';

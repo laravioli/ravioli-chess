@@ -42,9 +42,9 @@ export interface SocketSendOpts {
 
 export let siteSocket: WsSocket | undefined;
 
-export function wsConnect(path: Path) {
-  if (!siteSocket) siteSocket = new WsSocket(path);
-  else if (path !== siteSocket.getPath()) siteSocket.connect(path);
+export function wsConnect(path: Path, settings?: Partial<Settings>) {
+  if (!siteSocket) siteSocket = new WsSocket(path, settings);
+  else if (path !== siteSocket.getPath()) siteSocket.connect(path, settings);
   return siteSocket;
 }
 
@@ -56,8 +56,8 @@ class WsSocket {
   averageLag = 0;
 
   private path: Path;
-  private readonly settings: Settings;
-  private readonly options: Options;
+  private settings: Settings;
+  private options: Options;
   private ws: WebSocket | undefined;
   private pingSchedule: Timeout;
   private connectSchedule: Timeout;
@@ -87,9 +87,19 @@ class WsSocket {
     this.connect();
   }
 
-  connect = (path?: Path) => {
+  connect = (path?: Path, settings?: Partial<Settings>) => {
     this.destroy();
     if (path) this.path = path;
+    if (settings) {
+      this.options = { ...this.options, ...this.settings.options };
+      this.settings = {
+        receive: settings.receive,
+        params: {
+          sri: site.sri,
+          ...settings.params,
+        },
+      };
+    }
     try {
       const ws = (this.ws = new WebSocket(
         url(this.options.protocol, this.path, this.settings.params),
@@ -169,12 +179,13 @@ class WsSocket {
     this.averageLag += mix * (currentLag - this.averageLag);
   };
 
-  private readonly handle = (data: MsgIn) => {
-    switch (data.t || false) {
+  private readonly handle = (m: MsgIn) => {
+    switch (m.t || false) {
       case false:
         break;
       default:
-        console.log(data.d);
+        this.settings.receive?.(m.t, m.d);
+        break;
     }
   };
 

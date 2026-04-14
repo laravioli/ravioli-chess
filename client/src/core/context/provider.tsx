@@ -1,7 +1,7 @@
 import { useRef, useEffect, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { wsReload } from '@/lib/socket/socket';
+import { wsReload } from '@/lib/socket';
 
 import type { GlobalStore, PageStore } from '@/core/store/stores';
 import type { ProvidedData } from '@/core/boot/interface';
