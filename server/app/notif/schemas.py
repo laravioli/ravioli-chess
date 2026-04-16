@@ -1,10 +1,9 @@
 from datetime import datetime
 from typing import Annotated, Literal
 
-from fastapi_pagination import Page
 from pydantic import UUID4, AliasChoices, AliasPath, Field, TypeAdapter
 
-from app.api.schemas import BaseSchema
+from app.api.schemas import BaseSchema, SmallPage
 
 
 class NotificationBase(BaseSchema):
@@ -32,4 +31,5 @@ class FriendRequestSchema(NotificationBase):
 
 type Notification = Annotated[FriendRequestSchema, Field(discriminator="type")]
 
-notification_adapter = TypeAdapter(Page[Notification])
+
+notification_adapter = TypeAdapter(SmallPage[Notification])

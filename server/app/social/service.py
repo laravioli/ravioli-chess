@@ -5,105 +5,112 @@ from sqlalchemy.exc import IntegrityError
 
 from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
+from app.notif.deps import NotifService
 from core.db.models import FriendRequest, Friendship, User
 from core.db.models.social import FriendshipStatus
 
 
-async def create_request(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
-    try:
-        request = Friendship(
-            sender_id=current_user_id, receiver_id=target_id, status=FriendshipStatus.pending
+class SocialService:
+    def __init__(self, session: DbSession, notifier: NotifService):
+        self.session = session
+        self.notifier = notifier
+
+    async def create_request(self, current_user_id: uuid.UUID, target_id: uuid.UUID):
+        try:
+            request = Friendship(
+                sender_id=current_user_id, receiver_id=target_id, status=FriendshipStatus.pending
+            )
+            self.session.add(request)
+            await self.session.flush()
+
+            notification = FriendRequest(
+                user_id=target_id,
+                friendship_id=request.id,
+            )
+            self.session.add(notification)
+            await self.session.commit()
+        except IntegrityError:
+            await self.session.rollback()
+            raise DBConflict(detail="Unable to create friend request")
+
+        await self.notifier.notify(target_id)
+
+    async def accept_request(self, current_user_id: uuid.UUID, target_id: uuid.UUID):
+        stmt = (
+            update(Friendship)
+            .where(
+                Friendship.sender_id == target_id,
+                Friendship.receiver_id == current_user_id,
+                Friendship.status == FriendshipStatus.pending,
+            )
+            .values(status=FriendshipStatus.accepted)
+            .returning(Friendship.id)
         )
-        session.add(request)
-        await session.flush()
+        result = await self.session.execute(stmt)
 
-        notification = FriendRequest(
-            user_id=target_id,
-            friendship_id=request.id,
+        friendship_id = result.scalar_one_or_none()
+
+        if friendship_id is None:
+            raise DBNotFound(detail="There is no request to accept")
+
+        delete_notif_stmt = delete(FriendRequest).where(
+            FriendRequest.friendship_id == friendship_id
         )
-        session.add(notification)
 
-        await session.commit()
-    except IntegrityError:
-        await session.rollback()
-        raise DBConflict(detail="Unable to create friend request")
+        await self.session.execute(delete_notif_stmt)
 
+        await self.session.commit()
+        await self.notifier.notify(current_user_id)
 
-async def accept_request(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
-    stmt = (
-        update(Friendship)
-        .where(
-            Friendship.sender_id == target_id,
-            Friendship.receiver_id == current_user_id,
+    async def delete_request(self, sender_id: uuid.UUID, receiver_id: uuid.UUID):
+        stmt = delete(Friendship).where(
+            Friendship.sender_id == sender_id,
+            Friendship.receiver_id == receiver_id,
             Friendship.status == FriendshipStatus.pending,
         )
-        .values(status=FriendshipStatus.accepted)
-        .returning(Friendship.id)
-    )
-    result = await session.execute(stmt)
+        result = await self.session.execute(stmt)
 
-    friendship_id = result.scalar_one_or_none()
+        if result.rowcount == 0:
+            raise DBNotFound(detail="There is no request to delete")
 
-    if friendship_id is None:
-        raise DBNotFound(detail="There is no request to accept")
+        await self.session.commit()
+        await self.notifier.notify(receiver_id)
 
-    delete_notif_stmt = delete(FriendRequest).where(FriendRequest.friendship_id == friendship_id)
+    async def list_friendship(self, user_id: uuid.UUID, status: FriendshipStatus):
+        stmt1 = select(
+            Friendship.receiver_id.label("friend_id"),
+            Friendship.last_update,
+            literal("outgoing").label("direction"),
+        ).where(Friendship.sender_id == user_id, Friendship.status == status)
 
-    await session.execute(delete_notif_stmt)
+        stmt2 = select(
+            Friendship.sender_id.label("friend_id"),
+            Friendship.last_update,
+            literal("incoming").label("direction"),
+        ).where(Friendship.receiver_id == user_id, Friendship.status == status)
 
-    await session.commit()
+        subq = union_all(stmt1, stmt2).subquery()
 
+        stmt = (
+            select(User.id, User.username, subq.c.last_update, subq.c.direction)
+            .join(subq, User.id == subq.c.friend_id)
+            .order_by(subq.c.last_update.desc())
+        )
 
-async def delete_request(session: DbSession, sender_id: uuid.UUID, receiver_id: uuid.UUID):
-    stmt = delete(Friendship).where(
-        Friendship.sender_id == sender_id,
-        Friendship.receiver_id == receiver_id,
-        Friendship.status == FriendshipStatus.pending,
-    )
-    result = await session.execute(stmt)
+        result = await self.session.execute(stmt)
+        return result.all()
 
-    if result.rowcount == 0:
-        raise DBNotFound(detail="There is no request to delete")
+    async def delete_friend(self, current_user_id: uuid.UUID, target_id: uuid.UUID):
+        stmt = delete(Friendship).where(
+            *friendship_criteria(current_user_id, target_id),
+            Friendship.status == FriendshipStatus.accepted,
+        )
+        result = await self.session.execute(stmt)
 
-    await session.commit()
+        if result.rowcount == 0:
+            raise DBNotFound(detail="friend not found")
 
-
-async def list_friendship(session: DbSession, user_id: uuid.UUID, status: FriendshipStatus):
-    stmt1 = select(
-        Friendship.receiver_id.label("friend_id"),
-        Friendship.last_update,
-        literal("outgoing").label("direction"),
-    ).where(Friendship.sender_id == user_id, Friendship.status == status)
-
-    stmt2 = select(
-        Friendship.sender_id.label("friend_id"),
-        Friendship.last_update,
-        literal("incoming").label("direction"),
-    ).where(Friendship.receiver_id == user_id, Friendship.status == status)
-
-    subq = union_all(stmt1, stmt2).subquery()
-
-    stmt = (
-        select(User.id, User.username, subq.c.last_update, subq.c.direction)
-        .join(subq, User.id == subq.c.friend_id)
-        .order_by(subq.c.last_update.desc())
-    )
-
-    result = await session.execute(stmt)
-    return result.all()
-
-
-async def delete_friend(session: DbSession, current_user_id: uuid.UUID, target_id: uuid.UUID):
-    stmt = delete(Friendship).where(
-        *friendship_criteria(current_user_id, target_id),
-        Friendship.status == FriendshipStatus.accepted,
-    )
-    result = await session.execute(stmt)
-
-    if result.rowcount == 0:
-        raise DBNotFound(detail="friend not found")
-
-    await session.commit()
+        await self.session.commit()
 
 
 def friendship_criteria(id_a, id_b):
@@ -111,3 +118,7 @@ def friendship_criteria(id_a, id_b):
         func.least(Friendship.sender_id, Friendship.receiver_id) == func.least(id_a, id_b),
         func.greatest(Friendship.sender_id, Friendship.receiver_id) == func.greatest(id_a, id_b),
     ]
+
+
+async def create_social_service(session: DbSession, notifier: NotifService):
+    return SocialService(session, notifier)

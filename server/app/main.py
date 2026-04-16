@@ -18,7 +18,6 @@ app = FastAPI(
     lifespan=lifespan,
     generate_unique_id_function=custom_generate_unique_id,
 )
-add_pagination(app)
 app.add_middleware(CSRFMiddleWare)
 
 app.include_router(api_router)
@@ -26,6 +25,7 @@ app.include_router(web_router)
 app.include_router(ws_router)
 
 add_exception_handler(app)
+add_pagination(app)
 
 
 # todo

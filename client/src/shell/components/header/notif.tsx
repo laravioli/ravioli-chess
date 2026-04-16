@@ -61,14 +61,18 @@ const FriendRequestNotif: React.FC<{ data: FriendRequestSchema }> = ({ data }) =
 };
 export function Notifications() {
   const [hovered, setHovered] = useState(false);
-  const { data = [], refetch } = useQuery({ ...listNotifOptions(), enabled: hovered });
+  const { data, refetch } = useQuery({
+    ...listNotifOptions({ query: { page: 1 } }),
+    enabled: hovered,
+  });
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
-  const options = data.map((data) => {
-    if (data.type === 'friend_request') return <FriendRequestNotif data={data} key={data.id} />;
-  });
+  const options =
+    data?.items.map((data) => {
+      if (data.type === 'friend_request') return <FriendRequestNotif data={data} key={data.id} />;
+    }) ?? [];
   return (
     <>
       <Combobox
