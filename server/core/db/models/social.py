@@ -35,9 +35,9 @@ class Friendship(Base):
     __table_args__ = (
         Index(
             "ix_unique_friendship",
-            func.least("sender_id", "receiver_id"),
-            func.greatest("sender_id", "receiver_id"),
+            func.least(sender_id, receiver_id),
+            func.greatest(sender_id, receiver_id),
             unique=True,
         ),
-        CheckConstraint("sender_id != receiver_id", name="ck_user_not_friend_with_self"),
+        CheckConstraint(sender_id != receiver_id, name="ck_user_not_friend_with_self"),
     )

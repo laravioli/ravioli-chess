@@ -17,4 +17,5 @@ async def list_notif(
 ):
     params = resolve_params()
     notif = await service.get_notifications(user.id, params)
+
     return notif

@@ -22,10 +22,10 @@ T = TypeVar("T")
 
 class SmallPageFilter(Params):
     page: int = Query(1, ge=1, description="Page number")
-    size: int = Query(7, ge=1, le=20, description="Page size")
+    size: int = Query(4, ge=1, le=20, description="Page size")
 
     def is_default_page(self):
-        return self.page == 1 and self.size == 7
+        return self.page == 1 and self.size == 4
 
 
 SmallPage = CustomizedPage[Page[T], UseParams(SmallPageFilter), UseName("Page")]

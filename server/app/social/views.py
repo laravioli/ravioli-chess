@@ -54,12 +54,14 @@ async def send_friend_request(
     user: CurrentUser,
     target_id: UUID4,
 ):
+    print(user.username)
     if user.id == target_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You can't send a friend request to yourself",
         )
     await service.create_request(user.id, target_id)
+    await service.notifier.notify_one(target_id)
     return FriendShip(is_sender=True, status="pending")
 
 
@@ -69,7 +71,8 @@ async def cancel_friend_request(
     user: CurrentUser,
     target_id: UUID4,
 ):
-    await service.delete_request(sender_id=user.id, receiver_id=target_id)
+    await service.delete_request(user.id, target_id)
+    await service.notifier.notify_one(target_id)
 
 
 @router.post("/requests/{target_id}/accept", responses={200: {"model": FriendShip}})
@@ -78,8 +81,9 @@ async def accept_friend_request(
     user: CurrentUser,
     target_id: UUID4,
 ):
-    await service.accept_request(user.id, target_id)
+    await service.accept_request(target_id, user.id)
     return FriendShip(is_sender=False, status="accepted")
+    # await service.notifier.notify_one(sender)
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
@@ -88,4 +92,5 @@ async def reject_friend_request(
     user: CurrentUser,
     target_id: UUID4,
 ):
-    await service.delete_request(sender_id=target_id, receiver_id=user.id)
+    await service.delete_request(target_id, user.id)
+    # await service.notifier.notify_one(sender)

@@ -3,7 +3,11 @@ import { listNotifQueryKey } from '@/lib/api/@tanstack/react-query.gen';
 import { ListNotifResponse } from '@/lib/api';
 
 export const globalHandlers = (queryClient: QueryClient) => {
-  const notifications = (d: ListNotifResponse) => queryClient.setQueryData(listNotifQueryKey(), d);
+  const notifications = (d: ListNotifResponse) => {
+    const key = listNotifQueryKey({ query: { page: 1 } });
+
+    queryClient.setQueryData(key, d);
+  };
   const handlers = { notifications };
   return (t: string, d: any) => handlers[t](d);
 };

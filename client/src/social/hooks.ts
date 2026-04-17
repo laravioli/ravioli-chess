@@ -7,10 +7,9 @@ import {
   removeFriendMutation,
   getUserQueryKey,
   listMyFriendsQueryKey,
-  listNotifQueryKey,
 } from '@/lib/api/@tanstack/react-query.gen';
 
-import type { GetUserResponse, FriendShip, ListNotifResponse } from '@/lib/api';
+import type { GetUserResponse, FriendShip } from '@/lib/api';
 
 interface UrlPath {
   path: { target_id: string };
@@ -18,10 +17,9 @@ interface UrlPath {
 
 interface SocialHookParams {
   username: string;
-  id: string;
 }
 
-const makeUrl = (id: string): UrlPath => ({ path: { target_id: id } });
+export const makeSocialUrl = (id: string): UrlPath => ({ path: { target_id: id } });
 
 const refreshUserData = (queryClient: QueryClient, username: string, friendship?: FriendShip) => {
   queryClient.setQueryData<GetUserResponse>(getUserQueryKey({ path: { username } }), (old) =>
@@ -29,73 +27,60 @@ const refreshUserData = (queryClient: QueryClient, username: string, friendship?
   );
 };
 
-const refreshNotifData = (queryClient: QueryClient, id: string) => {
-  queryClient.setQueryData<ListNotifResponse>(listNotifQueryKey(), (old) =>
-    old?.filter((item) => item.type !== 'friend_request' || item.sender_id !== id),
-  );
-};
-
-export const useAddFriend = ({ username, id }: SocialHookParams) => {
-  const urlPath = makeUrl(id);
+export const useAddFriend = ({ username }: SocialHookParams) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    ...sendFriendRequestMutation(urlPath),
+    ...sendFriendRequestMutation(),
     onSuccess: (friendship) => refreshUserData(queryClient, username, friendship),
   });
 
-  return { ...mutation, onClick: () => mutation.mutate(urlPath) };
+  return mutation;
 };
 
-export const useCancelRequest = ({ username, id }: SocialHookParams) => {
-  const urlPath = makeUrl(id);
+export const useCancelRequest = ({ username }: SocialHookParams) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    ...cancelFriendRequestMutation(urlPath),
+    ...cancelFriendRequestMutation(),
     onSuccess: () => refreshUserData(queryClient, username, undefined),
   });
 
-  return { ...mutation, onClick: () => mutation.mutate(urlPath) };
+  return mutation;
 };
 
-export const useAcceptRequest = ({ username, id }: SocialHookParams) => {
-  const urlPath = makeUrl(id);
+export const useAcceptRequest = ({ username }: SocialHookParams) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    ...acceptFriendRequestMutation(urlPath),
+    ...acceptFriendRequestMutation(),
     onSuccess: async (friendhsip) => {
       refreshUserData(queryClient, username, friendhsip);
-      refreshNotifData(queryClient, id);
       await queryClient.invalidateQueries({ queryKey: listMyFriendsQueryKey() });
     },
   });
 
-  return { ...mutation, onClick: () => mutation.mutate(urlPath) };
+  return mutation;
 };
 
-export const useRejectRequest = ({ username, id }: SocialHookParams) => {
-  const urlPath = makeUrl(id);
+export const useRejectRequest = ({ username }: SocialHookParams) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    ...rejectFriendRequestMutation(urlPath),
+    ...rejectFriendRequestMutation(),
     onSuccess: () => {
       refreshUserData(queryClient, username, undefined);
-      refreshNotifData(queryClient, id);
     },
   });
 
-  return { ...mutation, onClick: () => mutation.mutate(urlPath) };
+  return mutation;
 };
 
-export const useRemoveFriend = ({ username, id }: SocialHookParams) => {
-  const urlPath = makeUrl(id);
+export const useRemoveFriend = ({ username }: SocialHookParams) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    ...removeFriendMutation(urlPath),
+    ...removeFriendMutation(),
     onSuccess: async () => {
       refreshUserData(queryClient, username, undefined);
       await queryClient.invalidateQueries({ queryKey: listMyFriendsQueryKey() });
     },
   });
 
-  return { ...mutation, onClick: () => mutation.mutate(urlPath) };
+  return mutation;
 };

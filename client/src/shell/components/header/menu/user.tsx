@@ -49,8 +49,8 @@ export const UserMenu: React.FC = observer(() => {
       <Menu
         trigger="click"
         position="bottom-start"
-        width={300}
-        offset={0}
+        width={310}
+        offset={{ mainAxis: 0, crossAxis: 38 }}
         radius={2}
         onExitTransitionEnd={() => navigate('main')}
         withinPortal

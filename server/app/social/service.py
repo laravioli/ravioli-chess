@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from sqlalchemy import delete, func, literal, select, union_all, update
@@ -9,38 +10,41 @@ from app.notif.deps import NotifService
 from core.db.models import FriendRequest, Friendship, User
 from core.db.models.social import FriendshipStatus
 
+logger = logging.getLogger(__name__)
+
 
 class SocialService:
     def __init__(self, session: DbSession, notifier: NotifService):
         self.session = session
         self.notifier = notifier
 
-    async def create_request(self, current_user_id: uuid.UUID, target_id: uuid.UUID):
+    async def create_request(self, sender_id: uuid.UUID, receiver_id: uuid.UUID):
         try:
             request = Friendship(
-                sender_id=current_user_id, receiver_id=target_id, status=FriendshipStatus.pending
+                sender_id=sender_id, receiver_id=receiver_id, status=FriendshipStatus.pending
             )
             self.session.add(request)
             await self.session.flush()
 
             notification = FriendRequest(
-                user_id=target_id,
+                user_id=receiver_id,
                 friendship_id=request.id,
             )
             self.session.add(notification)
             await self.session.commit()
-        except IntegrityError:
+        except IntegrityError as e:
             await self.session.rollback()
+            print(f"DEBUG: {e.orig}")
             raise DBConflict(detail="Unable to create friend request")
 
-        await self.notifier.notify(target_id)
+        await self.notifier.clear_cache([receiver_id])
 
-    async def accept_request(self, current_user_id: uuid.UUID, target_id: uuid.UUID):
+    async def accept_request(self, sender_id: uuid.UUID, receiver_id: uuid.UUID):
         stmt = (
             update(Friendship)
             .where(
-                Friendship.sender_id == target_id,
-                Friendship.receiver_id == current_user_id,
+                Friendship.sender_id == sender_id,
+                Friendship.receiver_id == receiver_id,
                 Friendship.status == FriendshipStatus.pending,
             )
             .values(status=FriendshipStatus.accepted)
@@ -60,8 +64,10 @@ class SocialService:
         await self.session.execute(delete_notif_stmt)
 
         await self.session.commit()
-        await self.notifier.notify(current_user_id)
+        await self.notifier.clear_cache([receiver_id])
 
+    # todo: create Msg notif, and 2 method, one for cancel-> one auto notif = clear cache receiver,
+    # one for reject: 1 auto notif + 1 msg notif = clear cache -> sender and receiver
     async def delete_request(self, sender_id: uuid.UUID, receiver_id: uuid.UUID):
         stmt = delete(Friendship).where(
             Friendship.sender_id == sender_id,
@@ -74,7 +80,7 @@ class SocialService:
             raise DBNotFound(detail="There is no request to delete")
 
         await self.session.commit()
-        await self.notifier.notify(receiver_id)
+        await self.notifier.clear_cache([receiver_id])
 
     async def list_friendship(self, user_id: uuid.UUID, status: FriendshipStatus):
         stmt1 = select(

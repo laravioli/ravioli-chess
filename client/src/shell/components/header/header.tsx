@@ -1,5 +1,6 @@
 import { Box, Group, Flex, Burger, useDrawersStack } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { observer } from 'mobx-react-lite';
 
 import classes from '@/shell/css/header.module.css';
 import { Navigation, NavDrawer } from './navigation';
@@ -37,7 +38,7 @@ export const Header: React.FC = () => {
   );
 };
 
-const Controls: React.FC<{ openAuth: () => void }> = ({ openAuth }) => {
+const Controls: React.FC<{ openAuth: () => void }> = observer(({ openAuth }) => {
   const { userStore } = useGlobalStore();
   const isSmallScreen = useMediaQuery('(max-width : 455px)');
   const [opened, { close, toggle }] = useDisclosure(false);
@@ -54,4 +55,4 @@ const Controls: React.FC<{ openAuth: () => void }> = ({ openAuth }) => {
       )}
     </>
   );
-};
+});
