@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 
 type Serializable = BaseModel | TypeAdapter | Struct | dict[str, Any] | str
 
-T = TypeVar("T")
+C = TypeVar("C")
 
 
-class CacheService:
+class CacheLib[A, B]:
     """
     Example:
-    user_cache = CacheService(
+    user_cache = CacheLib(
             redis_client,
             namespace="users",
             model=User,
@@ -37,7 +37,8 @@ class CacheService:
         self,
         redis: Redis,
         namespace: str,
-        model: BaseModel | TypeAdapter | Struct | None = None,
+        data_out: type[A] | TypeAdapter[A],
+        converter: type[B] | TypeAdapter[B] | None = None,
         default_ttl: int = 300,
         use_jitter: bool = True,
         prefix: str = "cache",
@@ -45,7 +46,8 @@ class CacheService:
     ):
         self.redis = redis
         self.namespace = namespace
-        self.model = model
+        self.converter = converter
+        self.data_out = data_out
         self.default_ttl = default_ttl
         self.use_jitter = use_jitter
         self.prefix = prefix
@@ -76,7 +78,7 @@ class CacheService:
         self,
         identifier: str,
         params: dict[str, Any] | None = None,
-    ) -> Serializable | None:
+    ) -> B | None:
         """
         Get cached value, deserialize to Pydantic model if configured
         """
@@ -85,21 +87,24 @@ class CacheService:
 
         if data is None:
             return None
-        if self.model:
-            if isinstance(self.model, TypeAdapter):
-                return self.model.validate_json(data)
-            elif isinstance(self.model, type):
-                if issubclass(self.model, BaseModel):
-                    return self.model.model_validate_json(data)
-                elif issubclass(self.model, Struct):
-                    return json.decode(data, type_arg=self.model)
+
+        if self.data_out is bytes:
+            return data
+
+        if isinstance(self.data_out, TypeAdapter):
+            return self.data_out.validate_json(data)
+        elif isinstance(self.data_out, type):
+            if issubclass(self.data_out, BaseModel):
+                return self.data_out.model_validate_json(data)
+            elif issubclass(self.data_out, Struct):
+                return json.decode(data, type_arg=self.data_out)
         else:
             return json.decode(data)
 
     async def set(
         self,
         identifier: str,
-        value: Serializable | bytes,
+        value: A,
         ttl: int | None = None,
         params: dict[str, Any] | None = None,
     ) -> None:
@@ -116,11 +121,11 @@ class CacheService:
             case BaseModel():
                 value = value.model_dump_json()
             case _:
-                if self.model:
-                    if isinstance(self.model, TypeAdapter):
-                        value = self.model.dump_json(self.model.validate_python(value))
-                    elif isinstance(self.model, type) and issubclass(self.model, BaseModel):
-                        value = self.model.model_validate(value).model_dump_json()
+                if self.converter:
+                    if isinstance(self.converter, TypeAdapter):
+                        value = self.converter.dump_json(self.converter.validate_python(value))
+                    elif isinstance(self.converter, type) and issubclass(self.converter, BaseModel):
+                        value = self.converter.model_validate(value).model_dump_json()
                 else:
                     value = json.encode(value)
 
@@ -129,10 +134,10 @@ class CacheService:
     async def get_or_set(
         self,
         identifier: str,
-        factory: Callable[[], Awaitable[T]],
+        factory: Callable[[], Awaitable[C]],
         ttl: int | None = None,
         params: dict[str, Any] | None = None,
-    ) -> Serializable | T:
+    ) -> B | C:
         """
         cache-aside
 
@@ -148,20 +153,6 @@ class CacheService:
             return cached
 
         value = await factory()
-
-        if self.model:
-            # try to have same return value as get
-            if isinstance(self.model, TypeAdapter):
-                validated_value = self.model.validate_python(value)
-                await self.set(identifier, self.model.dump_json(validated_value), ttl, params)
-                return validated_value
-            elif isinstance(self.model, type) and issubclass(self.model, BaseModel):
-                validated_value = (
-                    value if isinstance(value, BaseModel) else self.model.model_validate(value)
-                )
-                await self.set(identifier, validated_value.model_dump_json(), ttl, params)
-                return validated_value
-
         await self.set(identifier, value, ttl, params)
         return value
 

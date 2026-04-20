@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from fastapi_pagination import resolve_params
 
 from app.api.schemas import SmallPage
@@ -17,5 +17,7 @@ async def list_notif(
 ):
     params = resolve_params()
     notif = await service.get_notifications(user.id, params)
+    if isinstance(notif, bytes):
+        return Response(content=notif, media_type="application/json")
 
     return notif

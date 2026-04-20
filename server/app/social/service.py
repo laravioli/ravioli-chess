@@ -34,7 +34,7 @@ class SocialService:
             await self.session.commit()
         except IntegrityError as e:
             await self.session.rollback()
-            print(f"DEBUG: {e.orig}")
+            logger.debug(f"DB REQUEST ERROR: {e.orig}")
             raise DBConflict(detail="Unable to create friend request")
 
         await self.notifier.clear_cache([receiver_id])

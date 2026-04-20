@@ -10,6 +10,12 @@ import { FriendRequestNotif } from './base';
 import clsx from 'clsx';
 import c from '@/shell/css/notif.module.css';
 
+//todo work on the notif event
+// 1)when an event arrive -> trigger a state change, basicly -> goto page 1 and update the cache
+// it should act like a ping
+// 2) trash button
+// 3) read/unread red color feature
+// 4) Generic notif "MSG" -> you are now friend with..
 const PageNotif: React.FC<{
   page: number;
   data: PageNotification | undefined;
@@ -51,7 +57,7 @@ export const Notifications: React.FC = () => {
   const queryClient = useQueryClient();
   const { data, refetch, isStale } = useQuery({
     ...listNotifOptions({ query: { page: page } }),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
     enabled: hovered,
     placeholderData: (old) => old,
   });

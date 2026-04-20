@@ -18,6 +18,7 @@ app = FastAPI(
     lifespan=lifespan,
     generate_unique_id_function=custom_generate_unique_id,
 )
+add_pagination(app)
 app.add_middleware(CSRFMiddleWare)
 
 app.include_router(api_router)
@@ -25,15 +26,14 @@ app.include_router(web_router)
 app.include_router(ws_router)
 
 add_exception_handler(app)
-add_pagination(app)
 
 
 # todo
 # add client notification ui and client websocket notifications code
 # add a read attribute on notification model and implement ui
-# add Paginification
-# rewrite websocket a bit (specially user integration)
-# add an anon session identifier
+# add an anon session identifier/ game player id
 # implement a challenge api (it is close to friend request), keep it separate from notif like lichess
+# define hooks/seek
 # define game data model(s)
-# implement game ui + websocket
+# implement game ui + websocket + chat + rules
+# congrats

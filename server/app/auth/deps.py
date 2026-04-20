@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Response, status
 from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.config import settings
@@ -35,7 +36,6 @@ async def get_auth_session(
 
 def current_user_or_anon(with_pref=False):
     # note : fastapi deps caching rely on function identity
-    options = [joinedload(User.preference)] if with_pref else None
 
     async def dep(
         redis: RedisClient,
@@ -48,7 +48,13 @@ def current_user_or_anon(with_pref=False):
         try:
             session = await get_auth_session(redis, session_cookie)
 
-            user = await db.get(User, session.user_id, options=options)
+            stmt = select(User).where(User.id == session.user_id)
+            if with_pref:
+                stmt = stmt.options(joinedload(User.preference))
+
+            result = await db.execute(stmt)
+            user = result.scalar_one_or_none()
+
             if not (user and verify_session(user.hashed_password, session.auth_hash)):
                 await redis.delete(f"session:{session_cookie}")
                 raise InvalidSession()
@@ -66,7 +72,7 @@ def current_user_or_anon(with_pref=False):
     return dep
 
 
-type UserOrAnon = Annotated[User | None, Depends(current_user_or_anon())]
+type UserOrAnon = Annotated[User | None, Depends(current_user_or_anon(with_pref=False))]
 type UserWithPrefOrAnon = Annotated[User | None, Depends(current_user_or_anon(with_pref=True))]
 
 

@@ -15,6 +15,14 @@ from lib.pubsub import Broadcast
 engine, LocalSession = create_engine_and_sessionmaker(settings=DbSettings())
 
 
+async def get_connection():
+    async with engine.connect() as conn:
+        yield conn
+
+
+type DbConnection = Annotated[AsyncSession, Depends(get_connection, scope="function")]
+
+
 async def get_session():
     async with LocalSession() as session:
         yield session

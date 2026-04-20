@@ -24,6 +24,7 @@ class NotifService:
         user_id: UUID,
         params: SmallPageFilter = SmallPageFilter(),
     ):
+
         stmt = (
             select(Notification)
             .options(joinedload(FriendRequest.friendship).joinedload(Friendship.sender))

@@ -13,8 +13,6 @@ class DbSettings(BaseSettings):
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
 
-    SQLALCHEMY_POOL_SIZE: int = 10
-
     @computed_field
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
@@ -37,7 +35,8 @@ class RedisSettings(BaseSettings):
 class LogSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
-    LOG_LEVEL: str = "DEBUG"
+    LOG_LEVEL: str = "INFO"
+    SQL_LOG_LEVEL: str = "WARNING"
     LOG_FORMAT: str = "%(asctime)s | %(name)s | %(levelname)-6s | %(message)s"
 
     @property
@@ -59,10 +58,23 @@ class LogSettings(BaseSettings):
                 },
             },
             "loggers": {
-                "": {
+                "core": {
                     "handlers": ["console"],
                     "level": self.LOG_LEVEL,
-                }
+                },
+                "app": {
+                    "handlers": ["console"],
+                    "level": self.LOG_LEVEL,
+                },
+                "engine": {
+                    "handlers": ["console"],
+                    "level": self.LOG_LEVEL,
+                },
+                "sqlalchemy.engine": {
+                    "handlers": ["console"],
+                    "level": self.SQL_LOG_LEVEL,
+                    "propagate": False,
+                },
             },
         }
 
