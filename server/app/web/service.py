@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from app.deps import DbSession
-from core.db.models import ChessPosition
+from ravioli_service.db.models import ChessPosition
 
 from .deps import WebCache
 

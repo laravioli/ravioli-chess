@@ -5,7 +5,7 @@ import signal
 
 import uvloop
 
-from core.config import LogSettings, configure_logging
+from ravioli_service.config import LogSettings, configure_logging
 
 from .app import App
 

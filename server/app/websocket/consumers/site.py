@@ -1,7 +1,7 @@
 import logging
 
-from core.ipc import ClientIn, c_out, p_in, p_out
-from core.ipc.channels import EngineGameCreateChan
+from ravioli_service.ipc import ClientIn, c_out, p_in, p_out
+from ravioli_service.ipc.channels import EngineGameCreateChan
 
 from .base import Consumer
 

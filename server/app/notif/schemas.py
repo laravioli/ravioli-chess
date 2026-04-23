@@ -1,9 +1,12 @@
 from datetime import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypeVar
 
+from fastapi import Query
+from fastapi_pagination import Page, Params, set_page
+from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseName, UseParams
 from pydantic import UUID4, AliasChoices, AliasPath, Field, TypeAdapter
 
-from app.api.schemas import BaseSchema, SmallPage
+from app.api.schemas import BaseSchema
 
 
 class NotificationBase(BaseSchema):
@@ -32,4 +35,33 @@ class FriendRequestSchema(NotificationBase):
 type Notification = Annotated[FriendRequestSchema, Field(discriminator="type")]
 
 
-notification_adapter = TypeAdapter(SmallPage[Notification])
+# pagination
+T = TypeVar("T")
+
+
+class NotifParams(Params):
+    page: int = Query(1, ge=1, description="Page number")
+    size: int = Query(4, ge=1, le=20, description="Page size")
+
+    def is_default_page(self):
+        return self.page == 1 and self.size == 4
+
+
+NotifPagination = CustomizedPage[
+    Page[T],
+    UseParams(NotifParams),
+    UseAdditionalFields(unread=int),
+    UseName("Page"),
+]
+
+notification_adapter = TypeAdapter(NotifPagination[Notification])
+
+
+# todo: get rid of fastapi_pagination
+def pagination(coro):
+    # hack to call db_notif outside of endpoint
+    async def wrapper(*args, **kwargs):
+        with set_page(NotifPagination[Notification]):
+            return await coro(*args, **kwargs)
+
+    return wrapper

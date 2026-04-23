@@ -5,7 +5,7 @@ from fastapi.websockets import WebSocket
 
 from app.auth.deps import UserOrAnon
 from app.deps import BroadCastClient
-from core.ipc.channels import EngineGameChan
+from ravioli_service.ipc.channels import EngineGameChan
 
 from .consumers import PlayConsumer, SiteConsumer
 from .heartbeat import HeartBeat

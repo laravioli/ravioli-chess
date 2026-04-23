@@ -5,9 +5,9 @@ from fastapi import BackgroundTasks, Depends
 from msgspec import Raw
 
 from app.deps import BroadCastClient
-from core.db.models import Notification
-from core.ipc.channels import UserChan
-from core.ipc.process.out import TellUser
+from ravioli_service.db.models import Notification
+from ravioli_service.ipc.channels import UserChan
+from ravioli_service.ipc.process.out import TellUser
 
 from .schemas import notification_adapter
 

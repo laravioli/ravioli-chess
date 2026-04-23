@@ -5,8 +5,8 @@ from sqlalchemy.orm import joinedload
 
 from app.deps import DbSession, RedisClient
 from app.exceptions import InvalidCredentials
-from core.db.models import User
-from lib.serializers import msgpack
+from ravioli_lib.serializers import msgpack
+from ravioli_service.db.models import User
 
 from .deps import SessionCookie
 from .schemas import Session, UserLogin

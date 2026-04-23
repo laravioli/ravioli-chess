@@ -8,7 +8,7 @@ from app.lifespan import lifespan
 from app.middleware import CSRFMiddleWare
 from app.web.views import router as web_router
 from app.websocket.views import router as ws_router
-from core.config import LogSettings, configure_logging
+from ravioli_service.config import LogSettings, configure_logging
 
 configure_logging(settings=LogSettings())
 

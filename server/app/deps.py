@@ -1,17 +1,22 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import Depends
-from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from core.config import DbSettings
-from core.utils import create_engine_and_sessionmaker
-from lib.pubsub import Broadcast
+from ravioli_lib.pubsub import Broadcast, RedisBackend
+from ravioli_service.config import DbSettings, RedisSettings
+from ravioli_service.utils import (
+    create_async_redis,
+    create_engine_and_sessionmaker,
+)
 
-# Database
+# ╔══════════════════════════════════════╗
+# ║   DATABASE                           ║
+# ╚══════════════════════════════════════╝
 
-# side-effect import
+
 engine, LocalSession = create_engine_and_sessionmaker(settings=DbSettings())
 
 
@@ -34,14 +39,65 @@ type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
 # to force update => u2 = session.scalars(select(User).where(User.id == 5).execution_options(populate_existing=True)).one()
 
 
-# Redis
-async def get_redis(conn: HTTPConnection) -> Redis:
-    return conn.state.redis
+# ╔══════════════════════════════════════╗
+# ║   REDIS                              ║
+# ╚══════════════════════════════════════╝
 
 
-async def get_broadcast(conn: HTTPConnection) -> Broadcast:
-    return conn.state.broadcast
+redis = create_async_redis(settings=RedisSettings())
+
+
+async def get_redis() -> Redis:
+    return redis
 
 
 type RedisClient = Annotated[Redis, Depends(get_redis)]
+
+# ╔══════════════════════════════════════╗
+# ║   BROADCAST                          ║
+# ╚══════════════════════════════════════╝
+
+
+broadcast = Broadcast(backend=RedisBackend(redis))
+
+
+async def get_broadcast() -> Broadcast:
+    return broadcast
+
+
 type BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]
+
+
+# ╔══════════════════════════════════════╗
+# ║   ENV                                ║
+# ╚══════════════════════════════════════╝
+
+
+class EnvDep:
+    __slots__ = (
+        "engine",
+        "redis",
+        "broadcast",
+    )
+
+    def __init__(self, engine: AsyncEngine, redis: Redis, broadcast: Broadcast):
+        self.engine = engine
+        self.redis = redis
+        self.broadcast = broadcast
+
+    async def start(self):
+        await broadcast.start()
+
+    async def stop(self):
+        await asyncio.gather(broadcast.stop(), engine.dispose())
+        await redis.aclose()
+
+
+global_env = EnvDep(engine=engine, redis=redis, broadcast=broadcast)
+
+
+async def get_env():
+    return global_env
+
+
+type Env = Annotated[EnvDep, Depends(get_env)]

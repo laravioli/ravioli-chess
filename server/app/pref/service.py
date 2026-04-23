@@ -6,7 +6,7 @@ from itsdangerous import BadSignature, URLSafeSerializer
 
 from app.config import settings
 from app.deps import DbSession
-from core.db.models import User
+from ravioli_service.db.models import User
 
 from .schemas import PreferenceUpdate
 

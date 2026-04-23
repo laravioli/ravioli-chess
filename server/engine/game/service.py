@@ -4,9 +4,9 @@ import string
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.db.models import Game, User
-from core.ipc import p_in
 from engine.deps import LocalSession
+from ravioli_service.db.models import Game, User
+from ravioli_service.ipc import p_in
 
 
 def id8():

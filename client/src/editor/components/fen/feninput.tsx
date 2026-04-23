@@ -20,7 +20,7 @@ export const FenInput: React.FC = observer(() => {
         inputRef.current.value = pageStore.fen.current;
       }
     });
-  }, []);
+  });
 
   const onKeyDown = action((event) => {
     if (event.key === 'Enter') {

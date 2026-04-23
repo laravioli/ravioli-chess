@@ -1,10 +1,15 @@
 import asyncio
 from contextlib import suppress
 
-from core.ipc import p_in, p_out
-from core.ipc.channels import ConsumerChan, EngineGameChan, EngineGameCreateChan, WsGameChan
 from engine.utils import register_coroutine
-from lib.pubsub import Broadcast
+from ravioli_lib.pubsub import Broadcast
+from ravioli_service.ipc import p_in, p_out
+from ravioli_service.ipc.channels import (
+    ConsumerChan,
+    EngineGameChan,
+    EngineGameCreateChan,
+    WsGameChan,
+)
 
 from .actor import GameActor
 from .service import create_game_db

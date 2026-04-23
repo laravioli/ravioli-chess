@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BeforeValidator, StringConstraints
 
 from app.api.schemas import BaseSchema
-from core.ipc.channels import EngineGameChan
+from ravioli_service.ipc.channels import EngineGameChan
 
 SRI_PATTERN = r"^[a-zA-Z0-9_]+$"
 

@@ -50,7 +50,7 @@ export const Positions: React.FC = observer(() => {
     return autorun(() => {
       setValue(matcher(editorStore.fen.current));
     });
-  }, []);
+  });
 
   const onChange = (event) => {
     const fen = event.currentTarget.value;

@@ -1,7 +1,7 @@
 from pydantic import UUID4, AwareDatetime
 
 from app.api.schemas import BaseSchema
-from core.db.models.social import FriendshipStatus
+from ravioli_service.db.models.social import FriendshipStatus
 
 
 # out

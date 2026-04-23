@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
 from app.auth.deps import CurrentUser
-from core.db.models.social import FriendshipStatus
+from ravioli_service.db.models.social import FriendshipStatus
 
 from .deps import SocialDeps
 from .schemas import Friend, FriendRequest, FriendShip
@@ -54,7 +54,6 @@ async def send_friend_request(
     user: CurrentUser,
     target_id: UUID4,
 ):
-    print(user.username)
     if user.id == target_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -5,8 +5,8 @@ from fastapi import WebSocket
 from app.deps import BroadCastClient
 from app.websocket.heartbeat import HeartBeat
 from app.websocket.schemas import Game
-from core.ipc import ClientIn, c_out, p_in, p_out
-from core.ipc.channels import WsGameChan
+from ravioli_service.ipc import ClientIn, c_out, p_in, p_out
+from ravioli_service.ipc.channels import WsGameChan
 
 from .base import Consumer
 

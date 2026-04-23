@@ -1,16 +1,15 @@
 from fastapi import APIRouter, Response
 from fastapi_pagination import resolve_params
 
-from app.api.schemas import SmallPage
 from app.auth.deps import CurrentUser
 
 from .deps import NotifDeps
-from .schemas import Notification
+from .schemas import Notification, NotifPagination
 
 router = APIRouter(prefix="/notif", tags=["notifications"])
 
 
-@router.get("", response_model=SmallPage[Notification])
+@router.get("", response_model=NotifPagination[Notification])
 async def list_notif(
     service: NotifDeps,
     user: CurrentUser,

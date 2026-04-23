@@ -7,10 +7,10 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from app.deps import BroadCastClient
 from app.websocket.heartbeat import HeartBeat
 from app.websocket.schemas import MaybeUser, Sri
-from core.ipc import ClientIn, p_out
-from core.ipc.channels import ConsumerChan, UserChan, WebsocketChan
-from core.ipc.types import ClientOUT, ProcessOUT
-from lib.serializers import json
+from ravioli_lib.serializers import json
+from ravioli_service.ipc import ClientIn, p_out
+from ravioli_service.ipc.channels import ConsumerChan, UserChan, WebsocketChan
+from ravioli_service.ipc.types import ClientOUT, ProcessOUT
 
 logger = logging.getLogger(__name__)
 

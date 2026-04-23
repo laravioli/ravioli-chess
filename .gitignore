@@ -2,3 +2,6 @@
 openapi.yaml
 *.prod*
 .dockerignore
+.venv
+/node_modules
+.ruff_cache

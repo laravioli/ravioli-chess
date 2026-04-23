@@ -3,7 +3,7 @@ from typing import Self
 from pydantic import model_validator
 
 from app.api.schemas import BaseSchema
-from core.db.models.pref import Board, PieceSet
+from ravioli_service.db.models.pref import Board, PieceSet
 
 
 # In

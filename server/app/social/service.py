@@ -7,8 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
 from app.notif.deps import NotifService
-from core.db.models import FriendRequest, Friendship, User
-from core.db.models.social import FriendshipStatus
+from ravioli_service.db.models import FriendRequest, Friendship, User
+from ravioli_service.db.models.social import FriendshipStatus
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,9 @@ class SocialService:
     async def create_request(self, sender_id: uuid.UUID, receiver_id: uuid.UUID):
         try:
             request = Friendship(
-                sender_id=sender_id, receiver_id=receiver_id, status=FriendshipStatus.pending
+                sender_id=sender_id,
+                receiver_id=receiver_id,
+                status=FriendshipStatus.pending,
             )
             self.session.add(request)
             await self.session.flush()

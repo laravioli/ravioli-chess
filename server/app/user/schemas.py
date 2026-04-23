@@ -13,7 +13,7 @@ from pydantic import (
 
 from app.api.schemas import BaseSchema
 from app.pref.schemas import Preference
-from core.db.models.social import FriendshipStatus
+from ravioli_service.db.models.social import FriendshipStatus
 
 
 # In
