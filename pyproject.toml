@@ -1,5 +1,5 @@
 [project]
-name = "ravioli-root"
+name = "raviolichess"
 description = "chess server full-stack application"
 readme = "README.md"
 version = "0.1.0"
@@ -8,6 +8,11 @@ requires-python = ">=3.13"
 dev = [
     "honcho",
     "ruff>=0.14.10",
+    "alembic>=1.17.2",
 ]
 [tool.uv.workspace]
-members = ["server/app", "server/engine", "server/packages/*"]
+members = ["backend/*"]
+
+[tool.uv.sources]
+ravioli-lib = { workspace = true }
+ravioli-service = { workspace = true }

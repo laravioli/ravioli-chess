@@ -11,8 +11,8 @@ members = [
     "ravioli-chess",
     "ravioli-fastapi",
     "ravioli-lib",
-    "ravioli-root",
     "ravioli-service",
+    "raviolichess",
 ]
 
 [[package]]
@@ -834,7 +834,7 @@ wheels = [
 [[package]]
 name = "ravioli-chess"
 version = "0.1.0"
-source = { virtual = "server/engine" }
+source = { virtual = "backend/engine" }
 dependencies = [
     { name = "chess" },
     { name = "ravioli-lib" },
@@ -844,14 +844,14 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "chess", specifier = ">=1.11.2" },
-    { name = "ravioli-lib", editable = "server/packages/lib" },
-    { name = "ravioli-service", editable = "server/packages/service" },
+    { name = "ravioli-lib", editable = "backend/lib" },
+    { name = "ravioli-service", editable = "backend/service" },
 ]
 
 [[package]]
 name = "ravioli-fastapi"
 version = "0.1.0"
-source = { virtual = "server/app" }
+source = { virtual = "backend/app" }
 dependencies = [
     { name = "email-validator" },
     { name = "fastapi", extra = ["standard-no-fastapi-cloud-cli"] },
@@ -870,15 +870,15 @@ requires-dist = [
     { name = "fastapi-pagination", specifier = ">=0.15.12" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.0" },
-    { name = "ravioli-lib", editable = "server/packages/lib" },
-    { name = "ravioli-service", editable = "server/packages/service" },
+    { name = "ravioli-lib", editable = "backend/lib" },
+    { name = "ravioli-service", editable = "backend/service" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.38.0" },
 ]
 
 [[package]]
 name = "ravioli-lib"
 version = "0.1.0"
-source = { editable = "server/packages/lib" }
+source = { editable = "backend/lib" }
 dependencies = [
     { name = "cachelib" },
     { name = "jinja2" },
@@ -899,30 +899,10 @@ requires-dist = [
 ]
 
 [[package]]
-name = "ravioli-root"
-version = "0.1.0"
-source = { virtual = "." }
-
-[package.dev-dependencies]
-dev = [
-    { name = "honcho" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "honcho" },
-    { name = "ruff", specifier = ">=0.14.10" },
-]
-
-[[package]]
 name = "ravioli-service"
 version = "0.1.0"
-source = { editable = "server/packages/service" }
+source = { editable = "backend/service" }
 dependencies = [
-    { name = "alembic" },
     { name = "asyncpg" },
     { name = "msgspec" },
     { name = "orjson" },
@@ -933,13 +913,33 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "alembic", specifier = ">=1.17.2" },
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "msgspec", specifier = ">=0.20.0" },
     { name = "orjson", specifier = ">=3.11.7" },
     { name = "pydantic-settings", specifier = ">=2.12.0" },
     { name = "redis", extras = ["hiredis"], specifier = ">=7.4.0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.45" },
+]
+
+[[package]]
+name = "raviolichess"
+version = "0.1.0"
+source = { virtual = "." }
+
+[package.dev-dependencies]
+dev = [
+    { name = "alembic" },
+    { name = "honcho" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "alembic", specifier = ">=1.17.2" },
+    { name = "honcho" },
+    { name = "ruff", specifier = ">=0.14.10" },
 ]
 
 [[package]]

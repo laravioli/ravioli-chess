@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -e
 
-docker compose -f server/compose.yaml up -d
+docker compose -f backend/compose.yaml up -d
 uv run honcho start
