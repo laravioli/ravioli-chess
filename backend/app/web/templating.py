@@ -1,7 +1,7 @@
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from ravioli_lib.jinja import JinjaExtConfig, load_jinja_ext
+from ravioli_core.jinja import JinjaExtConfig, load_jinja_ext
 
 from .templating_ctx import web_context
 

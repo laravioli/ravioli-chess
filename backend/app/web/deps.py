@@ -5,7 +5,7 @@ from fastapi import Depends, Request
 from app.auth.deps import UserWithPrefOrAnon
 from app.deps import RedisClient
 from app.pref.service import extract_cookie_data
-from ravioli_lib.cache import CacheLib
+from ravioli_core.cache import CacheLib
 
 from .schemas import User
 

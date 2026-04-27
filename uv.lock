@@ -9,9 +9,8 @@ resolution-markers = [
 [manifest]
 members = [
     "ravioli-chess",
+    "ravioli-core",
     "ravioli-fastapi",
-    "ravioli-lib",
-    "ravioli-service",
     "raviolichess",
 ]
 
@@ -837,15 +836,42 @@ version = "0.1.0"
 source = { virtual = "backend/engine" }
 dependencies = [
     { name = "chess" },
-    { name = "ravioli-lib" },
-    { name = "ravioli-service" },
+    { name = "ravioli-core" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "chess", specifier = ">=1.11.2" },
-    { name = "ravioli-lib", editable = "backend/lib" },
-    { name = "ravioli-service", editable = "backend/service" },
+    { name = "ravioli-core", editable = "backend/ravioli_core" },
+]
+
+[[package]]
+name = "ravioli-core"
+version = "0.1.0"
+source = { editable = "backend/ravioli_core" }
+dependencies = [
+    { name = "alembic" },
+    { name = "asyncpg" },
+    { name = "cachelib" },
+    { name = "jinja2" },
+    { name = "msgspec" },
+    { name = "orjson" },
+    { name = "pydantic-settings" },
+    { name = "redis", extra = ["hiredis"] },
+    { name = "sqlalchemy", extra = ["asyncio"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "alembic", specifier = ">=1.17.2" },
+    { name = "asyncpg", specifier = ">=0.31.0" },
+    { name = "cachelib", specifier = ">=0.13.0" },
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "msgspec", specifier = ">=0.20.0" },
+    { name = "orjson", specifier = ">=3.11.7" },
+    { name = "pydantic-settings", specifier = ">=2.12.0" },
+    { name = "redis", extras = ["hiredis"], specifier = ">=7.4.0" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.45" },
 ]
 
 [[package]]
@@ -858,8 +884,7 @@ dependencies = [
     { name = "fastapi-pagination" },
     { name = "itsdangerous" },
     { name = "pwdlib", extra = ["argon2"] },
-    { name = "ravioli-lib" },
-    { name = "ravioli-service" },
+    { name = "ravioli-core" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -870,57 +895,8 @@ requires-dist = [
     { name = "fastapi-pagination", specifier = ">=0.15.12" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.0" },
-    { name = "ravioli-lib", editable = "backend/lib" },
-    { name = "ravioli-service", editable = "backend/service" },
+    { name = "ravioli-core", editable = "backend/ravioli_core" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.38.0" },
-]
-
-[[package]]
-name = "ravioli-lib"
-version = "0.1.0"
-source = { editable = "backend/lib" }
-dependencies = [
-    { name = "cachelib" },
-    { name = "jinja2" },
-    { name = "msgspec" },
-    { name = "orjson" },
-    { name = "pydantic-settings" },
-    { name = "redis", extra = ["hiredis"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "cachelib", specifier = ">=0.13.0" },
-    { name = "jinja2", specifier = ">=3.1.6" },
-    { name = "msgspec", specifier = ">=0.20.0" },
-    { name = "orjson", specifier = ">=3.11.7" },
-    { name = "pydantic-settings", specifier = ">=2.12.0" },
-    { name = "redis", extras = ["hiredis"], specifier = ">=7.4.0" },
-]
-
-[[package]]
-name = "ravioli-service"
-version = "0.1.0"
-source = { editable = "backend/service" }
-dependencies = [
-    { name = "alembic" },
-    { name = "asyncpg" },
-    { name = "msgspec" },
-    { name = "orjson" },
-    { name = "pydantic-settings" },
-    { name = "redis", extra = ["hiredis"] },
-    { name = "sqlalchemy", extra = ["asyncio"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "alembic", specifier = ">=1.17.2" },
-    { name = "asyncpg", specifier = ">=0.31.0" },
-    { name = "msgspec", specifier = ">=0.20.0" },
-    { name = "orjson", specifier = ">=3.11.7" },
-    { name = "pydantic-settings", specifier = ">=2.12.0" },
-    { name = "redis", extras = ["hiredis"], specifier = ">=7.4.0" },
-    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.45" },
 ]
 
 [[package]]

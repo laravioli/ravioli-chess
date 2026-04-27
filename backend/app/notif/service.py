@@ -6,8 +6,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
 from app.deps import DbSession
-from ravioli_lib.cache import CacheLib
-from ravioli_service.db.models import FriendRequest, Friendship, Notification
+from ravioli_core.cache import CacheLib
+from ravioli_core.db.models import FriendRequest, Friendship, Notification
 
 from .background import Notifier
 from .schemas import NotifParams, pagination

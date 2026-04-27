@@ -4,8 +4,7 @@ import os
 import signal
 
 import uvloop
-
-from ravioli_service.config import LogSettings, configure_logging
+from ravioli_core.config import LogSettings, configure_logging
 
 from .app import App
 

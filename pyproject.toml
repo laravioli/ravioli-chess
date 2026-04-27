@@ -11,7 +11,7 @@ dev = [
 ]
 [tool.uv.workspace]
 members = ["backend/*"]
+exclude = ["backend/scripts"]
 
 [tool.uv.sources]
-ravioli-lib = { workspace = true }
-ravioli-service = { workspace = true }
+ravioli-core = { workspace = true }

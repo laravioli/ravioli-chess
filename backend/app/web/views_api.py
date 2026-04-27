@@ -3,7 +3,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel
 
 from app.deps import DbSession
-from ravioli_lib.serializers import json
+from ravioli_core.serializers import json
 
 from .deps import WebCache
 from .service import get_positions

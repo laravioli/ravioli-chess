@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import AsyncGenerator
 
-from ravioli_lib.serializers import json
+from ravioli_core.serializers import json
 
 
 class Subscriber:

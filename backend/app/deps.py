@@ -5,9 +5,9 @@ from fastapi import Depends
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from ravioli_lib.pubsub import Broadcast, RedisBackend
-from ravioli_service.config import DbSettings, RedisSettings
-from ravioli_service.utils import (
+from ravioli_core.config import DbSettings, RedisSettings
+from ravioli_core.pubsub import Broadcast, RedisBackend
+from ravioli_core.utils import (
     create_async_redis,
     create_engine_and_sessionmaker,
 )

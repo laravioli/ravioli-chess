@@ -58,7 +58,7 @@ ignore-overlong-task-comments = true
 keep-runtime-typing = true
 
 [lint.isort]
-known-first-party = ["ravioli_lib", "ravioli_service"]
+known-first-party = ["ravioli_core"]
 
 [format]
 quote-style = "double"

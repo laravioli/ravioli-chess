@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import CheckConstraint, ForeignKey, Index, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ravioli_service.db.types import TimestampUpdated
+from ravioli_core.db.types import TimestampUpdated
 
 from .base import Base
 

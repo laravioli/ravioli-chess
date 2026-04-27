@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from app.deps import DbSession, global_env
-from ravioli_lib.cache import CacheLib
+from ravioli_core.cache import CacheLib
 
 from .background import Notifier
 from .schemas import notification_adapter

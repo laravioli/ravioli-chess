@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ravioli_service.db.types import GameId8, PrimaryKey, TimestampNow
+from ravioli_core.db.types import GameId8, PrimaryKey, TimestampNow
 
 from .base import Base
 

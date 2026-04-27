@@ -10,10 +10,10 @@ from pydantic import (
     StringConstraints,
     ValidationInfo,
 )
+from ravioli_core.db.models.social import FriendshipStatus
 
 from app.api.schemas import BaseSchema
 from app.pref.schemas import Preference
-from ravioli_service.db.models.social import FriendshipStatus
 
 
 # In

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from contextlib import AbstractAsyncContextManager
 
-from ravioli_lib.pubsub import Broadcast, RedisBackend
-from ravioli_service.config import RedisSettings
-from ravioli_service.utils import create_async_redis
+from ravioli_core.config import RedisSettings
+from ravioli_core.pubsub import Broadcast, RedisBackend
+from ravioli_core.utils import create_async_redis
 
 from .game.manager import GameManager
 

@@ -37,7 +37,7 @@ class LogSettings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
     SQL_LOG_LEVEL: str = "WARNING"
-    LOG_FORMAT: str = "%(asctime)s | %(name)s | %(levelname)-6s | %(message)s"
+    LOG_FORMAT: str = "%(levelname)-6s | %(message)s"
 
     @property
     def get_logging_config(self):

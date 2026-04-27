@@ -3,9 +3,9 @@ from typing import Annotated
 from uuid import UUID
 
 from pydantic import BeforeValidator, StringConstraints
+from ravioli_core.ipc.channels import EngineGameChan
 
 from app.api.schemas import BaseSchema
-from ravioli_service.ipc.channels import EngineGameChan
 
 SRI_PATTERN = r"^[a-zA-Z0-9_]+$"
 

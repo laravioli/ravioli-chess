@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ravioli_service.db.types import PrimaryKey, TimestampNow
+from ravioli_core.db.types import PrimaryKey, TimestampNow
 
 from .base import Base
 

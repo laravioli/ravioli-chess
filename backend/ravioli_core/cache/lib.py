@@ -6,7 +6,7 @@ from msgspec import Struct
 from pydantic import BaseModel, TypeAdapter
 from redis.asyncio import Redis
 
-from ravioli_lib.serializers import json
+from ravioli_core.serializers import json
 
 from .utils import (
     build_cache_key,

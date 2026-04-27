@@ -9,8 +9,8 @@ from sqlalchemy.orm import joinedload
 from app.config import settings
 from app.deps import DbSession, RedisClient
 from app.exceptions import InvalidSession
-from ravioli_lib.serializers import msgpack
-from ravioli_service.db.models import User
+from ravioli_core.db.models import User
+from ravioli_core.serializers import msgpack
 
 from .schemas import Session
 from .security import verify_session

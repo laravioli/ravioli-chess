@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ravioli_service.db.types import PrimaryKey
+from ravioli_core.db.types import PrimaryKey
 
 from .base import Base
 

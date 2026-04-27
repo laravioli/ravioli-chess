@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
-from ravioli_lib.serializers import json
+from ravioli_core.serializers import json
 
 from .backend import ChannelBackend
 from .subscriber import Subscriber

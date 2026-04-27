@@ -1,7 +1,7 @@
 [project]
-name = "ravioli-service"
+name = "ravioli-core"
 version = "0.1.0"
-description = "db communication settings"
+description = "utilities and shared services"
 authors = [
     { name = "Victor", email = "victorlecouteur@gmail.com" }
 ]
@@ -9,6 +9,8 @@ requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.17.2",
     "asyncpg>=0.31.0",
+    "cachelib>=0.13.0",
+    "jinja2>=3.1.6",
     "msgspec>=0.20.0",
     "orjson>=3.11.7",
     "pydantic-settings>=2.12.0",
@@ -22,4 +24,7 @@ extend-exclude = ["alembic"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ravioli_core"]
 
