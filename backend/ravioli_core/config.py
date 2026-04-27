@@ -58,15 +58,7 @@ class LogSettings(BaseSettings):
                 },
             },
             "loggers": {
-                "core": {
-                    "handlers": ["console"],
-                    "level": self.LOG_LEVEL,
-                },
-                "app": {
-                    "handlers": ["console"],
-                    "level": self.LOG_LEVEL,
-                },
-                "engine": {
+                "": {
                     "handlers": ["console"],
                     "level": self.LOG_LEVEL,
                 },

@@ -1,25 +1,20 @@
 #!/bin/bash
+set -euo pipefail
 
-set -e
+VERSION="sf_18_smallnet_relaxed-simd"
+DEST="$(pwd)/client/src/lib/eval/stockfish"
+BUILD_DIR="stockfish_build_tmp"
 
-VERSION="sf_18_smallnet"
-DEST="./client/src/lib/eval/stockfish"
+trap 'rm -rf "$BUILD_DIR"' EXIT
 
-if [[ -f "$DEST/$VERSION.js" && -f "$DEST/$VERSION.wasm" ]]; then
-  echo "Files $VERSION.js and $VERSION.wasm already exist in $DEST. Skipping build."
-  rm -rf stockfish-web
-  exit 0
-fi
+[[ -f "$DEST/$VERSION.js" && -f "$DEST/$VERSION.wasm" ]] && exit 0
 
-git clone https://github.com/lichess-org/stockfish-web.git
+git clone --depth 1 https://github.com/lichess-org/stockfish-web.git "$BUILD_DIR"
 
-cd ./stockfish-web/ && ./build-with-docker.sh "$VERSION"
-echo "Build complete"
+cd "$BUILD_DIR"
+./build-with-docker.sh "$VERSION"
 
-echo "Move output to $DEST"
-cd ..
-mkdir -p $DEST
-mv "./stockfish-web/$VERSION.js" "./stockfish-web/$VERSION.wasm" $DEST
+mkdir -p "$DEST"
+mv "$VERSION.js" "$VERSION.wasm" "$DEST/"
 
-rm -rf stockfish-web
-docker image rm emscripten/emsdk:4.0.7
+docker image rm emscripten/emsdk:4.0.7 || true

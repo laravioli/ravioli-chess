@@ -6,7 +6,7 @@ version = "0.1.0"
 requires-python = ">=3.13"
 [dependency-groups]
 dev = [
-    "honcho",
+    "honcho>=2.0.0",
     "ruff>=0.14.10",
 ]
 [tool.uv.workspace]
