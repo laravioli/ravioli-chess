@@ -10,14 +10,14 @@
 
 .PHONY: install-backend
 install-backend: .docker .uv
+	cp backend/.env.example backend/.env
 	uv sync --frozen --all-groups --all-packages --all-extras
 	docker compose -f backend/compose.yaml build
-	cp backend/.env.example backend/.env
 
 .PHONY: install-frontend
 install-frontend: .docker
-	yarn install
 	cp client/.env.example client/.env.development
+	yarn install
 	./scripts/build-stockfish.sh
 	@echo "\n✅ stockfish build done!"
 	@echo "💡 Note: You can now remove the Emscripten Docker image (emscripten/emsdk) to save space."
