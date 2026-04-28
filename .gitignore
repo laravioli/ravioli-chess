@@ -6,4 +6,3 @@ openapi.yaml
 /node_modules
 .ruff_cache
 .yarn
-.yarnrc.yml

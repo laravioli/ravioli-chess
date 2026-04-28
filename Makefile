@@ -12,13 +12,22 @@
 install-backend: .docker .uv
 	uv sync --frozen --all-groups --all-packages --all-extras
 	docker compose -f backend/compose.yaml build
+	cp backend/.env.example backend/.env
 
 .PHONY: install-frontend
 install-frontend: .docker
 	yarn install
+	cp client/.env.example client/.env.development
 	./scripts/build-stockfish.sh
 	@echo "\n✅ stockfish build done!"
 	@echo "💡 Note: You can now remove the Emscripten Docker image (emscripten/emsdk) to save space."
+	$(MAKE) openapi
+
+.PHONY: openapi
+openapi: .uv
+	uv run --package ravioli-fastapi --directory backend python -m scripts.generate-openapi
+	mv backend/openapi.json client/openapi.json
+	cd client && yarn openapi-ts && rm openapi.json
 
 .PHONY: install
 install: install-backend install-frontend
