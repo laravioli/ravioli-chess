@@ -20,8 +20,7 @@ install-frontend: .docker
 	cp client/.env.example client/.env.development
 	pnpm install
 	./scripts/build-stockfish.sh
-	@echo "\n✅ stockfish build done!"
-	@echo "💡 Note: You can now remove the Emscripten Docker image (emscripten/emsdk) to save space."
+	@echo "✅ stockfish build done!"
 	$(MAKE) openapi
 
 .PHONY: openapi
@@ -32,7 +31,8 @@ openapi: .uv
 
 .PHONY: install
 install: install-backend install-frontend
-	@echo "\n✅ Install done!"
+	@echo "✅ Install done!"
+	@echo "💡 Note: You can now remove the Emscripten Docker image (emscripten/emsdk) to save space."
 
 
 .PHONY: format 
