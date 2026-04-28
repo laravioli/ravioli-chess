@@ -2,10 +2,14 @@
 set -euo pipefail
 
 VERSION="sf_18_smallnet_relaxed-simd"
-DEST="$(pwd)/client/src/lib/eval/stockfish"
-BUILD_DIR="stockfish_build_tmp"
+ROOT_DIR="$(pwd)"
+DEST="$ROOT_DIR/client/src/lib/eval/stockfish"
+BUILD_DIR="$ROOT_DIR/sf_tmp"
 
-trap 'rm -rf "$BUILD_DIR"' EXIT
+cleanup() {
+    rm -rf "$BUILD_DIR"
+}
+trap cleanup EXIT
 
 [[ -f "$DEST/$VERSION.js" && -f "$DEST/$VERSION.wasm" ]] && exit 0
 
@@ -16,5 +20,3 @@ cd "$BUILD_DIR"
 
 mkdir -p "$DEST"
 mv "$VERSION.js" "$VERSION.wasm" "$DEST/"
-
-docker image rm emscripten/emsdk:4.0.7 || true

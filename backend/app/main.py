@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
-from ravioli_core.config import LogSettings, configure_logging
 
 from app.api.routes import router as api_router
 from app.api.utils import custom_generate_unique_id
@@ -9,6 +8,7 @@ from app.lifespan import lifespan
 from app.middleware import CSRFMiddleWare
 from app.web.views import router as web_router
 from app.websocket.views import router as ws_router
+from ravioli_core.config import LogSettings, configure_logging
 
 configure_logging(settings=LogSettings())
 

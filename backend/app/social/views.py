@@ -1,9 +1,9 @@
 from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
 from pydantic import UUID4
-from ravioli_core.db.models.social import FriendshipStatus
 
 from app.auth.deps import CurrentUser
+from ravioli_core.db.models.social import FriendshipStatus
 
 from .deps import SocialDeps
 from .schemas import Friend, FriendRequest, FriendShip

@@ -3,11 +3,11 @@ from uuid import UUID
 
 from fastapi import BackgroundTasks, Depends
 from msgspec import Raw
+
+from app.deps import BroadCastClient
 from ravioli_core.db.models import Notification
 from ravioli_core.ipc.channels import UserChan
 from ravioli_core.ipc.process.out import TellUser
-
-from app.deps import BroadCastClient
 
 from .schemas import notification_adapter
 

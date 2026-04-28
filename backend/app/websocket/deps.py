@@ -2,10 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends
 from fastapi.websockets import WebSocket
-from ravioli_core.ipc.channels import EngineGameChan
 
 from app.auth.deps import UserOrAnon
 from app.deps import BroadCastClient
+from ravioli_core.ipc.channels import EngineGameChan
 
 from .consumers import PlayConsumer, SiteConsumer
 from .heartbeat import HeartBeat

@@ -2,9 +2,9 @@ import logging
 from abc import ABC, abstractmethod
 
 import chess
-from ravioli_core.ipc import p_in, p_out
 
 from engine.exceptions import StopActor
+from ravioli_core.ipc import p_in, p_out
 
 logger = logging.getLogger(__name__)
 

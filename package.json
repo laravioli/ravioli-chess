@@ -1,6 +1,7 @@
 {
   "name": "raviolichess",
   "private": true,
+  "packageManager": "yarn@4.14.1",
   "workspaces": [
     "client"
   ]

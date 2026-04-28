@@ -1,6 +1,5 @@
 from uuid import UUID
 
-from ravioli_core.db.models import Friendship, Preference, User
 from sqlalchemy import and_, delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
@@ -9,6 +8,7 @@ from app.auth.security import generate_password_hash
 from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
 from app.social.service import friendship_criteria
+from ravioli_core.db.models import Friendship, Preference, User
 
 from .schemas import UserCreate
 

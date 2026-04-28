@@ -3,10 +3,10 @@ from datetime import timedelta
 import orjson
 from fastapi import Request, Response
 from itsdangerous import BadSignature, URLSafeSerializer
-from ravioli_core.db.models import User
 
 from app.config import settings
 from app.deps import DbSession
+from ravioli_core.db.models import User
 
 from .schemas import PreferenceUpdate
 

@@ -1,9 +1,9 @@
 from typing import Self
 
 from pydantic import model_validator
-from ravioli_core.db.models.pref import Board, PieceSet
 
 from app.api.schemas import BaseSchema
+from ravioli_core.db.models.pref import Board, PieceSet
 
 
 # In

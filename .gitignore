@@ -5,3 +5,5 @@ openapi.yaml
 .venv
 /node_modules
 .ruff_cache
+.yarn
+.yarnrc.yml

@@ -1,14 +1,14 @@
 import logging
 import uuid
 
-from ravioli_core.db.models import FriendRequest, Friendship, User
-from ravioli_core.db.models.social import FriendshipStatus
 from sqlalchemy import delete, func, literal, select, union_all, update
 from sqlalchemy.exc import IntegrityError
 
 from app.deps import DbSession
 from app.exceptions import DBConflict, DBNotFound
 from app.notif.deps import NotifService
+from ravioli_core.db.models import FriendRequest, Friendship, User
+from ravioli_core.db.models.social import FriendshipStatus
 
 logger = logging.getLogger(__name__)
 
