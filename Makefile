@@ -12,7 +12,7 @@
 install-backend: .docker .uv
 	cp backend/.env.example backend/.env
 	uv sync --frozen --all-groups --all-packages --all-extras
-	docker compose -f backend/compose.yaml build
+	docker compose -f backend/compose.yaml up -d --build
 	uv run --directory backend alembic upgrade head
 
 .PHONY: install-frontend
