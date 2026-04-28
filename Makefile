@@ -17,7 +17,7 @@ install-backend: .docker .uv
 .PHONY: install-frontend
 install-frontend: .docker
 	cp client/.env.example client/.env.development
-	yarn install
+	pnpm install
 	./scripts/build-stockfish.sh
 	@echo "\n✅ stockfish build done!"
 	@echo "💡 Note: You can now remove the Emscripten Docker image (emscripten/emsdk) to save space."
@@ -27,7 +27,7 @@ install-frontend: .docker
 openapi: .uv
 	uv run --package ravioli-fastapi --directory backend python -m scripts.generate-openapi
 	mv backend/openapi.json client/openapi.json
-	cd client && yarn openapi-ts && rm openapi.json
+	cd client && pnpm openapi-ts && rm openapi.json
 
 .PHONY: install
 install: install-backend install-frontend
@@ -38,7 +38,7 @@ install: install-backend install-frontend
 format: .uv
 	uv run ruff check --fix .
 	uv run ruff format .
-	yarn workspace client run format
+	pnpm --filter client format
 
 .PHONY: dev
 dev: .uv
