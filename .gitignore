@@ -7,3 +7,5 @@ openapi.yaml
 .ruff_cache
 .yarn
 .openapi.json
+.envrc
+raviolichess.code-workspace

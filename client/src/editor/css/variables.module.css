@@ -1,4 +1,7 @@
 .editor {
   --controls-bg-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-6));
-  --side-border: light-dark(1px solid var(--mantine-color-gray-5), 1px solid var(--mantine-color-dark-5));
+  --side-border: light-dark(
+    1px solid var(--mantine-color-gray-5),
+    1px solid var(--mantine-color-dark-5)
+  );
 }

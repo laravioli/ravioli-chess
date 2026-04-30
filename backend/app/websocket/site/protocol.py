@@ -1,40 +1,36 @@
-import logging
-
+from app.websocket.base.exceptions import UnHandledMsg
+from app.websocket.base.protocol import ConsumerProtocol
 from ravioli_core.ipc import ClientIn, c_out, p_in, p_out
 from ravioli_core.ipc.channels import EngineGameCreateChan
 
-from .base import Consumer
+type ClientMsgOut = c_out.GameCreate
+type ProcessMsgOut = p_out.GameCreate
 
-logger = logging.getLogger(__name__)
 
-
-class SiteConsumer(Consumer):
-    CLIENT_OUT_FRAME = c_out.GameCreate
-    PROCESS_OUT_FRAME = p_out.GameCreate
-
-    async def handle_client_msg(self, msg):
+class SiteProtocol(ConsumerProtocol):
+    async def client_protocol(self, msg: ClientMsgOut):
         response, channel = (None, None)
         match msg:
             case c_out.GameCreate(data):
                 response, channel = (
                     p_in.GameCreate(
-                        sri=self.sri,
+                        sri=self.params["sri"],
                         data=data,
                     ),
                     EngineGameCreateChan(1),
                 )
             case _:
-                await super().handle_client_msg(msg)
+                raise UnHandledMsg(msg)
 
         if response and channel:
-            await self.broadcast.publish(channel, response)
+            await self.publish(channel, response)
 
-    async def handle_process_msg(self, msg):
+    async def process_protocol(self, msg: ProcessMsgOut):
         match msg:
             case p_out.GameCreate(data):
                 await self.send_json(ClientIn(type="gameCreate", data=data))
-            case msg:
-                await super().handle_process_msg(msg)
+            case _:
+                raise UnHandledMsg(msg)
 
     async def disconnect(self):
         pass

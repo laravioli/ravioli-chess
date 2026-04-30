@@ -7,7 +7,11 @@
   border-bottom: 1px solid light-dark(var(--mantine-color-dark-2), var(--mantine-color-dark-4));
   background-color: var(--mantine-color-gray-4);
   @mixin dark {
-    background: linear-gradient(to top, var(--mantine-color-dark-6), var(--mantine-color-dark-7) 50%);
+    background: linear-gradient(
+      to top,
+      var(--mantine-color-dark-6),
+      var(--mantine-color-dark-7) 50%
+    );
   }
 }
 

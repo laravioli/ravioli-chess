@@ -6,14 +6,12 @@ from app.deps import DbSession, global_env
 from ravioli_core.cache import CacheLib
 
 from .background import Notifier
-from .schemas import notification_adapter
 from .service import NotifService
 
 cache = CacheLib(
     global_env.redis,
     namespace="notifications",
-    data_out=bytes,
-    converter=notification_adapter,
+    data_out=int,
     version="v1",
     default_ttl=300,
 )

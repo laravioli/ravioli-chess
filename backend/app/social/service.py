@@ -12,6 +12,8 @@ from ravioli_core.db.models.social import FriendshipStatus
 
 logger = logging.getLogger(__name__)
 
+# TODO: notif module should handle everything related to notif, here we just provide the content
+
 
 class SocialService:
     def __init__(self, session: DbSession, notifier: NotifService):

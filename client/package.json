@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "format": "prettier --write \"**/*.{ts,tsx,scss}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,scss}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,css}\"",
     "lint": "eslint .",
     "openapi-ts": "openapi-ts",
     "preview": "vite preview"

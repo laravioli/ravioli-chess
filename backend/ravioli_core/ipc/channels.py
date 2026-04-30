@@ -2,6 +2,18 @@ from abc import ABC
 from typing import ClassVar
 
 # ╔══════════════════════════════════════╗
+# ║             App Channels             ║
+# ╚══════════════════════════════════════╝
+
+
+class AppChan(str, ABC):
+    name: ClassVar[str]
+
+    def __new__(cls, chan):
+        return super().__new__(cls, f"chan:app:{cls.name}:{chan}")
+
+
+# ╔══════════════════════════════════════╗
 # ║          Engine Channels             ║
 # ╚══════════════════════════════════════╝
 
@@ -32,6 +44,8 @@ class EngineGameChan(EngineChan):
 
     name = "game"
 
+
+type ProcessChan = AppChan | EngineChan
 
 # ╔══════════════════════════════════════╗
 # ║        Websocket Channels            ║

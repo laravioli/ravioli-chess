@@ -57,9 +57,8 @@ NotifPagination = CustomizedPage[
 notification_adapter = TypeAdapter(NotifPagination[Notification])
 
 
-# todo: get rid of fastapi_pagination
 def pagination(coro):
-    # hack to call db_notif outside of endpoint
+    # NOTE paginate class is not set without response class in endpoint
     async def wrapper(*args, **kwargs):
         with set_page(NotifPagination[Notification]):
             return await coro(*args, **kwargs)

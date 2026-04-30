@@ -21,7 +21,7 @@ class Notification(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(String(50))
     user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
-    unread: Mapped[bool] = mapped_column(default=True)
+    read: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[TimestampNow]
 
 

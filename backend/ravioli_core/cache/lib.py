@@ -22,15 +22,7 @@ C = TypeVar("C")
 
 class CacheLib[A, B]:
     """
-    Example:
-    user_cache = CacheLib(
-            redis_client,
-            namespace="users",
-            model=User,
-            default_ttl=600
-        )
-        user = await user_cache.get("123")
-        await user_cache.set("123", user_obj, ttl=600)
+    A cache impl using a redis instance with decode_response = False
     """
 
     def __init__(
@@ -74,40 +66,37 @@ class CacheLib[A, B]:
             return get_ttl_with_jitter(effective_ttl)
         return effective_ttl
 
+    # API
     async def get(
         self,
-        identifier: str,
+        key: str,
         params: dict[str, Any] | None = None,
     ) -> B | None:
         """
         Get cached value, deserialize to Pydantic model if configured
         """
-        key = self._build_key(identifier, params)
-        data = await self.redis.get(key)
+        _key = self._build_key(key, params)
+        data = await self.redis.get(_key)
 
-        # null
+        # None
         if data is None:
             return None
 
-        # identity
-        if self.data_out is bytes:
-            return data
-
-        # schema
-        if isinstance(self.data_out, TypeAdapter):
-            return self.data_out.validate_json(data)
-        elif isinstance(self.data_out, type):
-            if issubclass(self.data_out, BaseModel):
-                return self.data_out.model_validate_json(data)
-            elif issubclass(self.data_out, Struct):
-                return json.decode(data, type_arg=self.data_out)
-        # default
-        else:
-            return json.decode(data, type_arg=self.data_out)
+        # Some
+        match self.data_out:
+            case type():
+                if issubclass(self.data_out, bytes):
+                    return data
+                elif issubclass(self.data_out, BaseModel):
+                    return self.data_out.model_validate_json(data)
+                else:
+                    return json.decode(data, type_arg=self.data_out)
+            case TypeAdapter():
+                return self.data_out.validate_json(data)
 
     async def set(
         self,
-        identifier: str,
+        key: str,
         value: A,
         ttl: int | None = None,
         params: dict[str, Any] | None = None,
@@ -117,7 +106,7 @@ class CacheLib[A, B]:
 
         """
 
-        key = self._build_key(identifier, params)
+        _key = self._build_key(key, params)
         effective_ttl = self._get_ttl(ttl)
         match value:
             case bytes() | int() | str():
@@ -132,12 +121,11 @@ class CacheLib[A, B]:
                         value = self.converter.model_validate(value).model_dump_json()
                 else:
                     value = json.encode(value)
-
-        await self.redis.set(key, value, ex=effective_ttl)
+        await self.redis.set(_key, value, ex=effective_ttl)
 
     async def get_or_set(
         self,
-        identifier: str,
+        key: str,
         factory: Callable[[], Awaitable[C]],
         ttl: int | None = None,
         params: dict[str, Any] | None = None,
@@ -152,30 +140,24 @@ class CacheLib[A, B]:
                 ttl=600
             )
         """
-        cached = await self.get(identifier, params)
+        cached = await self.get(key, params)
         if cached is not None:
             return cached
 
         value = await factory()
-        await self.set(identifier, value, ttl, params)
+        await self.set(key, value, ttl, params)
         return value
 
-    async def incrby(
+    async def delete(
         self,
-        value: int,
-        identifier: str,
-        factory: Callable[[], Awaitable[C]],
-        ttl: int | None = None,
+        key: str,
         params: dict[str, Any] | None = None,
-    ):
-        pass
-
-    async def delete(self, identifier: str, params: dict[str, Any] | None = None) -> bool:
+    ) -> bool:
         """
         Delete cached value
         """
-        key = self._build_key(identifier, params)
-        result = await self.redis.delete(key)
+        _key = self._build_key(key, params)
+        result = await self.redis.delete(_key)
         return result > 0
 
     async def delete_by_pattern(self, pattern: str, batch_size: int = 100) -> int:
@@ -206,15 +188,27 @@ class CacheLib[A, B]:
         key = self._build_key(identifier, params)
         return await self.redis.exists(key) > 0
 
-    async def get_ttl(self, identifier: str, params: dict[str, Any] | None = None) -> int:
+    async def get_ttl(self, key: str, params: dict[str, Any] | None = None) -> int:
         """
         Get remaining TTL for key in seconds
 
         Returns -2 if key doesn't exist, -1 if key has no expiration
         """
         try:
-            key = self._build_key(identifier, params)
-            return await self.redis.ttl(key)
+            _key = self._build_key(key, params)
+            return await self.redis.ttl(_key)
         except Exception as e:
-            logger.warning(f"TTL check failed for {identifier}: {e}")
+            logger.warning(f"TTL check failed for {key}: {e}")
             return -2
+
+    # LUA EXTENSION
+    async def lua_incrby(
+        self,
+        key: str,
+        value: int,
+        ttl: int | None = None,
+        params: dict[str, Any] | None = None,
+    ):
+        _key = self._build_key(key, params)
+        effective_ttl = self._get_ttl(ttl)
+        return await self.redis.fcall("rav_incrby", 1, _key, value, effective_ttl)

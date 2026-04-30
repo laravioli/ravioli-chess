@@ -1,20 +1,26 @@
-from typing import Annotated
+from typing import Annotated, TypedDict
 
 from fastapi import Depends
 from fastapi.websockets import WebSocket
 
 from app.auth.deps import UserOrAnon
 from app.deps import BroadCastClient
-from ravioli_core.ipc.channels import EngineGameChan
 
-from .consumers import PlayConsumer, SiteConsumer
 from .heartbeat import HeartBeat
-from .schemas import Game, Sri, User
+from .schemas import Sri, User
 
 
 async def get_user(user: UserOrAnon):
     if user:
         return User.model_validate(user)
+
+
+class WebsocketParams(TypedDict):
+    sri: Sri
+    user: User | None
+    websocket: WebSocket
+    broadcast: BroadCastClient
+    heartbeat: HeartBeat
 
 
 async def get_websocket_params(
@@ -23,25 +29,13 @@ async def get_websocket_params(
     websocket: WebSocket,
     broadcast: BroadCastClient,
 ):
-    return {
-        "sri": sri,
-        "user": user,
-        "websocket": websocket,
-        "broadcast": broadcast,
-        "heartbeat": HeartBeat(websocket=websocket),
-    }
+    return WebsocketParams(
+        sri=sri,
+        user=user,
+        websocket=websocket,
+        broadcast=broadcast,
+        heartbeat=HeartBeat(websocket=websocket),
+    )
 
 
-type BaseWebsocketParams = Annotated[dict, Depends(get_websocket_params)]
-
-
-async def site_consumer(params: BaseWebsocketParams):
-    return SiteConsumer(**params)
-
-
-async def play_consumer(params: BaseWebsocketParams, game_id: str):
-    return PlayConsumer(**params, game=Game(id=game_id, chan=EngineGameChan(game_id)))
-
-
-type SiteDep = Annotated[SiteConsumer, Depends(site_consumer)]
-type PlayDep = Annotated[PlayConsumer, Depends(play_consumer)]
+type WebsocketParamsDep = Annotated[WebsocketParams, Depends(get_websocket_params)]
