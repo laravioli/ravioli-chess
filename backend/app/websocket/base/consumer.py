@@ -15,6 +15,25 @@ from .protocol import ConsumerProtocol
 
 logger = logging.getLogger(__name__)
 
+# composition/inheritence wasnt the problem
+# the problem was everything was too glued together
+# the best way to decouple is to pass small object arond via deps
+# and each object has their own responsabilility
+# dont shy away from closure even with python, to pass some behavior around as ive done with engine
+# so -> one actor with one queue -> rewrite broadcast api so it accept a queue
+# so -> one layer from the endpoint (check lila ws controller), one object actor object(one queue)
+# reduce the concurrency at maximum, there is no need for concurrent task if there is no I/O.
+# currently the problem is -> broadcast give my actor a queue == bad
+# a better model would be broadcast send to a queue (decoupled), so he know the queue
+# this is way better, i wont have all this trick to delete the queue when its no longer needed....
+# the design came from starlite and it was bad..
+# 1) write a small actor like class
+# 2) rewrite broadcast (maybe subscribe could ne the "actor")
+# 3) write a layer when each receive message from ws are send to the queue
+# NOTE 4) write a clear ActorHandler and ActorRunner (will use deps ie injection to pass handler to runner)
+# so basicly u pass the instance of actorHandler in the __call__ function of runner
+# guccy
+
 
 class Consumer:
     def __init__(

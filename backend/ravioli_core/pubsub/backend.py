@@ -14,6 +14,8 @@ class ChannelBackend(Protocol):
 
 
 class RedisBackend(ChannelBackend):
+    __slots__ = ("_redis", "_pubsub")
+
     def __init__(self, redis: Redis):
         self._redis = redis
         self._pubsub = redis.pubsub(ignore_subscribe_messages=True)
