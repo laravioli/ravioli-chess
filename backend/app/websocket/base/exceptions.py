@@ -1,2 +1,0 @@
-class UnHandledMsg(Exception):
-    pass

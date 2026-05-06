@@ -6,7 +6,7 @@ from msgspec import Raw
 
 from app.deps import BroadCastClient
 from ravioli_core.db.models import Notification
-from ravioli_core.ipc.channels import UserChan
+from ravioli_core.ipc.channels import WsUserChan
 from ravioli_core.ipc.process.out import TellUser
 
 from .schemas import notification_adapter
@@ -27,7 +27,7 @@ class BackgroundNotif:
     async def publish_to_user(self, user_id: UUID, notifications: list[Notification]):
         raw = notification_adapter.dump_json(notification_adapter.validate_python(notifications))
         await self.broadcast.publish(
-            UserChan(str(user_id)), TellUser(type="notifications", data=Raw(raw))
+            WsUserChan(str(user_id)), TellUser(type="notifications", data=Raw(raw))
         )
 
 

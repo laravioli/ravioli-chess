@@ -5,7 +5,7 @@ from msgspec import Struct, field
 # ╚══════════════════════════════════════╝
 
 
-# todo: add validation
+# TODO: add validation
 # Data
 class GameInfo(Struct):
     white_player: str | None = field(name="wp", default=None)

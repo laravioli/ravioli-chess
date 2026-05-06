@@ -1,16 +1,21 @@
 from abc import ABC
 from typing import ClassVar
 
+# NOTE struture:
+# NOTE 1- target
+# NOTE 2- topic
+# NOTE 3- chan
+
 # ╔══════════════════════════════════════╗
 # ║             App Channels             ║
 # ╚══════════════════════════════════════╝
 
 
 class AppChan(str, ABC):
-    name: ClassVar[str]
+    topic: ClassVar[str]
 
     def __new__(cls, chan):
-        return super().__new__(cls, f"chan:app:{cls.name}:{chan}")
+        return super().__new__(cls, f"app:{cls.topic}:{chan}")
 
 
 # ╔══════════════════════════════════════╗
@@ -19,20 +24,20 @@ class AppChan(str, ABC):
 
 
 class EngineChan(str, ABC):
-    name: ClassVar[str]
+    topic: ClassVar[str]
 
     def __new__(cls, chan):
-        return super().__new__(cls, f"chan:engine:{cls.name}:{chan}")
+        return super().__new__(cls, f"engine:{cls.topic}:{chan}")
 
 
-class EngineGameCreateChan(EngineChan):
+class EngineCreateChan(EngineChan):
     """
 
     args:
         chan (int): process ID.
     """
 
-    name = "game:create"
+    topic = "create"
 
 
 class EngineGameChan(EngineChan):
@@ -42,7 +47,7 @@ class EngineGameChan(EngineChan):
         chan (str): game ID.
     """
 
-    name = "game"
+    topic = "game"
 
 
 type ProcessChan = AppChan | EngineChan
@@ -53,37 +58,53 @@ type ProcessChan = AppChan | EngineChan
 
 
 class WebsocketChan(str, ABC):
-    name: ClassVar[str]
+    topic: ClassVar[str]
 
     def __new__(cls, chan):
-        return super().__new__(cls, f"chan:ws:{cls.name}:{chan}")
+        return super().__new__(cls, f"ws:{cls.topic}:{chan}")
 
 
-class ConsumerChan(WebsocketChan):
+# ╔══════════════════════════════════════╗
+# ║        Site                          ║
+# ╚══════════════════════════════════════╝
+
+
+class WsSiteChan(WebsocketChan):
+    topic = "site"
+
+
+class WsConsumerChan(WsSiteChan):
     """
 
     args:
         sri: str
     """
 
-    name = "socket"
+    def __new__(cls, sri):
+        return super().__new__(cls, f"sri:{sri}")
 
 
-class UserChan(WebsocketChan):
+class WsUserChan(WsSiteChan):
     """
 
     args:
         uuid (str): user uuid.
     """
 
-    name = "user"
+    def __new__(cls, uuid):
+        return super().__new__(cls, f"user:{uuid}")
 
 
-class WsGameChan(WebsocketChan):
+# ╔══════════════════════════════════════╗
+# ║        Play                          ║
+# ╚══════════════════════════════════════╝
+
+
+class WsPlayChan(WebsocketChan):
     """
 
     args:
         chan (str): game ID.
     """
 
-    name = "game"
+    topic = "play"

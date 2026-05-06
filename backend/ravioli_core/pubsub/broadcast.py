@@ -1,40 +1,89 @@
 import asyncio
+from collections import defaultdict
+from collections.abc import Callable, Iterable
 from contextlib import asynccontextmanager, suppress
+
+from redis.asyncio import Redis
 
 from ravioli_core.serializers import json
 
 from .backend import ChannelBackend
+from .bus import EventBus
+from .exceptions import BroadcastClosed
 from .subscriber import Subscriber
-
-
-class BroadcastClosed(Exception):
-    pass
-
-
-class _LazyEvent:
-    def __init__(self) -> None:
-        self.__event: asyncio.Event | None = None
-
-    @property
-    def _event(self) -> asyncio.Event:
-        if self.__event is None:
-            self.__event = asyncio.Event()
-        return self.__event
-
-    def set(self) -> None:
-        self._event.set()
-
-    def is_set(self) -> bool:
-        return self._event.is_set()
-
-    def clear(self) -> None:
-        self._event.clear()
-
-    async def wait(self) -> None:
-        await self._event.wait()
+from .topic import Topic
+from .utils import LazyEvent
 
 
 class Broadcast:
+    def __init__(
+        self,
+        redis: Redis,
+        topics: Callable[[EventBus], dict[str, Topic]],
+    ):
+        self._redis = redis
+        self._bus = EventBus()
+        self._topics = topics(self._bus)
+        self._closed_event = LazyEvent()
+
+    async def start(self):
+
+        if not (self._closed_event.is_set() or hasattr(self, "_task")):
+            self._task = asyncio.create_task(self._run())
+        return self._task
+
+    async def stop(self):
+        if not self._closed_event.is_set():
+            self._task.cancel()
+            with suppress(asyncio.CancelledError):
+                await self._task
+
+    async def _run(self, immediate_shutdown=False):
+        try:
+            async with asyncio.TaskGroup() as tg:
+                for topic in self._topics.values():
+                    tg.create_task(topic.run(self._redis))
+        finally:
+            for sub in self._bus.subscribers:
+                # NOTE should not be called while Topics are running
+                sub.shutdown(immediate=immediate_shutdown)
+            self._closed_event.set()
+
+    async def publish(self, chan: str, msg: object):
+        await self._redis.publish(chan, json.encode(msg))
+
+    @asynccontextmanager
+    async def start_subscription(self, sub: Subscriber, *chans: str):
+        """
+        Subscribe/Unsubscribe sequentially
+        """
+        grouped = groupby(chans)
+        try:
+            for topic_name, topic_chans in grouped.items():
+                topic = self._topics[topic_name]
+                await topic.subscribe(sub, topic_chans)
+
+            if self._closed_event.is_set():
+                raise BroadcastClosed()
+            yield
+        finally:
+            for topic_name, topic_chans in grouped.items():
+                topic = self._topics[topic_name]
+                await topic.unsubscribe(sub, topic_chans)
+
+
+def groupby(chans: Iterable[str]):
+    """
+    Group a list of channels by related topic
+    """
+    grouped = defaultdict(list)
+    for chan in chans:
+        topic = chan.split(":", 2)[1]
+        grouped[topic].append(chan)
+    return grouped
+
+
+class LightBroadcast:
     def __init__(
         self,
         backend: ChannelBackend,
@@ -48,8 +97,8 @@ class Broadcast:
         self._backend = backend
         self._immediate_shutdown = immediate_shutdown
         self._channel_map: dict[str, set[Subscriber]] = {}
-        self.has_subscribers = _LazyEvent()
-        self.closed_event = _LazyEvent()
+        self.has_subscribers = LazyEvent()
+        self.closed_event = LazyEvent()
 
     @property
     def subscribers(self):

@@ -1,0 +1,2 @@
+class BroadcastClosed(Exception):
+    pass

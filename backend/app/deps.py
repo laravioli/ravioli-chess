@@ -5,8 +5,9 @@ from fastapi import Depends
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
+from app.websocket.broadcast import make_topics
 from ravioli_core.config import DbSettings, RedisSettings
-from ravioli_core.pubsub import Broadcast, RedisBackend
+from ravioli_core.pubsub import Broadcast
 from ravioli_core.utils import (
     create_async_redis,
     create_engine_and_sessionmaker,
@@ -59,7 +60,7 @@ type RedisClient = Annotated[Redis, Depends(get_redis)]
 # ╚══════════════════════════════════════╝
 
 
-broadcast = Broadcast(backend=RedisBackend(redis))
+broadcast = Broadcast(redis=redis, topics=make_topics)
 
 
 async def get_broadcast() -> Broadcast:

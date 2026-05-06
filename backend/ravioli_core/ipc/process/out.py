@@ -8,7 +8,29 @@ class ProcessOUT(Struct, tag_field="po", rename={"type": "t", "data": "d"}):
 
 
 # ╔══════════════════════════════════════╗
-# ║   ENGINE OUT : ws <- engine          ║
+# ║   websocket server <- ...            ║
+# ╚══════════════════════════════════════╝
+# ╔══════════════════════════════════════╗
+# ║   SITE                               ║
+# ╚══════════════════════════════════════╝
+
+
+class TellUser(ProcessOUT, tag="s/user"):
+    type: str
+    data: Raw
+
+
+class TellSocket(ProcessOUT, tag="s/socket"):
+    type: str
+    data: Raw
+
+
+class GameCreate(ProcessOUT, tag="s/create"):
+    data: Raw  # GameId
+
+
+# ╔══════════════════════════════════════╗
+# ║   PLAY                               ║
 # ╚══════════════════════════════════════╝
 
 
@@ -18,13 +40,6 @@ class GameUpdate(ProcessOUT, tag="g/update"):
     data: Raw
 
 
-class GameCreate(ProcessOUT, tag="g/create"):
-    data: Raw  # GameId
-
-
-# Data
-# NOTE: -> Raw in Frame to not deserialise data on ws side
-# NOTE cons: loose typing for serialisation
 class GameId(Struct):
     game_id: str
 
@@ -35,23 +50,3 @@ class GameMove(Struct):
 
 class GameEnd(Struct):
     reason: str
-
-
-# ╔══════════════════════════════════════╗
-# ║   APP OUT : ws <- app                ║
-# ╚══════════════════════════════════════╝
-
-
-class TellUser(ProcessOUT, tag="t/user"):
-    type: str
-    data: Raw
-
-
-class TellSocket(ProcessOUT, tag="t/socket"):
-    type: str
-    data: Raw
-
-
-# types
-type EngineOUT = GameUpdate | GameUpdate
-type AppOUT = TellUser | TellSocket

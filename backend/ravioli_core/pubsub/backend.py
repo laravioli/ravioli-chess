@@ -1,16 +1,8 @@
 import asyncio
-from collections.abc import AsyncGenerator
-from typing import Protocol
 
 from redis.asyncio import Redis
 
-
-class ChannelBackend(Protocol):
-    async def publish(self, channel: str, message: bytes) -> None: ...
-    async def subscribe(self, *args, **kwargs) -> None: ...
-    async def unsubscribe(self, *args, **kwargs) -> None: ...
-    async def stream(self) -> AsyncGenerator[tuple[str, bytes]]: ...
-    async def stop(self) -> None: ...
+from .types import ChannelBackend
 
 
 class RedisBackend(ChannelBackend):

@@ -6,7 +6,6 @@ from fastapi.websockets import WebSocket
 from app.auth.deps import UserOrAnon
 from app.deps import BroadCastClient
 
-from .heartbeat import HeartBeat
 from .schemas import Sri, User
 
 
@@ -20,7 +19,6 @@ class WebsocketParams(TypedDict):
     user: User | None
     websocket: WebSocket
     broadcast: BroadCastClient
-    heartbeat: HeartBeat
 
 
 async def get_websocket_params(
@@ -34,7 +32,6 @@ async def get_websocket_params(
         user=user,
         websocket=websocket,
         broadcast=broadcast,
-        heartbeat=HeartBeat(websocket=websocket),
     )
 
 

@@ -4,12 +4,12 @@ from contextlib import suppress
 from engine.utils import register_coroutine
 from ravioli_core.ipc import p_in, p_out
 from ravioli_core.ipc.channels import (
-    ConsumerChan,
+    EngineCreateChan,
     EngineGameChan,
-    EngineGameCreateChan,
-    WsGameChan,
+    WsConsumerChan,
+    WsPlayChan,
 )
-from ravioli_core.pubsub import Broadcast
+from ravioli_core.pubsub import LightBroadcast
 
 from .actor import GameActor
 from .service import create_game_db
@@ -20,7 +20,7 @@ class GameManager:
 
     def __init__(
         self,
-        broadcast: Broadcast,
+        broadcast: LightBroadcast,
     ):
         self.broadcast = broadcast
         self._start_tasks: set[asyncio.Task] = set()
@@ -29,7 +29,7 @@ class GameManager:
 
     async def run(self):
         try:
-            async with self.broadcast.start_subscription(EngineGameCreateChan(1)) as subscriber:
+            async with self.broadcast.start_subscription(EngineCreateChan(1)) as subscriber:
                 async for message in subscriber.iter_message(type_arg=p_in.GameStart):
                     register_coroutine(self._start_tasks, self.start_one, message)
         finally:
@@ -53,12 +53,12 @@ class GameManager:
     async def start_one(self, msg: p_in.GameStart):
         id = await create_game_db(msg)
 
-        send_channel = WsGameChan(id)
+        send_channel = WsPlayChan(id)
         receive_channel = EngineGameChan(id)
 
         # actor api
         async def receive():
-            await self.publish(ConsumerChan(msg.sri), p_out.GameCreate(data=p_out.GameId(id)))
+            await self.publish(WsConsumerChan(msg.sri), p_out.GameCreate(data=p_out.GameId(id)))
             async with self.broadcast.start_subscription(receive_channel) as sub:
                 async for message in sub.iter_message(type_arg=p_in.GameUpdate):
                     yield message
