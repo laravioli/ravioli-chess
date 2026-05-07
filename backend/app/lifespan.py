@@ -2,14 +2,14 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.deps import global_env
+from app.deps import GLOBAL_ENV
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # noqa: ARG001
 
     try:
-        await global_env.start()
+        await GLOBAL_ENV.start()
         yield
     finally:
-        await global_env.stop()
+        await GLOBAL_ENV.stop()

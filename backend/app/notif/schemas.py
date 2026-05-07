@@ -58,7 +58,7 @@ notification_adapter = TypeAdapter(NotifPagination[Notification])
 
 
 def pagination(coro):
-    # NOTE paginate class is not set without response class in endpoint
+    # NOTE decorator to use paginator outside fastapi endpoint
     async def wrapper(*args, **kwargs):
         with set_page(NotifPagination[Notification]):
             return await coro(*args, **kwargs)

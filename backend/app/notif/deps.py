@@ -2,18 +2,18 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.deps import DbSession, global_env
+from app.deps import GLOBAL_ENV, DbSession
 from ravioli_core.cache import CacheLib
 
 from .background import Notifier
 from .service import NotifService
 
 cache = CacheLib(
-    global_env.redis,
+    redis=GLOBAL_ENV.redis,
     namespace="notifications",
-    data_out=int,
     version="v1",
     default_ttl=300,
+    data_type=int,
 )
 
 

@@ -1,7 +1,7 @@
 from msgspec import Struct, field
 
 # ╔══════════════════════════════════════╗
-# ║   ENGINE IN : ws -> engine           ║
+# ║     ... -> engine server             ║
 # ╚══════════════════════════════════════╝
 
 

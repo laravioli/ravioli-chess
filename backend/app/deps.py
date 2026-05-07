@@ -95,11 +95,11 @@ class Env:
         await redis.aclose()
 
 
-global_env = Env(engine=engine, redis=redis, broadcast=broadcast)
+GLOBAL_ENV = Env(engine=engine, redis=redis, broadcast=broadcast)
 
 
 async def get_env():
-    return global_env
+    return GLOBAL_ENV
 
 
 type EnvDep = Annotated[Env, Depends(get_env)]

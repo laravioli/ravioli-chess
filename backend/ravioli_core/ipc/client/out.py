@@ -5,8 +5,6 @@ from msgspec import Struct, field
 # ╚══════════════════════════════════════╝
 
 
-# TODO: add validation
-# Data
 class GameInfo(Struct):
     white_player: str | None = field(name="wp", default=None)
     black_player: str | None = field(name="bp", default=None)
@@ -26,7 +24,3 @@ class GameCreate(ClientOUT, tag="newGame"):
 
 class GameMove(ClientOUT, tag="move"):
     data: MoveData
-
-
-# types
-type ClientFrameOut = GameCreate | GameMove
