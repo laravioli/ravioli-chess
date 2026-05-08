@@ -92,10 +92,7 @@ class CacheLib:
         params: KeyParams = None,
         ttl: int | None = None,
     ):
-        """
-        Note:
-            cache HIT/MISS might return different value
-        """
+        # NOTE cache HIT/MISS might return different value
         data = await self.get(id, params)
         if data is not None:
             return data

@@ -1,24 +1,14 @@
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import BackgroundTasks, Depends
 
-from app.deps import GLOBAL_ENV, DbSession
-from ravioli_core.cache import CacheLib
+from app.deps import BroadCastClient
 
-from .background import Notifier
-from .service import NotifService
-
-cache = CacheLib(
-    redis=GLOBAL_ENV.redis,
-    namespace="notifications",
-    version="v1",
-    default_ttl=300,
-    data_type=int,
-)
+from .background import BackgroundNotif
 
 
-async def create_service(session: DbSession, background: Notifier):
-    return NotifService(session, background, cache)
+async def get_notifier(broadcast: BroadCastClient, background_tasks: BackgroundTasks):
+    return BackgroundNotif(broadcast, background_tasks)
 
 
-type NotifDeps = Annotated[NotifService, Depends(create_service)]
+type BackgroundNotifDep = Annotated[BackgroundNotif, Depends(get_notifier)]

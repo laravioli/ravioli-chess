@@ -7,7 +7,7 @@ from typing import Any
 type KeyParams = dict[str, Any] | None
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class CacheKey:
     namespace: str
     prefix: str = "cache"

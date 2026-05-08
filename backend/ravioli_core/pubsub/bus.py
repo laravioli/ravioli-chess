@@ -5,14 +5,14 @@ from .types import Subscriber
 
 
 class EventBus:
-    __slots__ = ("_map",)
+    __slots__ = ("_mapping",)
 
     def __init__(self):
-        self._map: defaultdict[str, set[Subscriber]] = defaultdict(set)
+        self._mapping: defaultdict[str, set[Subscriber]] = defaultdict(set)
 
     @property
     def subscribers(self):
-        return set().union(*self._map.values())
+        return set().union(*self._mapping.values())
 
     def subscribe(self, sub: Subscriber, chans: list[str]) -> set[str]:
         """
@@ -28,9 +28,9 @@ class EventBus:
         to_subscribe = set()
 
         for chan in chans:
-            if len(self._map[chan]) == 0:
+            if len(self._mapping[chan]) == 0:
                 to_subscribe.add(chan)
-            self._map[chan].add(sub)
+            self._mapping[chan].add(sub)
 
         return to_subscribe
 
@@ -48,10 +48,10 @@ class EventBus:
         to_unsubscribe = set()
 
         for chan in chans:
-            self._map[chan].discard(sub)
-            if len(self._map[chan]) == 0:
+            self._mapping[chan].discard(sub)
+            if len(self._mapping[chan]) == 0:
                 to_unsubscribe.add(chan)
-                del self._map[chan]
+                del self._mapping[chan]
 
         return to_unsubscribe
 
@@ -59,7 +59,7 @@ class EventBus:
         """
         dispatch message internally to chan
         """
-        for sub in self._map[chan]:
+        for sub in self._mapping[chan]:
             sub.put_nowait(msg)
 
     def publish_many(self, chans: list[str], msg: Any):

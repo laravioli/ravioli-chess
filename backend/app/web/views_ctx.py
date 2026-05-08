@@ -1,7 +1,6 @@
 from app.deps import DbSession
 
-from .deps import WebCache
-from .service import get_positions
+from .service import WebService
 
 DEFAULT_CONTEXT = {}
 PAGE_DEFAULT = {
@@ -10,18 +9,18 @@ PAGE_DEFAULT = {
 }
 
 
-async def index_ctx(cache: WebCache, session: DbSession):
-    data = {"positions": await get_positions(cache, session)}
+async def index_ctx(service: WebService, session: DbSession):
+    data = {"positions": await service.get_chess_positions(session)}
     return {"page": PAGE_DEFAULT, "data": data}
 
 
-async def analyse_ctx(cache: WebCache, session: DbSession):
-    data = {"positions": await get_positions(cache, session)}
+async def analyse_ctx(service: WebService, session: DbSession):
+    data = {"positions": await service.get_chess_positions(session)}
     return {"page": PAGE_DEFAULT, "data": data}
 
 
-async def editor_ctx(cache: WebCache, session: DbSession):
-    data = {"positions": await get_positions(cache, session)}
+async def editor_ctx(service: WebService, session: DbSession):
+    data = {"positions": await service.get_chess_positions(session)}
     return {"page": PAGE_DEFAULT, "data": data}
 
 

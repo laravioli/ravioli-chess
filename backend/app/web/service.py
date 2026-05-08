@@ -1,20 +1,43 @@
+from fastapi.templating import Jinja2Templates
+from redis.asyncio import Redis
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.deps import DbSession
+from ravioli_core.cache import CacheLib
 from ravioli_core.db.models import ChessPosition
 
-from .deps import WebCache
+from .templating import make_templates
 
 
-async def chess_positions(session: DbSession):
+class WebService:
+    def __init__(self, chess_cache: CacheLib, templates: Jinja2Templates):
+        self.chess_cache = chess_cache
+        self.templates = templates
 
-    stmt = select(ChessPosition.eco, ChessPosition.name, ChessPosition.fen).order_by(
-        ChessPosition.eco
+    @staticmethod
+    async def db_chess_positions(session: AsyncSession):
+
+        stmt = select(ChessPosition.eco, ChessPosition.name, ChessPosition.fen).order_by(
+            ChessPosition.eco
+        )
+        result = await session.execute(stmt)
+        data = [dict(row) for row in result.mappings().all()]
+        return data
+
+    async def get_chess_positions(self, session: AsyncSession):
+        return await self.chess_cache.get_or_set(
+            "chess:positions", factory=lambda: self.db_chess_positions(session)
+        )
+
+
+def make_web_service(redis: Redis):
+    return WebService(
+        chess_cache=CacheLib(
+            redis,
+            namespace="chess",
+            version="v1",
+            default_ttl=900,
+            data_type=list,
+        ),
+        templates=make_templates(),
     )
-    result = await session.execute(stmt)
-    data = [dict(row) for row in result.mappings().all()]
-    return data
-
-
-async def get_positions(cache: WebCache, session: DbSession):
-    return await cache.get_or_set("chess:positions", factory=lambda: chess_positions(session))

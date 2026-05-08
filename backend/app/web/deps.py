@@ -1,11 +1,7 @@
-from typing import Annotated
-
-from fastapi import Depends, Request
+from fastapi import Request
 
 from app.auth.deps import UserWithPrefOrAnon
-from app.deps import RedisClient
 from app.pref.service import extract_cookie_data
-from ravioli_core.cache import CacheLib
 
 from .schemas import User
 
@@ -19,17 +15,3 @@ async def user_or_anon(request: Request, auth_user: UserWithPrefOrAnon):
         user = User.anon(extract_cookie_data(request))
 
     request.state.user = user
-
-
-# cache
-async def get_web_cache(redis: RedisClient):
-    return CacheLib(
-        redis,
-        namespace="web",
-        version="v1",
-        default_ttl=900,
-        data_type=list,
-    )
-
-
-type WebCache = Annotated[CacheLib, Depends(get_web_cache)]

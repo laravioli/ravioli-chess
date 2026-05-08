@@ -3,9 +3,10 @@ from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
 from app.auth.deps import CurrentUser
+from app.deps import DbSession, SocialServiceDep
+from app.notif.deps import BackgroundNotifDep
 from ravioli_core.db.models.social import FriendshipStatus
 
-from .deps import SocialDeps
 from .schemas import Friend, FriendRequest, FriendShip
 
 router = APIRouter(prefix="/social", tags=["social"])
@@ -13,35 +14,39 @@ router = APIRouter(prefix="/social", tags=["social"])
 
 @router.get("/friends/me", response_model=list[Friend])
 async def list_my_friends(
-    service: SocialDeps,
+    session: DbSession,
+    service: SocialServiceDep,
     user: CurrentUser,
 ):
-    return await service.list_friendship(user.id, status=FriendshipStatus.accepted)
+    return await service.list_friendship(session, user.id, status=FriendshipStatus.accepted)
 
 
 @router.get("/friends/{target_id}", response_model=list[Friend])
 async def list_friends(
-    service: SocialDeps,
+    session: DbSession,
+    service: SocialServiceDep,
     target_id: UUID4,
 ):
-    return await service.list_friendship(target_id, status=FriendshipStatus.accepted)
+    return await service.list_friendship(session, target_id, status=FriendshipStatus.accepted)
 
 
 @router.delete("/friends/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_friend(
-    service: SocialDeps,
+    session: DbSession,
+    service: SocialServiceDep,
     user: CurrentUser,
     target_id: UUID4,
 ):
-    await service.delete_friend(current_user_id=user.id, target_id=target_id)
+    await service.delete_friend(session, current_user_id=user.id, target_id=target_id)
 
 
 @router.get("/requests", response_model=list[FriendRequest])
 async def list_friend_request(
-    service: SocialDeps,
+    session: DbSession,
+    service: SocialServiceDep,
     user: CurrentUser,
 ):
-    return await service.list_friendship(user.id, status=FriendshipStatus.pending)
+    return await service.list_friendship(session, user.id, status=FriendshipStatus.pending)
 
 
 @router.post(
@@ -50,7 +55,9 @@ async def list_friend_request(
     responses={201: {"model": FriendShip}},
 )
 async def send_friend_request(
-    service: SocialDeps,
+    background_notif: BackgroundNotifDep,
+    session: DbSession,
+    service: SocialServiceDep,
     user: CurrentUser,
     target_id: UUID4,
 ):
@@ -59,37 +66,41 @@ async def send_friend_request(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You can't send a friend request to yourself",
         )
-    await service.create_request(user.id, target_id)
-    await service.notifier.notify_one(target_id)
+    await service.create_request(session, user.id, target_id)
+    await service.notif.notify_one(background_notif, session, target_id)
     return FriendShip(is_sender=True, status="pending")
 
 
 @router.delete("/requests/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def cancel_friend_request(
-    service: SocialDeps,
+    background_notif: BackgroundNotifDep,
+    session: DbSession,
+    service: SocialServiceDep,
     user: CurrentUser,
     target_id: UUID4,
 ):
-    await service.delete_request(user.id, target_id)
-    await service.notifier.notify_one(target_id)
+    await service.delete_request(session, user.id, target_id)
+    await service.notif.notify_one(background_notif, session, target_id)
 
 
 @router.post("/requests/{target_id}/accept", responses={200: {"model": FriendShip}})
 async def accept_friend_request(
-    service: SocialDeps,
+    session: DbSession,
+    service: SocialServiceDep,
     user: CurrentUser,
     target_id: UUID4,
 ):
-    await service.accept_request(target_id, user.id)
+    await service.accept_request(session, target_id, user.id)
     return FriendShip(is_sender=False, status="accepted")
-    # await service.notifier.notify_one(sender)
+    # await service.notif.notify_one(sender)
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
 async def reject_friend_request(
-    service: SocialDeps,
+    session: DbSession,
+    service: SocialServiceDep,
     user: CurrentUser,
     target_id: UUID4,
 ):
-    await service.delete_request(target_id, user.id)
-    # await service.notifier.notify_one(sender)
+    await service.delete_request(session, target_id, user.id)
+    # await service.notif.notify_one(sender)

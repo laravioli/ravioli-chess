@@ -1,13 +1,12 @@
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import BackgroundTasks, Depends
+from fastapi import BackgroundTasks
 from msgspec import Raw
 
-from app.deps import BroadCastClient
 from ravioli_core.db.models import Notification
 from ravioli_core.ipc.channels import WsUserChan
 from ravioli_core.ipc.process.out import TellUser
+from ravioli_core.pubsub import Broadcast
 
 from .schemas import notification_adapter
 
@@ -15,7 +14,7 @@ from .schemas import notification_adapter
 class BackgroundNotif:
     def __init__(
         self,
-        broadcast: BroadCastClient,
+        broadcast: Broadcast,
         background_tasks: BackgroundTasks,
     ):
         self.broadcast = broadcast
@@ -29,10 +28,3 @@ class BackgroundNotif:
         await self.broadcast.publish(
             WsUserChan(str(user_id)), TellUser(type="notifications", data=Raw(raw))
         )
-
-
-async def get_notifier(broadcast: BroadCastClient, background_tasks: BackgroundTasks):
-    return BackgroundNotif(broadcast, background_tasks)
-
-
-type Notifier = Annotated[BackgroundNotif, Depends(get_notifier)]
