@@ -8,15 +8,15 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from ravioli_core.cache import CacheLib
 from ravioli_core.db.models import FriendRequest, Friendship, Notification
 
 from .background import BackgroundNotif
+from .cache import NotifCache
 from .schemas import NotifParams, pagination
 
 
 class NotifService:
-    def __init__(self, cache: CacheLib):
+    def __init__(self, cache: NotifCache):
         self.cache = cache
 
     @pagination
@@ -26,6 +26,7 @@ class NotifService:
         user_id: UUID,
         params: NotifParams = NotifParams(),
     ):
+        # NOTE non-repeatable READ
 
         unread_count = await self.get_unread_count(session, user_id)
 
@@ -37,7 +38,16 @@ class NotifService:
         )
         return await apaginate(session, stmt, params, additional_data={"unread": unread_count})
 
-    async def db_unread_count(
+    async def get_unread_count(
+        self,
+        session: AsyncSession,
+        user_id: UUID,
+    ):
+        return await self.cache.get_or_set(
+            f"{user_id}", factory=lambda: self._db_unread_count(session, user_id)
+        )
+
+    async def _db_unread_count(
         self,
         session: AsyncSession,
         user_id: UUID,
@@ -48,29 +58,11 @@ class NotifService:
             .where(Notification.user_id == user_id, Notification.read.is_(False))
         )
 
-    async def get_unread_count(
-        self,
-        session: AsyncSession,
-        user_id: UUID,
-    ):
-        return await self.cache.get_or_set(
-            f"{user_id}", factory=lambda: self.db_unread_count(session, user_id)
-        )
-
     async def clear_cache(
         self,
         user_ids: Iterable[UUID],
     ):
-        coros = [self.cache.delete(f"{user_id}", f"{user_id}:unread") for user_id in user_ids]
-        await asyncio.gather(*coros, return_exceptions=True)
-
-    async def notify_many(
-        self,
-        notifier: BackgroundNotif,
-        session: AsyncSession,
-        user_ids: Iterable[UUID],
-    ):
-        coros = [self.notify_one(notifier, session, user_id) for user_id in user_ids]
+        coros = [self.cache.delete(f"{user_id}") for user_id in user_ids]
         await asyncio.gather(*coros, return_exceptions=True)
 
     async def notify_one(
@@ -82,14 +74,22 @@ class NotifService:
         notifications = await self.get_notifications(session, user_id, params=NotifParams())
         notifier.tell_user(user_id, notifications)
 
+    async def notify_many(
+        self,
+        notifier: BackgroundNotif,
+        session: AsyncSession,
+        user_ids: Iterable[UUID],
+    ):
+        coros = [self.notify_one(notifier, session, user_id) for user_id in user_ids]
+        await asyncio.gather(*coros, return_exceptions=True)
+
 
 def make_notif_service(redis: Redis):
     return NotifService(
-        cache=CacheLib(
+        cache=NotifCache(
             redis=redis,
             namespace="notifications",
             version="v1",
-            default_ttl=300,
             data_type=int,
         )
     )

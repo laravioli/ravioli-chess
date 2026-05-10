@@ -12,8 +12,6 @@ from ravioli_core.db.models.social import FriendshipStatus
 
 logger = logging.getLogger(__name__)
 
-# TODO: notif module should handle everything related to notif, here we just provide the content
-
 
 class SocialService:
     def __init__(self, notif: NotifService):
@@ -45,7 +43,7 @@ class SocialService:
             logger.debug(f"DB REQUEST ERROR: {e.orig}")
             raise DBConflict(detail="Unable to create friend request")
 
-        await self.notif.clear_cache([receiver_id])
+        await self.notif.cache.incrby(f"{receiver_id}", 1)
 
     async def accept_request(
         self,
