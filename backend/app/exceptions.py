@@ -1,5 +1,6 @@
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError
 
 
 class AppException(Exception):
@@ -9,12 +10,6 @@ class AppException(Exception):
 
     def __init__(self, detail: str = "An exception occured during request handling"):
         self.detail = detail
-
-
-class DBConflict(AppException):
-    """Exception caused by db_data integrity"""
-
-    status = status.HTTP_409_CONFLICT
 
 
 class DBNotFound(AppException):
@@ -35,4 +30,8 @@ def add_exception_handler(app: FastAPI):
     def exc_handler(request, exc: AppException):  # noqa: ARG001
         return JSONResponse({"detail": exc.detail}, status_code=exc.status)
 
+    def exc_integrity_error(request, exc: IntegrityError):  # noqa: ARG001
+        return JSONResponse({"detail": exc.detail}, status_code=status.HTTP_409_CONFLICT)
+
     app.add_exception_handler(AppException, exc_handler)
+    app.add_exception_handler(IntegrityError, exc_integrity_error)

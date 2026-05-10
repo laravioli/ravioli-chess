@@ -24,13 +24,11 @@ local function notif_get(keys, args)
   local result = nil
   
   if counter then
-    -- Return as string for the Python driver
     result = tostring(counter)
   else
     if redis.call("HEXISTS", hash, "update") == 0 then
           redis.call("HSET", hash, "update", 0)
     end
-    -- Redis will return a Null Bulk Reply, Python gets None
   end
 
   local ex = tonumber(args[1])

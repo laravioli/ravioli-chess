@@ -2,13 +2,13 @@ import logging
 import uuid
 
 from sqlalchemy import delete, func, literal, select, union_all, update
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions import DBConflict, DBNotFound
+from app.exceptions import DBNotFound
 from app.notif.service import NotifService
 from ravioli_core.db.models import FriendRequest, Friendship, User
 from ravioli_core.db.models.social import FriendshipStatus
+from ravioli_core.utils import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class SocialService:
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        try:
+        async with transaction(session, error_detail="Unable to create friend request"):
             request = Friendship(
                 sender_id=sender_id,
                 receiver_id=receiver_id,
@@ -37,11 +37,6 @@ class SocialService:
                 friendship_id=request.id,
             )
             session.add(notification)
-            await session.commit()
-        except IntegrityError as e:
-            await session.rollback()
-            logger.debug(f"DB REQUEST ERROR: {e.orig}")
-            raise DBConflict(detail="Unable to create friend request")
 
         await self.notif.cache.incrby(f"{receiver_id}", 1)
 

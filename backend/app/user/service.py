@@ -1,20 +1,20 @@
 from uuid import UUID
 
 from sqlalchemy import and_, delete, select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.auth.security import generate_password_hash
 from app.deps import DbSession
-from app.exceptions import DBConflict, DBNotFound
+from app.exceptions import DBNotFound
 from app.social.service import friendship_criteria
 from ravioli_core.db.models import Friendship, Preference, User
+from ravioli_core.utils import transaction
 
 from .schemas import UserCreate
 
 
 async def user_create(session: DbSession, data: UserCreate):
-    try:
+    async with transaction(session, error_detail="This username or email already exists"):
         new_user = User(
             username=data.username,
             email=data.email,
@@ -23,13 +23,8 @@ async def user_create(session: DbSession, data: UserCreate):
         )
 
         session.add(new_user)
-        await session.commit()
 
-    except IntegrityError as e:
-        await session.rollback()
-        raise DBConflict("This username or email already exists") from e
-    else:
-        return new_user
+    return new_user
 
 
 async def user_retrieve(session: DbSession, username: str, withPref=False):
