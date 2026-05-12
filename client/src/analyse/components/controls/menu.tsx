@@ -14,7 +14,7 @@ import {
 } from '@tabler/icons-react';
 
 import { chessPositionsOptions } from '@/lib/api/@tanstack/react-query.gen';
-import { usePageStore, useHTMLData } from '@/core/hooks';
+import { usePageStore } from '@/core/hooks';
 import { useMenu, type MenuViewFC } from '@/common/hooks';
 
 import type { AnalyseStore } from '@/analyse/store/analyse';
@@ -83,10 +83,8 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
 
 const PositionsMenu: MenuViewFC = ({ navigate }) => {
   const analyseStore = usePageStore<AnalyseStore>();
-  const htmlData = useHTMLData();
   const { data: positions = [] } = useQuery({
     ...chessPositionsOptions(),
-    initialData: htmlData?.positions,
   });
 
   const options = useMemo(

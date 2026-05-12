@@ -51,6 +51,7 @@ export const PageStoreProvider = <T extends PageStore>({
   factory,
 }: PageStoreProviderProps<T>) => {
   const storeRef = useRef<T | null>(null);
+  const niceStrictMode = useRef(true);
 
   //ensure factory is called only once
   //it may be a high density side-effect bomb
@@ -59,10 +60,13 @@ export const PageStoreProvider = <T extends PageStore>({
   }
 
   useEffect(() => {
-    (storeRef.current as PageStore).onLoad();
-    window.history.replaceState({}, '');
+    if (niceStrictMode.current) {
+      (storeRef.current as PageStore).onLoad();
+      window.history.replaceState({}, '');
+    }
     return () => {
-      (storeRef.current as PageStore).onUnLoad();
+      niceStrictMode.current && (storeRef.current as PageStore).onUnLoad();
+      niceStrictMode.current = false;
     };
   }, []);
 

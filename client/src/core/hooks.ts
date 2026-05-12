@@ -17,12 +17,6 @@ export const usePageStore = <T extends PageStore>(): T => {
   return store as T;
 };
 
-export const useHTMLData = () => {
-  const payload = useContext(DataContext);
-  if (!payload) throw new Error('missing initial server data');
-  return payload.data;
-};
-
 export const usePageInitCfg = () => {
   const { state } = useLocation();
   const payload = useContext(DataContext);
