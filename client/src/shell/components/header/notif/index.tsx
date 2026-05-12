@@ -1,74 +1,40 @@
 import { useCallback, useRef, useState } from 'react';
-import { Combobox, useCombobox, ActionIcon, Text, Stack, Button } from '@mantine/core';
+import { Combobox, useCombobox, ActionIcon, Text, Stack, Button, Indicator } from '@mantine/core';
 import { IconBell, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import { useQueryClient } from '@tanstack/react-query';
-
-import { listNotifQueryKey } from '@/lib/api/@tanstack/react-query.gen';
-import { PageNotification } from '@/lib/api';
 import { FriendRequestNotif } from './content';
 
 import clsx from 'clsx';
 import c from '@/shell/css/notif.module.css';
 
-import { useNotification } from './hooks';
-
-//todo work on the notif event
-// 2) trash button
-// 3) read/unread red color feature
-// 4) Generic notif "MSG" -> you are now friend with..
-const PageNotif: React.FC<{
-  page: number;
-  data: PageNotification | undefined;
-}> = ({ page, data }) => {
-  const queryClient = useQueryClient();
-  const invalidateQueries = () =>
-    queryClient.invalidateQueries({ queryKey: listNotifQueryKey({ query: { page: page } }) });
-  const options =
-    data?.items.map((data) => {
-      if (data.type === 'friend_request')
-        return <FriendRequestNotif data={data} key={data.id} onSuccess={invalidateQueries} />;
-    }) ?? [];
-
-  return (
-    <>
-      {options.length > 0 ? (
-        options
-      ) : (
-        <Stack align="center" gap="xs" py="md">
-          <Text size="sm" c="dimmed" fw={500}>
-            {page == 1 ? 'No new notifications.' : 'No more notifications'}
-          </Text>
-        </Stack>
-      )}
-    </>
-  );
-};
+import { useNotification, type Notifs } from './hooks';
 
 export const Notifications: React.FC = () => {
   const [hovered, setHovered] = useState(false);
-
-  const clearId = useRef<number | null>(null);
+  const timeoutId = useRef<number>(-1);
 
   const combobox = useCombobox({
     onDropdownClose: () => {
       combobox.resetSelectedOption();
-      setPage(1);
-      clearId.current = null;
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
+      }
     },
   });
 
-  const { data, page, invalidate, setPage } = useNotification({
+  const uiState = {
     dropdownOpened: combobox.dropdownOpened,
     hovered,
-  });
+  };
 
-  const nav = useCallback(
-    (page: number) => {
-      invalidate(page);
-      setPage(page);
-    },
-    [invalidate, setPage],
-  );
+  const notifications = useNotification(uiState);
+
+  const onOpen = useCallback(() => {
+    if (notifications.page === 1) {
+      timeoutId.current = setTimeout(() => {
+        notifications.invalidate(1);
+      }, 200);
+    }
+  }, [notifications.page]);
 
   return (
     <>
@@ -79,6 +45,7 @@ export const Notifications: React.FC = () => {
         offset={{ mainAxis: 15, crossAxis: -17 }}
         radius={0}
         withinPortal={false}
+        onOpen={onOpen}
         onOptionSubmit={() => {
           combobox.closeDropdown();
         }}
@@ -89,21 +56,28 @@ export const Notifications: React.FC = () => {
             onMouseEnter={() => {
               setHovered(true);
             }}
-            onClick={() => {
-              combobox.toggleDropdown();
-              if (!combobox.dropdownOpened)
-                clearId.current = setTimeout(() => {
-                  if (clearId.current) invalidate(1);
-                  clearId.current = null;
-                }, 200);
-            }}
+            onClick={() => combobox.toggleDropdown()}
             styles={{
               root: {
                 transform: 'none',
               },
             }}
           >
-            <IconBell size={20} stroke={1.4} />
+            <Indicator
+              inline
+              size={9}
+              offset={4}
+              color="red"
+              withBorder
+              processing
+              zIndex={10}
+              disabled={
+                notifications.data?.unread === 0 ||
+                (combobox.dropdownOpened && notifications.page === 1)
+              }
+            >
+              <IconBell size={20} stroke={1.4} />
+            </Indicator>
           </ActionIcon>
         </Combobox.Target>
 
@@ -114,24 +88,24 @@ export const Notifications: React.FC = () => {
               bdrs={0}
               mah={24}
               fullWidth
-              disabled={page === 1}
+              disabled={notifications.page === 1}
               onClick={() => {
-                const previousPage = page - 1;
-                nav(previousPage);
+                const previousPage = notifications.page - 1;
+                notifications.setPage(previousPage);
               }}
             >
               <IconChevronUp />
             </Button>
-            <PageNotif page={page} data={data} />
-            {data?.pages! > 1 && page !== data?.pages! && (
+            <PageNotif notifications={notifications} />
+            {!!notifications.maxPage && notifications.page < notifications.maxPage && (
               <Button
                 className={clsx(c.button, c.bottom)}
                 bdrs={0}
                 mah={24}
                 fullWidth
                 onClick={() => {
-                  const nextPage = page + 1;
-                  nav(nextPage);
+                  const nextPage = notifications.page + 1;
+                  notifications.setPage(nextPage);
                 }}
               >
                 <IconChevronDown />
@@ -140,6 +114,36 @@ export const Notifications: React.FC = () => {
           </Combobox.Options>
         </Combobox.Dropdown>
       </Combobox>
+    </>
+  );
+};
+
+const PageNotif: React.FC<{
+  notifications: Notifs;
+}> = ({ notifications }) => {
+  const options =
+    notifications.data?.items.map((data) => {
+      if (data.type === 'friend_request')
+        return (
+          <FriendRequestNotif
+            data={data}
+            key={data.id}
+            onSuccess={() => notifications.invalidate(notifications.page)}
+          />
+        );
+    }) ?? [];
+
+  return (
+    <>
+      {options.length > 0 ? (
+        options
+      ) : (
+        <Stack align="center" gap="xs" py="md">
+          <Text size="sm" c="dimmed" fw={500}>
+            {notifications.page == 1 ? 'No new notifications.' : 'No more notifications'}
+          </Text>
+        </Stack>
+      )}
     </>
   );
 };

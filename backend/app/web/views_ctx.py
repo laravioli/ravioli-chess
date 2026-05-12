@@ -1,6 +1,6 @@
-from app.deps import DbSession
+from app.deps import DbSession, Service
 
-from .service import WebService
+from .schemas import User
 
 DEFAULT_CONTEXT = {}
 PAGE_DEFAULT = {
@@ -9,20 +9,36 @@ PAGE_DEFAULT = {
 }
 
 
-async def index_ctx(service: WebService, session: DbSession):
-    data = {"positions": await service.get_chess_positions(session)}
+async def base_data(user: User, services: Service, session: DbSession):
+    data = {}
+    if user.is_auth:
+        data.update(unreadCount=await services.notif.get_unread_count(session, user.id))
+    return data
+
+
+async def index_ctx(user: User, services: Service, session: DbSession):
+    data = await base_data(user, services, session)
+    data.update(positions=await services.web.get_chess_positions(session))
     return {"page": PAGE_DEFAULT, "data": data}
 
 
-async def analyse_ctx(service: WebService, session: DbSession):
-    data = {"positions": await service.get_chess_positions(session)}
+async def analyse_ctx(user: User, services: Service, session: DbSession):
+    data = await base_data(user, services, session)
+    data.update(positions=await services.web.get_chess_positions(session))
     return {"page": PAGE_DEFAULT, "data": data}
 
 
-async def editor_ctx(service: WebService, session: DbSession):
-    data = {"positions": await service.get_chess_positions(session)}
+async def editor_ctx(user: User, services: Service, session: DbSession):
+    data = await base_data(user, services, session)
+    data.update(positions=await services.web.get_chess_positions(session))
     return {"page": PAGE_DEFAULT, "data": data}
 
 
-def play_ctx():
-    return {"page": PAGE_DEFAULT}
+async def play_ctx(user: User, services: Service, session: DbSession):
+    data = await base_data(user, services, session)
+    return {"page": PAGE_DEFAULT, "data": data}
+
+
+async def profile_ctx(user: User, services: Service, session: DbSession):
+    data = await base_data(user, services, session)
+    return {"page": PAGE_DEFAULT, "data": data}

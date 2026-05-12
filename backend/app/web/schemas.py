@@ -8,7 +8,9 @@ from app.pref.schemas import Preference
 
 
 class User(BaseSchema):
-    """User schema used in html templates"""
+    """User schema used in html templates and other web services\n
+    Anon users are represented with not User.is_auth
+    """
 
     id: UUID4 | Literal[""] = ""
     username: str = ""

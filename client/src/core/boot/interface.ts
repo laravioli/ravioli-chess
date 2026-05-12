@@ -1,4 +1,4 @@
-import type { UUID } from 'crypto';
+type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ServerPayload {
   user: User;
@@ -25,6 +25,7 @@ export type PlayConfig = BasePage & {};
 
 export interface Data {
   positions?: PositionData[];
+  unreadCount?: number;
 }
 
 export interface PositionData {

@@ -3,6 +3,7 @@ import { client as clientAPI } from '@/lib/api/client.gen';
 
 import { makeAppDependencies } from '@/core/app/config';
 import type { ServerPayload } from './interface';
+import { hydrate } from './hydrate';
 
 export const boot = async () => {
   initGlobals();
@@ -17,5 +18,8 @@ export const boot = async () => {
   if (!payload) {
     throw new Error('missing intial data from server');
   }
-  return makeAppDependencies(payload);
+  const appDep = makeAppDependencies(payload);
+  if (payload.data) hydrate(payload.data, appDep.queryClient);
+
+  return appDep;
 };

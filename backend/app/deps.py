@@ -70,6 +70,10 @@ async def get_env(conn: HTTPConnection):
 type EnvDep = Annotated[Env, Depends(get_env)]
 
 
+async def get_services(env: EnvDep):
+    return env.service
+
+
 async def get_web(env: EnvDep):
     return env.service.web
 
@@ -82,6 +86,7 @@ async def get_social(env: EnvDep):
     return env.service.social
 
 
+type ServiceDep = Annotated[Service, Depends(get_services)]
 type WebServiceDep = Annotated[WebService, Depends(get_web)]
 type NotifServiceDep = Annotated[NotifService, Depends(get_notif)]
 type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
