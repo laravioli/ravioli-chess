@@ -18,8 +18,22 @@ class MoveData(Struct):
 class ClientOUT(Struct, tag_field="t", rename={"data": "d"}): ...
 
 
+# ╔══════════════════════════════════════╗
+# ║   SITE                               ║
+# ╚══════════════════════════════════════╝
+
+
 class GameCreate(ClientOUT, tag="newGame"):
     data: GameInfo = field(default_factory=GameInfo)
+
+
+class Notified(ClientOUT, tag="notified"):
+    pass
+
+
+# ╔══════════════════════════════════════╗
+# ║   PLAY                               ║
+# ╚══════════════════════════════════════╝
 
 
 class GameMove(ClientOUT, tag="move"):

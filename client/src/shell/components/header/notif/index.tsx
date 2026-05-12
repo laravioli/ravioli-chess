@@ -1,18 +1,18 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Combobox, useCombobox, ActionIcon, Text, Stack, Button } from '@mantine/core';
 import { IconBell, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { listNotifOptions, listNotifQueryKey } from '@/lib/api/@tanstack/react-query.gen';
+import { listNotifQueryKey } from '@/lib/api/@tanstack/react-query.gen';
 import { PageNotification } from '@/lib/api';
-import { FriendRequestNotif } from './base';
+import { FriendRequestNotif } from './content';
 
 import clsx from 'clsx';
 import c from '@/shell/css/notif.module.css';
 
+import { useNotification } from './hooks';
+
 //todo work on the notif event
-// 1)when an event arrive -> trigger a state change, basicly -> goto page 1 and update the cache
-// it should act like a ping
 // 2) trash button
 // 3) read/unread red color feature
 // 4) Generic notif "MSG" -> you are now friend with..
@@ -46,21 +46,29 @@ const PageNotif: React.FC<{
 
 export const Notifications: React.FC = () => {
   const [hovered, setHovered] = useState(false);
-  const [page, setPage] = useState(1);
+
+  const clearId = useRef<number | null>(null);
 
   const combobox = useCombobox({
     onDropdownClose: () => {
       combobox.resetSelectedOption();
+      setPage(1);
+      clearId.current = null;
     },
   });
 
-  const queryClient = useQueryClient();
-  const { data, refetch, isStale } = useQuery({
-    ...listNotifOptions({ query: { page: page } }),
-    staleTime: 0,
-    enabled: hovered,
-    placeholderData: (old) => old,
+  const { data, page, invalidate, setPage } = useNotification({
+    dropdownOpened: combobox.dropdownOpened,
+    hovered,
   });
+
+  const nav = useCallback(
+    (page: number) => {
+      invalidate(page);
+      setPage(page);
+    },
+    [invalidate, setPage],
+  );
 
   return (
     <>
@@ -79,12 +87,15 @@ export const Notifications: React.FC = () => {
           <ActionIcon
             bg="inherit"
             onMouseEnter={() => {
-              (isStale || !hovered) && refetch();
               setHovered(true);
             }}
             onClick={() => {
-              if (!combobox.dropdownOpened && page == 1) refetch();
               combobox.toggleDropdown();
+              if (!combobox.dropdownOpened)
+                clearId.current = setTimeout(() => {
+                  if (clearId.current) invalidate(1);
+                  clearId.current = null;
+                }, 200);
             }}
             styles={{
               root: {
@@ -98,27 +109,33 @@ export const Notifications: React.FC = () => {
 
         <Combobox.Dropdown classNames={{ dropdown: c.dropdown }}>
           <Combobox.Options mah={500} style={{ overflowY: 'auto' }}>
-            <Top
-              page={page}
+            <Button
+              className={c.button}
+              bdrs={0}
+              mah={24}
+              fullWidth
+              disabled={page === 1}
               onClick={() => {
                 const previousPage = page - 1;
-                queryClient.invalidateQueries({
-                  queryKey: listNotifQueryKey({ query: { page: previousPage } }),
-                });
-                setPage(previousPage);
+                nav(previousPage);
               }}
-            />
+            >
+              <IconChevronUp />
+            </Button>
             <PageNotif page={page} data={data} />
             {data?.pages! > 1 && page !== data?.pages! && (
-              <Bottom
+              <Button
+                className={clsx(c.button, c.bottom)}
+                bdrs={0}
+                mah={24}
+                fullWidth
                 onClick={() => {
                   const nextPage = page + 1;
-                  queryClient.invalidateQueries({
-                    queryKey: listNotifQueryKey({ query: { page: nextPage } }),
-                  });
-                  setPage(nextPage);
+                  nav(nextPage);
                 }}
-              />
+              >
+                <IconChevronDown />
+              </Button>
             )}
           </Combobox.Options>
         </Combobox.Dropdown>
@@ -126,15 +143,3 @@ export const Notifications: React.FC = () => {
     </>
   );
 };
-
-const Top: React.FC<{ page: number; onClick: () => void }> = ({ page, onClick }) => (
-  <Button className={c.button} bdrs={0} mah={24} fullWidth disabled={page === 1} onClick={onClick}>
-    <IconChevronUp />
-  </Button>
-);
-
-const Bottom: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <Button className={clsx(c.button, c.bottom)} bdrs={0} mah={24} fullWidth onClick={onClick}>
-    <IconChevronDown />
-  </Button>
-);

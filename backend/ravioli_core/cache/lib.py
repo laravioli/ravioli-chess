@@ -87,7 +87,7 @@ class CacheLib[T]:
     async def set(
         self,
         id: str,
-        value,
+        value: T | Any,
         params: KeyParams = None,
         **kwargs,
     ):

@@ -40,7 +40,7 @@ export interface SocketSendOpts {
   millis?: number;
 }
 
-export let siteSocket: WsSocket | undefined;
+let siteSocket: WsSocket | undefined;
 
 export function wsConnect(path: Path, settings?: Partial<Settings>) {
   if (!siteSocket) siteSocket = new WsSocket(path, settings);
@@ -50,6 +50,10 @@ export function wsConnect(path: Path, settings?: Partial<Settings>) {
 
 export function wsReload() {
   if (siteSocket) siteSocket.connect();
+}
+
+export function wsSend(t: string, d?: any, o?: SocketSendOpts, noRetry?: boolean): void {
+  siteSocket?.send(t, d, o, noRetry);
 }
 
 class WsSocket {
@@ -124,7 +128,7 @@ class WsSocket {
     this.scheduleConnect();
   };
 
-  send = (t: string, d: Payload, o: Partial<SocketSendOpts> = {}, noRetry = false): void => {
+  send = (t: string, d?: Payload, o: Partial<SocketSendOpts> = {}, noRetry = false): void => {
     const msg: Partial<MsgOut> = { t };
     if (d !== undefined) {
       if (o.withLag) d.l = Math.round(this.averageLag);

@@ -46,52 +46,49 @@ class SocialService:
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        stmt = (
-            update(Friendship)
-            .where(
-                Friendship.sender_id == sender_id,
-                Friendship.receiver_id == receiver_id,
-                Friendship.status == FriendshipStatus.pending,
+        async with transaction(session):
+            stmt = (
+                update(Friendship)
+                .where(
+                    Friendship.sender_id == sender_id,
+                    Friendship.receiver_id == receiver_id,
+                    Friendship.status == FriendshipStatus.pending,
+                )
+                .values(status=FriendshipStatus.accepted)
+                .returning(Friendship.id)
             )
-            .values(status=FriendshipStatus.accepted)
-            .returning(Friendship.id)
-        )
-        result = await session.execute(stmt)
+            result = await session.execute(stmt)
 
-        friendship_id = result.scalar_one_or_none()
+            friendship_id = result.scalar_one_or_none()
 
-        if friendship_id is None:
-            raise DBNotFound(detail="There is no request to accept")
+            if friendship_id is None:
+                raise DBNotFound(detail="There is no request to accept")
 
-        delete_notif_stmt = delete(FriendRequest).where(
-            FriendRequest.friendship_id == friendship_id
-        )
+            delete_notif_stmt = delete(FriendRequest).where(
+                FriendRequest.friendship_id == friendship_id
+            )
+            await session.execute(delete_notif_stmt)
 
-        await session.execute(delete_notif_stmt)
+        await self.notif.invalidate([receiver_id])
 
-        await session.commit()
-        await self.notif.clear_cache([receiver_id])
-
-    # todo: create Msg notif, and 2 method, one for cancel-> one auto notif = clear cache receiver,
-    # one for reject: 1 auto notif + 1 msg notif = clear cache -> sender and receiver
     async def delete_request(
         self,
         session: AsyncSession,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        stmt = delete(Friendship).where(
-            Friendship.sender_id == sender_id,
-            Friendship.receiver_id == receiver_id,
-            Friendship.status == FriendshipStatus.pending,
-        )
-        result = await session.execute(stmt)
+        async with transaction(session):
+            stmt = delete(Friendship).where(
+                Friendship.sender_id == sender_id,
+                Friendship.receiver_id == receiver_id,
+                Friendship.status == FriendshipStatus.pending,
+            )
+            result = await session.execute(stmt)
 
-        if result.rowcount == 0:
-            raise DBNotFound(detail="There is no request to delete")
+            if result.rowcount == 0:
+                raise DBNotFound(detail="There is no request to delete")
 
-        await session.commit()
-        await self.notif.clear_cache([receiver_id])
+        await self.notif.invalidate([receiver_id])
 
     async def list_friendship(
         self,
@@ -128,16 +125,15 @@ class SocialService:
         current_user_id: uuid.UUID,
         target_id: uuid.UUID,
     ):
-        stmt = delete(Friendship).where(
-            *friendship_criteria(current_user_id, target_id),
-            Friendship.status == FriendshipStatus.accepted,
-        )
-        result = await session.execute(stmt)
+        async with transaction(session):
+            stmt = delete(Friendship).where(
+                *friendship_criteria(current_user_id, target_id),
+                Friendship.status == FriendshipStatus.accepted,
+            )
+            result = await session.execute(stmt)
 
-        if result.rowcount == 0:
-            raise DBNotFound(detail="friend not found")
-
-        await session.commit()
+            if result.rowcount == 0:
+                raise DBNotFound(detail="friend not found")
 
 
 def friendship_criteria(id_a, id_b):

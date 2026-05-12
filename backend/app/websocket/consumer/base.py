@@ -5,9 +5,9 @@ from dataclasses import dataclass
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app.deps import BroadCastClient
+from app.deps import BroadCastClient, Env
 from app.websocket.schemas import MaybeUser, Sri
-from ravioli_core.ipc import ClientIn
+from ravioli_core.ipc import ClientIn, c_out
 from ravioli_core.ipc.channels import WebsocketChan
 from ravioli_core.serializers import json
 
@@ -35,6 +35,7 @@ class Consumer[T: Context = Context](ABC):
         self.broadcast = broadcast
         self.heartbeat = heartbeat
         self._sub = Subscriber()
+        self._background_task = set()
 
     @abstractmethod
     async def handle(self, msg): ...
@@ -73,6 +74,16 @@ class Consumer[T: Context = Context](ABC):
                 await self.heartbeat.pong()
             case ClientIn():
                 await self.send_json(msg)
+            case c_out.Notified():
+                user = self.ctx.user
+                if user:
+                    env: Env = self.websocket.state["env"]
+                    self.add_background_task(env.service.notif.mark_all_read(env.engine, user.id))
+
+    def add_background_task(self, coro):
+        task = asyncio.create_task(coro)
+        self._background_task.add(task)
+        task.add_done_callback(self._background_task.discard)
 
 
-type BaseClientOut = str
+type BaseClientOut = str | c_out.Notified

@@ -4,8 +4,8 @@ from uuid import UUID
 
 from fastapi_pagination.ext.sqlalchemy import apaginate
 from redis.asyncio import Redis
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, select, update
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import joinedload
 
 from ravioli_core.db.models import FriendRequest, Friendship, Notification
@@ -58,7 +58,7 @@ class NotifService:
             .where(Notification.user_id == user_id, Notification.read.is_(False))
         )
 
-    async def clear_cache(
+    async def invalidate(
         self,
         user_ids: Iterable[UUID],
     ):
@@ -82,6 +82,18 @@ class NotifService:
     ):
         coros = [self.notify_one(notifier, session, user_id) for user_id in user_ids]
         await asyncio.gather(*coros, return_exceptions=True)
+
+    async def mark_all_read(self, engine: AsyncEngine, user_id: UUID):
+        async with engine.begin() as conn:
+            stmt = (
+                update(Notification)
+                .where(Notification.user_id == user_id, Notification.read.is_(False))
+                .values(read=True)
+            )
+            result = await conn.execute(stmt)
+
+        if result.rowcount > 0:
+            await self.cache.set(f"{user_id}", 0)
 
 
 def make_notif_service(redis: Redis):
