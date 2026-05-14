@@ -2,7 +2,7 @@ import { action } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
 
-import type { GlobalStore } from '@/core/store/stores';
+import type { GlobalStore } from '@/core/app/deps';
 import { wsConnect } from '@/lib/socket';
 
 import type { PlayOpts, PlaySettings } from './interface';

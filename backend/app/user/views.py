@@ -4,7 +4,7 @@ from fastapi import APIRouter, Query, Response, status
 from fastapi.exceptions import HTTPException
 
 from app.api.schemas import Message
-from app.auth.deps import CurrentUser, SessionCookie, UserOrAnon
+from app.auth.deps import AuthUser, SessionCookie, UserOrAnon
 from app.config import settings
 from app.deps import DbSession, RedisClient
 
@@ -21,14 +21,14 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserBase)
-async def get_me(me: CurrentUser):
+async def get_me(me: AuthUser):
     return me
 
 
 @router.delete("/me", responses={200: {"model": Message}})
 async def delete_user(
     session: DbSession,
-    user: CurrentUser,
+    user: AuthUser,
     redis: RedisClient,
     response: Response,
     session_cookie: SessionCookie = None,

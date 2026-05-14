@@ -1,3 +1,5 @@
+import type { UserSuccess } from '@/lib/api';
+
 type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ServerPayload {
@@ -37,4 +39,9 @@ export interface PositionData {
 export interface ProvidedData {
   page?: Page;
   data?: Data;
+}
+
+export interface UserCacheEvent {
+  onLogin: (user: UserSuccess) => Promise<void>;
+  onLogout: () => number;
 }

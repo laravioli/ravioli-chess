@@ -1,9 +1,5 @@
 import { useRef, useEffect, type ReactNode } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-
-import { wsReload } from '@/lib/socket';
-
-import type { GlobalStore, PageStore } from '@/core/store/stores';
+import type { GlobalStore, PageStore } from '@/core/app/deps';
 import type { ProvidedData } from '@/core/boot/interface';
 import { GlobalStoreContext, PageStoreContext, DataContext } from './context';
 
@@ -20,19 +16,10 @@ export const GlobalStoreProvider = ({
     storeRef.current = globalStore;
   }
 
-  const queryClient = useQueryClient();
-
   useEffect(() => {
-    const dispose = globalStore.userStore.onAuthchange(() => {
-      wsReload();
-      queryClient.resetQueries();
-    });
-
-    globalStore.userStore.listen();
-
+    globalStore.userStore.onLoad();
     return () => {
-      dispose();
-      globalStore.userStore.unlisten();
+      globalStore.userStore.onUnload();
     };
   }, []);
 

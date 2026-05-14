@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi_pagination.ext.sqlalchemy import apaginate
 from redis.asyncio import Redis
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -57,6 +57,14 @@ class NotifService:
             .select_from(Notification)
             .where(Notification.user_id == user_id, Notification.read.is_(False))
         )
+
+    async def delete_all(
+        self,
+        session: AsyncSession,
+        user_id: UUID,
+    ):
+        await session.execute(delete(Notification).where(Notification.user_id == user_id))
+        await session.commit()
 
     async def invalidate(
         self,

@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
-from app.auth.deps import CurrentUser
+from app.auth.deps import AuthUser
 from app.deps import DbSession, SocialServiceDep
 from app.notif.deps import BackgroundNotifDep
 from ravioli_core.db.models.social import FriendshipStatus
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/social", tags=["social"])
 async def list_my_friends(
     session: DbSession,
     service: SocialServiceDep,
-    user: CurrentUser,
+    user: AuthUser,
 ):
     return await service.list_friendship(session, user.id, status=FriendshipStatus.accepted)
 
@@ -34,7 +34,7 @@ async def list_friends(
 async def remove_friend(
     session: DbSession,
     service: SocialServiceDep,
-    user: CurrentUser,
+    user: AuthUser,
     target_id: UUID4,
 ):
     await service.delete_friend(session, current_user_id=user.id, target_id=target_id)
@@ -44,7 +44,7 @@ async def remove_friend(
 async def list_friend_request(
     session: DbSession,
     service: SocialServiceDep,
-    user: CurrentUser,
+    user: AuthUser,
 ):
     return await service.list_friendship(session, user.id, status=FriendshipStatus.pending)
 
@@ -58,7 +58,7 @@ async def send_friend_request(
     background_notif: BackgroundNotifDep,
     session: DbSession,
     service: SocialServiceDep,
-    user: CurrentUser,
+    user: AuthUser,
     target_id: UUID4,
 ):
     if user.id == target_id:
@@ -76,7 +76,7 @@ async def cancel_friend_request(
     background_notif: BackgroundNotifDep,
     session: DbSession,
     service: SocialServiceDep,
-    user: CurrentUser,
+    user: AuthUser,
     target_id: UUID4,
 ):
     await service.delete_request(session, user.id, target_id)
@@ -87,7 +87,7 @@ async def cancel_friend_request(
 async def accept_friend_request(
     session: DbSession,
     service: SocialServiceDep,
-    user: CurrentUser,
+    user: AuthUser,
     target_id: UUID4,
 ):
     await service.accept_request(session, target_id, user.id)
@@ -99,7 +99,7 @@ async def accept_friend_request(
 async def reject_friend_request(
     session: DbSession,
     service: SocialServiceDep,
-    user: CurrentUser,
+    user: AuthUser,
     target_id: UUID4,
 ):
     await service.delete_request(session, target_id, user.id)

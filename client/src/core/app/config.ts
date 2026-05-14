@@ -4,36 +4,9 @@ import {
   NativeSelect,
   type MantineProviderProps,
 } from '@mantine/core';
-import { QueryClient } from '@tanstack/react-query';
+import type { QueryClientConfig } from '@tanstack/react-query';
 
-import type { ServerPayload, ProvidedData } from '@/core/boot/interface';
-import { makeGlobalStore, type GlobalStore } from '@/core/store/stores';
-
-/* App config */
-
-export interface AppDependencies {
-  mantineConfig: MantineProviderProps;
-  data: ProvidedData;
-  queryClient: QueryClient;
-  globalStore: GlobalStore;
-}
-
-export const makeAppDependencies = (payload: ServerPayload): AppDependencies => {
-  const queryClient = makeQueryClient();
-  return {
-    mantineConfig: makeMantineConfig(),
-    data: { page: payload.page, data: payload.data },
-    queryClient,
-    globalStore: makeGlobalStore({
-      userConfig: payload.user,
-      queryClient,
-    }),
-  };
-};
-
-/* Mantine config */
-
-const makeMantineConfig = (): MantineProviderProps => {
+const mantineConfig = (): MantineProviderProps => {
   const localstorageScheme = localStorageColorSchemeManager({
     key: 'color-scheme',
   });
@@ -66,13 +39,12 @@ const makeMantineConfig = (): MantineProviderProps => {
   };
 };
 
-/* Tanstack query client */
-
-const makeQueryClient = () =>
-  new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: Infinity,
-      },
+const queryConfig = (): QueryClientConfig => ({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
     },
-  });
+  },
+});
+
+export const CONFIG = { mantine: mantineConfig(), queryClient: queryConfig() };

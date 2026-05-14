@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { useLocation } from 'react-router';
 
 import { DataContext, GlobalStoreContext, PageStoreContext } from '@/core/context/context';
-import type { PageStore } from '@/core/store/stores';
+import type { PageStore } from '@/core/app/deps';
 import type { Page } from '@/core/boot/interface';
 
 export const useGlobalStore = () => {

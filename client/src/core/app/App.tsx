@@ -5,9 +5,9 @@ import { RouterProvider } from 'react-router';
 
 import { GlobalStoreProvider, DataProvider } from '@/core/context/provider';
 import { createRouter } from '@/core/app/routes';
-import type { AppDependencies } from './config';
+import type { AppDeps } from './deps';
 
-const App: React.FC<AppDependencies> = (dep) => {
+const App: React.FC<AppDeps> = (dep) => {
   return (
     <MantineProvider {...dep.mantineConfig}>
       <Notifications />

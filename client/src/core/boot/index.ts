@@ -1,16 +1,13 @@
 import { initGlobals } from '@/lib/site';
 import { client as clientAPI } from '@/lib/api/client.gen';
+import { QueryClient } from '@tanstack/react-query';
 
-import { makeAppDependencies } from '@/core/app/config';
+import { CONFIG } from '@/core/app/config';
 import type { ServerPayload } from './interface';
 import { hydrate } from './hydrate';
+import { makeDeps } from '@/core/app/deps';
 
 export const boot = async () => {
-  initGlobals();
-  clientAPI.setConfig({
-    baseUrl: import.meta.env.VITE_FRONTEND_DOMAIN,
-    credentials: 'same-origin',
-  });
   const dataScript = document.getElementById('page-init-data');
   const payload: ServerPayload | undefined = dataScript && JSON.parse(dataScript.innerHTML);
   dataScript?.remove();
@@ -18,8 +15,13 @@ export const boot = async () => {
   if (!payload) {
     throw new Error('missing intial data from server');
   }
-  const appDep = makeAppDependencies(payload);
-  if (payload.data) hydrate(payload.data, appDep.queryClient);
 
-  return appDep;
+  initGlobals();
+  clientAPI.setConfig({
+    baseUrl: import.meta.env.VITE_FRONTEND_DOMAIN,
+    credentials: 'same-origin',
+  });
+  const queryClient = new QueryClient(CONFIG.queryClient);
+  const cacheController = hydrate(payload.data, queryClient);
+  return makeDeps(payload, queryClient, cacheController);
 };

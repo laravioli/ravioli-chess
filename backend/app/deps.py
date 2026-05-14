@@ -7,9 +7,7 @@ from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from app.notif.service import NotifService, make_notif_service
-from app.social.service import SocialService, make_social_service
-from app.web.service import WebService, make_web_service
+from app.service import NotifService, Service, SocialService, WebService
 from app.websocket.broadcast import make_topics
 from ravioli_core.config import DbSettings, RedisSettings
 from ravioli_core.pubsub import Broadcast
@@ -21,24 +19,6 @@ from ravioli_core.utils import (
 # ╔══════════════════════════════════════╗
 # ║   ENV                                ║
 # ╚══════════════════════════════════════╝
-
-
-@dataclass(slots=True)
-class Service:
-    web: WebService
-    notif: NotifService
-    social: SocialService
-
-    @staticmethod
-    def make(redis: Redis):
-        web = make_web_service(redis=redis)
-        notif = make_notif_service(redis=redis)
-        social = make_social_service(notif=notif)
-        return Service(
-            web=web,
-            notif=notif,
-            social=social,
-        )
 
 
 @dataclass(init=False, slots=True)

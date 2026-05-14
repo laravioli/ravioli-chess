@@ -1,7 +1,7 @@
 import uuid
 
 import msgspec
-from pydantic import UUID4, SecretStr
+from pydantic import UUID4, Field, SecretStr
 
 from app.api.schemas import BaseSchema
 from app.pref.schemas import Preference
@@ -12,12 +12,13 @@ class UserLogin(BaseSchema):
     password: SecretStr
 
 
+class Session(msgspec.Struct):
+    user_id: uuid.UUID
+    auth_hash: bytes
+
+
 class UserSuccess(BaseSchema):
     id: UUID4
     username: str
     preference: Preference
-
-
-class Session(msgspec.Struct):
-    user_id: uuid.UUID
-    auth_hash: bytes
+    unread_count: int = Field(serialization_alias="unreadCount")

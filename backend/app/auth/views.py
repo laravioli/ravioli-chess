@@ -4,8 +4,9 @@ from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
 
 from app.config import settings
-from app.deps import DbSession, RedisClient
+from app.deps import DbSession, RedisClient, ServiceDep
 from app.exceptions import InvalidCredentials
+from app.user.service import user_login
 
 from .deps import SessionCookie
 from .schemas import UserLogin, UserSuccess
@@ -20,6 +21,7 @@ async def login(
     session: DbSession,
     credentials: UserLogin,
     response: Response,
+    service: ServiceDep,
     session_cookie: SessionCookie = None,
 ):
     try:
@@ -47,7 +49,7 @@ async def login(
         httponly=True,
         samesite="lax",
     )
-    return user
+    return await user_login(session, service, user)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

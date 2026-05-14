@@ -1,6 +1,6 @@
 .card {
   border-radius: 0;
-  border: solid 0.1rem var(--mantine-color-dark-5);
+  border-top: solid 0.1rem var(--mantine-color-dark-5);
   background-color: var(--mantine-color-dark-6);
   transition: background-color 0.2s ease;
   cursor: pointer;
@@ -29,6 +29,34 @@
   --button-bg: var(--mantine-color-dark-6);
   --button-hover: var(--mantine-color-cyan-6);
   &.bottom {
+    border-top: solid 0.1rem var(--mantine-color-dark-5);
     padding-top: 0.2rem;
+  }
+}
+
+.tooltip {
+  --tooltip-bg: var(--mantine-color-dark-6);
+  --tooltip-color: #ffffff;
+  --tooltip-radius: 10px;
+
+  font-weight: 700;
+  font-size: 12px;
+  border: 0.5px solid var(--mantine-color-gray-7);
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.3);
+  animation: tooltip-pop 0.15s ease-out;
+}
+
+.tooltipArrow {
+  background-color: var(--mantine-color-gray-7);
+}
+
+@keyframes tooltip-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

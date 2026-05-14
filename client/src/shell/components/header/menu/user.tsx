@@ -94,11 +94,6 @@ const MainMenu: MenuViewFC = ({ navigate }) => {
     try {
       await Auth.logout();
       userStore.logout();
-      setTimeout(() => {
-        userStore.broadcast({
-          type: 'logout',
-        });
-      }, 0);
     } catch (err) {
       console.log(err);
     }

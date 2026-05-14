@@ -34,7 +34,7 @@ async def get_auth_session(
     return msgpack.decode(data, type_arg=Session)
 
 
-def current_user_or_anon(with_pref=False):
+def user_or_anon(with_pref=False):
     # NOTE : fastapi deps caching rely on function identity
 
     async def dep(
@@ -72,14 +72,14 @@ def current_user_or_anon(with_pref=False):
     return dep
 
 
-type UserOrAnon = Annotated[User | None, Depends(current_user_or_anon(with_pref=False))]
-type UserWithPrefOrAnon = Annotated[User | None, Depends(current_user_or_anon(with_pref=True))]
+type UserOrAnon = Annotated[User | None, Depends(user_or_anon(with_pref=False))]
+type UserWithPrefOrAnon = Annotated[User | None, Depends(user_or_anon(with_pref=True))]
 
 
-async def current_user(user: UserOrAnon):
+async def auth_user(user: UserOrAnon):
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return user
 
 
-type CurrentUser = Annotated[User, Depends(current_user)]
+type AuthUser = Annotated[User, Depends(auth_user)]

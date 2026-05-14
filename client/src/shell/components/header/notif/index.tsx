@@ -1,6 +1,17 @@
 import { useCallback, useRef, useState } from 'react';
-import { Combobox, useCombobox, ActionIcon, Text, Stack, Button, Indicator } from '@mantine/core';
-import { IconBell, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import {
+  Combobox,
+  useCombobox,
+  ActionIcon,
+  Text,
+  Stack,
+  Button,
+  Indicator,
+  Tooltip,
+  Group,
+} from '@mantine/core';
+import { IconBell, IconChevronDown, IconChevronUp, IconTrash } from '@tabler/icons-react';
+import { defined } from '@/lib/common';
 import { FriendRequestNotif } from './content';
 
 import clsx from 'clsx';
@@ -36,6 +47,8 @@ export const Notifications: React.FC = () => {
     }
   }, [notifications.page]);
 
+  const unRead = notifications.data?.unread ?? 0;
+
   return (
     <>
       <Combobox
@@ -51,51 +64,75 @@ export const Notifications: React.FC = () => {
         }}
       >
         <Combobox.Target>
-          <ActionIcon
-            bg="inherit"
-            onMouseEnter={() => {
-              setHovered(true);
-            }}
-            onClick={() => combobox.toggleDropdown()}
-            styles={{
-              root: {
-                transform: 'none',
-              },
-            }}
+          <Tooltip
+            classNames={{ tooltip: c.tooltip, arrow: c.tooltipArrow }}
+            label={`notifications: ${unRead}`}
+            hidden={unRead === 0 || combobox.dropdownOpened}
+            withArrow
+            openDelay={400}
+            arrowSize={6}
+            offset={17}
+            transitionProps={{ transition: 'pop', duration: 150 }}
           >
-            <Indicator
-              inline
-              size={9}
-              offset={4}
-              color="red"
-              withBorder
-              processing
-              zIndex={10}
-              disabled={
-                notifications.data?.unread === 0 ||
-                (combobox.dropdownOpened && notifications.page === 1)
-              }
+            <ActionIcon
+              bg="inherit"
+              onMouseEnter={() => {
+                setHovered(true);
+              }}
+              onClick={() => combobox.toggleDropdown()}
+              styles={{
+                root: {
+                  transform: 'none',
+                },
+              }}
             >
-              <IconBell size={20} stroke={1.4} />
-            </Indicator>
-          </ActionIcon>
+              <Indicator
+                inline
+                size={9}
+                offset={4}
+                color="red"
+                withBorder
+                processing
+                zIndex={10}
+                disabled={
+                  !defined(notifications.data?.unread) ||
+                  notifications.data?.unread === 0 ||
+                  (combobox.dropdownOpened && notifications.page === 1)
+                }
+              >
+                <IconBell size={20} stroke={1.4} />
+              </Indicator>
+            </ActionIcon>
+          </Tooltip>
         </Combobox.Target>
 
         <Combobox.Dropdown classNames={{ dropdown: c.dropdown }}>
           <Combobox.Options mah={500} style={{ overflowY: 'auto' }}>
-            <Button
-              className={c.button}
-              bdrs={0}
-              mah={24}
-              fullWidth
-              disabled={notifications.page === 1}
-              onClick={() => {
-                const previousPage = notifications.page - 1;
-                notifications.setPage(previousPage);
-              }}
-            >
-              <IconChevronUp />
-            </Button>
+            <Group gap={0} wrap="nowrap" align="stretch">
+              {notifications.data?.total! > 0 && (
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  size={22}
+                  radius={0}
+                  onClick={notifications.clear}
+                >
+                  <IconTrash size={20} />
+                </ActionIcon>
+              )}
+              <Button
+                className={c.button}
+                bdrs={0}
+                mah={24}
+                fullWidth
+                disabled={notifications.page === 1}
+                onClick={() => {
+                  notifications.setPage(notifications.page - 1);
+                }}
+              >
+                <IconChevronUp />
+              </Button>
+            </Group>
             <PageNotif notifications={notifications} />
             {!!notifications.maxPage && notifications.page < notifications.maxPage && (
               <Button
@@ -104,8 +141,7 @@ export const Notifications: React.FC = () => {
                 mah={24}
                 fullWidth
                 onClick={() => {
-                  const nextPage = notifications.page + 1;
-                  notifications.setPage(nextPage);
+                  notifications.setPage(notifications.page + 1);
                 }}
               >
                 <IconChevronDown />
@@ -138,11 +174,13 @@ const PageNotif: React.FC<{
       {options.length > 0 ? (
         options
       ) : (
-        <Stack align="center" gap="xs" py="md">
-          <Text size="sm" c="dimmed" fw={500}>
-            {notifications.page == 1 ? 'No new notifications.' : 'No more notifications'}
-          </Text>
-        </Stack>
+        <Combobox.Empty>
+          <Stack align="center" gap="xs" py="md">
+            <Text size="sm" c="dimmed" fw={500}>
+              {notifications.page == 1 ? 'No new notifications.' : 'No more notifications'}
+            </Text>
+          </Stack>
+        </Combobox.Empty>
       )}
     </>
   );
