@@ -13,3 +13,9 @@ declare global {
   type Nullable<T> = T | undefined | null;
   declare const site: Window['site'];
 }
+
+declare global {
+  interface Window {
+    __TANSTACK_QUERY_CLIENT__: import('@tanstack/query-core').QueryClient;
+  }
+}

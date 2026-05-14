@@ -42,6 +42,7 @@ const mantineConfig = (): MantineProviderProps => {
 const queryConfig = (): QueryClientConfig => ({
   defaultOptions: {
     queries: {
+      //default: fetch only if no data in the cache, allow invalidation
       staleTime: Infinity,
     },
   },
