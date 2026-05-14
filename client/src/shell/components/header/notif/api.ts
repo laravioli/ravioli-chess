@@ -26,7 +26,7 @@ export const useNotificationCount = (cb: onNewNotif) => {
   });
 
   useEffect(() => {
-    if (unreadCount ?? 0 > 0) {
+    if ((unreadCount ?? 0) > 0) {
       cb() && notified();
     }
   }, [unreadCount, cb]);
