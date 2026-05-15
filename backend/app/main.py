@@ -28,8 +28,6 @@ add_pagination(app)
 add_exception_handler(app)
 
 
-# TODO add client notification ui and client websocket notifications code
-# TODO add a read attribute on notification model and implement ui
 # TODO add an anon session identifier/ game player id
 # TODO implement a challenge api (it is close to friend request), keep it separate from notif like lichess
 # TODO define hooks/seek
