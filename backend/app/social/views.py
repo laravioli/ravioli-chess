@@ -85,14 +85,15 @@ async def cancel_friend_request(
 
 @router.post("/requests/{target_id}/accept", responses={200: {"model": FriendShip}})
 async def accept_friend_request(
+    background_notif: BackgroundNotifDep,
     session: DbSession,
     service: SocialServiceDep,
     user: AuthUser,
     target_id: UUID4,
 ):
     await service.accept_request(session, target_id, user.id)
+    await service.notif.notify_one(background_notif, session, target_id)
     return FriendShip(is_sender=False, status="accepted")
-    # await service.notif.notify_one(sender)
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
@@ -103,4 +104,3 @@ async def reject_friend_request(
     target_id: UUID4,
 ):
     await service.delete_request(session, target_id, user.id)
-    # await service.notif.notify_one(sender)

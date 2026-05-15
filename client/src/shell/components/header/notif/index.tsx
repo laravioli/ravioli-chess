@@ -15,7 +15,7 @@ import { IconBell, IconChevronDown, IconChevronUp, IconTrash } from '@tabler/ico
 import c from '@/shell/css/notif.module.css';
 import { defined } from '@/lib/common';
 import * as api from './api';
-import { FriendRequestNotif } from './content';
+import { FriendRequestNotif, FriendRequestAcceptedNotif } from './content';
 
 export const Notifications: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -169,6 +169,8 @@ const PageNotif: React.FC<{
             onSuccess={() => invalidate(notifications.page)}
           />
         );
+      if (data.type === 'friend_request_accepted')
+        return <FriendRequestAcceptedNotif data={data} key={data.id} />;
     }) ?? [];
 
   return (

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import DBNotFound
 from app.notif.service import NotifService
-from ravioli_core.db.models import FriendRequest, Friendship, User
+from ravioli_core.db.models import FriendRequest, FriendRequestAccepted, Friendship, User
 from ravioli_core.db.models.social import FriendshipStatus
 from ravioli_core.utils import transaction
 
@@ -70,7 +70,15 @@ class SocialService:
             )
             await session.execute(delete_notif_stmt)
 
+            friend_request_accepted = FriendRequestAccepted(
+                sender_id=receiver_id,
+                receiver_id=sender_id,
+                friendship_id=friendship_id,
+            )
+            session.add(friend_request_accepted)
+
         await self.notif.invalidate([receiver_id])
+        await self.notif.cache.incrby(f"{sender_id}", 1)
 
     async def delete_request(
         self,
@@ -135,6 +143,7 @@ class SocialService:
 
             if result.rowcount == 0:
                 raise DBNotFound(detail="friend not found")
+        await self.notif.invalidate([target_id])
 
 
 def friendship_criteria(id_a, id_b):

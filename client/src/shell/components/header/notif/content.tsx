@@ -2,7 +2,7 @@ import { type ReactNode, useState } from 'react';
 import { ActionIcon, Text, Group, Paper, Stack, rem } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
-import { FriendRequestSchema } from '@/lib/api';
+import { FriendRequestSchema, FriendRequestAcceptedSchema } from '@/lib/api';
 import { useAcceptRequest, useRejectRequest, makeSocialUrl } from '@/social/api';
 import classes from '@/shell/css/notif.module.css';
 import clsx from 'clsx';
@@ -85,6 +85,21 @@ export const FriendRequestNotif: React.FC<{
             <IconX style={{ width: rem(20), height: rem(20) }} stroke={2.5} />
           </ActionIcon>
         </Group>
+      </Group>
+    </BaseNotification>
+  );
+};
+
+export const FriendRequestAcceptedNotif: React.FC<{
+  data: FriendRequestAcceptedSchema;
+  className?: string[];
+}> = ({ data, className = [] }) => {
+  return (
+    <BaseNotification className={className}>
+      <Group justify="space-between" wrap="nowrap">
+        <Text size="xs" c="dimmed">
+          You are now friend with {data.sender}
+        </Text>
       </Group>
     </BaseNotification>
   );
