@@ -3,7 +3,7 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { observer } from 'mobx-react-lite';
 
 import classes from '@/shell/css/header.module.css';
-import { Navigation, NavDrawer } from './navigation';
+import { Raviolichess, Navigation, NavDrawer } from './navigation';
 import { SearchUsersWithCollapse } from './search';
 import { Notifications } from './notif';
 import { AuthDrawer, LoginButton } from './authentification';
@@ -20,7 +20,7 @@ export const Header: React.FC = () => {
           <Group h="100%" gap="md">
             <Burger opened={stack.state['nav']} onClick={() => stack.open('nav')} hiddenFrom="sm" />
             <Box mr="xl" visibleFrom="xs">
-              Raviolichess
+              <Raviolichess />
             </Box>
             <Group h="100%" gap={0} visibleFrom="sm">
               <Navigation />

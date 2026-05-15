@@ -33,7 +33,8 @@ class SocialService:
             await session.flush()
 
             notification = FriendRequest(
-                user_id=receiver_id,
+                sender_id=sender_id,
+                receiver_id=receiver_id,
                 friendship_id=request.id,
             )
             session.add(notification)

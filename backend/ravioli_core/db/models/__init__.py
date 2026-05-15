@@ -1,7 +1,7 @@
 # Import every model here
 
 from .game import Game
-from .notif import FriendRequest, Notification
+from .notif import FriendRequest, FriendRequestAccepted, Notification
 from .pref import Preference
 from .social import Friendship
 from .user import User
@@ -9,8 +9,9 @@ from .web import ChessPosition
 
 __all__ = [
     "Game",
-    "FriendRequest",
     "Notification",
+    "FriendRequest",
+    "FriendRequestAccepted",
     "Preference",
     "Friendship",
     "User",

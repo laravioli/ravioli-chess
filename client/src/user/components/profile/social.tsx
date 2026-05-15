@@ -9,7 +9,7 @@ import {
   useAcceptRequest,
   useRejectRequest,
   makeSocialUrl,
-} from '@/social/hooks';
+} from '@/social/api';
 
 interface ActionProps {
   user: UserProfile;

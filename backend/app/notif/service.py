@@ -8,7 +8,7 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import joinedload
 
-from ravioli_core.db.models import FriendRequest, Friendship, Notification
+from ravioli_core.db.models import Notification, User
 
 from .background import BackgroundNotif
 from .cache import NotifCache
@@ -32,8 +32,8 @@ class NotifService:
 
         stmt = (
             select(Notification)
-            .options(joinedload(FriendRequest.friendship).joinedload(Friendship.sender))
-            .where(Notification.user_id == user_id)
+            .where(Notification.receiver_id == user_id)
+            .options(joinedload(Notification.sender).load_only(User.username))
             .order_by(Notification.created_at.desc())
         )
         return await apaginate(session, stmt, params, additional_data={"unread": unread_count})
@@ -55,7 +55,7 @@ class NotifService:
         return await session.scalar(
             select(func.count())
             .select_from(Notification)
-            .where(Notification.user_id == user_id, Notification.read.is_(False))
+            .where(Notification.receiver_id == user_id, Notification.read.is_(False))
         )
 
     async def delete_all(
@@ -63,7 +63,7 @@ class NotifService:
         session: AsyncSession,
         user_id: UUID,
     ):
-        await session.execute(delete(Notification).where(Notification.user_id == user_id))
+        await session.execute(delete(Notification).where(Notification.receiver_id == user_id))
         await session.commit()
 
     async def invalidate(
@@ -95,7 +95,7 @@ class NotifService:
         async with engine.begin() as conn:
             stmt = (
                 update(Notification)
-                .where(Notification.user_id == user_id, Notification.read.is_(False))
+                .where(Notification.receiver_id == user_id, Notification.read.is_(False))
                 .values(read=True)
             )
             result = await conn.execute(stmt)

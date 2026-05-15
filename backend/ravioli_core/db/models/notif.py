@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -9,8 +10,11 @@ from .base import Base
 
 if TYPE_CHECKING:
     from .social import Friendship
+    from .user import User
 
 
+# NOTE 1:1 system
+# NOTE N:N would require 3 tables and more complex queries
 class Notification(Base):
     __tablename__ = "notification"
     __mapper_args__ = {
@@ -20,7 +24,9 @@ class Notification(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(String(50))
-    user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
+    sender_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
+    receiver_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
+    sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id], innerjoin=True)
     read: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[TimestampNow]
 
@@ -32,7 +38,19 @@ class FriendRequest(Notification):
     }
 
     friendship_id: Mapped[int | None] = mapped_column(
-        ForeignKey("friendship.id", ondelete="CASCADE")
+        ForeignKey("friendship.id", ondelete="CASCADE"), use_existing_column=True
+    )
+    friendship: Mapped["Friendship"] = relationship(lazy="raise")
+
+
+class FriendRequestAccepted(Notification):
+    __mapper_args__ = {
+        "polymorphic_identity": "friend_request_accepted",
+        "polymorphic_load": "inline",
+    }
+
+    friendship_id: Mapped[int | None] = mapped_column(
+        ForeignKey("friendship.id", ondelete="CASCADE"), use_existing_column=True
     )
     friendship: Mapped["Friendship"] = relationship(lazy="raise")
 

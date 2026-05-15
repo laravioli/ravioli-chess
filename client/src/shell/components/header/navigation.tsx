@@ -10,6 +10,11 @@ import { PlayMenu } from './menu/play';
 
 const defaultState = { fen: INITIAL_FEN, orientation: 'white' };
 
+export const Raviolichess: React.FC = () => (
+  <Button component={Link} to="/" state={defaultState} variant="transparent" color="white">
+    Raviolichess
+  </Button>
+);
 export const Navigation: React.FC = () => {
   return (
     <>

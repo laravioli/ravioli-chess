@@ -3,7 +3,7 @@ import { ActionIcon, Text, Group, Paper, Stack, rem } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 
 import { FriendRequestSchema } from '@/lib/api';
-import { useAcceptRequest, useRejectRequest, makeSocialUrl } from '@/social/hooks';
+import { useAcceptRequest, useRejectRequest, makeSocialUrl } from '@/social/api';
 import classes from '@/shell/css/notif.module.css';
 import clsx from 'clsx';
 

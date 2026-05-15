@@ -4,35 +4,32 @@ from typing import Annotated, Literal, TypeVar
 from fastapi import Query
 from fastapi_pagination import Page, Params, set_page
 from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseName, UseParams
-from pydantic import UUID4, AliasChoices, AliasPath, Field, TypeAdapter
+from pydantic import UUID4, AliasPath, Field, TypeAdapter
 
 from app.api.schemas import BaseSchema
 
 
 class NotificationBase(BaseSchema):
     id: int
+    sender_id: UUID4
+    sender: str = Field(
+        validation_alias=AliasPath("sender", "username"),
+    )
     created_at: datetime
     type: str
 
 
 class FriendRequestSchema(NotificationBase):
     type: Literal["friend_request"]
-    sender: str = Field(
-        # validation alias: weither it come from cache or DB
-        validation_alias=AliasChoices(
-            "sender",
-            AliasPath("friendship", "sender", "username"),
-        )
-    )
-    sender_id: UUID4 = Field(
-        validation_alias=AliasChoices(
-            "sender_id",
-            AliasPath("friendship", "sender", "id"),
-        )
-    )
 
 
-type Notification = Annotated[FriendRequestSchema, Field(discriminator="type")]
+class FriendRequestAcceptedSchema(NotificationBase):
+    type: Literal["friend_request_accepted"]
+
+
+type Notification = Annotated[
+    FriendRequestSchema | FriendRequestAcceptedSchema, Field(discriminator="type")
+]
 
 
 # pagination
@@ -54,7 +51,7 @@ NotifPagination = CustomizedPage[
     UseName("Page"),
 ]
 
-notification_adapter = TypeAdapter(NotifPagination[Notification])
+notification_ta = TypeAdapter(NotifPagination[Notification])
 
 
 def pagination(coro):
