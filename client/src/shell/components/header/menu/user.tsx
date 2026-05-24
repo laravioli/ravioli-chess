@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import {
   ActionIcon,
@@ -30,6 +30,7 @@ import { setBoardColor, setPieceSet } from '@/user/store/utils';
 import classes from '@/shell/css/header.module.css';
 
 export const UserMenu: React.FC = observer(() => {
+  const [opened, setOpened] = useState(false);
   const { userStore } = useGlobalStore();
 
   const menus = useMemo(() => {
@@ -42,11 +43,13 @@ export const UserMenu: React.FC = observer(() => {
     return { main: MainMenuPref, ...MainMenuPref.subMenus };
   }, [userStore.isAuth]);
 
-  const { currentMenu, navigate } = useMenu(menus);
+  const { currentMenu, navigate } = useMenu(menus, setOpened);
 
   return (
     <>
       <Menu
+        opened={opened}
+        onChange={setOpened}
         trigger="click"
         position="bottom-start"
         width={310}
@@ -255,7 +258,7 @@ const PieceSetMenu: MenuViewFC = ({ navigate }) => {
   );
 };
 
-const FriendsMenu: MenuViewFC = ({ navigate }) => {
+const FriendsMenu: MenuViewFC = ({ navigate, setOpened }) => {
   const routeNav = useNavigate();
   const { isFetching, data } = useQuery({
     ...listMyFriendsOptions(),
@@ -285,7 +288,8 @@ const FriendsMenu: MenuViewFC = ({ navigate }) => {
               <IconBrandGooglePlay
                 stroke={1.2}
                 size={22}
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation();
                   modals.openContextModal({
                     modal: 'play',
                     title: 'Create a lobby',
@@ -293,8 +297,9 @@ const FriendsMenu: MenuViewFC = ({ navigate }) => {
                       modalBody: LobbySetup,
                       modalBodyProps: { opponent: 'friend' },
                     },
-                  })
-                }
+                  });
+                  setOpened!(false);
+                }}
               />
             }
           >
