@@ -22,9 +22,8 @@ type ActionType = 'accept' | 'reject' | null;
 
 export const FriendRequestNotif: React.FC<{
   data: FriendRequestSchema;
-  onSuccess: () => Promise<void>;
   className?: string[];
-}> = ({ data, onSuccess, className = [] }) => {
+}> = ({ data, className = [] }) => {
   const sender = {
     username: data.sender,
     id: data.sender_id,
@@ -41,7 +40,6 @@ export const FriendRequestNotif: React.FC<{
     try {
       setActiveAction(type);
       await mutateAsync(makeSocialUrl(sender.id));
-      await onSuccess();
     } catch (e) {
       console.log(e);
     } finally {

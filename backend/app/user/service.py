@@ -7,7 +7,7 @@ from app.auth.security import generate_password_hash
 from app.deps import DbSession
 from app.exceptions import DBNotFound
 from app.service import Service
-from app.social.service import friendship_criteria
+from app.social.db import friendship_criteria
 from ravioli_core.db.models import Friendship, Preference, User
 from ravioli_core.utils import transaction
 

@@ -1,52 +1,46 @@
 #!lua name=raviolib
 
 local function notif_incrby(keys, args)
-  local hash = keys[1]
-
-  if redis.call("EXISTS", hash) == 0 then 
-    return false
+  for i=1,#keys do
+    local hash = keys[i]
+    if redis.call("EXISTS", hash) == 1 then
+      local counter = redis.call("HGET", hash, "counter")
+      local incr = tonumber(args[i])
+      if counter then
+          redis.call("HSET", hash, "counter", math.max(0, tonumber(counter)+incr))
+      elseif args[i] > 0 then
+        redis.call("HINCRBY", hash, "temporary", incr)
+      end
+    end
   end
-
-  local incr = tonumber(args[1])
-  local counter = redis.call("HGET", hash, "counter")
-
-  if counter then
-    redis.call("HINCRBY", hash, "counter", incr)
-  else
-    redis.call("HINCRBY", hash, "update", incr)
-  end
-  return true
 end
 
 local function notif_get(keys, args)
   local hash = keys[1]
   local counter = redis.call("HGET", hash, "counter")
   local result = nil
-  
+
   if counter then
     result = tostring(counter)
   else
-    if redis.call("HEXISTS", hash, "update") == 0 then
-          redis.call("HSET", hash, "update", 0)
-    end
+    --set update to acc increment values
+    redis.call("HSETNX", hash, "temporary", 0)
   end
-
-  local ex = tonumber(args[1])
-  redis.call("EXPIRE", hash , ex)
-  return result 
+  redis.call("EXPIRE", hash , tonumber(args[1]))
+  return result
 end
 
 local function notif_set(keys, args)
+  -- called only during get_or_set
+  -- otherwise write use notif_incrby or invalidation
   local hash = keys[1]
-  local update = tonumber(redis.call('HGET', hash, "update")) or 0
-  local new_val = tonumber(args[1]) + update
+  local update = redis.call('HGET', hash, "temporary")
 
-  redis.call('HSET', hash, "counter", new_val)
-  redis.call('HDEL', hash, "update")
-
-  local ex = tonumber(args[2])
-  redis.call('EXPIRE', hash, ex)
-  return tostring(new_val)
+  if update then
+    -- first set win
+    redis.call('HSETNX', hash, "counter", tonumber(args[1]) + tonumber(update))
+    redis.call('HDEL', hash, "temporary")
+  end
 end
 
 redis.register_function('notif_incrby', notif_incrby)

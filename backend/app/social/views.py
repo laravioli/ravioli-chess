@@ -32,12 +32,15 @@ async def list_friends(
 
 @router.delete("/friends/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_friend(
+    background_notif: BackgroundNotifDep,
     session: DbSession,
     service: SocialServiceDep,
     user: AuthUser,
     target_id: UUID4,
 ):
-    await service.delete_friend(session, current_user_id=user.id, target_id=target_id)
+    await service.delete_friend(
+        background_notif, session, current_user_id=user.id, target_id=target_id
+    )
 
 
 @router.get("/requests", response_model=list[FriendRequest])
@@ -66,8 +69,7 @@ async def send_friend_request(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You can't send a friend request to yourself",
         )
-    await service.create_request(session, user.id, target_id)
-    await service.notif.notify_one(background_notif, session, target_id)
+    await service.create_request(background_notif, session, user.id, target_id)
     return FriendShip(is_sender=True, status="pending")
 
 
@@ -79,8 +81,7 @@ async def cancel_friend_request(
     user: AuthUser,
     target_id: UUID4,
 ):
-    await service.delete_request(session, user.id, target_id)
-    await service.notif.notify_one(background_notif, session, target_id)
+    await service.delete_request(background_notif, session, user.id, target_id)
 
 
 @router.post("/requests/{target_id}/accept", responses={200: {"model": FriendShip}})
@@ -91,16 +92,16 @@ async def accept_friend_request(
     user: AuthUser,
     target_id: UUID4,
 ):
-    await service.accept_request(session, target_id, user.id)
-    await service.notif.notify_one(background_notif, session, target_id)
+    await service.accept_request(background_notif, session, target_id, user.id)
     return FriendShip(is_sender=False, status="accepted")
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
 async def reject_friend_request(
+    background_notif: BackgroundNotifDep,
     session: DbSession,
     service: SocialServiceDep,
     user: AuthUser,
     target_id: UUID4,
 ):
-    await service.delete_request(session, target_id, user.id)
+    await service.delete_request(background_notif, session, target_id, user.id)

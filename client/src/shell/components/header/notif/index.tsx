@@ -133,7 +133,7 @@ export const Notifications: React.FC = () => {
                 <IconChevronUp />
               </Button>
             </Group>
-            <PageNotif notifications={notifications} invalidate={action.invalidate} />
+            <PageNotif notifications={notifications} />
             {notifications && notifications.page < notifications.pages && (
               <Button
                 className={clsx(c.button, c.bottom)}
@@ -157,18 +157,10 @@ export const Notifications: React.FC = () => {
 
 const PageNotif: React.FC<{
   notifications: api.NotificationData;
-  invalidate: (page: number) => Promise<void>;
-}> = ({ notifications, invalidate }) => {
+}> = ({ notifications }) => {
   const options =
     notifications?.items.map((data) => {
-      if (data.type === 'friend_request')
-        return (
-          <FriendRequestNotif
-            data={data}
-            key={data.id}
-            onSuccess={() => invalidate(notifications.page)}
-          />
-        );
+      if (data.type === 'friend_request') return <FriendRequestNotif data={data} key={data.id} />;
       if (data.type === 'friend_request_accepted')
         return <FriendRequestAcceptedNotif data={data} key={data.id} />;
     }) ?? [];

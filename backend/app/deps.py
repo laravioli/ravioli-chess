@@ -118,13 +118,3 @@ async def get_broadcast(env: EnvDep):
 
 
 type BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]
-
-
-# GLOBAL_ENV = Env(engine=engine, redis=redis, broadcast=broadcast)
-
-
-# async def get_env():
-#     return GLOBAL_ENV
-
-
-# type EnvDep = Annotated[Env, Depends(get_env)]
