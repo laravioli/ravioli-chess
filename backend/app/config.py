@@ -1,3 +1,4 @@
+import os
 import secrets
 from typing import Annotated, Literal
 
@@ -8,6 +9,7 @@ from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
+    APP_ID: str = f"app:{os.getpid()}"
     ENVIRONMENT: Literal["local", "staging", "production"] = "production"
     SECRET_KEY: SecretStr = secrets.token_urlsafe(32)
     SSL: bool = True

@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from .config import DbSettings, RedisSettings
 
+# DB stuff
+
 
 def create_engine_and_sessionmaker(settings: DbSettings):
     engine = create_async_engine(

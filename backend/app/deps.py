@@ -7,10 +7,12 @@ from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from app.config import settings
 from app.service import NotifService, Service, SocialService, WebService
 from app.websocket.broadcast import make_topics
 from ravioli_core.config import DbSettings, RedisSettings
 from ravioli_core.pubsub import Broadcast
+from ravioli_core.scheduler import Scheduler
 from ravioli_core.utils import (
     create_async_redis,
     create_engine_and_sessionmaker,
@@ -28,18 +30,32 @@ class Env:
     engine: AsyncEngine
     session_maker: async_sessionmaker[AsyncSession]
     service: Service
+    scheduler: Scheduler
 
     def __init__(self):
         self.redis = create_async_redis(settings=RedisSettings())
         self.broadcast = Broadcast(redis=self.redis, topics=make_topics)
         self.engine, self.session_maker = create_engine_and_sessionmaker(settings=DbSettings())
         self.service = Service.make(self.redis)
+        self.scheduler = Scheduler()
 
+    # Start
     async def on_start(self):
         await self.broadcast.start()
+        self.start_scheduler()
 
+    def start_scheduler(self):
+        @self.scheduler.periodic(10, duration=1)
+        async def heartbeat():
+            await self.redis.set(settings.APP_ID, "alive", ex=15)
+
+        self.scheduler.start()
+
+    # Stop
     async def on_stop(self):
         await asyncio.gather(self.broadcast.stop(), self.engine.dispose())
+        await self.scheduler.shutdown()
+        await self.redis.delete(settings.APP_ID)
         await self.redis.aclose()
 
 
