@@ -26,7 +26,7 @@ local function notif_get(keys, args)
     --set update to acc increment values
     redis.call("HSETNX", hash, "temporary", 0)
   end
-  redis.call("EXPIRE", hash , tonumber(args[1]))
+  redis.call("EXPIRE", hash , 300)
   return result
 end
 
@@ -34,13 +34,14 @@ local function notif_set(keys, args)
   -- called only during get_or_set
   -- otherwise write use notif_incrby or invalidation
   local hash = keys[1]
-  local update = redis.call('HGET', hash, "temporary")
+  local update = redis.call('HGETDEL', hash, 'FIELDS', 1, "temporary")[1]
 
   if update then
     -- first set win
     redis.call('HSETNX', hash, "counter", tonumber(args[1]) + tonumber(update))
-    redis.call('HDEL', hash, "temporary")
   end
+  redis.call("EXPIRE", hash , 300)
+
 end
 
 redis.register_function('notif_incrby', notif_incrby)

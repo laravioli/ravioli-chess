@@ -7,7 +7,7 @@ from ravioli_core.cache import CacheLib
 
 class NotifCache(CacheLib[int]):
     async def _get(self, key: str, **kwargs):
-        return await self.redis.fcall("notif_get", 1, key, self.ttl(self.default_ttl))
+        return await self.redis.fcall("notif_get", 1, key)
 
     async def _set(self, key: str, data: str | bytes, **kwargs):
         return await self.redis.fcall("notif_set", 1, key, data)

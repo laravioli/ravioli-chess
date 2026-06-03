@@ -30,7 +30,7 @@ services:
     - ADMINER_DESIGN=pepa-linha-dark
 
   redis:
-    image: redis:7
+    image: redis:8
     volumes:
       - redis_data:/data
     ports:
