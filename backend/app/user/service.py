@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 from app.auth.security import generate_password_hash
 from app.deps import DbSession
 from app.exceptions import DBNotFound
-from app.service import Service
+from app.services import Services
 from app.social.db import friendship_criteria
 from ravioli_core.db.models import Friendship, Preference, User
 from ravioli_core.utils import transaction
@@ -82,9 +82,9 @@ async def user_delete(session: DbSession, id: UUID) -> bool:
     await session.commit()
 
 
-async def user_login(session: DbSession, service: Service, user: User):
+async def user_login(session: DbSession, services: Services, user: User):
     try:
-        user.unread_count = await service.notif.get_unread_count(session, user.id)
+        user.unread_count = await services.notif.get_unread_count(session, user.id)
     except Exception:
         user.unread_count = 0
     return user

@@ -21,7 +21,7 @@ async def login(
     session: DbSession,
     credentials: UserLogin,
     response: Response,
-    service: ServiceDep,
+    services: ServiceDep,
     session_cookie: SessionCookie = None,
 ):
     try:
@@ -49,7 +49,7 @@ async def login(
         httponly=True,
         samesite="lax",
     )
-    return await user_login(session, service, user)
+    return await user_login(session, services, user)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

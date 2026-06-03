@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app.deps import BroadCastClient, Env
+from app.deps import BroadCastClient, ServerEnv
 from app.websocket.schemas import MaybeUser, Sri
 from ravioli_core.ipc import ClientIn, c_out
 from ravioli_core.ipc.channels import WebsocketChan
@@ -77,8 +77,10 @@ class Consumer[T: Context = Context](ABC):
             case c_out.Notified():
                 user = self.ctx.user
                 if user:
-                    env: Env = self.websocket.state["env"]
-                    self.add_background_task(env.service.notif.mark_all_read(env.engine, user.id))
+                    env: ServerEnv = self.websocket.state["env"]
+                    self.add_background_task(
+                        env["services"].notif.mark_all_read(env["engine"], user.id)
+                    )
 
     def add_background_task(self, coro):
         task = asyncio.create_task(coro)

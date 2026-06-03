@@ -1,88 +1,40 @@
-import asyncio
-from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import Depends
 from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
-from app.service import NotifService, Service, SocialService, WebService
-from app.websocket.broadcast import make_topics
-from ravioli_core.config import DbSettings, RedisSettings
+from app.services import NotifService, Services, SocialService, WebService
 from ravioli_core.pubsub import Broadcast
-from ravioli_core.scheduler import Scheduler
-from ravioli_core.utils import (
-    create_async_redis,
-    create_engine_and_sessionmaker,
-)
 
-# ╔══════════════════════════════════════╗
-# ║   ENV                                ║
-# ╚══════════════════════════════════════╝
+from .lifespan import ServerEnv
 
 
-@dataclass(init=False, slots=True)
-class Env:
-    redis: Redis
-    broadcast: Broadcast
-    engine: AsyncEngine
-    session_maker: async_sessionmaker[AsyncSession]
-    service: Service
-    scheduler: Scheduler
-
-    def __init__(self):
-        self.redis = create_async_redis(settings=RedisSettings())
-        self.broadcast = Broadcast(redis=self.redis, topics=make_topics)
-        self.engine, self.session_maker = create_engine_and_sessionmaker(settings=DbSettings())
-        self.service = Service.make(self.redis)
-        self.scheduler = Scheduler()
-
-    # Start
-    async def on_start(self):
-        await self.broadcast.start()
-        self.start_scheduler()
-
-    def start_scheduler(self):
-        @self.scheduler.periodic(10, duration=1)
-        async def heartbeat():
-            await self.redis.set(settings.APP_ID, "alive", ex=15)
-
-        self.scheduler.start()
-
-    # Stop
-    async def on_stop(self):
-        await asyncio.gather(self.broadcast.stop(), self.engine.dispose())
-        await self.scheduler.shutdown()
-        await self.redis.delete(settings.APP_ID)
-        await self.redis.aclose()
-
-
-async def get_env(conn: HTTPConnection):
+async def get_env(conn: HTTPConnection) -> ServerEnv:
     return conn.state["env"]
 
 
-type EnvDep = Annotated[Env, Depends(get_env)]
+type EnvDep = Annotated[ServerEnv, Depends(get_env)]
 
 
 async def get_services(env: EnvDep):
-    return env.service
+    return env["services"]
 
 
 async def get_web(env: EnvDep):
-    return env.service.web
+    return env["services"].web
 
 
 async def get_notif(env: EnvDep):
-    return env.service.notif
+    return env["services"].notif
 
 
 async def get_social(env: EnvDep):
-    return env.service.social
+    return env["services"].social
 
 
-type ServiceDep = Annotated[Service, Depends(get_services)]
+type ServiceDep = Annotated[Services, Depends(get_services)]
 type WebServiceDep = Annotated[WebService, Depends(get_web)]
 type NotifServiceDep = Annotated[NotifService, Depends(get_notif)]
 type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
@@ -94,7 +46,7 @@ type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
 
 
 async def get_db_connection(env: EnvDep):
-    async with env.engine.connect() as conn:
+    async with env["engine"].connect() as conn:
         yield conn
 
 
@@ -102,7 +54,7 @@ type DbConnection = Annotated[AsyncSession, Depends(get_db_connection, scope="fu
 
 
 async def get_session(env: EnvDep):
-    async with env.session_maker() as session:
+    async with env["session_maker"]() as session:
         yield session
 
 
@@ -119,7 +71,7 @@ type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
 
 
 async def get_redis(env: EnvDep):
-    return env.redis
+    return env["redis"]
 
 
 type RedisClient = Annotated[Redis, Depends(get_redis)]
@@ -130,7 +82,7 @@ type RedisClient = Annotated[Redis, Depends(get_redis)]
 
 
 async def get_broadcast(env: EnvDep):
-    return env.broadcast
+    return env["broadcast"]
 
 
 type BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]

@@ -10,14 +10,14 @@ from .bus import EventBus
 from .subscriber import Subscriber
 from .utils import LazyEvent
 
-type ChanStr = str
-type MsgStr = str
+type Chan = str
+type Msg = str
 
 
 @dataclass(frozen=True)
 class Deps:
     bus: EventBus
-    handler: Callable[[EventBus, ChanStr, MsgStr], None]
+    handler: Callable[[EventBus, Chan, Msg], None]
     message_types: type
 
 
