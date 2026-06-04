@@ -59,8 +59,11 @@ class EventBus:
         """
         dispatch message internally to chan
         """
-        for sub in self._mapping[chan]:
-            sub.put_nowait(msg)
+        try:
+            for sub in self._mapping[chan]:
+                sub.put_nowait(msg)
+        except KeyError:
+            pass
 
     def publish_many(self, chans: list[str], msg: Any):
         """

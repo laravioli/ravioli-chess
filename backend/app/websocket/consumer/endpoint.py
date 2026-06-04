@@ -24,8 +24,8 @@ def site_endpoint(params: WebsocketParams):
             user=user,
             channels=base_channels(sri, user),
         ),
+        env=params["env"],
         websocket=websocket,
-        broadcast=params["broadcast"],
         heartbeat=HeartBeat(websocket),
     )
 
@@ -40,7 +40,7 @@ def play_endpoint(params: WebsocketParams, game_id: str):
             channels=base_channels(sri, user) + [WsPlayChan(game_id)],
             game=Game(game_id),
         ),
+        env=params["env"],
         websocket=websocket,
-        broadcast=params["broadcast"],
         heartbeat=HeartBeat(websocket),
     )

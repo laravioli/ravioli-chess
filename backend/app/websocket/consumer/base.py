@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app.deps import BroadCastClient, ServerEnv
+from app.websocket.env import WsEnv
 from app.websocket.schemas import MaybeUser, Sri
 from ravioli_core.ipc import ClientIn, c_out
 from ravioli_core.ipc.channels import WebsocketChan
@@ -26,13 +26,13 @@ class Consumer[T: Context = Context](ABC):
     def __init__(
         self,
         context: T,
+        env: WsEnv,
         websocket: WebSocket,
-        broadcast: BroadCastClient,
         heartbeat: HeartBeat,
     ):
         self.ctx = context
+        self.env = env
         self.websocket = websocket
-        self.broadcast = broadcast
         self.heartbeat = heartbeat
         self._sub = Subscriber()
         self._background_task = set()
@@ -48,9 +48,10 @@ class Consumer[T: Context = Context](ABC):
 
     async def __call__(self):
         await self.websocket.accept()
+        await self.env.users.connect(self.ctx.user.id, self._sub)
 
         try:
-            async with self.broadcast.start_subscription(self._sub, *self.ctx.channels):
+            async with self.env.broadcast.start_subscription(self._sub, *self.ctx.channels):
                 async with asyncio.TaskGroup() as tg:
                     tg.create_task(self.receive_iter())
                     async for msg in self._sub.iter_message():
@@ -58,6 +59,7 @@ class Consumer[T: Context = Context](ABC):
         except* WebSocketDisconnect:
             pass
         finally:
+            self.env.users.disconnect(self.ctx.user.id, self._sub)
             await self.disconnect()
 
     async def receive_iter(self):
@@ -77,10 +79,7 @@ class Consumer[T: Context = Context](ABC):
             case c_out.Notified():
                 user = self.ctx.user
                 if user:
-                    env: ServerEnv = self.websocket.state["env"]
-                    self.add_background_task(
-                        env["services"].notif.mark_all_read(env["engine"], user.id)
-                    )
+                    self.add_background_task(self.env.notif.mark_all_read(self.env.engine, user.id))
 
     def add_background_task(self, coro):
         task = asyncio.create_task(coro)

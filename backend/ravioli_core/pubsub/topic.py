@@ -17,7 +17,7 @@ type Msg = str
 @dataclass(frozen=True)
 class Deps:
     bus: EventBus
-    handler: Callable[[EventBus, Chan, Msg], None]
+    handler: Callable[[Chan, Msg], None]
     message_types: type
 
 
@@ -45,7 +45,6 @@ class Topic:
 
         conn = self._conn = redis.pubsub(ignore_subscribe_messages=True)
         handle = self._deps.handler
-        bus = self._bus
         message_types = self._deps.message_types
         try:
             while True:
@@ -53,7 +52,7 @@ class Topic:
                 async for msg in conn.listen():
                     chan = msg["channel"].decode()
                     data = json.decode(msg["data"], type_arg=message_types)
-                    handle(bus, chan, data)
+                    handle(chan, data)
                 # NOTE this code rely on current listen behavior redis-py 7.4.0
                 self._has_sub.clear()
         finally:

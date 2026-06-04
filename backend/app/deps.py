@@ -12,26 +12,26 @@ from .lifespan import ServerEnv
 
 
 async def get_env(conn: HTTPConnection) -> ServerEnv:
-    return conn.state["env"]
+    return conn.state["http_env"]
 
 
 type EnvDep = Annotated[ServerEnv, Depends(get_env)]
 
 
 async def get_services(env: EnvDep):
-    return env["services"]
+    return env.services
 
 
 async def get_web(env: EnvDep):
-    return env["services"].web
+    return env.services.web
 
 
 async def get_notif(env: EnvDep):
-    return env["services"].notif
+    return env.services.notif
 
 
 async def get_social(env: EnvDep):
-    return env["services"].social
+    return env.services.social
 
 
 type ServiceDep = Annotated[Services, Depends(get_services)]
@@ -46,7 +46,7 @@ type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
 
 
 async def get_db_connection(env: EnvDep):
-    async with env["engine"].connect() as conn:
+    async with env.engine.connect() as conn:
         yield conn
 
 
@@ -54,7 +54,7 @@ type DbConnection = Annotated[AsyncSession, Depends(get_db_connection, scope="fu
 
 
 async def get_session(env: EnvDep):
-    async with env["session_maker"]() as session:
+    async with env.session_maker() as session:
         yield session
 
 
@@ -71,7 +71,7 @@ type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
 
 
 async def get_redis(env: EnvDep):
-    return env["redis"]
+    return env.redis
 
 
 type RedisClient = Annotated[Redis, Depends(get_redis)]
@@ -82,7 +82,7 @@ type RedisClient = Annotated[Redis, Depends(get_redis)]
 
 
 async def get_broadcast(env: EnvDep):
-    return env["broadcast"]
+    return env.broadcast
 
 
 type BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]
