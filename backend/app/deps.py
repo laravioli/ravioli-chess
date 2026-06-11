@@ -6,9 +6,9 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services import NotifService, Services, SocialService, WebService
-from ravioli_core.pubsub import Broadcast
+from ravioli_core.pubsub import Publisher
 
-from .lifespan import ServerEnv
+from .env import ServerEnv
 
 
 async def get_env(conn: HTTPConnection) -> ServerEnv:
@@ -77,12 +77,12 @@ async def get_redis(env: EnvDep):
 type RedisClient = Annotated[Redis, Depends(get_redis)]
 
 # ╔══════════════════════════════════════╗
-# ║   BROADCAST                          ║
+# ║   PUBLISHER                          ║
 # ╚══════════════════════════════════════╝
 
 
-async def get_broadcast(env: EnvDep):
-    return env.broadcast
+async def get_publisher(env: EnvDep):
+    return env.pub
 
 
-type BroadCastClient = Annotated[Broadcast, Depends(get_broadcast)]
+type PublisherDep = Annotated[Publisher, Depends(get_publisher)]

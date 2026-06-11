@@ -10,24 +10,35 @@ class ProcessOUT(Struct, tag_field="po", rename={"type": "t", "data": "d"}):
 # ╔══════════════════════════════════════╗
 # ║   websocket server <- ...            ║
 # ╚══════════════════════════════════════╝
+
+
 # ╔══════════════════════════════════════╗
-# ║   SITE                               ║
+# ║   SRI                                ║
 # ╚══════════════════════════════════════╝
 
 
-class TellUser(ProcessOUT, tag="s/user"):
+class TellSri(ProcessOUT, tag="tell"):
     type: str
     data: Raw
 
 
-class TellSocket(ProcessOUT, tag="s/socket"):
-    type: str
-    data: Raw
-
-
-class GameCreate(ProcessOUT, tag="s/create"):
+class GameCreate(ProcessOUT, tag="gc"):
     data: Raw  # GameId
 
+
+type Sri = TellSri | GameCreate
+
+# ╔══════════════════════════════════════╗
+# ║   USERS                              ║
+# ╚══════════════════════════════════════╝
+
+
+class TellUser(ProcessOUT, tag="tell"):
+    type: str
+    data: Raw
+
+
+type Users = TellUser
 
 # ╔══════════════════════════════════════╗
 # ║   PLAY                               ║
@@ -35,7 +46,7 @@ class GameCreate(ProcessOUT, tag="s/create"):
 
 
 # Frame
-class GameUpdate(ProcessOUT, tag="g/update"):
+class GameUpdate(ProcessOUT, tag="u"):
     type: Literal["move", "takeback", "draw", "resign", "endData"]
     data: Raw
 
@@ -50,3 +61,6 @@ class GameMove(Struct):
 
 class GameEnd(Struct):
     reason: str
+
+
+type Play = GameUpdate

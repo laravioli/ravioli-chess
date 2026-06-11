@@ -1,25 +1,34 @@
 from collections import defaultdict
+from collections.abc import Iterable
 from typing import Any
 
-from .types import Subscriber
+from ravioli_core.pubsub.types import Chan, Subscriber
 
 
 class EventBus:
-    __slots__ = ("_mapping",)
+    __slots__ = ("_mapping", "_subs")
 
     def __init__(self):
-        self._mapping: defaultdict[str, set[Subscriber]] = defaultdict(set)
+        self._mapping: defaultdict[Chan, set[Subscriber]] = defaultdict(set)
+        self._subs: set[Subscriber] = set()
 
     @property
-    def subscribers(self):
-        return set().union(*self._mapping.values())
+    def subs(self):
+        return self._subs
 
-    def subscribe(self, sub: Subscriber, chans: list[str]) -> set[str]:
+    def register(self, sub: Subscriber):
+        self._subs.add(sub)
+
+    def unregister(self, sub: Subscriber):
+        self._subs.discard(sub)
+
+    def subscribe(self, sub: Subscriber, chans: Iterable[Chan]):
         """
         map a subscriber to a list of channels.
 
         Args:
-            sub (Subscriber): the sub to add.
+            sub (Subscriber): a sub to add.
+            conn (Connection): a connection to update (pubsub)
             chans (list[str]): list of channels to subscribe.
 
         Returns:
@@ -34,7 +43,7 @@ class EventBus:
 
         return to_subscribe
 
-    def unsubcribe(self, sub: Subscriber, chans: list[str]) -> set[str]:
+    def unsubscribe(self, sub: Subscriber, chans: Iterable[Chan]):
         """
         remove a subscriber from a list of channel keys.
 
@@ -55,7 +64,7 @@ class EventBus:
 
         return to_unsubscribe
 
-    def publish_one(self, chan: str, msg: Any):
+    def publish_one(self, chan: Chan, msg: Any):
         """
         dispatch message internally to chan
         """
@@ -65,7 +74,7 @@ class EventBus:
         except KeyError:
             pass
 
-    def publish_many(self, chans: list[str], msg: Any):
+    def publish_many(self, chans: Iterable[Chan], msg: Any):
         """
         dispatch message internally to chans
         """

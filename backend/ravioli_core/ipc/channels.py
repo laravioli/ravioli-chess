@@ -1,21 +1,20 @@
-from abc import ABC
-from typing import ClassVar
+"""
+format invariant: chan_name:chan_id
+"""
 
-# NOTE struture:
-# NOTE 1- target
-# NOTE 2- topic
-# NOTE 3- chan
-
-# ╔══════════════════════════════════════╗
-# ║             App Channels             ║
-# ╚══════════════════════════════════════╝
+type Chan = str
+type ChanName = str
+type ChanId = str
 
 
-class AppChan(str, ABC):
-    topic: ClassVar[str]
+class _Chan:
+    @staticmethod
+    def name(chan: Chan) -> ChanName:
+        return chan.split(":")[0]
 
-    def __new__(cls, chan):
-        return super().__new__(cls, f"app:{cls.topic}:{chan}")
+    @staticmethod
+    def id(chan: Chan) -> ChanId:
+        return chan.split(":")[1]
 
 
 # ╔══════════════════════════════════════╗
@@ -23,88 +22,34 @@ class AppChan(str, ABC):
 # ╚══════════════════════════════════════╝
 
 
-class EngineChan(str, ABC):
-    topic: ClassVar[str]
+class EngChan(_Chan):
+    all = ["game:all"]
 
-    def __new__(cls, chan):
-        return super().__new__(cls, f"engine:{cls.topic}:{chan}")
+    @staticmethod
+    def game(game_id: str = "all"):
+        return f"game:{game_id}"
 
-
-class EngineCreateChan(EngineChan):
-    """
-
-    args:
-        chan (int): process ID.
-    """
-
-    topic = "create"
-
-
-class EngineGameChan(EngineChan):
-    """
-
-    args:
-        chan (str): game ID.
-    """
-
-    topic = "game"
-
-
-type ProcessChan = AppChan | EngineChan
 
 # ╔══════════════════════════════════════╗
 # ║        Websocket Channels            ║
 # ╚══════════════════════════════════════╝
 
 
-class WebsocketChan(str, ABC):
-    topic: ClassVar[str]
+class WsChan(_Chan):
+    all = ["sri:all", "users:all", "play:all", "room:all"]
 
-    def __new__(cls, chan):
-        return super().__new__(cls, f"ws:{cls.topic}:{chan}")
+    @staticmethod
+    def sri(sri_id: ChanId = "all"):
+        return f"sri:{sri_id}"
 
+    @staticmethod
+    def users(user_id: ChanId = "all"):
+        return f"users:{user_id}"
 
-# ╔══════════════════════════════════════╗
-# ║        Site                          ║
-# ╚══════════════════════════════════════╝
+    @staticmethod
+    def play(game_id: ChanId = "all"):
+        return f"play:{game_id}"
 
-
-class WsSiteChan(WebsocketChan):
-    topic = "site"
-
-
-class WsConsumerChan(WsSiteChan):
-    """
-
-    args:
-        sri: str
-    """
-
-    def __new__(cls, sri):
-        return super().__new__(cls, f"sri:{sri}")
-
-
-class WsUserChan(WsSiteChan):
-    """
-
-    args:
-        uuid (str): user uuid.
-    """
-
-    def __new__(cls, uuid):
-        return super().__new__(cls, f"user:{uuid}")
-
-
-# ╔══════════════════════════════════════╗
-# ║        Play                          ║
-# ╚══════════════════════════════════════╝
-
-
-class WsPlayChan(WebsocketChan):
-    """
-
-    args:
-        chan (str): game ID.
-    """
-
-    topic = "play"
+    @staticmethod
+    def room(id: ChanId = "all"):
+        return f"room:{id}"

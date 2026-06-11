@@ -8,18 +8,18 @@ from fastapi import WebSocket, WebSocketDisconnect
 from app.websocket.env import WsEnv
 from app.websocket.schemas import MaybeUser, Sri
 from ravioli_core.ipc import ClientIn, c_out
-from ravioli_core.ipc.channels import WebsocketChan
+from ravioli_core.pubsub.types import Chan
 from ravioli_core.serializers import json
 
 from .heartbeat import HeartBeat
-from .sub import Subscriber
+from .subscriber import Subscriber
 
 
 @dataclass(frozen=True)
 class Context:
     sri: Sri
     user: MaybeUser
-    channels: Iterable[WebsocketChan]
+    channels: Iterable[Chan]
 
 
 class Consumer[T: Context = Context](ABC):
@@ -32,6 +32,9 @@ class Consumer[T: Context = Context](ABC):
     ):
         self.ctx = context
         self.env = env
+        self.broadcast = env.broadcast
+        self.pub = env.pub
+        self.users = env.users
         self.websocket = websocket
         self.heartbeat = heartbeat
         self._sub = Subscriber()
@@ -48,10 +51,10 @@ class Consumer[T: Context = Context](ABC):
 
     async def __call__(self):
         await self.websocket.accept()
-        await self.env.users.connect(self.ctx.user.id, self._sub)
-
         try:
-            async with self.env.broadcast.start_subscription(self._sub, *self.ctx.channels):
+            async with self.broadcast.start_subscription(
+                self._sub, self.ctx.user, self.ctx.channels
+            ):
                 async with asyncio.TaskGroup() as tg:
                     tg.create_task(self.receive_iter())
                     async for msg in self._sub.iter_message():
@@ -59,7 +62,6 @@ class Consumer[T: Context = Context](ABC):
         except* WebSocketDisconnect:
             pass
         finally:
-            self.env.users.disconnect(self.ctx.user.id, self._sub)
             await self.disconnect()
 
     async def receive_iter(self):

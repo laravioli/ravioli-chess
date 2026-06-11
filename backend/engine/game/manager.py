@@ -58,7 +58,9 @@ class GameManager:
 
         # actor api
         async def receive():
-            await self.publish(WsConsumerChan(msg.sri), p_out.GameCreate(data=p_out.GameId(id)))
+            await self.publish(
+                WsConsumerChan(msg.sri), p_out.GameCreate(sri=msg.sri, data=p_out.GameId(id))
+            )
             async with self.broadcast.start_subscription(receive_channel) as sub:
                 async for message in sub.iter_message(type_arg=p_in.GameUpdate):
                     yield message

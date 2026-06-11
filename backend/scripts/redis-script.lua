@@ -1,5 +1,15 @@
 #!lua name=raviolib
 
+--Publish
+local function publish(keys,args)
+  local data = args[1]
+
+  for _, channel in ipairs(keys) do
+      redis.call("PUBLISH", channel, data)
+  end
+end
+
+--Notifications
 local function notif_incrby(keys, args)
   for i=1,#keys do
     local hash = keys[i]
@@ -44,6 +54,8 @@ local function notif_set(keys, args)
 
 end
 
+--Register
+redis.register_function('publish', publish)
 redis.register_function('notif_incrby', notif_incrby)
 redis.register_function('notif_get', notif_get)
 redis.register_function('notif_set', notif_set)

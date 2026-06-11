@@ -1,5 +1,5 @@
 from ravioli_core.ipc import c_out, p_in
-from ravioli_core.ipc.channels import EngineCreateChan
+from ravioli_core.ipc.channels import EngChan
 from ravioli_core.serializers import json
 
 from .base import BaseClientOut, Consumer
@@ -10,7 +10,7 @@ class SiteConsumer(Consumer):
         match msg:
             case c_out.GameCreate(data):
                 response = p_in.GameCreate(sri=self.ctx.sri, data=data)
-                await self.broadcast.publish(EngineCreateChan(1), response)
+                await self.pub.publish(EngChan.game(), response)
             case _:
                 await self.global_handle(msg)
 
