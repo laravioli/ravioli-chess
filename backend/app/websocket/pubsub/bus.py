@@ -28,7 +28,6 @@ class EventBus:
 
         Args:
             sub (Subscriber): a sub to add.
-            conn (Connection): a connection to update (pubsub)
             chans (list[str]): list of channels to subscribe.
 
         Returns:

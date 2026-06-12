@@ -41,8 +41,8 @@ export class UserStore {
     this.channel = new BroadcastChannel('UserStoreChannel');
     this.channel.onmessage = (event) => {
       const { type, ...data } = event.data;
-      if (type === 'login') this.login(data);
-      if (type === 'logout') this.logout();
+      if (type === 'login') this.login(data, true);
+      if (type === 'logout') this.logout(true);
     };
   }
 
@@ -60,32 +60,34 @@ export class UserStore {
   }
 
   @action
-  login(user: UserSuccess) {
+  login(user: UserSuccess, broadcast: boolean = false) {
     this.username = user.username;
     this.preference = user.preference;
     this.logged = true;
     this.cacheEvent.onLogin(user);
     wsReload();
-    setTimeout(() =>
-      this.broadcast({
-        type: 'login',
-        ...user,
-      }),
-    );
+    if (!broadcast)
+      setTimeout(() =>
+        this.broadcast({
+          type: 'login',
+          ...user,
+        }),
+      );
   }
 
   @action
-  logout() {
+  logout(broadcast: boolean = false) {
     this.username = ANON.username;
     this.preference = ANON.preference;
     this.logged = false;
     this.cacheEvent.onLogout();
     wsReload();
-    setTimeout(() => {
-      this.broadcast({
-        type: 'logout',
+    if (!broadcast)
+      setTimeout(() => {
+        this.broadcast({
+          type: 'logout',
+        });
       });
-    });
   }
 
   private broadcast(event: UserEvent) {

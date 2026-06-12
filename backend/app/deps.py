@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from app.services import NotifService, Services, SocialService, WebService
 from ravioli_core.pubsub import Publisher
@@ -45,12 +45,11 @@ type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
 # ╚══════════════════════════════════════╝
 
 
-async def get_db_connection(env: EnvDep):
-    async with env.engine.connect() as conn:
-        yield conn
+async def get_engine(env: EnvDep):
+    return env.engine
 
 
-type DbConnection = Annotated[AsyncSession, Depends(get_db_connection, scope="function")]
+type EngineDep = Annotated[AsyncEngine, Depends(get_engine)]
 
 
 async def get_session(env: EnvDep):

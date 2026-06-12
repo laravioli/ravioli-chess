@@ -1,10 +1,8 @@
 import asyncio
 from contextlib import suppress
-from functools import cached_property
 
 from redis.asyncio import Redis
 
-from app.config import settings
 from app.websocket.schemas import MaybeUser
 from ravioli_core.ipc.channels import WsChan
 from ravioli_core.pubsub import Connection
@@ -29,8 +27,8 @@ class Users:
         self._flush_disconnects: set[UserId] = set()
         self._flush_disconnects_event = LazyEvent()
 
-        self._redis = redis
         self._connection = connection
+        self._redis = redis
 
         @scheduler.periodic(5.0, 7.0)
         async def flush_disconnects():
@@ -39,18 +37,10 @@ class Users:
             if self._flush_disconnects:
                 with self._flush_disconnects_event:
                     try:
-                        async with asyncio.TaskGroup() as tg:
-                            tg.create_task(
-                                self._redis.srem(self.presence_key, *self._flush_disconnects)
-                            )
-                            user_chans = (WsChan.users(uid) for uid in self._flush_disconnects)
-                            await self._connection.unsubscribe(user_chans)
+                        user_chans = (WsChan.users(uid) for uid in self._flush_disconnects)
+                        await self._connection.unsubscribe(user_chans)
                     finally:
                         self._flush_disconnects.clear()
-
-    @cached_property
-    def presence_key(self):
-        return f"presence:{settings.NODE_ID}"
 
     async def connect(self, sub: Subscriber, user: MaybeUser):
         """
@@ -68,13 +58,9 @@ class Users:
                 except KeyError:
                     # this avoid race where user appear offline while online
                     if user_id in self._flush_disconnects:
-                        # we ensure srem -> sadd
                         with suppress(asyncio.TimeoutError):
-                            await asyncio.wait_for(self._flush_disconnects_event.wait(), 1)
+                            await asyncio.wait_for(self._flush_disconnects_event.wait(), 0.5)
                     # end
-                    await self._redis.sadd(self.presence_key, user_id)
-
-                    # the caller can add this channel to a pubsub connection
                     return WsChan.users(user_id)
 
             else:
@@ -90,6 +76,21 @@ class Users:
                 if len(subs) == 0:
                     self._disconnects.add(user_id)
                     del self._users[user_id]
+
+    async def is_online(self, user_id: str):
+        # NOTE relying on "pubsub_numsub~=online" means:
+        # NOTE 1- no cluster
+        # NOTE 2- only users:user_id subscribers are websockets
+        if user_id in self._users:
+            return True
+        else:
+            return (await self._redis.pubsub_numsub(WsChan.users(user_id)))[0][1] > 0
+
+    async def are_online(self, user_ids: list[str]):
+        result: list[tuple[str, int]] = await self._redis.pubsub_numsub(
+            *(WsChan.users(user_id) for user_id in user_ids)
+        )
+        return ((_, bool(c)) for _, c in result)
 
     def tell_one(self, user_id: str, msg: str):
         try:

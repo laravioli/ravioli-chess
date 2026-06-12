@@ -18,9 +18,6 @@ def make_handler(bus: EventBus, users: Users):
     def handle(channel: str, data: bytes):
         channel_name = channel.split(":")[0]
         match channel_name:
-            # ╔══════════════════════════════════════╗
-            # ║       Play                           ║
-            # ╚══════════════════════════════════════╝
             case "play":
                 msg = json.decode(data, type_arg=PlayOut)
                 match msg:
@@ -28,10 +25,6 @@ def make_handler(bus: EventBus, users: Users):
                         bus.publish_one(channel, ClientIn(type, data))
                     case _:
                         raise ValueError("invalid message")
-
-            # ╔══════════════════════════════════════╗
-            # ║       Socket                         ║
-            # ╚══════════════════════════════════════╝
             case "sri":
                 msg = json.decode(data, type_arg=SriOut)
                 match msg:
@@ -41,9 +34,7 @@ def make_handler(bus: EventBus, users: Users):
                         bus.publish_one(channel, ClientIn(type="gameCreate", data=data))
                     case _:
                         raise ValueError("invalid message")
-            # ╔══════════════════════════════════════╗
-            # ║       Users                          ║
-            # ╚══════════════════════════════════════╝
+
             case "users":
                 msg = json.decode(data, type_arg=UserOut)
                 match msg:

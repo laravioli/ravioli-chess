@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app.websocket.env import WsEnv
+from app.env import WsEnv
 from app.websocket.schemas import MaybeUser, Sri
 from ravioli_core.ipc import ClientIn, c_out
 from ravioli_core.pubsub.types import Chan

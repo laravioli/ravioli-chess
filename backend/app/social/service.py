@@ -26,7 +26,7 @@ class SocialService:
         receiver_id: uuid.UUID,
     ):
         await self.db.create_request(session, sender_id, receiver_id)
-        await self.notif.create(bg, session, receiver_id)
+        await self.notif.create(bg, receiver_id)
 
     async def accept_request(
         self,
@@ -36,7 +36,7 @@ class SocialService:
         receiver_id: uuid.UUID,
     ):
         await self.db.accept_request(session, sender_id, receiver_id)
-        await self.notif.accept(bg, session, sender_id, receiver_id)
+        await self.notif.accept(bg, sender_id, receiver_id)
 
     async def delete_request(
         self,
@@ -47,7 +47,7 @@ class SocialService:
     ):
 
         await self.db.delete_request(session, sender_id, receiver_id)
-        await self.notif.delete(bg, session, receiver_id)
+        await self.notif.delete(bg, receiver_id)
 
     async def list_friendship(
         self,
@@ -65,7 +65,7 @@ class SocialService:
         target_id: uuid.UUID,
     ):
         await self.db.delete_friend(session, current_user_id, target_id)
-        await self.notif.delete_friend(bg, session, current_user_id, target_id)
+        await self.notif.delete_friend(bg, current_user_id, target_id)
 
 
 def make_social_service(notif: NotifService):

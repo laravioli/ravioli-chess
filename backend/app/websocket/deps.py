@@ -5,8 +5,8 @@ from fastapi.requests import HTTPConnection
 from fastapi.websockets import WebSocket
 
 from app.auth.deps import UserOrAnon
+from app.env import WsEnv
 
-from .env import WsEnv
 from .schemas import Sri, User
 
 

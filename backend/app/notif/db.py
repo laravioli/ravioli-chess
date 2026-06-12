@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi_pagination.ext.sqlalchemy import apaginate
 from sqlalchemy import delete, func, select, update
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import joinedload
 
 from ravioli_core.db.models import Notification, User
@@ -14,7 +14,7 @@ class NotifDB:
     @pagination
     async def get_notifications(
         self,
-        conn: AsyncSession | AsyncConnection,
+        session: AsyncSession,
         user_id: UUID,
         unread_count: int,
         params: NotifParams = NotifParams(),
@@ -26,14 +26,14 @@ class NotifDB:
             .options(joinedload(Notification.sender).load_only(User.username))
             .order_by(Notification.created_at.desc())
         )
-        return await apaginate(conn, stmt, params, additional_data={"unread": unread_count})
+        return await apaginate(session, stmt, params, additional_data={"unread": unread_count})
 
     async def unread_count(
         self,
-        conn: AsyncSession | AsyncConnection,
+        session: AsyncSession,
         user_id: UUID,
     ):
-        return await conn.scalar(
+        return await session.scalar(
             select(func.count())
             .select_from(Notification)
             .where(Notification.receiver_id == user_id, Notification.read.is_(False))

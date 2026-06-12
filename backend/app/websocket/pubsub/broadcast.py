@@ -1,16 +1,14 @@
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
-from redis.asyncio import Redis
-
 from app.websocket.consumer import Subscriber
 from app.websocket.schemas import MaybeUser
 from ravioli_core.pubsub import Connection
+from ravioli_core.pubsub.exceptions import BroadcastClosed
 from ravioli_core.pubsub.types import Chan
 from ravioli_core.pubsub.utils import LazyEvent
 
 from .bus import EventBus
-from .exceptions import BroadcastClosed
 from .handlers import make_handler
 from .users import Users
 
@@ -19,11 +17,9 @@ class Broadcast:
     def __init__(
         self,
         connection: Connection,
-        redis: Redis,
         users: Users,
     ):
         self._connection = connection
-        self._redis = redis
         self._users = users
         self._bus = EventBus()
         self._connection.set_handler(make_handler(self._bus, self._users))
@@ -58,8 +54,8 @@ class Broadcast:
             if self._closed_event.is_set():
                 raise BroadcastClosed()
             self._bus.register(sub)
-            user_chan = await self._users.connect(sub, user)
             new_chans = self._bus.subscribe(sub, chans)
+            user_chan = await self._users.connect(sub, user)
             if user_chan:
                 new_chans.add(user_chan)
             if len(new_chans) > 0:

@@ -3,17 +3,17 @@ from __future__ import annotations
 from contextlib import AbstractAsyncContextManager
 
 from ravioli_core.config import RedisSettings
-from ravioli_core.pubsub import LightBroadcast, RedisBackend
 from ravioli_core.utils import create_async_redis
 
 from .game.manager import GameManager
+from .pubsub.broadcast import Broadcast
 
 
 class App(AbstractAsyncContextManager):
     def __init__(self, pid: int):
         self.pid = pid
         self.redis = create_async_redis(settings=RedisSettings())
-        self.broadcast = LightBroadcast(backend=RedisBackend(self.redis))
+        self.broadcast = Broadcast(backend=RedisBackend(self.redis))
         self.game_manager = GameManager(broadcast=self.broadcast)
 
     async def __aenter__(self):

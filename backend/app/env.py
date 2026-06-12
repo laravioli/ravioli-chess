@@ -3,9 +3,12 @@ from dataclasses import dataclass
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from app.notif.service import NotifService
 from app.services import Services
+from app.websocket.pubsub import Broadcast, Users
 from ravioli_core.config import DbSettings, RedisSettings
-from ravioli_core.pubsub import Publisher
+from ravioli_core.ipc.channels import WsChan
+from ravioli_core.pubsub import Connection, Publisher
 from ravioli_core.scheduler import Scheduler
 from ravioli_core.utils import (
     create_async_redis,
@@ -22,13 +25,27 @@ class ServerEnv:
     services: Services
     scheduler: Scheduler
 
-    @staticmethod
-    def make():
 
-        redis = create_async_redis(settings=RedisSettings())
-        pub = Publisher(redis)
-        scheduler = Scheduler()
-        engine, session_maker = create_engine_and_sessionmaker(settings=DbSettings())
-        services = Services.make(redis)
+@dataclass(slots=True, frozen=True)
+class WsEnv:
+    broadcast: Broadcast
+    pub: Publisher
+    engine: AsyncEngine
+    notif: NotifService
+    users: Users
 
-        return ServerEnv(redis, pub, engine, session_maker, services, scheduler)
+
+def make_env():
+
+    redis = create_async_redis(settings=RedisSettings())
+    pub = Publisher(redis)
+    scheduler = Scheduler()
+    engine, session_maker = create_engine_and_sessionmaker(settings=DbSettings())
+    services = Services.make(redis)
+    conn = Connection(WsChan.all, redis)
+    users = Users(conn, redis, scheduler)
+    broadcast = Broadcast(conn, users)
+
+    return ServerEnv(redis, pub, engine, session_maker, services, scheduler), WsEnv(
+        broadcast, pub, engine, services.notif, users
+    )

@@ -1,13 +1,16 @@
 from collections.abc import Iterable
 from uuid import UUID
 
+from msgspec import Raw
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+
+from ravioli_core.ipc.process.out import TellUser
 
 from .background import BackgroundNotif
 from .cache import NotifCache
 from .db import NotifDB
-from .schemas import NotifParams
+from .schemas import NotifParams, notification_ta
 
 
 class NotifService:
@@ -17,16 +20,16 @@ class NotifService:
 
     async def get_notifications(
         self,
-        conn: AsyncSession | AsyncConnection,
+        session: AsyncSession,
         user_id: UUID,
         params: NotifParams = NotifParams(),
     ):
-        unread_count = await self.get_unread_count(conn, user_id)
-        return await self.db.get_notifications(conn, user_id, unread_count, params)
+        unread_count = await self.get_unread_count(session, user_id)
+        return await self.db.get_notifications(session, user_id, unread_count, params)
 
     async def get_unread_count(
         self,
-        session: AsyncSession | AsyncConnection,
+        session: AsyncSession,
         user_id: UUID,
     ):
         return await self.cache.get_or_set(
@@ -40,24 +43,26 @@ class NotifService:
     ):
         await self.db.delete_all(session, user_id)
 
-    async def notify_one(
+    def notify_one(
         self,
         notifier: BackgroundNotif,
-        session: AsyncSession,
         user_id: UUID,
     ):
-        notifications = await self.get_notifications(session, user_id, params=NotifParams())
-        notifier.tell_user(user_id, notifications)
+        async def lazy_notif(session_maker: async_sessionmaker[AsyncSession]):
+            async with session_maker() as session:
+                notifications = await self.get_notifications(session, user_id, params=NotifParams())
+            raw = notification_ta.dump_json(notification_ta.validate_python(notifications))
+            return TellUser(type="notifications", data=Raw(raw))
 
-    async def notify_many(
+        notifier.tell_user(user_id, lazy_notif)
+
+    def notify_many(
         self,
         notifier: BackgroundNotif,
-        session: AsyncSession,
         user_ids: Iterable[UUID],
     ):
-        # NOTE: to make this concurrent i would need X separates conn
-        for id in user_ids:
-            await self.notify_one(notifier, session, id)
+        for user_id in user_ids:
+            self.notify_one(notifier, user_id)
 
     async def mark_all_read(self, engine: AsyncEngine, user_id: UUID):
         await self.db.mark_all_read(engine, user_id)

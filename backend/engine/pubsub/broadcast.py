@@ -1,30 +1,20 @@
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
+from ravioli_core.pubsub import Connection
+from ravioli_core.pubsub.exceptions import BroadcastClosed
+from ravioli_core.pubsub.utils import LazyEvent
 from ravioli_core.serializers import json
 
-from .backend import ChannelBackend
 from .subscriber import Subscriber
-from .utils import LazyEvent
 
 
-class BroadcastClosed(Exception):
-    pass
-
-
-class LightBroadcast:
+class Broadcast:
     def __init__(
         self,
-        backend: ChannelBackend,
-        immediate_shutdown=False,
+        connection: Connection,
     ):
-        """
-        Args:
-            backend: broker to manage message
-            immediate_shutdown: weither to let application consume pending messages in susbcribers
-        """
-        self._backend = backend
-        self._immediate_shutdown = immediate_shutdown
+        self._conn = connection
         self._channel_map: dict[str, set[Subscriber]] = {}
         self.has_subscribers = LazyEvent()
         self.closed_event = LazyEvent()
@@ -42,7 +32,7 @@ class LightBroadcast:
                         subscriber.put_nowait(message)
         finally:
             for sub in self.subscribers:
-                sub.shutdown(immediate=self._immediate_shutdown)
+                sub.shutdown(immediate=False)
             self.closed_event.set()
 
     async def start(self):
@@ -62,13 +52,6 @@ class LightBroadcast:
         await self._backend.publish(channel, json.encode(message))
 
     async def subscribe(self, *args: str):
-        """
-        Create a new instance of Subscriber and register it to channels.
-
-        Args:
-            args:Each argument represent a channel to subscribe to
-        """
-
         subscriber = Subscriber()
 
         backend_subscribe = set()
