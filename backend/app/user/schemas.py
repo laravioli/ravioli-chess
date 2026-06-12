@@ -42,6 +42,10 @@ class UserBase(BaseSchema):
     username: str
 
 
+class UserSearch(UserBase):
+    online: bool
+
+
 class FriendShip(BaseSchema):
     is_sender: bool
     status: FriendshipStatus

@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Iterable
 from contextlib import suppress
 
 from redis.asyncio import Redis
@@ -80,17 +81,17 @@ class Users:
     async def is_online(self, user_id: str):
         # NOTE relying on "pubsub_numsub~=online" means:
         # NOTE 1- no cluster
-        # NOTE 2- only users:user_id subscribers are websockets
+        # NOTE 2- users:user_id subscribers are websockets only
         if user_id in self._users:
             return True
         else:
             return (await self._redis.pubsub_numsub(WsChan.users(user_id)))[0][1] > 0
 
-    async def are_online(self, user_ids: list[str]):
+    async def are_online(self, user_ids: Iterable[str]):
         result: list[tuple[str, int]] = await self._redis.pubsub_numsub(
             *(WsChan.users(user_id) for user_id in user_ids)
         )
-        return ((_, bool(c)) for _, c in result)
+        return (bool(c) for _, c in result)
 
     def tell_one(self, user_id: str, msg: str):
         try:
@@ -99,6 +100,6 @@ class Users:
         except KeyError:
             pass
 
-    def tell_many(self, user_ids: list[UserId], msg: str):
+    def tell_many(self, user_ids: Iterable[UserId], msg: str):
         for user_id in user_ids:
             self.tell_one(user_id, msg)

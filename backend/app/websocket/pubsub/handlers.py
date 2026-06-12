@@ -1,9 +1,9 @@
+from app.user import Users
 from ravioli_core.ipc import ClientIn, p_out
 from ravioli_core.ipc.channels import WsChan
 from ravioli_core.serializers import json
 
 from .bus import EventBus
-from .users import Users
 
 # ╔══════════════════════════════════════╗
 # ║        Handler                       ║

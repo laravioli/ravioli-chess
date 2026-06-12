@@ -11,7 +11,8 @@ from app.social.db import friendship_criteria
 from ravioli_core.db.models import Friendship, Preference, User
 from ravioli_core.utils import transaction
 
-from .schemas import UserCreate
+from .schemas import UserCreate, UserSearch
+from .users import Users
 
 
 async def user_create(session: DbSession, data: UserCreate):
@@ -61,15 +62,26 @@ async def user_retrieve_with_friendship(session: DbSession, current_user: User, 
     return user
 
 
-async def user_search(session: DbSession, search_query: str, limit: int):
+async def user_search(session: DbSession, users: Users, search_query: str, limit: int):
     stmt = (
         select(User.id, User.username)
         .where(User.username.like(f"{search_query}%"))
         .order_by(User.username)
         .limit(limit)
     )
-    users = await session.execute(stmt)
-    return users.all()
+    result = await session.execute(stmt)
+    rows = result.all()
+
+    online_status = await users.are_online([row.id for row in rows])
+
+    return [
+        UserSearch(
+            id=row.id,
+            username=row.username,
+            online=online,
+        )
+        for row, online in zip(rows, online_status, strict=True)
+    ]
 
 
 async def user_delete(session: DbSession, id: UUID) -> bool:

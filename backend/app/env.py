@@ -5,7 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.notif.service import NotifService
 from app.services import Services
-from app.websocket.pubsub import Broadcast, Users
+from app.user import Users
+from app.websocket.pubsub import Broadcast
 from ravioli_core.config import DbSettings, RedisSettings
 from ravioli_core.ipc.channels import WsChan
 from ravioli_core.pubsub import Connection, Publisher
@@ -23,6 +24,7 @@ class ServerEnv:
     engine: AsyncEngine
     session_maker: async_sessionmaker[AsyncSession]
     services: Services
+    users: Users
     scheduler: Scheduler
 
 
@@ -46,6 +48,6 @@ def make_env():
     users = Users(conn, redis, scheduler)
     broadcast = Broadcast(conn, users)
 
-    return ServerEnv(redis, pub, engine, session_maker, services, scheduler), WsEnv(
+    return ServerEnv(redis, pub, engine, session_maker, services, users, scheduler), WsEnv(
         broadcast, pub, engine, services.notif, users
     )
