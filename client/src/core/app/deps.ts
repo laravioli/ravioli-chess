@@ -9,7 +9,7 @@ import type { AnalyseStore } from '@/analyse/store/analyse';
 import type { EditorStore } from '@/editor/store/editor';
 import type { PlayStore } from '@/play/store/play';
 import { CONFIG } from './config';
-import { socketHandlers } from './socket';
+import { siteHandlers } from './socket';
 
 export interface AppDeps {
   mantineConfig: MantineProviderProps;
@@ -39,7 +39,7 @@ export const makeDeps = (
       userStore: new UserStore({ data: payload.user, cacheEvent }),
       ceval: new Ceval(),
       lobbySettings: new LobbySettings(),
-      socketReceive: socketHandlers(queryClient),
+      socketReceive: siteHandlers(queryClient),
     },
     data: { page: payload.page, data: payload.data },
   };

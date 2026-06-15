@@ -27,11 +27,15 @@ const refreshUserData = (queryClient: QueryClient, username: string, friendship?
   );
 };
 
+const invalidateUserData = (queryClient: QueryClient, username: string) =>
+  queryClient.invalidateQueries({ queryKey: getUserQueryKey({ path: { username } }) });
+
 export const useAddFriend = ({ username }: SocialHookParams) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     ...sendFriendRequestMutation(),
     onSuccess: (friendship) => refreshUserData(queryClient, username, friendship),
+    onError: () => invalidateUserData(queryClient, username),
   });
 
   return mutation;
@@ -42,6 +46,7 @@ export const useCancelRequest = ({ username }: SocialHookParams) => {
   const mutation = useMutation({
     ...cancelFriendRequestMutation(),
     onSuccess: () => refreshUserData(queryClient, username, undefined),
+    onError: () => invalidateUserData(queryClient, username),
   });
 
   return mutation;
@@ -51,10 +56,11 @@ export const useAcceptRequest = ({ username }: SocialHookParams) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     ...acceptFriendRequestMutation(),
-    onSuccess: async (friendhsip) => {
-      refreshUserData(queryClient, username, friendhsip);
+    onSuccess: async (friendship) => {
+      refreshUserData(queryClient, username, friendship);
       await queryClient.invalidateQueries({ queryKey: listMyFriendsQueryKey() });
     },
+    onError: () => invalidateUserData(queryClient, username),
   });
 
   return mutation;
@@ -67,6 +73,7 @@ export const useRejectRequest = ({ username }: SocialHookParams) => {
     onSuccess: () => {
       refreshUserData(queryClient, username, undefined);
     },
+    onError: () => invalidateUserData(queryClient, username),
   });
 
   return mutation;
@@ -80,6 +87,7 @@ export const useRemoveFriend = ({ username }: SocialHookParams) => {
       refreshUserData(queryClient, username, undefined);
       await queryClient.invalidateQueries({ queryKey: listMyFriendsQueryKey() });
     },
+    onError: () => invalidateUserData(queryClient, username),
   });
 
   return mutation;

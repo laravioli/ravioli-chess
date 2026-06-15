@@ -1,18 +1,18 @@
+from typing import Unpack
 from uuid import UUID
 
 from sqlalchemy import and_, delete, select
 from sqlalchemy.orm import joinedload
 
 from app.auth.security import generate_password_hash
-from app.deps import DbSession
+from app.deps import DbSession, Users
 from app.exceptions import DBNotFound
 from app.services import Services
 from app.social.db import friendship_criteria
 from ravioli_core.db.models import Friendship, Preference, User
 from ravioli_core.utils import transaction
 
-from .schemas import UserCreate, UserSearch
-from .users import Users
+from .schemas import UserCreate, UserFilter, UserSearch
 
 
 async def user_create(session: DbSession, data: UserCreate):
@@ -29,16 +29,24 @@ async def user_create(session: DbSession, data: UserCreate):
     return new_user
 
 
-async def user_retrieve(session: DbSession, username: str, withPref=False):
+async def user_retrieve(
+    session: DbSession, users: Users, username: str, **kwargs: Unpack[UserFilter]
+):
     options = []
-    if withPref:
+    if kwargs.get("with_pref"):
         options.append(joinedload(User.preference))
     stmt = select(User).where(User.username == username).options(*options)
     user = await session.scalar(stmt)
+
+    if user and kwargs.get("with_online"):
+        user.online = await users.is_online(str(user.id))
+
     return user
 
 
-async def user_retrieve_with_friendship(session: DbSession, current_user: User, username: str):
+async def user_retrieve_with_friendship(
+    session: DbSession, users: Users, current_user: User, username: str
+):
     stmt = (
         select(User, Friendship)
         .outerjoin(
@@ -55,9 +63,11 @@ async def user_retrieve_with_friendship(session: DbSession, current_user: User, 
         return None
 
     user, friendship = row
-    if friendship:
-        friendship.is_sender = friendship.sender_id == current_user.id
-    user.friendship = friendship
+    if user:
+        if friendship:
+            friendship.is_sender = friendship.sender_id == current_user.id
+        user.friendship = friendship
+        user.online = await users.is_online(str(user.id))
 
     return user
 

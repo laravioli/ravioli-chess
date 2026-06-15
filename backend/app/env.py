@@ -5,8 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.notif.service import NotifService
 from app.services import Services
-from app.user import Users
-from app.websocket.pubsub import Broadcast
+from app.websocket.pubsub import Broadcast, Users
 from ravioli_core.config import DbSettings, RedisSettings
 from ravioli_core.ipc.channels import WsChan
 from ravioli_core.pubsub import Connection, Publisher

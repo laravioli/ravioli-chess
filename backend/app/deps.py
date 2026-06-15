@@ -6,6 +6,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from app.services import NotifService, Services, SocialService, WebService
+from app.websocket.pubsub import Users
 from ravioli_core.pubsub import Publisher
 
 from .env import ServerEnv
@@ -38,6 +39,13 @@ type ServiceDep = Annotated[Services, Depends(get_services)]
 type WebServiceDep = Annotated[WebService, Depends(get_web)]
 type NotifServiceDep = Annotated[NotifService, Depends(get_notif)]
 type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
+
+
+async def get_users(env: EnvDep):
+    return env.users
+
+
+type UsersDep = Annotated[Users, Depends(get_users)]
 
 
 # ╔══════════════════════════════════════╗

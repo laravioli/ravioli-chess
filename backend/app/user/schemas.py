@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, TypedDict
 
 from pydantic import (
     UUID4,
@@ -54,11 +54,17 @@ class FriendShip(BaseSchema):
 class UserProfile(UserBase):
     friendship: FriendShip | None = None
     joined_at: AwareDatetime
+    online: bool
 
 
 class UserWithPref(UserBase):
     preference: Preference
     joined_at: AwareDatetime
+
+
+class UserFilter(TypedDict, total=False):
+    with_pref: bool
+    with_online: bool
 
 
 # Note

@@ -1,10 +1,20 @@
 import { useState } from 'react';
-import { ActionIcon, Autocomplete, Collapse, FocusTrap, Group } from '@mantine/core';
+import {
+  ActionIcon,
+  Autocomplete,
+  AutocompleteProps,
+  Collapse,
+  FocusTrap,
+  Group,
+  Box,
+  Text,
+} from '@mantine/core';
 import { useClickOutside, useDebouncedValue } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { IconSearch } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 
+import { defined } from '@/lib/common';
 import { listUserOptions } from '@/lib/api/@tanstack/react-query.gen';
 
 interface SearchUsersWithCollapseProps {
@@ -35,11 +45,29 @@ const SearchUsers: React.FC<{ close: (() => void) | undefined }> = ({ close = un
   const { data } = useQuery({
     ...listUserOptions({ query: { q: debounced } }),
     enabled: debounced.length >= 3,
-    select: (data) => data.map((r) => r.username),
+    staleTime: 2 * 90 * 1000,
+    select: (data) => new Map(data.map((r) => [r.username, r])),
     placeholderData: (prev) => prev,
   });
 
-  const userList = value.length >= 3 ? data : [];
+  const renderAutocompleteOption: AutocompleteProps['renderOption'] = ({ option }) => {
+    const user = data?.get(option.value);
+    if (defined(user))
+      return (
+        <Group gap="xs">
+          <Box
+            w={8}
+            h={8}
+            style={{
+              borderRadius: '50%',
+              backgroundColor: user.online ? 'limegreen' : 'gray',
+            }}
+          />
+          <Text size="sm">{user.username}</Text>
+        </Group>
+      );
+  };
+
   const navigate = useNavigate();
 
   return (
@@ -48,7 +76,8 @@ const SearchUsers: React.FC<{ close: (() => void) | undefined }> = ({ close = un
         placeholder="Search"
         value={value}
         onChange={setValue}
-        data={userList}
+        data={data && value.length >= 3 ? [...data.keys()] : []}
+        renderOption={renderAutocompleteOption}
         onOptionSubmit={(val) => navigate(`/profile/${val}`)}
         onDropdownClose={() => {
           setValue('');

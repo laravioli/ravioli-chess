@@ -6,7 +6,7 @@ from fastapi.exceptions import HTTPException
 from app.api.schemas import Message
 from app.auth.deps import AuthUser, SessionCookie, UserOrAnon
 from app.config import settings
-from app.deps import DbSession, EnvDep, RedisClient
+from app.deps import DbSession, EnvDep, RedisClient, UsersDep
 
 from .schemas import UserBase, UserCreate, UserProfile, UserSearch, UserWithPref
 from .service import (
@@ -48,12 +48,12 @@ async def delete_user(
 
 
 @router.get("/{username}", response_model=UserProfile, response_model_exclude_unset=True)
-async def get_user(session: DbSession, current_user: UserOrAnon, username: str):
+async def get_user(session: DbSession, users: UsersDep, current_user: UserOrAnon, username: str):
 
     user = (
-        await user_retrieve_with_friendship(session, current_user, username)
+        await user_retrieve_with_friendship(session, users, current_user, username)
         if current_user and (current_user.username != username)
-        else await user_retrieve(session, username=username)
+        else await user_retrieve(session, users, username=username, with_online=True)
     )
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")

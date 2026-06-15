@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
-import { useQuery } from '@tanstack/react-query';
-import { Group, Button, Tabs } from '@mantine/core';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Group, Button, Tabs, Image, Indicator } from '@mantine/core';
 import { useParams } from 'react-router';
 
 import { useGlobalStore } from '@/core/hooks';
@@ -11,6 +11,10 @@ import { dateFormatter } from '@/user/utils';
 import l from '@/user/css/layout.module.css';
 import s from '@/user/css/header.module.css';
 import { SocialActions } from './social';
+import { useEffect } from 'react';
+
+import { wsConnect } from '@/lib/socket';
+import { siteHandlers } from '@/core/app/socket';
 
 const Profile: React.FC = () => {
   return (
@@ -23,20 +27,28 @@ const Profile: React.FC = () => {
 const Header: React.FC = observer(() => {
   const { userStore } = useGlobalStore();
   const params = useParams();
+  const queryClient = useQueryClient();
   const { data } = useQuery({
     ...getUserOptions({ path: { username: params.username! } }),
   });
+  const me = userStore.username === data?.username;
+
+  useEffect(() => {
+    wsConnect('/socket/site', { receive: siteHandlers(queryClient) });
+  }, []);
 
   if (data)
     return (
       <>
         <div className={clsx(l.profileHeader, s.profileHeader)}>
-          <div className={clsx(l.avatar, s.avatar)}>
-            <img src="/static/images/avatar.svg"></img>
-          </div>
+          <Indicator position="top-end" color="teal" disabled={!data.online}>
+            <div className={clsx(l.avatar, s.avatar)}>
+              <Image src="/static/images/avatar.svg" />
+            </div>
+          </Indicator>
           <span className={clsx(l.info, s.info)}>{data.username}</span>
           <div className={l.actions}>
-            {userStore.username !== data.username && (
+            {!me && (
               <Group justify="center" gap={0}>
                 <Button variant="default">Challenge</Button>
 

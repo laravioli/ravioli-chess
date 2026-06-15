@@ -30,7 +30,7 @@ async def transaction(session: AsyncSession, error_detail="Integrity Error"):
     try:
         yield
         await session.commit()
-    except Exception as e:
+    except BaseException as e:
         if isinstance(e, IntegrityError):
             e.detail = error_detail
         await session.rollback()

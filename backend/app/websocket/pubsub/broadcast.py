@@ -1,7 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager, suppress
 
-from app.user import Users
 from app.websocket.consumer import Subscriber
 from app.websocket.schemas import MaybeUser
 from ravioli_core.pubsub import Connection
@@ -11,6 +10,7 @@ from ravioli_core.pubsub.utils import LazyEvent
 
 from .bus import EventBus
 from .handlers import make_handler
+from .users import Users
 
 
 class Broadcast:
