@@ -6,14 +6,16 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from app.notif.service import NotifService
 from app.services import Services
 from app.websocket.pubsub import Broadcast, Users
-from ravioli_core.config import DbSettings, RedisSettings
+from ravioli_core.config import DbSettings
 from ravioli_core.ipc.channels import WsChan
-from ravioli_core.pubsub import Connection, Publisher
+from ravioli_core.pubsub import Connection
 from ravioli_core.scheduler import Scheduler
 from ravioli_core.utils import (
     create_async_redis,
     create_engine_and_sessionmaker,
 )
+
+from .publisher import Publisher
 
 
 @dataclass(slots=True, frozen=True)
@@ -38,7 +40,7 @@ class WsEnv:
 
 def make_env():
 
-    redis = create_async_redis(settings=RedisSettings())
+    redis = create_async_redis()
     pub = Publisher(redis)
     scheduler = Scheduler()
     engine, session_maker = create_engine_and_sessionmaker(settings=DbSettings())

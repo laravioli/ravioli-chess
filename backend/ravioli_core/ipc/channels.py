@@ -1,5 +1,6 @@
 """
 format invariant: chan_name:chan_id
+define all channels in one file to avoid conflict
 """
 
 type Chan = str
@@ -24,10 +25,7 @@ class _Chan:
 
 class EngChan(_Chan):
     all = ["game:all"]
-
-    @staticmethod
-    def game(game_id: str = "all"):
-        return f"game:{game_id}"
+    game = "game:all"
 
 
 # ╔══════════════════════════════════════╗

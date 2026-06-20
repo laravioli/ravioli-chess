@@ -1,18 +1,23 @@
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import AsyncGenerator, Awaitable, Callable
 
 import chess
 
 from engine.exceptions import StopActor
-from ravioli_core.ipc import p_in, p_out
+from ravioli_core.ipc import e_in, w_in
 
 logger = logging.getLogger(__name__)
 
 
-class Actor(ABC):
-    async def __call__(self, receive, send):
+class Actor[S, R](ABC):
+    async def __call__(
+        self,
+        send: Callable[[S], Awaitable[None]],
+        receive: AsyncGenerator[R],
+    ):
         try:
-            async for msg in receive():
+            async for msg in receive:
                 response = self.handle_message(msg)
                 if response:
                     await send(response)
@@ -22,7 +27,7 @@ class Actor(ABC):
             logger.info("stop game actor")
 
     @abstractmethod
-    def handle_message(msg):
+    def handle_message(self, msg: R) -> S | None:
         """
         **Return**:
             A python object message to send back.
@@ -33,27 +38,24 @@ class Actor(ABC):
         ...
 
 
-class GameActor(Actor):
-    def __init__(self, *, info: p_in.GameInfo):
-        self.white_player = info.white_player
-        self.black_player = info.black_player
+class GameActor(Actor[w_in.GameUpdate, e_in.GameUpdate]):
+    def __init__(self):
         self._board = chess.Board()
 
     def handle_message(self, msg):
         response = None
 
         match msg:
-            case p_in.GameMove(san):
+            case e_in.GameMove(_, san):
                 try:
                     self._board.push_san(san)
-                    response = p_out.GameUpdate(type="move", data=p_out.GameMove(san))
+                    response = w_in.GameUpdate(type="move", data=w_in.D_GameMove(san))
                 except ValueError as exc:
-                    response = p_out.GameUpdate(
-                        type="endData", data=p_out.GameEnd(reason="invalid move")
+                    response = w_in.GameUpdate(
+                        type="endData", data=w_in.D_GameEnd(reason="invalid move")
                     )
                     raise StopActor from exc
             case _:
                 logger.warning("Unknown message received: %s", msg)
-                raise StopActor
 
         return response

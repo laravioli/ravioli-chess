@@ -2,27 +2,28 @@ from __future__ import annotations
 
 from contextlib import AbstractAsyncContextManager
 
-from ravioli_core.config import RedisSettings
+from ravioli_core.ipc.channels import EngChan
+from ravioli_core.pubsub import Connection
 from ravioli_core.utils import create_async_redis
 
-from .game.manager import GameManager
-from .pubsub.broadcast import Broadcast
+from .game import Games
+from .pubsub import Listener, Publisher, make_handler
 
 
 class App(AbstractAsyncContextManager):
-    def __init__(self, pid: int):
-        self.pid = pid
-        self.redis = create_async_redis(settings=RedisSettings())
-        self.broadcast = Broadcast(backend=RedisBackend(self.redis))
-        self.game_manager = GameManager(broadcast=self.broadcast)
+    def __init__(self):
+        self.redis = create_async_redis()
+        self.pub = Publisher(self.redis)
+        self.games = Games(self.pub)
+        self.listener = Listener(Connection(EngChan.all, self.redis))
 
     async def __aenter__(self):
-        await self.broadcast.start()
-        await self.game_manager.start()
-
+        self.pub.start()
+        self.listener.start(make_handler(self.games))
         return self
 
     async def __aexit__(self, exc_type, exc, tb):
-        await self.broadcast.stop()
-        await self.game_manager.stop()
+        await self.listener.stop()
+        await self.games.stop()
+        await self.pub.stop()
         await self.redis.aclose()

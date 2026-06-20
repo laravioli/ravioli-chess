@@ -1,12 +1,14 @@
+from collections.abc import Coroutine
 from contextlib import asynccontextmanager
+
+# DB stuff
+from typing import Any, Protocol
 
 from redis.asyncio import Redis
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from .config import DbSettings, RedisSettings
-
-# DB stuff
 
 
 def create_engine_and_sessionmaker(settings: DbSettings):
@@ -21,17 +23,24 @@ def create_engine_and_sessionmaker(settings: DbSettings):
     return engine, async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
 
-def create_async_redis(settings: RedisSettings):
-    return Redis.from_url(settings.REDIS_URL, health_check_interval=15)
+class Transactional(Protocol):
+    def commit(self) -> Coroutine[Any, Any, None]: ...
+    def rollback(self) -> Coroutine[Any, Any, None]: ...
 
 
 @asynccontextmanager
-async def transaction(session: AsyncSession, error_detail="Integrity Error"):
+async def transaction(conn: Transactional, error_detail="Integrity Error"):
     try:
         yield
-        await session.commit()
+        await conn.commit()
     except BaseException as e:
         if isinstance(e, IntegrityError):
             e.detail = error_detail
-        await session.rollback()
+        await conn.rollback()
         raise
+
+
+def create_async_redis(**kwargs: Any):
+    settings = RedisSettings().as_dict()
+    settings.update(kwargs)
+    return Redis(**settings)

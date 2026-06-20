@@ -2,6 +2,8 @@ from logging import config
 
 from pydantic import PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from redis.asyncio.retry import Retry
+from redis.backoff import ExponentialWithJitterBackoff
 
 
 class DbSettings(BaseSettings):
@@ -29,7 +31,22 @@ class DbSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
-    REDIS_URL: str
+    REDIS_HOST: str
+    REDIS_PORT: str
+    REDIS_UNIX_SOCKET_PATH: str | None = None
+
+    def as_dict(self):
+        return {
+            "host": self.REDIS_HOST,
+            "port": self.REDIS_PORT,
+            "socket_connect_timeout": 15,
+            "socket_timeout": 5,
+            "unix_socket_path": self.REDIS_UNIX_SOCKET_PATH,
+            "decode_responses": False,
+            "retry": Retry(backoff=ExponentialWithJitterBackoff(base=1, cap=10), retries=3),
+            "health_check_interval": 3,
+            "protocol": 3,
+        }
 
 
 class LogSettings(BaseSettings):

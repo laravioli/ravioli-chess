@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from fastapi import WebSocket, WebSocketDisconnect
 
 from app.env import WsEnv
+from app.websocket.frame import ClientIn, c_out
 from app.websocket.schemas import MaybeUser, Sri
-from ravioli_core.ipc import ClientIn, c_out
 from ravioli_core.pubsub.types import Chan
 from ravioli_core.serializers import json
 

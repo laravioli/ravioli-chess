@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from ravioli_core.ipc import c_out, p_in
+from app.websocket.frame import c_out
+from ravioli_core.ipc import e_in
 from ravioli_core.ipc.channels import EngChan
 from ravioli_core.serializers import json
 
@@ -21,8 +22,8 @@ class PlayConsumer(Consumer[PlayContext]):
     async def handle(self, msg):
         match msg:
             case c_out.GameMove(data):
-                move = p_in.GameMove(san=data.san)
-                await self.pub.publish(EngChan.game(self.ctx.game.id), move)
+                move = e_in.GameMove(game_id=self.ctx.game.id, san=data.san)
+                await self.pub.publish(EngChan.game, move)
             case _:
                 await self.global_handle(msg)
 

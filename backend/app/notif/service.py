@@ -5,7 +5,7 @@ from msgspec import Raw
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from ravioli_core.ipc.process.out import TellUser
+from ravioli_core.ipc.w_in import TellUser
 
 from .background import BackgroundNotif
 from .cache import NotifCache

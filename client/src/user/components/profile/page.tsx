@@ -30,6 +30,7 @@ const Header: React.FC = observer(() => {
   const queryClient = useQueryClient();
   const { data } = useQuery({
     ...getUserOptions({ path: { username: params.username! } }),
+    staleTime: 30 * 1000,
   });
   const me = userStore.username === data?.username;
 

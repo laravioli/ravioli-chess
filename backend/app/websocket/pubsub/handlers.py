@@ -1,5 +1,7 @@
-from ravioli_core.ipc import ClientIn, p_out
+from app.websocket.frame import ClientIn
+from ravioli_core.ipc import w_in
 from ravioli_core.ipc.channels import WsChan
+from ravioli_core.pubsub.utils import str_if_bytes
 from ravioli_core.serializers import json
 
 from .bus import EventBus
@@ -11,34 +13,33 @@ from .users import Users
 
 
 def make_handler(bus: EventBus, users: Users):
-    type SriOut = p_out.TellSri | p_out.GameCreate
-    type UserOut = p_out.TellUser
-    type PlayOut = p_out.GameUpdate
+    type SriIn = w_in.TellSri
+    type UserIn = w_in.TellUser
+    type PlayIn = w_in.GameUpdate
 
-    def handle(channel: str, data: bytes):
+    def handle(channel: str | bytes, data: bytes):
+        channel = str_if_bytes(channel)
         channel_name = channel.split(":")[0]
         match channel_name:
             case "play":
-                msg = json.decode(data, type_arg=PlayOut)
+                msg = json.decode(data, type_arg=PlayIn)
                 match msg:
-                    case p_out.GameUpdate(type, data):
+                    case w_in.GameUpdate(type, data):
                         bus.publish_one(channel, ClientIn(type, data))
                     case _:
                         raise ValueError("invalid message")
             case "sri":
-                msg = json.decode(data, type_arg=SriOut)
+                msg = json.decode(data, type_arg=SriIn)
                 match msg:
-                    case p_out.TellSri(type, data):
+                    case w_in.TellSri(type, data):
                         bus.publish_one(channel, ClientIn(type, data))
-                    case p_out.GameCreate(data):
-                        bus.publish_one(channel, ClientIn(type="gameCreate", data=data))
                     case _:
                         raise ValueError("invalid message")
 
             case "users":
-                msg = json.decode(data, type_arg=UserOut)
+                msg = json.decode(data, type_arg=UserIn)
                 match msg:
-                    case p_out.TellUser(type, data):
+                    case w_in.TellUser(type, data):
                         users.tell_one(WsChan.id(channel), ClientIn(type=type, data=data))
                     case _:
                         raise ValueError("invalid message")

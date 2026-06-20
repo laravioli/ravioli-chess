@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager, suppress
 from app.websocket.consumer import Subscriber
 from app.websocket.schemas import MaybeUser
 from ravioli_core.pubsub import Connection
-from ravioli_core.pubsub.exceptions import BroadcastClosed
+from ravioli_core.pubsub.exceptions import BroadcastStopped
 from ravioli_core.pubsub.types import Chan
 from ravioli_core.pubsub.utils import LazyEvent
 
@@ -23,27 +23,20 @@ class Broadcast:
         self._users = users
         self._bus = EventBus()
         self._connection.set_handler(make_handler(self._bus, self._users))
-        self._closed_event = LazyEvent()
+        self._shutdown = LazyEvent()
 
     async def start(self):
-
-        if not (self._closed_event.is_set() or hasattr(self, "_task")):
-            self._task = asyncio.create_task(self._run())
-        return self._task
+        if self._shutdown.is_set():
+            raise BroadcastStopped()
+        self._task = asyncio.create_task(self._connection.listen())
 
     async def stop(self):
-        if not self._closed_event.is_set():
+        self._shutdown.set()
+        if not self._task.done():
             self._task.cancel()
             with suppress(asyncio.CancelledError):
                 await self._task
-
-    async def _run(self):
-        try:
-            await self._connection.listen()
-        finally:
-            for sub in self._bus.subs:
-                sub.shutdown(immediate=False)
-            self._closed_event.set()
+        await self._connection.aclose()
 
     @asynccontextmanager
     async def start_subscription(self, sub: Subscriber, user: MaybeUser, chans: list[Chan]):
@@ -51,9 +44,6 @@ class Broadcast:
         Subscribe/Unsubscribe sequentially
         """
         try:
-            if self._closed_event.is_set():
-                raise BroadcastClosed()
-            self._bus.register(sub)
             new_chans = self._bus.subscribe(sub, chans)
             user_chan = await self._users.connect(sub, user)
             if user_chan:
@@ -66,7 +56,6 @@ class Broadcast:
             #####
 
         finally:
-            self._bus.unregister(sub)
             self._users.disconnect(sub, user)
             old_chans = self._bus.unsubscribe(sub, chans)
             if len(old_chans) > 0:

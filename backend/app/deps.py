@@ -7,9 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from app.services import NotifService, Services, SocialService, WebService
 from app.websocket.pubsub import Users
-from ravioli_core.pubsub import Publisher
 
-from .env import ServerEnv
+from .env import Publisher, ServerEnv
 
 
 async def get_env(conn: HTTPConnection) -> ServerEnv:

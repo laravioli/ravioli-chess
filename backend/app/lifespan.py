@@ -1,5 +1,5 @@
 import asyncio
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 
@@ -22,9 +22,10 @@ async def on_start(env: ServerEnv, ws_env: WsEnv):
 
 async def on_stop(env: ServerEnv, ws_env: WsEnv):
     await env.scheduler.shutdown()
-    await asyncio.gather(ws_env.broadcast.stop(), env.engine.dispose())
-    await env.redis.hdel("app:node", settings.NODE_ID)
-    await env.redis.aclose()
+    await ws_env.broadcast.stop()
+    with suppress(Exception):
+        await env.redis.hdel("app:node", settings.NODE_ID)
+    await asyncio.gather(env.redis.aclose(), env.engine.dispose(), return_exceptions=True)
 
 
 @asynccontextmanager

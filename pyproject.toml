@@ -1,6 +1,6 @@
 [project]
 name = "raviolichess"
-description = "chess server full-stack application"
+description = "chess server application"
 readme = "README.md"
 version = "0.1.0"
 requires-python = ">=3.13"

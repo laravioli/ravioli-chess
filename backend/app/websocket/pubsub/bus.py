@@ -10,17 +10,6 @@ class EventBus:
 
     def __init__(self):
         self._mapping: defaultdict[Chan, set[Subscriber]] = defaultdict(set)
-        self._subs: set[Subscriber] = set()
-
-    @property
-    def subs(self):
-        return self._subs
-
-    def register(self, sub: Subscriber):
-        self._subs.add(sub)
-
-    def unregister(self, sub: Subscriber):
-        self._subs.discard(sub)
 
     def subscribe(self, sub: Subscriber, chans: Iterable[Chan]):
         """

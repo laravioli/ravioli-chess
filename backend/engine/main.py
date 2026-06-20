@@ -27,7 +27,7 @@ async def main():
     logger.info(f"Started server process [{os.getpid()}]")
     logger.info("Waiting for application startup.")
 
-    async with App(pid=1):
+    async with App():
         logger.info("Application startup complete.")
         await shutdown_event.wait()
         logger.info("Waiting for application shutdown.")

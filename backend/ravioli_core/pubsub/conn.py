@@ -1,9 +1,13 @@
+import asyncio
+import logging
 from collections.abc import Iterable
 
 from redis.asyncio import Redis
+from redis.exceptions import ConnectionError, TimeoutError
 
 from .types import Chan, MsgHandler
-from .utils import str_if_bytes
+
+logger = logging.getLogger(__name__)
 
 
 class Connection:
@@ -12,6 +16,8 @@ class Connection:
     """
 
     def __init__(self, chans: list[Chan], redis: Redis):
+        # NOTE conn.listen keeps running
+        # NOTE behavior of listen is not the same in redis-py > 7.4
         assert len(chans) > 0
         self.chans = chans
         self._pubsub = redis.pubsub(ignore_subscribe_messages=True)
@@ -25,21 +31,25 @@ class Connection:
         pubsub = self._pubsub
         assert self._handler
         handle = self._handler
-        # "chan:all" channel so conn.listen keeps running
         await pubsub.subscribe(*self.chans)
-        try:
-            while True:
+        while True:
+            try:
                 async for msg in pubsub.listen():
-                    channel = str_if_bytes(msg["channel"])
+                    channel = msg["channel"]
                     if channel not in pubsub.pending_unsubscribe_channels:
-                        handle(channel, msg["data"])
-        finally:
-            await pubsub.aclose()
+                        try:
+                            handle(channel, msg["data"])
+                        except ValueError:
+                            logger.exception("channel: %s\n message: %s", channel, msg["data"])
+            except (ConnectionError, TimeoutError):
+                logger.exception("redis pubsub connection error")
+                await asyncio.sleep(5)
 
-    # NOTE using this concurrently "may" alter connection state (like retry)
-    # NOTE but not packet sent
     async def subscribe(self, chans: Iterable[Chan]):
         await self._pubsub.subscribe(*chans)
 
     async def unsubscribe(self, chans: Iterable[Chan]):
         await self._pubsub.unsubscribe(*chans)
+
+    async def aclose(self):
+        await self._pubsub.aclose()

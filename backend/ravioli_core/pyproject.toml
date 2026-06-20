@@ -14,7 +14,7 @@ dependencies = [
     "msgspec>=0.20.0",
     "orjson>=3.11.7",
     "pydantic-settings>=2.12.0",
-    "redis[hiredis]>=7.4.0",
+    "redis[hiredis]==7.4.0",
     "sqlalchemy[asyncio]>=2.0.45",
 ]
 [tool.ruff]
@@ -27,4 +27,3 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["ravioli_core"]
-

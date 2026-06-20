@@ -12,4 +12,4 @@ type TimestampUpdated = Annotated[
     datetime.datetime, mapped_column(server_default=func.now(), onupdate=func.now())
 ]
 
-type GameId8 = Annotated[str, mapped_column(String(8), unique=True, index=True)]
+type GameId8 = Annotated[str, mapped_column(String(8), unique=True, index=True, nullable=False)]
