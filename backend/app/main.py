@@ -28,6 +28,7 @@ add_pagination(app)
 add_exception_handler(app)
 
 
+# TODO create a small functional wrapper to chain coroutine (those function should just schedule on task, but offer way to combine coroutine like foreach etc)
 # TODO add an anon session identifier/ game player id
 # TODO implement a challenge api (it is close to friend request), keep it separate from notif like lichess
 # TODO define hooks/seek
