@@ -13,3 +13,6 @@ type TimestampUpdated = Annotated[
 ]
 
 type GameId8 = Annotated[str, mapped_column(String(8), unique=True, index=True, nullable=False)]
+type ChallengeId8 = Annotated[
+    str, mapped_column(String(8), unique=True, index=True, nullable=False)
+]

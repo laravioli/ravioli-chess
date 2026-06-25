@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from .user import User
 
 
-class Status(IntEnum):
+class GameStatus(IntEnum):
     CREATED = 1
     STARTED = 2
     ABORTED = 3
@@ -36,7 +36,7 @@ class Game(Base):
     black_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("user_account.id", ondelete="SET NULL"), index=True
     )
-    status: Mapped[Status] = mapped_column(default=Status.CREATED)
+    status: Mapped[GameStatus] = mapped_column(default=GameStatus.CREATED)
     pub_date: Mapped[TimestampNow]
     meta: Mapped[dict] = mapped_column(JSON, default=dict)
     moves: Mapped[str | None]  # uncompressed format
