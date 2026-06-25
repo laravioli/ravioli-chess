@@ -25,22 +25,21 @@ class Status(IntEnum):
     NOSTART = 9
 
 
-# update db
 class Game(Base):
     __tablename__ = "game"
 
     id: Mapped[PrimaryKey[int]]
     game_id: Mapped[GameId8]
     white_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey("user_account.id", ondelete="SET NULL")
+        ForeignKey("user_account.id", ondelete="SET NULL"), index=True
     )
     black_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey("user_account.id", ondelete="SET NULL")
+        ForeignKey("user_account.id", ondelete="SET NULL"), index=True
     )
     status: Mapped[Status] = mapped_column(default=Status.CREATED)
     pub_date: Mapped[TimestampNow]
     meta: Mapped[dict] = mapped_column(JSON, default=dict)
-    moves: Mapped[bytes | None]
-    clock: Mapped[bytes | None] = mapped_column(JSON, nullable=True)
+    moves: Mapped[str | None]  # uncompressed format
+    clock: Mapped[str | None]  # uncompressed format
     white: Mapped[Optional["User"]] = relationship(foreign_keys=[white_id])
     black: Mapped[Optional["User"]] = relationship(foreign_keys=[black_id])
