@@ -1,5 +1,7 @@
 from msgspec import Struct, field
 
+from app.types import UserId
+
 # ╔══════════════════════════════════════╗
 # ║    CLIENT -> WEBSOCKET               ║
 # ╚══════════════════════════════════════╝
@@ -10,8 +12,8 @@ from msgspec import Struct, field
 
 
 class D_GameInfo(Struct):
-    white_player: str | None = field(name="wp", default=None)
-    black_player: str | None = field(name="bp", default=None)
+    white_player: UserId | None = field(name="wp", default=None)
+    black_player: UserId | None = field(name="bp", default=None)
 
 
 class D_GameMove(Struct):

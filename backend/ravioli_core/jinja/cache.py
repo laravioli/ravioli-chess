@@ -1,3 +1,4 @@
+# type: ignore
 # source: https://jinja.palletsprojects.com/en/stable/extensions/#example-extensions
 from jinja2 import nodes
 from jinja2.ext import Extension

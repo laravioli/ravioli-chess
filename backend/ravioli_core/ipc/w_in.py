@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 
 from msgspec import Raw, Struct
 
@@ -19,6 +19,11 @@ class WebsocketIn(Struct, tag_field="wi", rename={"type": "t", "data": "d"}):
 
 class TellSri(WebsocketIn, tag="tell"):
     type: str
+    data: Any
+
+
+class TellSriRaw(WebsocketIn, tag="tell"):
+    type: str
     data: Raw
 
 
@@ -30,6 +35,11 @@ type Sri = TellSri
 
 
 class TellUser(WebsocketIn, tag="tell"):
+    type: str
+    data: Any
+
+
+class TellUserRaw(WebsocketIn, tag="tell"):
     type: str
     data: Raw
 
@@ -56,5 +66,10 @@ class D_GameId(Struct):
 
 # Frame
 class GameUpdate(WebsocketIn, tag="u"):
+    type: Literal["move", "takeback", "draw", "resign", "endData"]
+    data: D_GameMove | D_GameEnd
+
+
+class GameUpdateRaw(WebsocketIn, tag="u"):
     type: Literal["move", "takeback", "draw", "resign", "endData"]
     data: Raw

@@ -33,4 +33,6 @@ class LazyEvent:
 
 
 def str_if_bytes(value: str | bytes) -> str:
-    return value.decode("utf-8", errors="replace") if isinstance(value, bytes) else value
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", errors="replace")
+    return value

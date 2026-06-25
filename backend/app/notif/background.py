@@ -27,6 +27,6 @@ class BackgroundNotif:
     ):
         self.background_tasks.add_task(
             self.pub.publish_to_online_user,
-            user_id,
+            str(user_id),
             functools.partial(lazy_notif, self.session_maker),
         )

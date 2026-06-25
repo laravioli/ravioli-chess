@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 
@@ -12,7 +14,7 @@ router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)]
 def generate_page(
     request: Request,
     services: ServiceDep,
-    page_ctx: dict[str, any] = DEFAULT_CONTEXT,
+    page_ctx: dict[str, Any] = DEFAULT_CONTEXT,
 ):
     user = request.state.user
     ctx = {"payload": {"user": user.info, **page_ctx}}

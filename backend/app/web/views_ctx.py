@@ -1,3 +1,6 @@
+from typing import cast
+from uuid import UUID
+
 from app.deps import DbSession, Services
 
 from .schemas import User
@@ -12,7 +15,7 @@ PAGE_DEFAULT = {
 async def base_data(user: User, services: Services, session: DbSession):
     data = {}
     if user.is_auth:
-        data.update(unreadCount=await services.notif.get_unread_count(session, user.id))
+        data.update(unreadCount=await services.notif.get_unread_count(session, cast(UUID, user.id)))
     return data
 
 

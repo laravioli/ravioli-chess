@@ -1,6 +1,7 @@
 # Import every model here
 
-from .game import Game, GameStatus
+from .game import Game
+from .game import Status as GameStatus
 from .notif import FriendRequest, FriendRequestAccepted, Notification
 from .pref import Preference
 from .social import Friendship

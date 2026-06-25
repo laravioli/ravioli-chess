@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import Iterable
 from contextlib import suppress
+from typing import Any
 
 from redis.asyncio import Redis
 
@@ -93,7 +94,7 @@ class Users:
         )
         return (bool(c) for _, c in result)
 
-    def tell_one(self, user_id: str, msg: str):
+    def tell_one(self, user_id: str, msg: Any):
         try:
             for sub in self._users[user_id]:
                 sub.put_nowait(msg)

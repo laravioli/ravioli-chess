@@ -13,9 +13,9 @@ async def on_start(env: ServerEnv, ws_env: WsEnv):
 
     @scheduler.periodic(10, duration=1)
     async def heartbeat():
-        await redis.hsetex("app:node", settings.NODE_ID, "alive", ex=30)
+        await redis.hsetex("app:node", settings.NODE_ID, "alive", ex=30)  # type: ignore
 
-    await redis.ping()
+    await redis.ping()  # type: ignore
     await ws_env.broadcast.start()
     scheduler.start()
 
@@ -24,7 +24,7 @@ async def on_stop(env: ServerEnv, ws_env: WsEnv):
     await env.scheduler.shutdown()
     await ws_env.broadcast.stop()
     with suppress(Exception):
-        await env.redis.hdel("app:node", settings.NODE_ID)
+        await env.redis.hdel("app:node", settings.NODE_ID)  # type: ignore
     await asyncio.gather(env.redis.aclose(), env.engine.dispose(), return_exceptions=True)
 
 

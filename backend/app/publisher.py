@@ -16,7 +16,7 @@ class Publisher:
         return await self.redis.publish(chan, json.encode(msg))
 
     async def publish_to_many(self, chans: list[str], msg: object):
-        return await self.redis.fcall("publish", len(chans), *chans, json.encode(msg))
+        return await self.redis.fcall("publish", len(chans), *chans, json.encode(msg))  # type: ignore
 
     async def publish_to_online_user(self, user_id: str, lazy_msg: Callable[[], Awaitable[Any]]):
         chan = WsChan.users(user_id)

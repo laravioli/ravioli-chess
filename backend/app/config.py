@@ -1,5 +1,4 @@
 import os
-import secrets
 from typing import Annotated, Literal
 
 from pydantic import SecretStr, field_validator
@@ -11,10 +10,9 @@ class Settings(BaseSettings):
 
     NODE_ID: str = f"node:{os.getpid()}"
     ENVIRONMENT: Literal["local", "staging", "production"] = "production"
-    SECRET_KEY: SecretStr = secrets.token_urlsafe(32)
+    SECRET_KEY: SecretStr
     SSL: bool = True
     ALLOWED_HOSTS: Annotated[list[str], NoDecode]
-
     ANON_COOKIE: str = "anon"
     SESSION_COOKIE: str = "session"
 
@@ -24,4 +22,4 @@ class Settings(BaseSettings):
         return [str(s) for s in v.split(",") if s]
 
 
-settings = Settings()
+settings = Settings()  # type: ignore

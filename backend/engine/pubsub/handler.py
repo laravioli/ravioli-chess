@@ -6,9 +6,10 @@ from ravioli_core.serializers import json
 if TYPE_CHECKING:
     from engine.game import Games
 
+type GameMsg = e_in.GameUpdate | e_in.GameStart
+
 
 def make_handler(games: "Games"):
-    type GameMsg = e_in.GameUpdate | e_in.GameStart
 
     def handle(_, data: bytes):
         msg = json.decode(data, type_arg=GameMsg)

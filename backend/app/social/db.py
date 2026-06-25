@@ -82,7 +82,7 @@ class SocialDB:
             )
             result = await session.execute(stmt)
 
-            if result.rowcount == 0:
+            if result.rowcount == 0:  # type:ignore[attr-defined]
                 raise DBNotFound(detail="There is no request to delete")
 
     async def list_friendship(
@@ -128,7 +128,7 @@ class SocialDB:
                 )
             )
 
-            if result.rowcount == 0:
+            if result.rowcount == 0:  # type:ignore[attr-defined]
                 raise DBNotFound(detail="friend not found")
 
 

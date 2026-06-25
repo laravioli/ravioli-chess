@@ -70,7 +70,7 @@ async def send_friend_request(
             detail="You can't send a friend request to yourself",
         )
     await service.create_request(background_notif, session, user.id, target_id)
-    return FriendShip(is_sender=True, status="pending")
+    return FriendShip(is_sender=True, status=FriendshipStatus.pending)
 
 
 @router.delete("/requests/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -93,7 +93,7 @@ async def accept_friend_request(
     target_id: UUID4,
 ):
     await service.accept_request(background_notif, session, target_id, user.id)
-    return FriendShip(is_sender=False, status="accepted")
+    return FriendShip(is_sender=False, status=FriendshipStatus.accepted)
 
 
 @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)

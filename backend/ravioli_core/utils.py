@@ -35,12 +35,12 @@ async def transaction(conn: Transactional, error_detail="Integrity Error"):
         await conn.commit()
     except BaseException as e:
         if isinstance(e, IntegrityError):
-            e.detail = error_detail
+            setattr(e, "detail", error_detail)
         await conn.rollback()
         raise
 
 
 def create_async_redis(**kwargs: Any):
-    settings = RedisSettings().as_dict()
+    settings = RedisSettings().as_dict()  # type: ignore
     settings.update(kwargs)
     return Redis(**settings)

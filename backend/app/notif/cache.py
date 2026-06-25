@@ -1,3 +1,4 @@
+# type: ignore
 import asyncio
 from collections.abc import Iterable
 from uuid import UUID

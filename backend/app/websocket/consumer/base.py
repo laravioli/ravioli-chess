@@ -2,6 +2,8 @@ import asyncio
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import Any, cast
+from uuid import UUID
 
 from fastapi import WebSocket, WebSocketDisconnect
 
@@ -44,7 +46,7 @@ class Consumer[T: Context = Context](ABC):
     async def handle(self, msg): ...
 
     @abstractmethod
-    async def receive(self): ...
+    async def receive(self) -> Any: ...
 
     @abstractmethod
     async def disconnect(self): ...
@@ -81,7 +83,9 @@ class Consumer[T: Context = Context](ABC):
             case c_out.Notified():
                 user = self.ctx.user
                 if user:
-                    self.add_background_task(self.env.notif.mark_all_read(self.env.engine, user.id))
+                    self.add_background_task(
+                        self.env.notif.mark_all_read(self.env.engine, cast(UUID, user.id))
+                    )
 
     def add_background_task(self, coro):
         task = asyncio.create_task(coro)

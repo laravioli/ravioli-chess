@@ -11,7 +11,7 @@ def load_jinja_ext(*, env: Environment, config: JinjaExtConfig):
         from cachelib import SimpleCache
 
         env.add_extension(FragmentCacheExtension)
-        env.fragment_cache = SimpleCache()
+        env.fragment_cache = SimpleCache()  # type: ignore
 
 
 __all__ = ["load_jinja_ext", "JinjaExtConfig"]

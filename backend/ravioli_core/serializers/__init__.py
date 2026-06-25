@@ -1,3 +1,4 @@
+# type: ignore
 from collections.abc import Callable
 from typing import Any, overload
 

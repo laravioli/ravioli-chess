@@ -1,3 +1,4 @@
+# type: ignore
 import asyncio
 
 from logging.config import fileConfig

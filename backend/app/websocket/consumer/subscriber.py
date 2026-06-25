@@ -6,7 +6,7 @@ class Subscriber:
     def __init__(self, maxsize=100):
         self._queue: asyncio.Queue[bytes] = asyncio.Queue(maxsize=maxsize)
 
-    def put_nowait(self, item: bytes | None) -> bool:
+    def put_nowait(self, item: bytes) -> bool:
         """Put an item in the subscriber's stream without waiting"""
         try:
             self._queue.put_nowait(item)

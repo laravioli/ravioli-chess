@@ -12,4 +12,4 @@ from msgspec import UNSET, Raw, Struct
 
 class ClientIn(Struct, rename={"type": "t", "data": "d"}):
     type: str
-    data: Raw | None = UNSET
+    data: Raw | None = UNSET  # type: ignore

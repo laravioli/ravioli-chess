@@ -39,7 +39,7 @@ async def user_retrieve(
     user = await session.scalar(stmt)
 
     if user and kwargs.get("with_online"):
-        user.online = await users.is_online(str(user.id))
+        user.online = await users.is_online(str(user.id))  # type: ignore
 
     return user
 
@@ -94,11 +94,11 @@ async def user_search(session: DbSession, users: Users, search_query: str, limit
     ]
 
 
-async def user_delete(session: DbSession, id: UUID) -> bool:
+async def user_delete(session: DbSession, id: UUID):
     stmt = delete(User).where(User.id == id)
     result = await session.execute(stmt)
 
-    if result.rowcount == 0:
+    if result.rowcount == 0:  # type: ignore
         raise DBNotFound(detail="User does not exist")
 
     await session.commit()
@@ -106,7 +106,7 @@ async def user_delete(session: DbSession, id: UUID) -> bool:
 
 async def user_login(session: DbSession, services: Services, user: User):
     try:
-        user.unread_count = await services.notif.get_unread_count(session, user.id)
+        user.unread_count = await services.notif.get_unread_count(session, user.id)  # type: ignore
     except Exception:
-        user.unread_count = 0
+        user.unread_count = 0  # type: ignore
     return user

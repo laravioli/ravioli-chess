@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Annotated, Literal, TypeVar
+from typing import Annotated, Any, Literal, TypeVar, cast
 
 from fastapi import Query
 from fastapi_pagination import Page, Params, set_page
+from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseName, UseParams
 from pydantic import UUID4, AliasPath, Field, TypeAdapter
 
@@ -57,7 +58,7 @@ notification_ta = TypeAdapter(NotifPagination[Notification])
 def pagination(coro):
     # NOTE decorator to use paginator outside fastapi endpoint
     async def wrapper(*args, **kwargs):
-        with set_page(NotifPagination[Notification]):
+        with set_page(cast(type[AbstractPage[Any]], NotifPagination[Notification])):
             return await coro(*args, **kwargs)
 
     return wrapper

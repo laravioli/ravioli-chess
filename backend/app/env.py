@@ -43,7 +43,7 @@ def make_env():
     redis = create_async_redis()
     pub = Publisher(redis)
     scheduler = Scheduler()
-    engine, session_maker = create_engine_and_sessionmaker(settings=DbSettings())
+    engine, session_maker = create_engine_and_sessionmaker(settings=DbSettings())  # type: ignore
     services = Services.make(redis)
     conn = Connection(WsChan.all, redis)
     users = Users(conn, redis, scheduler)

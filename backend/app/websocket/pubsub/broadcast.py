@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Iterable
 from contextlib import asynccontextmanager, suppress
 
 from app.websocket.consumer import Subscriber
@@ -39,7 +40,7 @@ class Broadcast:
         await self._connection.aclose()
 
     @asynccontextmanager
-    async def start_subscription(self, sub: Subscriber, user: MaybeUser, chans: list[Chan]):
+    async def start_subscription(self, sub: Subscriber, user: MaybeUser, chans: Iterable[Chan]):
         """
         Subscribe/Unsubscribe sequentially
         """
