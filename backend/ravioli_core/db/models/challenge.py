@@ -26,10 +26,10 @@ class Challenge(Base):
 
     id: Mapped[PrimaryKey[int]]
     challenge_id: Mapped[ChallengeId8]
-    sender_id: Mapped[UUID] = mapped_column(
+    sender_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("user_account.id", ondelete="SET NULL"), index=True
     )
-    receiver_id: Mapped[UUID] = mapped_column(
+    receiver_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("user_account.id", ondelete="SET NULL"), index=True
     )
     status: Mapped[ChallengeStatus] = mapped_column(default=ChallengeStatus.CREATED)

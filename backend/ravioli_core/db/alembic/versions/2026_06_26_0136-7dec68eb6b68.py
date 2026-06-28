@@ -24,8 +24,8 @@ def upgrade() -> None:
     op.create_table('challenge',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('challenge_id', sa.String(length=8), nullable=False),
-    sa.Column('sender_id', sa.Uuid(), nullable=False),
-    sa.Column('receiver_id', sa.Uuid(), nullable=False),
+    sa.Column('sender_id', sa.Uuid(), nullable=True),
+    sa.Column('receiver_id', sa.Uuid(), nullable=True),
     sa.Column('status', sa.Enum('CREATED', 'CANCELED', 'DECLINED', 'ACCEPTED', name='challengestatus'), nullable=False),
     sa.Column('color_choice', sa.Enum('RANDOM', 'WHITE', 'BLACK', name='chesscolorchoice'), nullable=False),
     sa.Column('color', sa.Enum('WHITE', 'BLACK', name='chesscolor'), nullable=True),
@@ -49,5 +49,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_challenge_challenge_id'), table_name='challenge')
     op.drop_table('challenge')
     op.execute("DROP TYPE challengestatus")
-
+    op.execute("DROP TYPE chesscolorchoice")
+    op.execute("DROP TYPE chesscolor")
     # ### end Alembic commands ###
