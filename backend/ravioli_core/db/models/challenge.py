@@ -7,8 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ravioli_core.db.types import ChallengeId8, PrimaryKey, TimestampNow
 
+from ..enums import ChessColor, ChessColorChoice
 from .base import Base
-from .enums import ChessColor, ChessColorChoice
 
 if TYPE_CHECKING:
     from .user import User
