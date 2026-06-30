@@ -5,9 +5,9 @@ from msgspec import Raw
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from app.background import Background
 from ravioli_core.ipc.w_in import TellUser
 
-from .background import BackgroundNotif
 from .cache import NotifCache
 from .db import NotifDB
 from .schemas import NotifParams, notification_ta
@@ -45,7 +45,7 @@ class NotifService:
 
     def notify_one(
         self,
-        notifier: BackgroundNotif,
+        bg: Background,
         user_id: UUID,
     ):
         async def lazy_notif(session_maker: async_sessionmaker[AsyncSession]):
@@ -54,15 +54,15 @@ class NotifService:
             raw = notification_ta.dump_json(notification_ta.validate_python(notifications))
             return TellUser(type="notifications", data=Raw(raw))
 
-        notifier.tell_user(user_id, lazy_notif)
+        bg.tell_user(user_id, lazy_notif)
 
     def notify_many(
         self,
-        notifier: BackgroundNotif,
+        bg: Background,
         user_ids: Iterable[UUID],
     ):
         for user_id in user_ids:
-            self.notify_one(notifier, user_id)
+            self.notify_one(bg, user_id)
 
     async def mark_all_read(self, engine: AsyncEngine, user_id: UUID):
         await self.db.mark_all_read(engine, user_id)

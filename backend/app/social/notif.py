@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.notif.background import BackgroundNotif
+from app.background import Background
 from app.notif.service import NotifService
 
 
@@ -10,7 +10,7 @@ class SocialNotif:
 
     async def create(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         receiver_id: UUID,
     ):
         await self.notif.cache.incrby(f"{receiver_id}", 1)
@@ -18,7 +18,7 @@ class SocialNotif:
 
     async def accept(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         sender_id: UUID,
         receiver_id: UUID,
     ):
@@ -27,7 +27,7 @@ class SocialNotif:
 
     async def delete(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         receiver_id: UUID,
     ):
         await self.notif.cache.incrby(f"{receiver_id}", -1)
@@ -35,7 +35,7 @@ class SocialNotif:
 
     async def delete_friend(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         current_user_id: UUID,
         target_id: UUID,
     ):

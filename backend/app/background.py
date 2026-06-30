@@ -9,7 +9,7 @@ from app.publisher import Publisher
 from ravioli_core.ipc.w_in import TellUser
 
 
-class BackgroundNotif:
+class Background:
     def __init__(
         self,
         pub: Publisher,

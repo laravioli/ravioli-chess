@@ -3,7 +3,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.notif.background import BackgroundNotif
+from app.background import Background
 from app.notif.service import NotifService
 from ravioli_core.db.models.social import FriendshipStatus
 
@@ -20,7 +20,7 @@ class SocialService:
 
     async def create_request(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         session: AsyncSession,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
@@ -30,7 +30,7 @@ class SocialService:
 
     async def accept_request(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         session: AsyncSession,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
@@ -40,7 +40,7 @@ class SocialService:
 
     async def delete_request(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         session: AsyncSession,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
@@ -59,7 +59,7 @@ class SocialService:
 
     async def delete_friend(
         self,
-        bg: BackgroundNotif,
+        bg: Background,
         session: AsyncSession,
         current_user_id: uuid.UUID,
         target_id: uuid.UUID,

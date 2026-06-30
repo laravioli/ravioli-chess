@@ -5,52 +5,25 @@ from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from app.services import ChallengeService, NotifService, Services, SocialService, WebService
-from app.websocket.pubsub import Users
+from app.background import Background
+from app.publisher import Publisher
 
-from .background import Background
-from .env import Publisher, ServerEnv
-
-
-async def get_env(conn: HTTPConnection) -> ServerEnv:
-    return conn.state["http_env"]
+from .env import Env
+from .service import MatchMakingService
 
 
-type EnvDep = Annotated[ServerEnv, Depends(get_env)]
+async def get_env(conn: HTTPConnection) -> Env:
+    return conn.state["env"]
 
 
-async def get_services(env: EnvDep):
-    return env.services
+type EnvDep = Annotated[Env, Depends(get_env)]
 
 
-async def get_web(env: EnvDep):
-    return env.services.web
+async def get_mm(env: EnvDep):
+    return env.matchmaking
 
 
-async def get_notif(env: EnvDep):
-    return env.services.notif
-
-
-async def get_social(env: EnvDep):
-    return env.services.social
-
-
-async def get_challenge(env: EnvDep):
-    return env.services.challenge
-
-
-type ServiceDep = Annotated[Services, Depends(get_services)]
-type WebServiceDep = Annotated[WebService, Depends(get_web)]
-type NotifServiceDep = Annotated[NotifService, Depends(get_notif)]
-type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
-type ChallengeServiceDep = Annotated[ChallengeService, Depends(get_challenge)]
-
-
-async def get_users(env: EnvDep):
-    return env.users
-
-
-type UsersDep = Annotated[Users, Depends(get_users)]
+type MatchmakingServiceDep = Annotated[MatchMakingService, Depends(get_mm)]
 
 
 # ╔══════════════════════════════════════╗
@@ -71,10 +44,6 @@ async def get_session(env: EnvDep):
 
 
 type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
-
-
-# NOTE : session identity map doesn't update already populated object if you double select.
-# NOTE to force update => u2 = session.scalars(select(User).where(User.id == 5).execution_options(populate_existing=True)).one()
 
 
 # ╔══════════════════════════════════════╗
