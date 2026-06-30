@@ -3,6 +3,7 @@ from fastapi_pagination import add_pagination
 
 from app.api.routes import router as api_router
 from app.api.utils import custom_generate_unique_id
+from app.config import settings
 from app.exceptions import add_exception_handler
 from app.lifespan import lifespan
 from app.middleware import CSRFMiddleWare
@@ -23,6 +24,11 @@ app.add_middleware(CSRFMiddleWare)
 app.include_router(api_router)
 app.include_router(web_router)
 app.include_router(ws_router)
+
+if settings.ENABLE_MATCHMAKING:
+    from app.matchmaking.views import router as router_matchmaking
+
+    app.include_router(router_matchmaking)
 
 add_pagination(app)
 add_exception_handler(app)

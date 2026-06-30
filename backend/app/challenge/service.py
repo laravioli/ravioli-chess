@@ -17,7 +17,11 @@ async def list_challenge(
     )
 
 
-async def accept_challenge(session: AsyncSession, user_id: UUID | None, challenge_id: str):
+async def create_challenge(session: AsyncSession, user_id: UUID | None):
+    pass
+
+
+async def accept_challenge(session: AsyncSession, user_id: UUID | None, challenge_id: UUID):
     pass
 
 

@@ -8,8 +8,9 @@ from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
-    NODE_ID: str = f"node:{os.getpid()}"
     ENVIRONMENT: Literal["local", "staging", "production"] = "production"
+    ENABLE_MATCHMAKING: bool = False
+    NODE_ID: str = f"node:{os.getpid()}"
     SECRET_KEY: SecretStr
     SSL: bool = True
     ALLOWED_HOSTS: Annotated[list[str], NoDecode]

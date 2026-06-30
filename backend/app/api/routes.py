@@ -11,6 +11,7 @@ from app.web.views_api import router as router_web
 from .deps import api_response_headers
 
 router = APIRouter(prefix="/api", dependencies=[Depends(api_response_headers)])
+
 router.include_router(router_auth)
 router.include_router(router_user)
 router.include_router(router_pref)

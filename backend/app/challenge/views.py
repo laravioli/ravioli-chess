@@ -22,7 +22,7 @@ async def list_challenge(
 async def accept_challenge(
     user: UserOrAnon,
     session: DbSession,
-    challenge_id: str,
+    challenge_id: UUID4,
 ):
     user_id = user.id if user else None
     await service.accept_challenge(session, user_id, challenge_id)
