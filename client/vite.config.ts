@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import babel from '@rolldown/plugin-babel';
 
 export default defineConfig(({ mode }) => {
-  const { BACKEND_DOMAIN } = loadEnv(mode, process.cwd(), '');
+  const { BACKEND_DOMAIN, MATCHMAKING_DOMAIN } = loadEnv(mode, process.cwd(), '');
 
   return {
     base: '/static/',
@@ -36,6 +36,11 @@ export default defineConfig(({ mode }) => {
           target: `http://${BACKEND_DOMAIN}`,
           changeOrigin: false,
         },
+        '/mm': {
+          target: `http://${MATCHMAKING_DOMAIN}`,
+          changeOrigin: false,
+        },
+
         '^/(\\w+)?(/\\w+)?$': {
           target: `http://${BACKEND_DOMAIN}`,
           changeOrigin: false,

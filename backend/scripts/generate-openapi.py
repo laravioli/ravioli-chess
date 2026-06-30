@@ -1,6 +1,10 @@
 import json
 
 from app.main import app
+from app.matchmaking.views import router as router_matchmaking
+
+# create one openapi.json
+app.include_router(router_matchmaking)
 
 
 def generate_schema():
