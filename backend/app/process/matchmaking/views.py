@@ -3,8 +3,8 @@ from pydantic import UUID4
 
 from app.auth.deps import UserOrAnon
 from app.challenge.schemas import ChallengeRequest
-from app.coordinator.deps import MatchmakingDep
 from app.deps import DbSession
+from app.process.deps import MatchmakingDep
 
 router = APIRouter(prefix="/mm", tags=["matchmaking"])
 

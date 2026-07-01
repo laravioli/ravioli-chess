@@ -14,7 +14,7 @@ async def on_start(core_env: CoreEnv):
 
     @scheduler.periodic(10, duration=1)
     async def heartbeat():
-        await redis.hsetex("app:node", "coordinator", "alive", ex=30)  # type: ignore
+        await redis.hsetex("app:node", "node-0", "alive", ex=30)  # type: ignore
 
     await redis.ping()  # type: ignore
     scheduler.start()
@@ -23,7 +23,7 @@ async def on_start(core_env: CoreEnv):
 async def on_stop(core_env: CoreEnv):
     await core_env.scheduler.shutdown()
     with suppress(Exception):
-        await core_env.redis.hdel("app:node", "coordinator")  # type: ignore
+        await core_env.redis.hdel("app:node", "node-0")  # type: ignore
     await asyncio.gather(core_env.redis.aclose(), core_env.engine.dispose(), return_exceptions=True)
 
 
@@ -33,6 +33,6 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
         core_env = CoreEnv.make()
         env = Env.make()
         await on_start(core_env)
-        yield {"core_env": core_env, "coord_env": env}
+        yield {"core_env": core_env, "env": env}
     finally:
         await on_stop(core_env)

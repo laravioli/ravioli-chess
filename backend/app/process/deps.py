@@ -8,7 +8,7 @@ from .matchmaking.service import MatchMakingService
 
 
 async def get_env(req: Request) -> Env:
-    return req.state["coord_env"]
+    return req.state["env"]
 
 
 type EnvDep = Annotated[Env, Depends(get_env)]

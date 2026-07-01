@@ -1,7 +1,7 @@
 import json
 
-from app.coordinator.matchmaking.views import router as router_matchmaking
 from app.main import app
+from app.process.matchmaking.views import router as router_matchmaking
 
 # create one openapi.json
 app.include_router(router_matchmaking)
