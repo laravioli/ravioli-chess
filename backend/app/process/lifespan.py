@@ -31,7 +31,7 @@ async def on_stop(core_env: CoreEnv):
 async def lifespan(app: FastAPI):  # noqa: ARG001
     try:
         core_env = CoreEnv.make()
-        env = Env.make()
+        env = Env.make(redis=core_env.redis)
         await on_start(core_env)
         yield {"core_env": core_env, "env": env}
     finally:

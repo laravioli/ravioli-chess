@@ -28,7 +28,7 @@ class User(BaseSchema):
 
     @cached_property
     def piece_style(self):
-        return self.preference.pieceset
+        return self.preference.pieceset.value
 
     @cached_property
     def info(self):

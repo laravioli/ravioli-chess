@@ -1,9 +1,11 @@
 from typing import Annotated
 
-from pydantic import UUID4, StringConstraints
+from pydantic import ConfigDict, Field, StringConstraints
 
 from app.api.schemas import BaseSchema
-from ravioli_core.db.enums import ChessColorChoice
+from app.user.schemas import UserBase
+from ravioli_core.db.enums import ChessColor, ChessColorChoice
+from ravioli_core.db.models import ChallengeStatus
 
 type TimeControl = Annotated[
     str,
@@ -17,8 +19,13 @@ class ChallengeRequest(BaseSchema):
 
 
 class ChallengeNotif(BaseSchema):
-    challenge_id: str
-    sender_id: UUID4
-    receiver_id: UUID4
+    model_config = ConfigDict(use_enum_values=True)
+
+    id: str = Field(validation_alias="challenge_id")
+    status: ChallengeStatus
+    sender: UserBase
+    receiver: UserBase
     color_choice: ChessColorChoice
+    final_color: ChessColor = Field(validation_alias="color")
     time_control: TimeControl
+    initial_fen: str

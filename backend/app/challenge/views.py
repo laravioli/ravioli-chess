@@ -15,7 +15,7 @@ async def list_challenge(
     user: AuthUser,
     session: DbSession,
 ):
-    await chall.list_challenge(session, user.id)
+    await chall.list(session, user.id)
 
 
 @router.post("{challenge_id}/accept")
@@ -26,7 +26,7 @@ async def accept_challenge(
     challenge_id: UUID4,
 ):
     user_id = user.id if user else None
-    await chall.accept_challenge(session, user_id, challenge_id)
+    await chall.accept(session, user_id, challenge_id)
 
 
 @router.post("{target_id}/reject")
@@ -36,7 +36,7 @@ async def reject_challenge(
     session: DbSession,
     target_id: UUID4,
 ):
-    await chall.reject_challenge(session, user.id, target_id)
+    await chall.reject(session, user.id, target_id)
 
 
 @router.post("{challenge_id}/cancel")
@@ -46,4 +46,4 @@ async def cancel_challenge(
     session: DbSession,
     challenge_id: str,
 ):
-    await chall.delete_challenge(session, user, challenge_id)
+    await chall.delete(session, user, challenge_id)

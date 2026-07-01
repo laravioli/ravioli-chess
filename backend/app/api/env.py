@@ -20,5 +20,5 @@ class ApiEnv:
         web = make_web_service(redis=redis)
         notif = make_notif_service(redis=redis)
         social = make_social_service(notif=notif)
-        challenge = make_challenge_service()
+        challenge = make_challenge_service(redis=redis)
         return ApiEnv(web=web, notif=notif, social=social, challenge=challenge)
