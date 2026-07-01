@@ -5,8 +5,8 @@ from uuid import UUID
 from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.publisher import Publisher
 from ravioli_core.ipc.w_in import TellUser
+from ravioli_core.pubsub.publisher import Publisher
 
 
 class Background:

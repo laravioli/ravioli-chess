@@ -7,9 +7,10 @@ from uuid import UUID
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app.env import WsEnv
+from app.websocket.env import WsEnv
 from app.websocket.frame import ClientIn, c_out
 from app.websocket.schemas import MaybeUser, Sri
+from ravioli_core.env import CoreEnv
 from ravioli_core.pubsub.types import Chan
 from ravioli_core.serializers import json
 
@@ -28,14 +29,16 @@ class Consumer[T: Context = Context](ABC):
     def __init__(
         self,
         context: T,
+        core_env: CoreEnv,
         env: WsEnv,
         websocket: WebSocket,
         heartbeat: HeartBeat,
     ):
         self.ctx = context
+        self.core_env = core_env
         self.env = env
         self.broadcast = env.broadcast
-        self.pub = env.pub
+        self.pub = core_env.pub
         self.users = env.users
         self.websocket = websocket
         self.heartbeat = heartbeat
@@ -84,7 +87,7 @@ class Consumer[T: Context = Context](ABC):
                 user = self.ctx.user
                 if user:
                     self.add_background_task(
-                        self.env.notif.mark_all_read(self.env.engine, cast(UUID, user.id))
+                        self.env.notif.mark_all_read(self.core_env.engine, cast(UUID, user.id))
                     )
 
     def add_background_task(self, coro):

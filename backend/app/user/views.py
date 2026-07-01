@@ -6,7 +6,7 @@ from fastapi.exceptions import HTTPException
 from app.api.schemas import Message
 from app.auth.deps import AuthUser, SessionCookie, UserOrAnon
 from app.config import settings
-from app.deps import DbSession, EnvDep, RedisClient, UsersDep
+from app.deps import DbSession, RedisClient, UsersDep
 
 from .schemas import UserBase, UserCreate, UserProfile, UserSearch, UserWithPref
 from .service import (
@@ -62,12 +62,12 @@ async def get_user(session: DbSession, users: UsersDep, current_user: UserOrAnon
 
 @router.get("", response_model=list[UserSearch])
 async def list_user(
-    env: EnvDep,
+    users: UsersDep,
     session: DbSession,
     q: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(le=50)] = 20,
 ):
-    return await user_search(session, env.users, q, limit) if q else []
+    return await user_search(session, users, q, limit) if q else []
 
 
 @router.post("", response_model=UserWithPref, status_code=status.HTTP_201_CREATED)

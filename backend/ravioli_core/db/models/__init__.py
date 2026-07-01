@@ -1,6 +1,6 @@
 # Import every model here
 
-from .challenge import Challenge
+from .challenge import Challenge, ChallengeStatus
 from .game import Game, GameStatus
 from .notif import FriendRequest, FriendRequestAccepted, Notification
 from .pref import Preference
@@ -10,6 +10,7 @@ from .web import ChessPosition
 
 __all__ = [
     "Challenge",
+    "ChallengeStatus",
     "Game",
     "GameStatus",
     "Notification",

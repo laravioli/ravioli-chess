@@ -2,11 +2,11 @@ from fastapi import FastAPI
 
 from app.api.utils import custom_generate_unique_id
 from app.exceptions import add_exception_handler
-from app.matchmaking.views import router as router_matchmaking
 from app.middleware import CSRFMiddleWare
 from ravioli_core.config import LogSettings, configure_logging
 
 from .lifespan import lifespan
+from .matchmaking.views import router as router_matchmaking
 
 configure_logging(settings=LogSettings())
 

@@ -13,7 +13,7 @@ class SiteConsumer(Consumer):
             # test
             case c_out.GameCreate(data):
                 game = await db_create_game(
-                    self.env.engine,
+                    self.core_env.engine,
                     game_with_id(
                         NewGame(white_player=data.white_player, black_player=data.black_player)
                     ),

@@ -19,6 +19,7 @@ def create_engine_and_sessionmaker(settings: DbSettings):
         pool_pre_ping=True,  # validates connections before use
         pool_recycle=1800,  # avoid stale sockets
         future=True,
+        connect_args={"server_settings": {"jit": "off"}},
     )
     return engine, async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 

@@ -2,20 +2,21 @@ from typing import Unpack
 from uuid import UUID
 
 from sqlalchemy import and_, delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
+from app.api.env import ApiEnv
 from app.auth.security import generate_password_hash
-from app.deps import DbSession, Users
 from app.exceptions import DBNotFound
-from app.services import Services
 from app.social.db import friendship_criteria
+from app.websocket.pubsub import Users
 from ravioli_core.db.models import Friendship, Preference, User
 from ravioli_core.utils import transaction
 
 from .schemas import UserCreate, UserFilter, UserSearch
 
 
-async def user_create(session: DbSession, data: UserCreate):
+async def user_create(session: AsyncSession, data: UserCreate):
     async with transaction(session, error_detail="This username or email already exists"):
         new_user = User(
             username=data.username,
@@ -30,7 +31,7 @@ async def user_create(session: DbSession, data: UserCreate):
 
 
 async def user_retrieve(
-    session: DbSession, users: Users, username: str, **kwargs: Unpack[UserFilter]
+    session: AsyncSession, users: Users, username: str, **kwargs: Unpack[UserFilter]
 ):
     options = []
     if kwargs.get("with_pref"):
@@ -45,7 +46,7 @@ async def user_retrieve(
 
 
 async def user_retrieve_with_friendship(
-    session: DbSession, users: Users, current_user: User, username: str
+    session: AsyncSession, users: Users, current_user: User, username: str
 ):
     stmt = (
         select(User, Friendship)
@@ -72,7 +73,7 @@ async def user_retrieve_with_friendship(
     return user
 
 
-async def user_search(session: DbSession, users: Users, search_query: str, limit: int):
+async def user_search(session: AsyncSession, users: Users, search_query: str, limit: int):
     stmt = (
         select(User.id, User.username)
         .where(User.username.like(f"{search_query}%"))
@@ -94,7 +95,7 @@ async def user_search(session: DbSession, users: Users, search_query: str, limit
     ]
 
 
-async def user_delete(session: DbSession, id: UUID):
+async def user_delete(session: AsyncSession, id: UUID):
     stmt = delete(User).where(User.id == id)
     result = await session.execute(stmt)
 
@@ -104,7 +105,7 @@ async def user_delete(session: DbSession, id: UUID):
     await session.commit()
 
 
-async def user_login(session: DbSession, services: Services, user: User):
+async def user_login(session: AsyncSession, services: ApiEnv, user: User):
     try:
         user.unread_count = await services.notif.get_unread_count(session, user.id)  # type: ignore
     except Exception:

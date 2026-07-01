@@ -5,13 +5,22 @@ from uuid import UUID
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ravioli_core.db.types import ChallengeId8, PrimaryKey, TimestampNow
+from ravioli_core.db.types import (
+    ChallengeId8,
+    ExpireAfter1Week,
+    Fen,
+    PrimaryKey,
+    TimeControl,
+    TimestampNow,
+)
 
 from ..enums import ChessColor, ChessColorChoice
 from .base import Base
 
 if TYPE_CHECKING:
     from .user import User
+
+INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 
 class ChallengeStatus(IntEnum):
@@ -35,7 +44,9 @@ class Challenge(Base):
     status: Mapped[ChallengeStatus] = mapped_column(default=ChallengeStatus.CREATED)
     color_choice: Mapped[ChessColorChoice]
     color: Mapped[ChessColor | None]
+    inital_fen: Mapped[Fen] = mapped_column(default=INITIAL_FEN)
     pub_date: Mapped[TimestampNow]
-    time_control: Mapped[str]  # todo write something that make sense for timecontrol
+    expire_at: Mapped[ExpireAfter1Week]
+    time_control: Mapped[TimeControl]  # todo write something that make sense for timecontrol
     sender: Mapped["User"] = relationship(foreign_keys=[sender_id])
     receiver: Mapped["User"] = relationship(foreign_keys=[receiver_id])

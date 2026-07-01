@@ -9,7 +9,7 @@ from app.web.service import WebService, make_web_service
 
 
 @dataclass(slots=True)
-class Services:
+class ApiEnv:
     web: WebService
     notif: NotifService
     social: SocialService
@@ -21,4 +21,4 @@ class Services:
         notif = make_notif_service(redis=redis)
         social = make_social_service(notif=notif)
         challenge = make_challenge_service()
-        return Services(web=web, notif=notif, social=social, challenge=challenge)
+        return ApiEnv(web=web, notif=notif, social=social, challenge=challenge)

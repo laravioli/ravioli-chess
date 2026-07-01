@@ -4,7 +4,7 @@ from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
 
 from app.config import settings
-from app.deps import DbSession, RedisClient, ServiceDep
+from app.deps import ApiDep, DbSession, RedisClient
 from app.exceptions import InvalidCredentials
 from app.user.service import user_login
 
@@ -21,7 +21,7 @@ async def login(
     session: DbSession,
     credentials: UserLogin,
     response: Response,
-    services: ServiceDep,
+    services: ApiDep,
     session_cookie: SessionCookie = None,
 ):
     try:

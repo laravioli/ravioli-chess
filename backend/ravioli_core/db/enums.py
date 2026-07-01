@@ -1,12 +1,19 @@
-from enum import IntEnum
+import random
+from enum import StrEnum
 
 
-class ChessColorChoice(IntEnum):
-    RANDOM = 1
-    WHITE = 2
-    BLACK = 3
+class ChessColorChoice(StrEnum):
+    RANDOM = "rand"
+    WHITE = "w"
+    BLACK = "b"
 
 
-class ChessColor(IntEnum):
-    WHITE = 1
-    BLACK = 2
+class ChessColor(StrEnum):
+    WHITE = "w"
+    BLACK = "b"
+
+    @classmethod
+    def from_choice(cls, choice: ChessColorChoice) -> "ChessColor":
+        if choice is ChessColorChoice.RANDOM:
+            return random.choice((cls.WHITE, cls.BLACK))
+        return cls(choice.value)

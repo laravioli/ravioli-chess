@@ -1,71 +1,102 @@
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import BackgroundTasks, Depends
 from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from app.services import ChallengeService, NotifService, Services, SocialService, WebService
-from app.websocket.pubsub import Users
+from ravioli_core.env import CoreEnv
+from ravioli_core.pubsub import Publisher
 
 from .background import Background
-from .env import Publisher, ServerEnv
+
+if TYPE_CHECKING:
+    from app.api.env import ApiEnv
+    from app.challenge.service import ChallengeService
+    from app.notif.service import NotifService
+    from app.social.service import SocialService
+    from app.web.service import WebService
+    from app.websocket.env import WsEnv
+    from app.websocket.pubsub import Users
 
 
-async def get_env(conn: HTTPConnection) -> ServerEnv:
-    return conn.state["http_env"]
+# ╔══════════════════════════════════════╗
+# ║   ENV                                ║
+# ╚══════════════════════════════════════╝
 
 
-type EnvDep = Annotated[ServerEnv, Depends(get_env)]
+async def get_core_env(conn: HTTPConnection) -> CoreEnv:
+    return conn.state["core_env"]
 
 
-async def get_services(env: EnvDep):
-    return env.services
+type CoreDep = Annotated[CoreEnv, Depends(get_core_env)]
 
 
-async def get_web(env: EnvDep):
-    return env.services.web
+async def get_api_env(conn: HTTPConnection) -> "ApiEnv":
+    return conn.state["api_env"]
 
 
-async def get_notif(env: EnvDep):
-    return env.services.notif
+type ApiDep = Annotated["ApiEnv", Depends(get_api_env)]
 
 
-async def get_social(env: EnvDep):
-    return env.services.social
+async def get_ws_env(conn: HTTPConnection) -> "WsEnv":
+    return conn.state["ws_env"]
 
 
-async def get_challenge(env: EnvDep):
-    return env.services.challenge
+type WsDep = Annotated["WsEnv", Depends(get_ws_env)]
 
 
-type ServiceDep = Annotated[Services, Depends(get_services)]
-type WebServiceDep = Annotated[WebService, Depends(get_web)]
-type NotifServiceDep = Annotated[NotifService, Depends(get_notif)]
-type SocialServiceDep = Annotated[SocialService, Depends(get_social)]
-type ChallengeServiceDep = Annotated[ChallengeService, Depends(get_challenge)]
+# ╔══════════════════════════════════════╗
+# ║   API SERVICE                        ║
+# ╚══════════════════════════════════════╝
 
 
-async def get_users(env: EnvDep):
+async def get_web(env: ApiDep):
+    return env.web
+
+
+async def get_notif(env: ApiDep):
+    return env.notif
+
+
+async def get_social(env: ApiDep):
+    return env.social
+
+
+async def get_challenge(env: ApiDep):
+    return env.challenge
+
+
+type WebServiceDep = Annotated["WebService", Depends(get_web)]
+type NotifServiceDep = Annotated["NotifService", Depends(get_notif)]
+type SocialServiceDep = Annotated["SocialService", Depends(get_social)]
+type ChallengeServiceDep = Annotated["ChallengeService", Depends(get_challenge)]
+
+
+# ╔══════════════════════════════════════╗
+# ║   USERS                              ║
+# ╚══════════════════════════════════════╝
+
+
+async def get_users(env: WsDep):
     return env.users
 
 
-type UsersDep = Annotated[Users, Depends(get_users)]
-
+type UsersDep = Annotated["Users", Depends(get_users)]
 
 # ╔══════════════════════════════════════╗
 # ║   DATABASE                           ║
 # ╚══════════════════════════════════════╝
 
 
-async def get_engine(env: EnvDep):
+async def get_engine(env: CoreDep):
     return env.engine
 
 
 type EngineDep = Annotated[AsyncEngine, Depends(get_engine)]
 
 
-async def get_session(env: EnvDep):
+async def get_session(env: CoreDep):
     async with env.session_maker() as session:
         yield session
 
@@ -82,7 +113,7 @@ type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
 # ╚══════════════════════════════════════╝
 
 
-async def get_redis(env: EnvDep):
+async def get_redis(env: CoreDep):
     return env.redis
 
 
@@ -94,7 +125,7 @@ type RedisClient = Annotated[Redis, Depends(get_redis)]
 # ╚══════════════════════════════════════╝
 
 
-async def get_publisher(env: EnvDep):
+async def get_publisher(env: CoreDep):
     return env.pub
 
 
@@ -106,7 +137,7 @@ type PublisherDep = Annotated[Publisher, Depends(get_publisher)]
 # ╚══════════════════════════════════════╝
 
 
-async def get_background(env: EnvDep, background_tasks: BackgroundTasks):
+async def get_background(env: CoreDep, background_tasks: BackgroundTasks):
     return Background(env.pub, env.session_maker, background_tasks)
 
 
