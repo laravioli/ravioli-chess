@@ -2,7 +2,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ravioli_core.db.types import (
@@ -50,3 +50,14 @@ class Challenge(Base):
     time_control: Mapped[TimeControl]  # todo write something that make sense for timecontrol
     sender: Mapped["User"] = relationship(foreign_keys=[sender_id])
     receiver: Mapped["User"] = relationship(foreign_keys=[receiver_id])
+
+    __table_args__ = (
+        CheckConstraint(
+            "sender_id IS NOT NULL OR receiver_id IS NULL",
+            name="challenge_sender_required_for_receiver",
+        ),
+        CheckConstraint(
+            "sender_id <> receiver_id",
+            name="challenge_no_self_challenge",
+        ),
+    )

@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import Annotated
 
 from pydantic import ConfigDict, Field, StringConstraints
@@ -18,14 +19,20 @@ class ChallengeRequest(BaseSchema):
     time_control: TimeControl | None = None
 
 
+class Direction(StrEnum):
+    IN = "in"
+    OUT = "out"
+
+
 class ChallengeNotif(BaseSchema):
     model_config = ConfigDict(use_enum_values=True)
 
-    id: str = Field(validation_alias="challenge_id")
+    id: str
     status: ChallengeStatus
     sender: UserBase
     receiver: UserBase
     color_choice: ChessColorChoice
-    final_color: ChessColor = Field(validation_alias="color")
+    final_color: ChessColor
     time_control: TimeControl
     initial_fen: str
+    direction: Direction

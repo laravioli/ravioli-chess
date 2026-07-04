@@ -52,8 +52,7 @@ def user_or_anon(with_pref=False):
             if with_pref:
                 stmt = stmt.options(joinedload(User.preference))
 
-            result = await db.execute(stmt)
-            user = result.scalar_one_or_none()
+            user = (await db.execute(stmt)).scalar_one_or_none()
 
             if not (user and verify_session(user.hashed_password, session.auth_hash)):
                 await redis.delete(f"session:{session_cookie}")
