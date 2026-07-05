@@ -11,7 +11,7 @@ from app.exceptions import DBNotFound
 from app.social.db import friendship_criteria
 from app.websocket.pubsub import Users
 from ravioli_core.db.models import Friendship, Preference, User
-from ravioli_core.utils import transaction
+from ravioli_core.db.utils import transaction
 
 from .schemas import UserCreate, UserFilter, UserSearch
 

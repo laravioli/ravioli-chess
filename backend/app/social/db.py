@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions import DBNotFound
 from ravioli_core.db.models import FriendRequest, FriendRequestAccepted, Friendship, User
 from ravioli_core.db.models.social import FriendshipStatus
-from ravioli_core.utils import transaction
+from ravioli_core.db.utils import transaction
 
 
 class SocialDB:

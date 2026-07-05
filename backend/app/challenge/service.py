@@ -8,7 +8,7 @@ from app.game.db import id8
 from ravioli_core.cache import CacheLib
 from ravioli_core.db.enums import ChessColor
 from ravioli_core.db.models import Challenge, User
-from ravioli_core.utils import transaction
+from ravioli_core.db.utils import transaction
 
 from .schemas import ChallengeRequest
 

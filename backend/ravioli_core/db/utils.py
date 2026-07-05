@@ -4,11 +4,10 @@ from contextlib import asynccontextmanager
 # DB stuff
 from typing import Any, Protocol
 
-from redis.asyncio import Redis
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from .config import DbSettings, RedisSettings
+from ravioli_core.config import DbSettings
 
 
 def create_engine_and_sessionmaker(settings: DbSettings):
@@ -39,9 +38,3 @@ async def transaction(conn: Transactional, error_detail="Integrity Error"):
             setattr(e, "detail", error_detail)
         await conn.rollback()
         raise
-
-
-def create_async_redis(**kwargs: Any):
-    settings = RedisSettings().as_dict()  # type: ignore
-    settings.update(kwargs)
-    return Redis(**settings)

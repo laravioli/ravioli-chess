@@ -189,4 +189,7 @@ notes.txt
 
 #db
 *_db
+
+#test
+/playground
 test*.py

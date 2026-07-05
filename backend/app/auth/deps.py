@@ -3,12 +3,11 @@ from typing import Annotated
 from fastapi import Depends, Response, status
 from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
-from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 
 from app.config import settings
 from app.deps import DbSession, RedisClient
 from app.exceptions import InvalidSession
+from app.user.db import select_user
 from ravioli_core.db.models import User
 from ravioli_core.serializers import msgpack
 
@@ -36,6 +35,7 @@ async def get_auth_session(
 
 def user_or_anon(with_pref=False):
     # NOTE : fastapi deps caching rely on function identity
+    stmt = select_user(with_pref)
 
     async def dep(
         redis: RedisClient,
@@ -48,11 +48,7 @@ def user_or_anon(with_pref=False):
         try:
             session = await get_auth_session(redis, session_cookie)
 
-            stmt = select(User).where(User.id == session.user_id)
-            if with_pref:
-                stmt = stmt.options(joinedload(User.preference))
-
-            user = (await db.execute(stmt)).scalar_one_or_none()
+            user = (await db.execute(stmt, {"user_id": session.user_id})).scalar_one_or_none()
 
             if not (user and verify_session(user.hashed_password, session.auth_hash)):
                 await redis.delete(f"session:{session_cookie}")
