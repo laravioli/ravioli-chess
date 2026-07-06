@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from sqlalchemy import delete, func, literal, select, union_all, update
 from sqlalchemy.exc import NoResultFound
@@ -10,12 +10,12 @@ from ravioli_core.db.models.social import FriendshipStatus
 from ravioli_core.db.utils import transaction
 
 
-class SocialDB:
+class SocialRepo:
     async def create_request(
         self,
         session: AsyncSession,
-        sender_id: uuid.UUID,
-        receiver_id: uuid.UUID,
+        sender_id: UUID,
+        receiver_id: UUID,
     ):
         async with transaction(session, error_detail="Unable to create friend request"):
             request = Friendship(
@@ -37,8 +37,8 @@ class SocialDB:
     async def accept_request(
         self,
         session: AsyncSession,
-        sender_id: uuid.UUID,
-        receiver_id: uuid.UUID,
+        sender_id: UUID,
+        receiver_id: UUID,
     ):
         async with transaction(session):
             result = await session.execute(
@@ -71,8 +71,8 @@ class SocialDB:
     async def delete_request(
         self,
         session: AsyncSession,
-        sender_id: uuid.UUID,
-        receiver_id: uuid.UUID,
+        sender_id: UUID,
+        receiver_id: UUID,
     ):
         async with transaction(session):
             stmt = delete(Friendship).where(
@@ -88,7 +88,7 @@ class SocialDB:
     async def list_friendship(
         self,
         session: AsyncSession,
-        user_id: uuid.UUID,
+        user_id: UUID,
         status: FriendshipStatus,
     ):
         stmt1 = select(
@@ -117,13 +117,13 @@ class SocialDB:
     async def delete_friend(
         self,
         session: AsyncSession,
-        current_user_id: uuid.UUID,
-        target_id: uuid.UUID,
+        current_user_id: UUID,
+        target_id: UUID,
     ):
         async with transaction(session):
             result = await session.execute(
                 delete(Friendship).where(
-                    *friendship_criteria(current_user_id, target_id),
+                    *self.friendship_criteria(current_user_id, target_id),
                     Friendship.status == FriendshipStatus.accepted,
                 )
             )
@@ -131,9 +131,10 @@ class SocialDB:
             if result.rowcount == 0:  # type:ignore[attr-defined]
                 raise DBNotFound(detail="friend not found")
 
-
-def friendship_criteria(id_a, id_b):
-    return [
-        func.least(Friendship.sender_id, Friendship.receiver_id) == func.least(id_a, id_b),
-        func.greatest(Friendship.sender_id, Friendship.receiver_id) == func.greatest(id_a, id_b),
-    ]
+    @staticmethod
+    def friendship_criteria(id_a, id_b):
+        return [
+            func.least(Friendship.sender_id, Friendship.receiver_id) == func.least(id_a, id_b),
+            func.greatest(Friendship.sender_id, Friendship.receiver_id)
+            == func.greatest(id_a, id_b),
+        ]

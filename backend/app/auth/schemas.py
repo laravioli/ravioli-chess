@@ -4,7 +4,7 @@ import msgspec
 from pydantic import UUID4, Field, SecretStr
 
 from app.api.schemas import BaseSchema
-from app.pref.schemas import Preference
+from app.pref import Preference
 
 
 class UserLogin(BaseSchema):

@@ -3,10 +3,7 @@ name = "ravioli-chess"
 version = "0.1.0"
 description = "chess server"
 requires-python = ">=3.13"
-dependencies = [
-    "ravioli-core",
-    "chess>=1.11.2",
-]
+dependencies = ["ravioli-core", "chess>=1.11.2"]
 
 [tool.ruff]
-extend = "../ruff.toml"
+extend = "../../ruff.toml"

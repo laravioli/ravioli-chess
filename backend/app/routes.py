@@ -10,8 +10,8 @@ from .env import Env
 
 def add_routes(app: FastAPI, env: Env):
 
-    app.include_router(create_api_router(env))
     app.include_router(create_web_router(env))
+    app.include_router(create_api_router(env))
     app.include_router(create_ws_router(env))
 
     add_pagination(app)

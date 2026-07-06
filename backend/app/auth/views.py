@@ -2,15 +2,15 @@ from datetime import timedelta
 
 from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.deps import DbSession
+from app.deps import DbConnection
 from app.env import Env
 from app.exceptions import InvalidCredentials
 
 from .deps import SessionCookie
 from .schemas import UserLogin, UserSuccess
-from .service import authenticate, create_session
 
 
 def create_auth_api_router(env: Env):
@@ -18,20 +18,20 @@ def create_auth_api_router(env: Env):
 
     @router.post("/login", response_model=UserSuccess)
     async def login(
-        session: DbSession,
+        conn: DbConnection,
         credentials: UserLogin,
         response: Response,
         session_cookie: SessionCookie = None,
     ):
         try:
-            user = await authenticate(session, credentials)
+            user = await env.auth.authenticate(conn, credentials)
         except InvalidCredentials:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
         expire_in = int(timedelta(days=7).total_seconds())
 
-        session_id = await create_session(
-            env.core.redis, user, expires_in=expire_in, session_cookie=session_cookie
+        session_id = await env.auth.create_session(
+            user, expires_in=expire_in, session_cookie=session_cookie
         )
 
         response.set_cookie(
@@ -48,7 +48,18 @@ def create_auth_api_router(env: Env):
             httponly=True,
             samesite="lax",
         )
-        return await env.user.login(session, user)
+        try:
+            async with AsyncSession(bind=conn) as session:
+                unread_count = await env.notif.get_unread_count(session, user.id)
+        except Exception:
+            unread_count = 0
+
+        return UserSuccess(
+            id=user.id,
+            username=user.username,
+            preference=user.preference,
+            unread_count=unread_count,
+        )
 
     @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
     async def logout(

@@ -5,12 +5,13 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import joinedload
 
+from app.types import _SA_Connection
 from ravioli_core.db.models import Notification, User
 
 from .schemas import NotifParams, pagination
 
 
-class NotifDB:
+class NotifRepo:
     @pagination
     async def get_notifications(
         self,
@@ -30,10 +31,10 @@ class NotifDB:
 
     async def unread_count(
         self,
-        session: AsyncSession,
+        conn: _SA_Connection,
         user_id: UUID,
     ):
-        return await session.scalar(
+        return await conn.scalar(
             select(func.count())
             .select_from(Notification)
             .where(Notification.receiver_id == user_id, Notification.read.is_(False))

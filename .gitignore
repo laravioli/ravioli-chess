@@ -9,3 +9,4 @@ openapi.yaml
 .openapi.json
 .envrc
 raviolichess.code-workspace
+/.vscode/

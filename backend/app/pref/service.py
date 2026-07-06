@@ -6,7 +6,7 @@ from itsdangerous import BadSignature, URLSafeSerializer
 
 from app.config import settings
 from app.deps import DbSession
-from ravioli_core.db.models import User
+from app.user import UserWithPref
 
 from .schemas import PreferenceUpdate
 
@@ -29,7 +29,7 @@ def extract_cookie_data(request: Request):
     return cookie_data
 
 
-async def update_user_pref(session: DbSession, user: User, pref: PreferenceUpdate):
+async def update_user_pref(session: DbSession, user: UserWithPref, pref: PreferenceUpdate):
     payload = pref.model_dump(exclude_unset=True)
     for key, value in payload.items():
         setattr(user.preference, key, value)

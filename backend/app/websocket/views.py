@@ -12,7 +12,7 @@ def create_ws_router(env: Env):
     @router.websocket("/socket/site")
     async def index(deps: WebsocketParamsDep):
         consumer = site_endpoint(env, deps)
-        await consumer()
+        await consumer()  # pyright: ignore[reportGeneralTypeIssues]
 
     @router.websocket("/socket/play/{game_id}")
     async def play(deps: WebsocketParamsDep, game_id: str):

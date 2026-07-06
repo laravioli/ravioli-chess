@@ -1,19 +1,19 @@
 //https://github.com/lichess-org/lila/blob/master/ui/analyse/src/ctrl.ts
-import { observable, action, computed } from 'mobx';
 import { Chessground } from '@lichess-org/chessground';
 import type { Api as ChessgroundApi } from '@lichess-org/chessground/api';
-import { uciToMove, opposite } from '@lichess-org/chessground/util';
+import { opposite, uciToMove } from '@lichess-org/chessground/util';
+import { action, computed, observable } from 'mobx';
 
-import { TreePath, TreeOps, Tree } from '@/lib/tree/tree';
-import { isEvalBetter } from '@/lib/eval/utils';
 import type { Ceval } from '@/lib/eval/ceval';
 import type { CevalOpts, ClientEval } from '@/lib/eval/interface';
+import { isEvalBetter } from '@/lib/eval/utils';
 import type { Node, Path } from '@/lib/tree/interface';
+import { Tree, TreeOps, TreePath } from '@/lib/tree/tree';
 
-import { makeObservableNode, makeRoot, makeNode } from './node';
+import { wsConnect } from '@/lib/socket';
 import { makeShapes } from './autoshape';
 import type { AnalyseOpts, AnalyseSettings, JustCaptured } from './interface';
-import { wsConnect } from '@/lib/socket';
+import { makeNode, makeObservableNode, makeRoot } from './node';
 
 export class AnalyseStore {
   board: ChessgroundApi | undefined;

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, cast
 from uuid import UUID
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.notif.service import NotifService
 
@@ -24,53 +24,53 @@ class ContextBuilder:
 
     async def base(
         self,
-        session: AsyncSession,
+        conn: AsyncConnection,
         user: User,
     ):
         data = {}
         if user.is_auth:
-            data.update(unreadCount=await self.notif.get_unread_count(session, cast(UUID, user.id)))
+            data.update(unreadCount=await self.notif.get_unread_count(conn, cast(UUID, user.id)))
         return data
 
     async def index(
         self,
-        session: AsyncSession,
+        conn: AsyncConnection,
         user: User,
     ):
-        data = await self.base(session, user)
-        data.update(positions=await self.web.get_chess_positions(session))
+        data = await self.base(conn, user)
+        data.update(positions=await self.web.get_chess_positions(conn))
         return {"page": PAGE_DEFAULT, "data": data}
 
     async def analyse(
         self,
-        session: AsyncSession,
+        conn: AsyncConnection,
         user: User,
     ):
-        data = await self.base(session, user)
-        data.update(positions=await self.web.get_chess_positions(session))
+        data = await self.base(conn, user)
+        data.update(positions=await self.web.get_chess_positions(conn))
         return {"page": PAGE_DEFAULT, "data": data}
 
     async def editor(
         self,
-        session: AsyncSession,
+        conn: AsyncConnection,
         user: User,
     ):
-        data = await self.base(session, user)
-        data.update(positions=await self.web.get_chess_positions(session))
+        data = await self.base(conn, user)
+        data.update(positions=await self.web.get_chess_positions(conn))
         return {"page": PAGE_DEFAULT, "data": data}
 
     async def play(
         self,
-        session: AsyncSession,
+        conn: AsyncConnection,
         user: User,
     ):
-        data = await self.base(session, user)
+        data = await self.base(conn, user)
         return {"page": PAGE_DEFAULT, "data": data}
 
     async def profile(
         self,
-        session: AsyncSession,
+        conn: AsyncConnection,
         user: User,
     ):
-        data = await self.base(session, user)
+        data = await self.base(conn, user)
         return {"page": PAGE_DEFAULT, "data": data}

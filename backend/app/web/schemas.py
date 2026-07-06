@@ -7,6 +7,8 @@ from app.api.schemas import BaseSchema
 from app.pref.schemas import Preference
 
 
+# TODO: i stopped there
+# WEDDING
 class User(BaseSchema):
     """User schema used in html templates and other web services\n
     Anon users are represented with not User.is_auth

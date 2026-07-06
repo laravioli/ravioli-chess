@@ -1,7 +1,7 @@
 from fastapi.templating import Jinja2Templates
 from redis.asyncio import Redis
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.notif.service import NotifService
 from ravioli_core.cache import CacheLib
@@ -23,18 +23,18 @@ class WebService:
         self.ctx_builder = ContextBuilder(self, notif)
 
     @staticmethod
-    async def _db_chess_positions(session: AsyncSession):
+    async def _db_chess_positions(conn: AsyncConnection):
 
         stmt = select(ChessPosition.eco, ChessPosition.name, ChessPosition.fen).order_by(
             ChessPosition.eco
         )
-        result = await session.execute(stmt)
+        result = await conn.execute(stmt)
         data = [dict(row) for row in result.mappings().all()]
         return data
 
-    async def get_chess_positions(self, session: AsyncSession):
+    async def get_chess_positions(self, conn: AsyncConnection):
         return await self._chess_cache.get_or_set(
-            "chess:positions", factory=lambda: self._db_chess_positions(session)
+            "chess:positions", factory=lambda: self._db_chess_positions(conn)
         )
 
     @staticmethod

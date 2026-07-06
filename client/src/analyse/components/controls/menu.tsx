@@ -1,25 +1,25 @@
-import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
-import { INITIAL_FEN } from 'chessops/fen';
 import { ActionIcon, Menu } from '@mantine/core';
 import {
+  IconChessRook,
+  IconChevronLeft,
+  IconChevronRight,
   IconEdit,
+  IconMenu,
   IconReload,
   IconRepeat,
-  IconChessRook,
-  IconChevronRight,
-  IconChevronLeft,
-  IconMenu,
 } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
+import { INITIAL_FEN } from 'chessops/fen';
+import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router';
 
-import { chessPositionsOptions } from '@/lib/api/@tanstack/react-query.gen';
-import { usePageStore } from '@/core/hooks';
 import { useMenu, type MenuViewFC } from '@/common/hooks';
+import { usePageStore } from '@/core/hooks';
+import { chessPositionsOptions } from '@/lib/api/@tanstack/react-query.gen';
 
+import classes from '@/analyse/css/controls.module.css';
 import type { AnalyseStore } from '@/analyse/store/analyse';
 import type { AnalyseOpts } from '@/analyse/store/interface';
-import classes from '@/analyse/css/controls.module.css';
 
 export const ControlsMenu: React.FC = () => {
   const { currentMenu, navigate } = useMenu({

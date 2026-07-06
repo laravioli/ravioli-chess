@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, Query, status
 from pydantic import UUID4
 
 from app.auth.deps import UserOrAnon
-from ravioli_core.db.models import User
+from app.user import User
 
 
 @dataclass

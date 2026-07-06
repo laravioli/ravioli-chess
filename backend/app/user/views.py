@@ -2,11 +2,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Response, status
 from fastapi.exceptions import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemas import Message
 from app.auth.deps import AuthUser, SessionCookie, UserOrAnon
 from app.config import settings
-from app.deps import DbSession
+from app.deps import DbConnection
 from app.env import Env
 
 from .schemas import UserBase, UserCreate, UserProfile, UserSearch, UserWithPref
@@ -21,12 +22,12 @@ def create_user_api_router(env: Env):
 
     @router.delete("/me", responses={200: {"model": Message}})
     async def delete_user(
-        session: DbSession,
+        conn: DbConnection,
         user: AuthUser,
         response: Response,
         session_cookie: SessionCookie = None,
     ):
-        await env.user.delete(session, user.id)
+        await env.user.delete(conn, user.id)
 
         # same logic as logout
         if session_cookie:
@@ -40,27 +41,35 @@ def create_user_api_router(env: Env):
         return {"message": "your account has been deleted"}
 
     @router.get("/{username}", response_model=UserProfile, response_model_exclude_unset=True)
-    async def get_user(session: DbSession, current_user: UserOrAnon, username: str):
+    async def get_user(
+        conn: DbConnection,
+        current_user: UserOrAnon,
+        username: str,
+    ):
 
-        user = (
-            await env.user.retrieve_with_friendship(session, current_user, username)
-            if current_user and (current_user.username != username)
-            else await env.user.retrieve(session, username=username, with_online=True)
-        )
-        if not user:
+        if current_user and (current_user.username != username):
+            async with AsyncSession(bind=conn) as session:
+                profile = await env.user.profile_with_friendship(session, current_user, username)
+        else:
+            profile = await env.user.profile(conn, username=username)
+
+        if not profile:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
-        return user
+        return profile
 
     @router.get("", response_model=list[UserSearch])
     async def list_user(
-        session: DbSession,
+        conn: DbConnection,
         q: Annotated[str | None, Query()] = None,
         limit: Annotated[int, Query(le=50)] = 20,
     ):
-        return await env.user.search(session, q, limit) if q else []
+        return await env.user.search(conn, q, limit) if q else []
 
     @router.post("", response_model=UserWithPref, status_code=status.HTTP_201_CREATED)
-    async def register_user(session: DbSession, body: UserCreate):
-        return await env.user.create(session, body)
+    async def register_user(
+        conn: DbConnection,
+        body: UserCreate,
+    ):
+        return await env.user.create(conn, body)
 
     return router

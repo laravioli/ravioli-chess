@@ -1,5 +1,5 @@
-import type { MouseEventHandler, ReactNode } from 'react';
 import { ActionIcon, Tooltip } from '@mantine/core';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 import { useToolTipConfig } from './tooltip';
 

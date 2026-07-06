@@ -1,88 +1,59 @@
-from typing import Unpack
 from uuid import UUID
 
-from sqlalchemy import and_, delete, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
-from app.auth.security import generate_password_hash
-from app.exceptions import DBNotFound
 from app.notif.service import NotifService
-from app.social.db import friendship_criteria
+from app.pref import Preference
+from app.user.repo import UserRepo
 from app.websocket.pubsub import Users
-from ravioli_core.db.models import Friendship, Preference, User
-from ravioli_core.db.utils import transaction
 
-from .schemas import UserCreate, UserFilter, UserSearch
+from .schemas import FriendShipProfile, UserCreate, UserProfile, UserSearch, UserWithPref
+from .user import User
 
 
 class UserService:
-    def __init__(self, users: Users, notif: NotifService):
+    def __init__(self, repo: UserRepo, users: Users, notif: NotifService):
+        self.user_repo = repo
         self._users = users
         self._notif = notif
 
-    async def create(self, session: AsyncSession, data: UserCreate):
-        async with transaction(session, error_detail="This username or email already exists"):
-            new_user = User(
-                username=data.username,
-                email=data.email,
-                hashed_password=generate_password_hash(data.password.get_secret_value()),
-                preference=Preference(),
+    async def create(self, conn: AsyncConnection, data: UserCreate):
+        row = await self.user_repo.create(conn, data)
+        return UserWithPref(**row._mapping, preference=Preference.default())
+
+    async def profile(self, conn: AsyncConnection, username: str):
+        user = await self.user_repo.by_username(conn, username)
+        if user:
+            online = await self._users.is_online(str(user.id))
+            return UserProfile(
+                id=user.id, username=user.username, joined_at=user.joined_at, online=online
             )
 
-            session.add(new_user)
-
-        return new_user
-
-    async def retrieve(self, session: AsyncSession, username: str, **kwargs: Unpack[UserFilter]):
-        options = []
-        if kwargs.get("with_pref"):
-            options.append(joinedload(User.preference))
-        stmt = select(User).where(User.username == username).options(*options)
-        user = await session.scalar(stmt)
-
-        if user and kwargs.get("with_online"):
-            user.online = await self._users.is_online(str(user.id))  # type: ignore
-
-        return user
-
-    async def retrieve_with_friendship(
+    async def profile_with_friendship(
         self, session: AsyncSession, current_user: User, username: str
     ):
-        stmt = (
-            select(User, Friendship)
-            .outerjoin(
-                Friendship,
-                and_(*friendship_criteria(current_user.id, User.id)),
+
+        result = await self.user_repo.by_username_with_friendship(session, current_user, username)
+        if not result:
+            return
+
+        user, friendship = result
+
+        return UserProfile(
+            id=user.id,
+            username=user.username,
+            friendship=FriendShipProfile(
+                is_sender=friendship.sender_id == current_user.id, status=friendship.status
             )
-            .where(User.username == username)
+            if friendship
+            else None,
+            joined_at=user.joined_at,
+            online=await self._users.is_online(str(user.id)),
         )
 
-        result = await session.execute(stmt)
-        row = result.first()
+    async def search(self, conn: AsyncConnection, search_query: str, limit: int):
 
-        if row is None:
-            return None
-
-        user, friendship = row
-        if user:
-            if friendship:
-                friendship.is_sender = friendship.sender_id == current_user.id
-            user.friendship = friendship
-            user.online = await self._users.is_online(str(user.id))
-
-        return user
-
-    async def search(self, session: AsyncSession, search_query: str, limit: int):
-        stmt = (
-            select(User.id, User.username)
-            .where(User.username.like(f"{search_query}%"))
-            .order_by(User.username)
-            .limit(limit)
-        )
-        result = await session.execute(stmt)
-        rows = result.all()
-
+        rows = await self.user_repo.search(conn, search_query, limit)
         online_status = await self._users.are_online([row.id for row in rows])
 
         return [
@@ -94,22 +65,9 @@ class UserService:
             for row, online in zip(rows, online_status, strict=True)
         ]
 
-    async def delete(self, session: AsyncSession, id: UUID):
-        stmt = delete(User).where(User.id == id)
-        result = await session.execute(stmt)
-
-        if result.rowcount == 0:  # type: ignore
-            raise DBNotFound(detail="User does not exist")
-
-        await session.commit()
-
-    async def login(self, session: AsyncSession, user: User):
-        try:
-            user.unread_count = await self._notif.get_unread_count(session, user.id)  # type: ignore
-        except Exception:
-            user.unread_count = 0  # type: ignore
-        return user
+    async def delete(self, conn: AsyncConnection, user_id: UUID):
+        await self.user_repo.delete(conn, user_id)
 
     @staticmethod
-    def make(*, users: Users, notif: NotifService):
-        return UserService(users, notif)
+    def make(*, repo: UserRepo, users: Users, notif: NotifService):
+        return UserService(repo, users, notif)

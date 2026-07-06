@@ -1,14 +1,14 @@
 import clsx from 'clsx';
 
-import { PageStoreProvider } from '@/core/context/provider';
 import { Board } from '@/common/components/board';
+import { PageStoreProvider } from '@/core/context/provider';
 
-import { useInitStore } from '@/analyse/store/init';
 import layout from '@/analyse/css/layout.module.css';
 import variables from '@/analyse/css/variables.module.css';
+import { useInitStore } from '@/analyse/store/init';
 import { Controls } from './controls/controls';
-import { Tools } from './tools/tools';
 import { MaybeEvalBar } from './tools/eval/bar';
+import { Tools } from './tools/tools';
 import { FenInput } from './underboard/feninput';
 
 const Analyse: React.FC = () => {

@@ -21,15 +21,15 @@ class NotificationBase(BaseSchema):
 
 
 class FriendRequestSchema(NotificationBase):
-    type: Literal["friend_request"]
+    notif_type: Literal["friend_request"] = Field(validation_alias="type")
 
 
 class FriendRequestAcceptedSchema(NotificationBase):
-    type: Literal["friend_request_accepted"]
+    notif_type: Literal["friend_request_accepted"] = Field(validation_alias="type")
 
 
 type Notification = Annotated[
-    FriendRequestSchema | FriendRequestAcceptedSchema, Field(discriminator="type")
+    FriendRequestSchema | FriendRequestAcceptedSchema, Field(discriminator="notif_type")
 ]
 
 

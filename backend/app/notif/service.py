@@ -6,15 +6,16 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.background import Background
+from app.types import _SA_Connection
 from ravioli_core.ipc.w_in import TellUser
 
 from .cache import NotifCache
-from .db import NotifDB
+from .repo import NotifRepo
 from .schemas import NotifParams, notification_ta
 
 
 class NotifService:
-    def __init__(self, db: NotifDB, cache: NotifCache):
+    def __init__(self, db: NotifRepo, cache: NotifCache):
         self._db = db
         self._cache = cache
 
@@ -29,11 +30,11 @@ class NotifService:
 
     async def get_unread_count(
         self,
-        session: AsyncSession,
+        conn: _SA_Connection,
         user_id: UUID,
     ):
         return await self._cache.get_or_set(
-            f"{user_id}", factory=lambda: self._db.unread_count(session, user_id)
+            f"{user_id}", factory=lambda: self._db.unread_count(conn, user_id)
         )
 
     async def delete_all(
@@ -72,7 +73,7 @@ class NotifService:
     @staticmethod
     def make(*, redis: Redis):
         return NotifService(
-            db=NotifDB(),
+            db=NotifRepo(),
             cache=NotifCache(
                 redis=redis,
                 namespace="notifications",

@@ -5,19 +5,14 @@ readme = "README.md"
 version = "0.1.0"
 requires-python = ">=3.13"
 [dependency-groups]
-dev = [
-    "honcho>=2.0.0",
-    "pyright>=1.1.411",
-    "ruff>=0.14.10",
-]
+dev = ["honcho>=2.0.0", "pyright>=1.1.411", "ruff>=0.14.10"]
 [tool.uv.workspace]
-members = ["backend/*"]
-exclude = ["backend/scripts", "backend/playground"]
+members = ["backend/app", "backend/engine", "backend/ravioli_core"]
 
 [tool.uv.sources]
 ravioli-core = { workspace = true }
 
 [tool.pyright]
+include = ["backend"]
 pythonVersion = "3.13"
-typeCheckingMode = "basic"
-reportMissingTypeStubs = false
+typeCheckingMode = "standard"
