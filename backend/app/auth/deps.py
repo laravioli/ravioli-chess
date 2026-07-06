@@ -5,7 +5,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
 
 from app.config import settings
-from app.deps import DbSession, RedisClient
+from app.deps import DbConnection, RedisClient
 from app.exceptions import InvalidSession
 from app.user.db import select_user
 from ravioli_core.db.models import User
@@ -20,6 +20,12 @@ async def get_session_cookie(conn: HTTPConnection):
 
 
 type SessionCookie = Annotated[str | None, Depends(get_session_cookie)]
+
+# asyncpg : 1.4k rps
+# engine connection: 1.2 rps
+# session connection: 1k rps
+# TODO: investigate engine connection behavior toward ROLLBACK
+# TODO : if consistent i may start using connection and not session
 
 
 async def get_auth_session(
@@ -39,16 +45,16 @@ def user_or_anon(with_pref=False):
 
     async def dep(
         redis: RedisClient,
-        db: DbSession,
+        conn: DbConnection,
         response: Response,
         session_cookie: SessionCookie = None,
-    ) -> User | None:
+    ):
         if not session_cookie:
             return
         try:
             session = await get_auth_session(redis, session_cookie)
 
-            user = (await db.execute(stmt, {"user_id": session.user_id})).scalar_one_or_none()
+            user = (await conn.execute(stmt, {"user_id": session.user_id})).first()
 
             if not (user and verify_session(user.hashed_password, session.auth_hash)):
                 await redis.delete(f"session:{session_cookie}")

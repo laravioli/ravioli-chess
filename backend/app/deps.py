@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Annotated
 from fastapi import BackgroundTasks, Depends
 from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession
 
 from ravioli_core.env import CoreEnv
 from ravioli_core.pubsub import Publisher
@@ -94,6 +94,14 @@ async def get_engine(env: CoreDep):
 
 
 type EngineDep = Annotated[AsyncEngine, Depends(get_engine)]
+
+
+async def get_connection(env: CoreDep):
+    async with env.engine.connect() as conn:
+        yield conn
+
+
+type DbConnection = Annotated[AsyncConnection, Depends(get_connection)]
 
 
 async def get_session(env: CoreDep):

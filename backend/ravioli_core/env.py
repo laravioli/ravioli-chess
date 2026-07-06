@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from ravioli_core.config import DbSettings
 from ravioli_core.db.utils import create_engine_and_sessionmaker
 from ravioli_core.ipc.utils import create_async_redis
 from ravioli_core.pubsub.publisher import Publisher
@@ -23,5 +22,5 @@ class CoreEnv:
         redis = create_async_redis()
         pub = Publisher(redis)
         scheduler = Scheduler()
-        engine, session_maker = create_engine_and_sessionmaker(settings=DbSettings())  # type: ignore
+        engine, session_maker = create_engine_and_sessionmaker()
         return CoreEnv(redis, pub, engine, session_maker, scheduler)

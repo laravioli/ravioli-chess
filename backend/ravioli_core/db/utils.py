@@ -10,12 +10,13 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from ravioli_core.config import DbSettings
 
 
-def create_engine_and_sessionmaker(settings: DbSettings):
+def create_engine_and_sessionmaker():
+    settings = DbSettings()  # type: ignore
     engine = create_async_engine(
         str(settings.SQLALCHEMY_DATABASE_URI),
-        pool_size=10,
-        max_overflow=20,
-        pool_pre_ping=True,  # validates connections before use
+        pool_size=5,
+        max_overflow=10,
+        pool_pre_ping=False,
         pool_recycle=1800,  # avoid stale sockets
         future=True,
         connect_args={"server_settings": {"jit": "off"}},
