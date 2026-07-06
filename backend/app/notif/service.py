@@ -15,8 +15,8 @@ from .schemas import NotifParams, notification_ta
 
 class NotifService:
     def __init__(self, db: NotifDB, cache: NotifCache):
-        self.db = db
-        self.cache = cache
+        self._db = db
+        self._cache = cache
 
     async def get_notifications(
         self,
@@ -25,15 +25,15 @@ class NotifService:
         params: NotifParams = NotifParams(),
     ):
         unread_count = await self.get_unread_count(session, user_id)
-        return await self.db.get_notifications(session, user_id, unread_count, params)
+        return await self._db.get_notifications(session, user_id, unread_count, params)
 
     async def get_unread_count(
         self,
         session: AsyncSession,
         user_id: UUID,
     ):
-        return await self.cache.get_or_set(
-            f"{user_id}", factory=lambda: self.db.unread_count(session, user_id)
+        return await self._cache.get_or_set(
+            f"{user_id}", factory=lambda: self._db.unread_count(session, user_id)
         )
 
     async def delete_all(
@@ -41,7 +41,7 @@ class NotifService:
         session: AsyncSession,
         user_id: UUID,
     ):
-        await self.db.delete_all(session, user_id)
+        await self._db.delete_all(session, user_id)
 
     def notify_one(
         self,
@@ -65,18 +65,18 @@ class NotifService:
             self.notify_one(bg, user_id)
 
     async def mark_all_read(self, engine: AsyncEngine, user_id: UUID):
-        await self.db.mark_all_read(engine, user_id)
+        await self._db.mark_all_read(engine, user_id)
         # set0 would create write-write race condition with incr
-        await self.cache.invalidate_count([user_id])
+        await self._cache.invalidate_count([user_id])
 
-
-def make_notif_service(redis: Redis):
-    return NotifService(
-        db=NotifDB(),
-        cache=NotifCache(
-            redis=redis,
-            namespace="notifications",
-            version="v1",
-            data_type=int,
-        ),
-    )
+    @staticmethod
+    def make(*, redis: Redis):
+        return NotifService(
+            db=NotifDB(),
+            cache=NotifCache(
+                redis=redis,
+                namespace="notifications",
+                version="v1",
+                data_type=int,
+            ),
+        )

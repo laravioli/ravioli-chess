@@ -15,7 +15,7 @@ from .schemas import ChallengeRequest
 
 class ChallengeService:
     def __init__(self, cache: CacheLib[int]):
-        self.cache = cache
+        self._cache = cache
 
     async def list(
         self,
@@ -73,13 +73,13 @@ class ChallengeService:
     ):
         pass
 
-
-def make_challenge_service(redis: Redis):
-    return ChallengeService(
-        cache=CacheLib(
-            redis=redis,
-            namespace="challenge",
-            version="v1",
-            data_type=int,
+    @staticmethod
+    def make(*, redis: Redis):
+        return ChallengeService(
+            cache=CacheLib(
+                redis=redis,
+                namespace="challenge",
+                version="v1",
+                data_type=int,
+            )
         )
-    )

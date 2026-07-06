@@ -3,7 +3,7 @@ from app.challenge.service import ChallengeService
 
 class MatchMakingService:
     def __init__(self, challenge: ChallengeService):
-        self.challenge = challenge
+        self._challenge = challenge
 
     async def ai(self):
         pass
@@ -14,6 +14,6 @@ class MatchMakingService:
     async def random(self):
         pass
 
-
-def make_mm_service(challenge: ChallengeService):
-    return MatchMakingService(challenge=challenge)
+    @staticmethod
+    def make(*, challenge: ChallengeService):
+        return MatchMakingService(challenge=challenge)

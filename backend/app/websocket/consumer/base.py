@@ -7,10 +7,9 @@ from uuid import UUID
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app.websocket.env import WsEnv
+from app.env import Env
 from app.websocket.frame import ClientIn, c_out
 from app.websocket.schemas import MaybeUser, Sri
-from ravioli_core.env import CoreEnv
 from ravioli_core.pubsub.types import Chan
 from ravioli_core.serializers import json
 
@@ -29,17 +28,13 @@ class Consumer[T: Context = Context](ABC):
     def __init__(
         self,
         context: T,
-        core_env: CoreEnv,
-        env: WsEnv,
+        env: Env,
         websocket: WebSocket,
         heartbeat: HeartBeat,
     ):
         self.ctx = context
-        self.core_env = core_env
         self.env = env
-        self.broadcast = env.broadcast
-        self.pub = core_env.pub
-        self.users = env.users
+        self.pub = env.core.pub
         self.websocket = websocket
         self.heartbeat = heartbeat
         self._sub = Subscriber()
@@ -57,7 +52,7 @@ class Consumer[T: Context = Context](ABC):
     async def __call__(self):
         await self.websocket.accept()
         try:
-            async with self.broadcast.start_subscription(
+            async with self.env.ws.broadcast.start_subscription(
                 self._sub, self.ctx.user, self.ctx.channels
             ):
                 async with asyncio.TaskGroup() as tg:
@@ -87,7 +82,7 @@ class Consumer[T: Context = Context](ABC):
                 user = self.ctx.user
                 if user:
                     self.add_background_task(
-                        self.env.notif.mark_all_read(self.core_env.engine, cast(UUID, user.id))
+                        self.env.notif.mark_all_read(self.env.core.engine, cast(UUID, user.id))
                     )
 
     def add_background_task(self, coro):

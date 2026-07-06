@@ -5,15 +5,14 @@ from contextlib import asynccontextmanager
 from typing import Any, Protocol
 
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 from ravioli_core.config import DbSettings
 
 
-def create_engine_and_sessionmaker():
-    settings = DbSettings()  # type: ignore
+def create_engine(s: DbSettings):
     engine = create_async_engine(
-        str(settings.SQLALCHEMY_DATABASE_URI),
+        str(s.SQLALCHEMY_DATABASE_URI),
         pool_size=5,
         max_overflow=10,
         pool_pre_ping=False,
@@ -21,7 +20,11 @@ def create_engine_and_sessionmaker():
         future=True,
         connect_args={"server_settings": {"jit": "off"}},
     )
-    return engine, async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+    return engine
+
+
+def create_sessionmaker(engine: AsyncEngine):
+    return async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
 
 class Transactional(Protocol):

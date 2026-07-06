@@ -1,10 +1,18 @@
 import json
+from typing import cast
 
+from app.env import Env
 from app.main import app
-from app.process.matchmaking.views import router as router_matchmaking
+from app.process.env import Env as ProcessEnv
+from app.process.routes import add_routes as add_process_routes
+from app.routes import add_routes
+
+env = cast(Env, object())
+process_env = cast(ProcessEnv, object())
 
 # create one openapi.json
-app.include_router(router_matchmaking)
+add_routes(app, env)
+add_process_routes(app, process_env)
 
 
 def generate_schema():

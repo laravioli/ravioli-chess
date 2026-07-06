@@ -1,38 +1,36 @@
-import asyncio
 from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 
-from ravioli_core.env import CoreEnv
+from ravioli_core.config import DbSettings, RedisSettings
 
 from .env import Env
+from .routes import add_routes
 
 
-async def on_start(core_env: CoreEnv):
-    redis = core_env.redis
-    scheduler = core_env.scheduler
+async def on_start(env: Env):
+    redis = env.core.redis
+    scheduler = env.core.scheduler
 
     @scheduler.periodic(10, duration=1)
     async def heartbeat():
         await redis.hsetex("app:node", "node-0", "alive", ex=30)  # type: ignore
 
-    await redis.ping()  # type: ignore
-    scheduler.start()
+    await env.on_start()
 
 
-async def on_stop(core_env: CoreEnv):
-    await core_env.scheduler.shutdown()
+async def on_stop(env: Env):
     with suppress(Exception):
-        await core_env.redis.hdel("app:node", "node-0")  # type: ignore
-    await asyncio.gather(core_env.redis.aclose(), core_env.engine.dispose(), return_exceptions=True)
+        await env.core.redis.hdel("app:node", "node-0")  # type: ignore
+    await env.on_stop()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):  # noqa: ARG001
+async def lifespan(app: FastAPI):
     try:
-        core_env = CoreEnv.make()
-        env = Env.make(redis=core_env.redis)
-        await on_start(core_env)
-        yield {"core_env": core_env, "env": env}
+        env = Env.make(settings={"db": DbSettings(), "redis": RedisSettings()})  # type: ignore
+        await on_start(env)
+        add_routes(app, env)
+        yield {"env": env}
     finally:
-        await on_stop(core_env)
+        await on_stop(env)

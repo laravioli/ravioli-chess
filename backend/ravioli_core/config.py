@@ -7,41 +7,45 @@ from redis.backoff import ExponentialWithJitterBackoff
 
 
 class DbSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
+    model_config = SettingsConfigDict(
+        env_prefix="POSTGRES_", env_file=".env", extra="ignore", env_ignore_empty=True
+    )
 
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str = ""
-    POSTGRES_DB: str = ""
+    HOST: str
+    PORT: int = 5432
+    USER: str
+    PASSWORD: str = ""
+    DB: str = ""
 
     @computed_field
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
         return PostgresDsn.build(
             scheme="postgresql+asyncpg",
-            username=self.POSTGRES_USER,
-            password=self.POSTGRES_PASSWORD,
-            host=self.POSTGRES_HOST,
-            port=self.POSTGRES_PORT,
-            path=self.POSTGRES_DB,
+            username=self.USER,
+            password=self.PASSWORD,
+            host=self.HOST,
+            port=self.PORT,
+            path=self.DB,
         )
 
 
 class RedisSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
+    model_config = SettingsConfigDict(
+        env_prefix="REDIS_", env_file=".env", extra="ignore", env_ignore_empty=True
+    )
 
-    REDIS_HOST: str
-    REDIS_PORT: str
-    REDIS_UNIX_SOCKET_PATH: str | None = None
+    HOST: str
+    PORT: str
+    UNIX_SOCKET_PATH: str | None = None
 
     def as_dict(self):
         return {
-            "host": self.REDIS_HOST,
-            "port": self.REDIS_PORT,
+            "host": self.HOST,
+            "port": self.PORT,
             "socket_connect_timeout": 15,
             "socket_timeout": 5,
-            "unix_socket_path": self.REDIS_UNIX_SOCKET_PATH,
+            "unix_socket_path": self.UNIX_SOCKET_PATH,
             "decode_responses": False,
             "retry": Retry(backoff=ExponentialWithJitterBackoff(base=1, cap=10), retries=3),
             "health_check_interval": 3,

@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import Annotated
 
-from pydantic import ConfigDict, Field, StringConstraints
+from pydantic import ConfigDict, StringConstraints
 
 from app.api.schemas import BaseSchema
 from app.user.schemas import UserBase

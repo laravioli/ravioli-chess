@@ -1,9 +1,10 @@
 import secrets
 
+from redis.asyncio import Redis
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.deps import DbSession, RedisClient
 from app.exceptions import InvalidCredentials
 from ravioli_core.db.models import User
 from ravioli_core.serializers import msgpack
@@ -13,7 +14,7 @@ from .schemas import Session, UserLogin
 from .security import generate_session_hash, verify_password
 
 
-async def authenticate(session: DbSession, credentials: UserLogin):
+async def authenticate(session: AsyncSession, credentials: UserLogin):
     stmt = (
         select(User)
         .where(User.username == credentials.username)
@@ -27,7 +28,7 @@ async def authenticate(session: DbSession, credentials: UserLogin):
 
 
 async def create_session(
-    redis: RedisClient,
+    redis: Redis,
     user: User,
     expires_in: int,
     session_cookie: SessionCookie = None,

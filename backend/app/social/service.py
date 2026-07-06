@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 
 class SocialService:
     def __init__(self, db: SocialDB, notif: SocialNotif):
-        self.db = db
-        self.notif = notif
+        self._db = db
+        self._notif = notif
 
     async def create_request(
         self,
@@ -25,8 +25,8 @@ class SocialService:
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        await self.db.create_request(session, sender_id, receiver_id)
-        await self.notif.create(bg, receiver_id)
+        await self._db.create_request(session, sender_id, receiver_id)
+        await self._notif.create(bg, receiver_id)
 
     async def accept_request(
         self,
@@ -35,8 +35,8 @@ class SocialService:
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        await self.db.accept_request(session, sender_id, receiver_id)
-        await self.notif.accept(bg, sender_id, receiver_id)
+        await self._db.accept_request(session, sender_id, receiver_id)
+        await self._notif.accept(bg, sender_id, receiver_id)
 
     async def delete_request(
         self,
@@ -46,8 +46,8 @@ class SocialService:
         receiver_id: uuid.UUID,
     ):
 
-        await self.db.delete_request(session, sender_id, receiver_id)
-        await self.notif.delete(bg, receiver_id)
+        await self._db.delete_request(session, sender_id, receiver_id)
+        await self._notif.delete(bg, receiver_id)
 
     async def list_friendship(
         self,
@@ -55,7 +55,7 @@ class SocialService:
         user_id: uuid.UUID,
         status: FriendshipStatus,
     ):
-        return await self.db.list_friendship(session, user_id, status)
+        return await self._db.list_friendship(session, user_id, status)
 
     async def delete_friend(
         self,
@@ -64,9 +64,9 @@ class SocialService:
         current_user_id: uuid.UUID,
         target_id: uuid.UUID,
     ):
-        await self.db.delete_friend(session, current_user_id, target_id)
-        await self.notif.delete_friend(bg, current_user_id, target_id)
+        await self._db.delete_friend(session, current_user_id, target_id)
+        await self._notif.delete_friend(bg, current_user_id, target_id)
 
-
-def make_social_service(notif: NotifService):
-    return SocialService(db=SocialDB(), notif=SocialNotif(notif=notif))
+    @staticmethod
+    def make(*, notif: NotifService):
+        return SocialService(db=SocialDB(), notif=SocialNotif(notif=notif))

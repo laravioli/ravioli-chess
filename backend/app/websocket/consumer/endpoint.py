@@ -1,3 +1,4 @@
+from app.env import Env
 from app.websocket.deps import WebsocketParams
 from ravioli_core.ipc.channels import WsChan
 
@@ -7,7 +8,7 @@ from .play import Game, PlayConsumer, PlayContext
 from .site import SiteConsumer
 
 
-def site_endpoint(params: WebsocketParams):
+def site_endpoint(env: Env, params: WebsocketParams):
     sri, user, websocket = params["sri"], params["user"], params["websocket"]
 
     return SiteConsumer(
@@ -16,14 +17,13 @@ def site_endpoint(params: WebsocketParams):
             user=user,
             channels=[WsChan.sri(sri)],
         ),
-        core_env=params["core_env"],
-        env=params["env"],
+        env=env,
         websocket=websocket,
         heartbeat=HeartBeat(websocket),
     )
 
 
-def play_endpoint(params: WebsocketParams, game_id: str):
+def play_endpoint(env: Env, params: WebsocketParams, game_id: str):
     sri, user, websocket = params["sri"], params["user"], params["websocket"]
 
     return PlayConsumer(
@@ -33,8 +33,7 @@ def play_endpoint(params: WebsocketParams, game_id: str):
             channels=[WsChan.sri(sri), WsChan.play(game_id)],
             game=Game(game_id),
         ),
-        core_env=params["core_env"],
-        env=params["env"],
+        env=env,
         websocket=websocket,
         heartbeat=HeartBeat(websocket),
     )

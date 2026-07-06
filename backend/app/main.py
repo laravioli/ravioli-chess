@@ -1,13 +1,9 @@
 from fastapi import FastAPI
-from fastapi_pagination import add_pagination
 
-from app.api.routes import router as api_router
 from app.api.utils import custom_generate_unique_id
 from app.exceptions import add_exception_handler
 from app.lifespan import lifespan
 from app.middleware import CSRFMiddleWare
-from app.web.views import router as web_router
-from app.websocket.views import router as ws_router
 from ravioli_core.config import LogSettings, configure_logging
 
 configure_logging(settings=LogSettings())
@@ -19,14 +15,7 @@ app = FastAPI(
     generate_unique_id_function=custom_generate_unique_id,
 )
 app.add_middleware(CSRFMiddleWare)
-
-app.include_router(api_router)
-app.include_router(web_router)
-app.include_router(ws_router)
-
-add_pagination(app)
 add_exception_handler(app)
-
 
 # TODO remove session, rewrite query that used DBSession. use engine only. rename models -> nameTable and create name dataclass or msgspec structs
 # TODO then Name(**row)
