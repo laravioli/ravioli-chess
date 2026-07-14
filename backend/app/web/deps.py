@@ -1,17 +1,30 @@
-from fastapi import Request
+from typing import Annotated
+
+from fastapi import Depends, Request
 
 from app.auth.deps import UserWithPrefOrAnon
+from app.deps import DbConnection, EnvDep
+from app.pref import Preference
 from app.pref.service import extract_cookie_data
 
-from .schemas import User
+from .ctx.user import UserCtx
 
 
-# auth
-async def user_or_anon(request: Request, auth_user: UserWithPrefOrAnon):
-    if auth_user:
-        user = User.model_validate(auth_user)
-        user.is_auth = True
+# user context
+async def user_ctx(
+    request: Request,
+    user: UserWithPrefOrAnon,
+    env: EnvDep,
+    conn: DbConnection,
+):
+    if user:
+        return UserCtx(
+            user=user,
+            preference=user.preference,
+            unread_count=await env.notif.get_unread_count(conn, user.id),
+        )
     else:
-        user = User.anon(extract_cookie_data(request))
+        return UserCtx(user=None, preference=Preference(**extract_cookie_data(request)))
 
-    request.state.user = user
+
+type UserCtxDep = Annotated[UserCtx, Depends(user_ctx)]

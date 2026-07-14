@@ -1,24 +1,22 @@
-from typing import Any
-
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
 from app.deps import DbConnection
 from app.env import Env
 
-from .deps import user_or_anon
-from .views_ctx import DEFAULT_CONTEXT
+from .ctx.page import PagePayload
+from .deps import UserCtx, UserCtxDep
 
 
 def create_web_router(env: Env):
-    router = APIRouter(prefix="", tags=["web"], dependencies=[Depends(user_or_anon)])
+    router = APIRouter(prefix="", tags=["web"])
 
-    def generate_page(
+    def template_response(
         request: Request,
-        page_ctx: dict[str, Any] = DEFAULT_CONTEXT,
+        user_ctx: UserCtx,
+        page_payload: PagePayload,
     ):
-        user = request.state.user
-        ctx = {"payload": {"user": user.info, **page_ctx}}
+        ctx = {"user": user_ctx, "payload": {**page_payload, "user": user_ctx.payload}}
         return env.web.templates.TemplateResponse(
             request=request,
             headers={
@@ -35,40 +33,43 @@ def create_web_router(env: Env):
     async def index(
         conn: DbConnection,
         request: Request,
+        user_ctx: UserCtxDep,
     ):
-        page_ctx = await env.web.ctx_builder.index(conn, request.state.user)
-        return generate_page(request, page_ctx)
+        page_payload = await env.web.page_ctx.index(conn)
+        return template_response(request, user_ctx, page_payload)
 
     @router.get("/analysis", response_class=HTMLResponse, name="analyse")
     async def analysis(
         conn: DbConnection,
         request: Request,
+        user_ctx: UserCtxDep,
     ):
-        page_ctx = await env.web.ctx_builder.analyse(conn, request.state.user)
-        return generate_page(request, page_ctx)
+        page_payload = await env.web.page_ctx.analyse(conn)
+        return template_response(request, user_ctx, page_payload)
 
     @router.get("/editor", response_class=HTMLResponse, name="editor")
     async def editor(
         conn: DbConnection,
         request: Request,
+        user_ctx: UserCtxDep,
     ):
-        page_ctx = await env.web.ctx_builder.editor(conn, request.state.user)
-        return generate_page(request, page_ctx)
+        page_payload = await env.web.page_ctx.editor(conn)
+        return template_response(request, user_ctx, page_payload)
 
     @router.get("/play", response_class=HTMLResponse, name="play")
     async def play(
-        conn: DbConnection,
         request: Request,
+        user_ctx: UserCtxDep,
     ):
-        page_ctx = await env.web.ctx_builder.play(conn, request.state.user)
-        return generate_page(request, page_ctx)
+        page_payload = await env.web.page_ctx.play()
+        return template_response(request, user_ctx, page_payload)
 
     @router.get("/profile/{username}", response_class=HTMLResponse, name="profile")
     async def profile(
-        conn: DbConnection,
         request: Request,
+        user_ctx: UserCtxDep,
     ):
-        page_ctx = await env.web.ctx_builder.profile(conn, request.state.user)
-        return generate_page(request, page_ctx)
+        page_payload = await env.web.page_ctx.profile()
+        return template_response(request, user_ctx, page_payload)
 
     return router

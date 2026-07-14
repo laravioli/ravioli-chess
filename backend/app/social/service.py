@@ -1,7 +1,7 @@
 import logging
 import uuid
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from app.background import Background
 from app.notif.service import NotifService
@@ -60,11 +60,11 @@ class SocialService:
     async def delete_friend(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: AsyncConnection,
         current_user_id: uuid.UUID,
         target_id: uuid.UUID,
     ):
-        await self._repo.delete_friend(session, current_user_id, target_id)
+        await self._repo.delete_friend(conn, current_user_id, target_id)
         await self._notif.delete_friend(bg, current_user_id, target_id)
 
     @staticmethod

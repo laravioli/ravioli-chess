@@ -1,11 +1,11 @@
-import { initGlobals } from '@/lib/site';
 import { client as clientAPI } from '@/lib/api/client.gen';
+import { initGlobals } from '@/lib/site';
 import { QueryClient } from '@tanstack/react-query';
 
 import { CONFIG } from '@/core/app/config';
 import { makeDeps } from '@/core/app/deps';
-import type { ServerPayload } from './interface';
 import { hydrate } from './hydrate';
+import type { ServerPayload } from './interface';
 
 export const boot = async () => {
   const dataScript = document.getElementById('page-init-data');
@@ -25,6 +25,6 @@ export const boot = async () => {
   if (import.meta.env.DEV) {
     window.__TANSTACK_QUERY_CLIENT__ = queryClient;
   }
-  const userCacheEvent = hydrate(payload.data, queryClient);
+  const userCacheEvent = hydrate(payload, queryClient);
   return makeDeps(payload, queryClient, userCacheEvent);
 };

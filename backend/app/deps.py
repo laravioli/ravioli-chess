@@ -37,9 +37,11 @@ async def get_connection(http_conn: HTTPConnection) -> AsyncGenerator[AsyncConne
 type DbConnection = Annotated[AsyncConnection, Depends(get_connection, scope="function")]
 
 
-async def get_session(db_conn: DbConnection) -> AsyncGenerator[AsyncSession]:
+async def get_session(env: EnvDep) -> AsyncGenerator[AsyncSession]:
 
-    async with AsyncSession(bind=db_conn) as session:
+    async with AsyncSession(
+        bind=env.core.engine, autoflush=False, expire_on_commit=False
+    ) as session:
         yield session
 
 

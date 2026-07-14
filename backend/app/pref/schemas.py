@@ -1,4 +1,4 @@
-from typing import Self
+from typing import NotRequired, Self, TypedDict
 
 from pydantic import model_validator
 
@@ -22,3 +22,8 @@ class PreferenceUpdate(BaseSchema):
 class Preference(BaseSchema):
     board: Board = Board.BLUE
     pieceset: PieceSet = PieceSet.BASE
+
+
+class CookiePreference(TypedDict):
+    board: NotRequired[Board]
+    pieceset: NotRequired[PieceSet]

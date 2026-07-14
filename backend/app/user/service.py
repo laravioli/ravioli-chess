@@ -19,7 +19,7 @@ class UserService:
 
     async def create(self, conn: AsyncConnection, data: UserCreate):
         row = await self.user_repo.create(conn, data)
-        return UserWithPref(**row._mapping, preference=Preference.default())
+        return UserWithPref(**row._mapping, preference=Preference())
 
     async def profile(self, conn: AsyncConnection, username: str):
         user = await self.user_repo.by_username(conn, username)

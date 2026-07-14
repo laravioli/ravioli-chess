@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
 from app.auth.deps import AuthUser
-from app.deps import BackgroundDep, DbSession
+from app.deps import BackgroundDep, DbConnection, DbSession
 from app.env import Env
 from ravioli_core.db.models.social import FriendshipStatus
 
@@ -32,12 +32,12 @@ def create_social_api_router(env: Env):
     @router.delete("/friends/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
     async def remove_friend(
         background: BackgroundDep,
-        session: DbSession,
+        conn: DbConnection,
         user: AuthUser,
         target_id: UUID4,
     ):
         await env.social.delete_friend(
-            background, session, current_user_id=user.id, target_id=target_id
+            background, conn, current_user_id=user.id, target_id=target_id
         )
 
     @router.get("/requests", response_model=list[FriendRequest])

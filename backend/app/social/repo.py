@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, func, literal, select, union_all, update
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from app.exceptions import DBNotFound
 from ravioli_core.db.models import FriendRequest, FriendRequestAccepted, Friendship, User
@@ -116,12 +116,12 @@ class SocialRepo:
 
     async def delete_friend(
         self,
-        session: AsyncSession,
+        conn: AsyncConnection,
         current_user_id: UUID,
         target_id: UUID,
     ):
-        async with transaction(session):
-            result = await session.execute(
+        async with transaction(conn):
+            result = await conn.execute(
                 delete(Friendship).where(
                     *self.friendship_criteria(current_user_id, target_id),
                     Friendship.status == FriendshipStatus.accepted,

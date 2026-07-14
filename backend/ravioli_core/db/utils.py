@@ -1,11 +1,13 @@
-from collections.abc import Coroutine
 from contextlib import asynccontextmanager
 
-# DB stuff
-from typing import Any, Protocol
-
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncConnection,
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from ravioli_core.config import DbSettings
 
@@ -27,13 +29,8 @@ def create_sessionmaker(engine: AsyncEngine):
     return async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
 
-class Transactional(Protocol):
-    def commit(self) -> Coroutine[Any, Any, None]: ...
-    def rollback(self) -> Coroutine[Any, Any, None]: ...
-
-
 @asynccontextmanager
-async def transaction(conn: Transactional, error_detail="Integrity Error"):
+async def transaction(conn: AsyncConnection | AsyncSession, error_detail="Integrity Error"):
     try:
         yield
         await conn.commit()

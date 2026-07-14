@@ -8,7 +8,7 @@ from app.config import settings
 from app.deps import DbSession
 from app.user import UserWithPref
 
-from .schemas import PreferenceUpdate
+from .schemas import CookiePreference, PreferenceUpdate
 
 cookie_serializer = URLSafeSerializer(
     secret_key=settings.SECRET_KEY.get_secret_value(),
@@ -23,7 +23,7 @@ def extract_cookie_data(request: Request):
 
     if raw_cookie:
         try:
-            cookie_data = cookie_serializer.loads(raw_cookie)
+            cookie_data: CookiePreference = cookie_serializer.loads(raw_cookie)
         except BadSignature:
             cookie_data = {}
     return cookie_data

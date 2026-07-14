@@ -3,15 +3,16 @@ import type { UserSuccess } from '@/lib/api';
 type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ServerPayload {
-  user: User;
+  user: UserData;
   page?: Page;
   data?: Data;
 }
 
-interface User {
+interface UserData {
   id: UUID;
   username: string;
   is_auth?: boolean;
+  unread_count?: number;
 }
 
 export type Page = AnalyseConfig | EditorConfig | PlayConfig;
@@ -25,9 +26,8 @@ export type AnalyseConfig = BasePage & {};
 export type EditorConfig = BasePage & {};
 export type PlayConfig = BasePage & {};
 
-export interface Data {
+interface Data {
   positions?: PositionData[];
-  unreadCount?: number;
 }
 
 export interface PositionData {

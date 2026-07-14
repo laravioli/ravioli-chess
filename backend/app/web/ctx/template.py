@@ -16,5 +16,11 @@ PIECE_VARS = {
 }
 
 
+PAGE_DEFAULT = {
+    "orientation": "white",
+    "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+}
+
+
 def web_context(request: Request):  # noqa: ARG001
     return {"pieces": PIECE_VARS}

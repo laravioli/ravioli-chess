@@ -1,10 +1,10 @@
-import { QueryClient } from '@tanstack/react-query';
-import { defined } from '@/lib/common';
-import { chessPositionsQueryKey, listNotifQueryKey } from '@/lib/api/@tanstack/react-query.gen';
 import { UserSuccess } from '@/lib/api';
-import type { Data, UserCacheEvent } from './interface';
+import { chessPositionsQueryKey, listNotifQueryKey } from '@/lib/api/@tanstack/react-query.gen';
+import { defined } from '@/lib/common';
+import { QueryClient } from '@tanstack/react-query';
+import type { ServerPayload, UserCacheEvent } from './interface';
 
-export function hydrate(data: Data | undefined, client: QueryClient): UserCacheEvent {
+export function hydrate(payload: ServerPayload, client: QueryClient): UserCacheEvent {
   const setUnreadCount = (unreadCount: number) => {
     const notifKey = listNotifQueryKey({ query: { page: 1 } });
     client.setQueryData(notifKey, {
@@ -17,9 +17,9 @@ export function hydrate(data: Data | undefined, client: QueryClient): UserCacheE
     });
   };
 
-  if (data) {
-    if (defined(data.unreadCount)) setUnreadCount(data.unreadCount);
-    const chessPositions = data.positions;
+  if (payload) {
+    if (defined(payload.user.unread_count)) setUnreadCount(payload.user.unread_count);
+    const chessPositions = payload.data?.positions;
     if (defined(chessPositions)) {
       const chessPositionsKey = chessPositionsQueryKey();
       client.setQueryData(chessPositionsKey, chessPositions);

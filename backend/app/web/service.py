@@ -1,40 +1,25 @@
 from fastapi.templating import Jinja2Templates
 from redis.asyncio import Redis
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.notif.service import NotifService
 from ravioli_core.cache import CacheLib
-from ravioli_core.db.models import ChessPosition
 
+from .ctx.page import PageCtx
+from .repo import WebRepo
 from .templating import make_templates
-from .views_ctx import ContextBuilder
 
 
 class WebService:
-    def __init__(
-        self,
-        chess_cache: CacheLib,
-        templates: Jinja2Templates,
-        notif: NotifService,
-    ):
+    def __init__(self, chess_cache: CacheLib, templates: Jinja2Templates, repo: WebRepo):
         self._chess_cache = chess_cache
         self.templates = templates
-        self.ctx_builder = ContextBuilder(self, notif)
-
-    @staticmethod
-    async def _db_chess_positions(conn: AsyncConnection):
-
-        stmt = select(ChessPosition.eco, ChessPosition.name, ChessPosition.fen).order_by(
-            ChessPosition.eco
-        )
-        result = await conn.execute(stmt)
-        data = [dict(row) for row in result.mappings().all()]
-        return data
+        self.page_ctx = PageCtx(self)
+        self._repo = repo
 
     async def get_chess_positions(self, conn: AsyncConnection):
         return await self._chess_cache.get_or_set(
-            "chess:positions", factory=lambda: self._db_chess_positions(conn)
+            "chess:positions", factory=lambda: self._repo.chess_positions(conn)
         )
 
     @staticmethod
@@ -48,5 +33,5 @@ class WebService:
                 data_type=list,
             ),
             templates=make_templates(),
-            notif=notif,
+            repo=WebRepo(),
         )
