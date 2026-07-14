@@ -4,7 +4,7 @@ from app.auth.views import create_auth_api_router
 from app.challenge.views import create_challenge_api_router
 from app.env import Env
 from app.notif.views import create_notif_api_router
-from app.pref.views import router as router_pref
+from app.pref.views import create_pref_api_router
 from app.social.views import create_social_api_router
 from app.user.views import create_user_api_router
 from app.web.views_api import create_web_api_router
@@ -19,7 +19,7 @@ def create_api_router(env: Env):
     router.include_router(create_auth_api_router(env))
     router.include_router(create_challenge_api_router(env))
     router.include_router(create_notif_api_router(env))
-    router.include_router(router_pref)
+    router.include_router(create_pref_api_router(env))
     router.include_router(create_social_api_router(env))
     router.include_router(create_web_api_router(env))
 

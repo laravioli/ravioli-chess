@@ -119,7 +119,7 @@ class UserRepo:
         user_id: UUID,
     ):
         async with transaction(conn):
-            stmt = delete(User).where(SA_User.id == user_id)
+            stmt = delete(SA_User).where(SA_User.id == user_id)
             result = await conn.execute(stmt)
 
             if result.rowcount == 0:  # type: ignore
