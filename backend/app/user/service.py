@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from app.notif.service import NotifService
-from app.pref import Preference
+from app.pref.schemas import Preference
 from app.user.repo import UserRepo
 from app.websocket.pubsub import Users
 
@@ -26,7 +26,10 @@ class UserService:
         if user:
             online = await self._users.is_online(str(user.id))
             return UserProfile(
-                id=user.id, username=user.username, joined_at=user.joined_at, online=online
+                id=user.id,
+                username=user.username,
+                joined_at=user.joined_at,
+                online=online,
             )
 
     async def profile_with_friendship(

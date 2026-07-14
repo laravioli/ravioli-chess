@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.deps import DbConnection
@@ -24,14 +23,14 @@ def create_auth_api_router(env: Env):
         session_cookie: SessionCookie = None,
     ):
         try:
-            user = await env.auth.authenticate(conn, credentials)
+            data = await env.auth.authenticate(conn, credentials)
         except InvalidCredentials:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
         expire_in = int(timedelta(days=7).total_seconds())
 
         session_id = await env.auth.create_session(
-            user, expires_in=expire_in, session_cookie=session_cookie
+            data.user, expires_in=expire_in, session_cookie=session_cookie
         )
 
         response.set_cookie(
@@ -49,15 +48,14 @@ def create_auth_api_router(env: Env):
             samesite="lax",
         )
         try:
-            async with AsyncSession(bind=conn) as session:
-                unread_count = await env.notif.get_unread_count(session, user.id)
+            unread_count = await env.notif.get_unread_count(conn, data.user.id)
         except Exception:
             unread_count = 0
 
         return UserSuccess(
-            id=user.id,
-            username=user.username,
-            preference=user.preference,
+            id=data.user.id,
+            username=data.user.username,
+            preference=data.preference,
             unread_count=unread_count,
         )
 

@@ -1,12 +1,11 @@
 from typing import NotRequired, Self, TypedDict
 
-from pydantic import model_validator
+from pydantic import BaseModel, model_validator
 
 from app.api.schemas import BaseSchema
 from ravioli_core.db.models.pref import Board, PieceSet
 
 
-# In
 class PreferenceUpdate(BaseSchema):
     board: Board | None = None
     pieceset: PieceSet | None = None
@@ -18,10 +17,16 @@ class PreferenceUpdate(BaseSchema):
         return self
 
 
-# Out
-class Preference(BaseSchema):
+class Preference(BaseModel):
     board: Board = Board.BLUE
     pieceset: PieceSet = PieceSet.BASE
+
+    def update(self, patch: PreferenceUpdate):
+        return self.model_copy(update=patch.model_dump(exclude_none=True))
+
+    @property
+    def html_attrs(self):
+        return f'data-board="{self.board.value}" data-pieceset="{self.pieceset.value}"'
 
 
 class CookiePreference(TypedDict):

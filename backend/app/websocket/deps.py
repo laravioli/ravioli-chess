@@ -25,7 +25,7 @@ async def user_or_anon(
         session = await get_auth_session(redis, session_cookie)
 
         async with env.core.engine.connect() as conn:
-            user = await user_repo.by_id(conn, session.user_id, False)
+            user = await user_repo.by_id(conn, session.user_id)
 
         if not (user and verify_session(user.hashed_password, session.auth_hash)):
             await redis.delete(f"session:{session_cookie}")

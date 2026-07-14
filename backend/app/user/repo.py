@@ -1,7 +1,7 @@
-from typing import Literal, overload
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, and_, bindparam, delete, insert, select
+from sqlalchemy import ColumnElement, Select, and_, bindparam, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from app.auth.security import generate_password_hash
@@ -11,6 +11,7 @@ from ravioli_core.db.models import Friendship as _sa_Friendship
 from ravioli_core.db.models import SA_Preference, SA_User
 from ravioli_core.db.models.pref import Board, PieceSet
 from ravioli_core.db.utils import transaction
+from ravioli_core.structs import CoreStruct
 
 from .schemas import UserCreate
 from .user import User, UserWithPref
@@ -24,43 +25,35 @@ def stmt_with_pref(condition: ColumnElement):
     return select(SA_User, SA_Preference).outerjoin(SA_Preference).where(condition)
 
 
-_STMT_ID = stmt_by(SA_User.id == bindparam("user_id"))
-_STMT_USERNAME = stmt_by(SA_User.username == bindparam("user_username"))
-_STMT_ID_PREF = stmt_with_pref(SA_User.id == bindparam("user_id"))
-_STMT_USERNAME_PREF = stmt_with_pref(SA_User.username == bindparam("user_username"))
+STMT_ID = stmt_by(SA_User.id == bindparam("user_id"))
+STMT_ID_PREF = stmt_with_pref(SA_User.id == bindparam("user_id"))
+STMT_USERNAME = stmt_by(SA_User.username == bindparam("user_username"))
+STMT_USERNAME_PREF = stmt_with_pref(SA_User.username == bindparam("user_username"))
 
 
 class UserRepo:
     def __init__(self, social_repo: SocialRepo):
         self._social_repo = social_repo
 
-    @overload
-    async def by_id(self, conn, user_id, load_pref: Literal[True]) -> UserWithPref: ...
-    @overload
-    async def by_id(self, conn, user_id, load_pref: Literal[False]) -> User: ...
-    async def by_id(
-        self,
-        conn: AsyncConnection,
-        user_id: UUID,
-        load_pref=False,
-    ):
-        stmt = _STMT_ID_PREF if load_pref else _STMT_ID
-        row = (await conn.execute(stmt, {"user_id": user_id})).mappings().one()
-        return UserWithPref.from_row(row) if load_pref else User.from_row(row)
+    async def _fetch_one[T: CoreStruct](
+        self, conn: AsyncConnection, statement: Select, parameters: dict[str, Any], model: type[T]
+    ) -> T:
+        row = await conn.execute(statement, parameters)
+        return model.from_mapping(row.mappings().one())
 
-    @overload
-    async def by_username(self, conn, username, load_pref: bool = True) -> UserWithPref: ...
-    @overload
-    async def by_username(self, conn, username, load_pref: bool = False) -> User: ...
-    async def by_username(
-        self,
-        conn: AsyncConnection,
-        username: str,
-        load_pref=False,
-    ):
-        stmt = _STMT_USERNAME_PREF if load_pref else _STMT_USERNAME
-        row = (await conn.execute(stmt, {"user_username": username})).mappings().one()
-        return UserWithPref.from_row(row) if load_pref else User.from_row(row)
+    async def by_id(self, conn: AsyncConnection, user_id: UUID):
+        return await self._fetch_one(conn, STMT_ID, {"user_id": user_id}, User)
+
+    async def by_id_with_pref(self, conn: AsyncConnection, user_id: UUID):
+        return await self._fetch_one(conn, STMT_ID_PREF, {"user_id": user_id}, UserWithPref)
+
+    async def by_username(self, conn: AsyncConnection, username: str):
+        return await self._fetch_one(conn, STMT_USERNAME, {"user_username": username}, User)
+
+    async def by_username_with_pref(self, conn: AsyncConnection, username: str):
+        return await self._fetch_one(
+            conn, STMT_USERNAME_PREF, {"user_username": username}, UserWithPref
+        )
 
     async def by_username_with_friendship(
         self,

@@ -6,8 +6,8 @@ from itsdangerous import BadSignature, URLSafeSerializer
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.config import settings
+from app.pref.schemas import Preference
 from app.user import User
-from ravioli_core.db.models.pref import Board, PieceSet
 
 from .repo import PrefRepo
 from .schemas import CookiePreference, PreferenceUpdate
@@ -20,12 +20,10 @@ class PrefService:
     async def update_user_pref(self, conn: AsyncConnection, user: User, pref: PreferenceUpdate):
         await self._repo.update(conn, user, pref.model_dump(exclude_none=True))
 
-    def update_anon_pref(self, request: Request, pref: PreferenceUpdate, response: Response):
-        cookie_data = extract_cookie_data(request)
-        pref_data = pref.model_dump(exclude_unset=True, mode="json")
-        new_data = {**cookie_data, **pref_data}
-
-        payload = cookie_serializer.dumps(new_data)
+    def update_anon_pref(self, request: Request, data: PreferenceUpdate, response: Response):
+        payload = cookie_serializer.dumps(
+            extract_cookie_data(request).update(data).model_dump(mode="json")
+        )
         if isinstance(payload, bytes):
             payload = payload.decode("utf-8")
 
@@ -55,7 +53,4 @@ def extract_cookie_data(request: Request):
             cookie_data: CookiePreference = cookie_serializer.loads(raw_cookie)
         except BadSignature:
             cookie_data = {}
-    return {
-        "board": Board(cookie_data.get("board", Board.BLUE)),
-        "pieceset": PieceSet(cookie_data.get("pieceset", PieceSet.BASE)),
-    }
+    return Preference(**cookie_data)

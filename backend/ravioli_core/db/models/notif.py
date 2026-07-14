@@ -13,8 +13,6 @@ if TYPE_CHECKING:
     from .user import SA_User
 
 
-# NOTE 1:1 system
-# NOTE N:N would require 3 tables and more complex queries
 class Notification(Base):
     __tablename__ = "notification"
     __mapper_args__ = {

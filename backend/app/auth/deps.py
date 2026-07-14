@@ -8,11 +8,11 @@ from redis.asyncio import Redis
 from app.config import settings
 from app.deps import DbConnection, RedisDep, UserRepoDep
 from app.exceptions import InvalidSession
-from app.user.user import User, UserWithPref
+from app.user import User, UserWithPref
 from ravioli_core.serializers import msgpack
 
 from .schemas import Session
-from .security import verify_session
+from .security import verify_user, verify_user_with_pref
 
 
 async def get_session_cookie(conn: HTTPConnection):
@@ -27,14 +27,16 @@ async def get_auth_session(
     session_cookie: str,
 ) -> Session:
     data = await redis.get(f"session:{session_cookie}")
-    if not data:
+    if data is None:
         raise InvalidSession()
 
     return msgpack.decode(data, type_arg=Session)
 
 
-def user_or_anon(load_pref=False):
+def user_or_anon(*, with_pref: bool):
     # NOTE : fastapi deps caching rely on function identity
+
+    verify = verify_user_with_pref if with_pref else verify_user
 
     async def dep(
         redis: RedisDep,
@@ -43,17 +45,16 @@ def user_or_anon(load_pref=False):
         response: Response,
         session_cookie: SessionCookie = None,
     ):
-        if not session_cookie:
+        if session_cookie is None:
             return
 
         try:
             session = await get_auth_session(redis, session_cookie)
-
-            user = await user_repo.by_id(conn, session.user_id, load_pref)
-
-            if not (user and verify_session(user.hashed_password, session.auth_hash)):
+            user = await verify(user_repo, conn, session)
+            if user is None:
                 await redis.delete(f"session:{session_cookie}")
                 raise InvalidSession()
+
             return user
 
         except InvalidSession:
@@ -68,12 +69,12 @@ def user_or_anon(load_pref=False):
     return dep
 
 
-type UserOrAnon = Annotated[User | None, Depends(user_or_anon(load_pref=False))]
-type UserWithPrefOrAnon = Annotated[UserWithPref | None, Depends(user_or_anon(load_pref=True))]
+type UserOrAnon = Annotated[User | None, Depends(user_or_anon(with_pref=False))]
+type UserWithPrefOrAnon = Annotated[UserWithPref | None, Depends(user_or_anon(with_pref=True))]
 
 
 async def auth_user(user: UserOrAnon):
-    if not user:
+    if user is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return user
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, Response, status
 
+from app.api.responses import JSONResponse
 from app.auth.deps import UserOrAnon, UserWithPrefOrAnon
 from app.deps import DbConnection
 from app.env import Env
@@ -15,9 +16,10 @@ def create_pref_api_router(env: Env):
     @router.get("", response_model=Preference)
     async def get_pref(user: UserWithPrefOrAnon, request: Request):
         if user:
-            return user.preference
+            pref = user.preference
         else:
-            return extract_cookie_data(request)
+            pref = extract_cookie_data(request)
+        return JSONResponse(pref)
 
     @router.post("", status_code=status.HTTP_204_NO_CONTENT)
     async def update_pref(

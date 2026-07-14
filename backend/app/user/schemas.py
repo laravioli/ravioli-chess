@@ -12,7 +12,7 @@ from pydantic import (
 )
 
 from app.api.schemas import BaseSchema
-from app.pref import Preference
+from app.pref.schemas import Preference
 from ravioli_core.db.models.social import FriendshipStatus
 
 

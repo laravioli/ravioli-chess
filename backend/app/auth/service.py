@@ -22,9 +22,11 @@ class AuthService:
         self._user_repo = repo
 
     async def authenticate(self, conn: AsyncConnection, credentials: UserLogin):
-        user = await self._user_repo.by_username(conn, credentials.username, load_pref=True)
-        if user and verify_password(credentials.password.get_secret_value(), user.hashed_password):
-            return user
+        data = await self._user_repo.by_username_with_pref(conn, credentials.username)
+        if data and verify_password(
+            credentials.password.get_secret_value(), data.user.hashed_password
+        ):
+            return data
         raise InvalidCredentials()
 
     async def create_session(
