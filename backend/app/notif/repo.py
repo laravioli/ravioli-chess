@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.types import _SA_Connection
-from ravioli_core.db.models import Notification, User
+from ravioli_core.db.models import Notification, SA_User
 
 from .schemas import NotifParams, pagination
 
@@ -24,7 +24,7 @@ class NotifRepo:
         stmt = (
             select(Notification)
             .where(Notification.receiver_id == user_id)
-            .options(joinedload(Notification.sender).load_only(User.username))
+            .options(joinedload(Notification.sender).load_only(SA_User.username))
             .order_by(Notification.created_at.desc())
         )
         return await apaginate(session, stmt, params, additional_data={"unread": unread_count})

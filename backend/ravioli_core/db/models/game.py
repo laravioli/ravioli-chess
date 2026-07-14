@@ -10,7 +10,7 @@ from ravioli_core.db.types import GameId8, PrimaryKey, TimestampNow
 from .base import Base
 
 if TYPE_CHECKING:
-    from .user import User
+    from .user import SA_User
 
 
 class GameStatus(IntEnum):
@@ -41,5 +41,5 @@ class Game(Base):
     meta: Mapped[dict] = mapped_column(JSON, default=dict)
     moves: Mapped[str | None]  # uncompressed format
     clock: Mapped[str | None]  # uncompressed format
-    white: Mapped[Optional["User"]] = relationship(foreign_keys=[white_id])
-    black: Mapped[Optional["User"]] = relationship(foreign_keys=[black_id])
+    white: Mapped[Optional["SA_User"]] = relationship(foreign_keys=[white_id])
+    black: Mapped[Optional["SA_User"]] = relationship(foreign_keys=[black_id])

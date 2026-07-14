@@ -5,7 +5,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from app.exceptions import DBNotFound
-from ravioli_core.db.models import FriendRequest, FriendRequestAccepted, Friendship, User
+from ravioli_core.db.models import FriendRequest, FriendRequestAccepted, Friendship, SA_User
 from ravioli_core.db.models.social import FriendshipStatus
 from ravioli_core.db.utils import transaction
 
@@ -106,8 +106,8 @@ class SocialRepo:
         subq = union_all(stmt1, stmt2).subquery()
 
         stmt = (
-            select(User.id, User.username, subq.c.last_update, subq.c.direction)
-            .join(subq, User.id == subq.c.friend_id)
+            select(SA_User.id, SA_User.username, subq.c.last_update, subq.c.direction)
+            .join(subq, SA_User.id == subq.c.friend_id)
             .order_by(subq.c.last_update.desc())
         )
 

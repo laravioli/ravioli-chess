@@ -10,7 +10,7 @@ from .base import Base
 
 if TYPE_CHECKING:
     from .social import Friendship
-    from .user import User
+    from .user import SA_User
 
 
 # NOTE 1:1 system
@@ -26,7 +26,7 @@ class Notification(Base):
     type: Mapped[str] = mapped_column(String(50))
     sender_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
     receiver_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
-    sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id], innerjoin=True)
+    sender: Mapped["SA_User"] = relationship("SA_User", foreign_keys=[sender_id], innerjoin=True)
     read: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[TimestampNow]
 

@@ -18,7 +18,7 @@ from ..enums import ChessColor, ChessColorChoice
 from .base import Base
 
 if TYPE_CHECKING:
-    from .user import User
+    from .user import SA_User
 
 INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -48,8 +48,8 @@ class Challenge(Base):
     pub_date: Mapped[TimestampNow]
     expire_at: Mapped[ExpireAfter1Week]
     time_control: Mapped[TimeControl]  # todo write something that make sense for timecontrol
-    sender: Mapped["User"] = relationship(foreign_keys=[sender_id])
-    receiver: Mapped["User"] = relationship(foreign_keys=[receiver_id])
+    sender: Mapped["SA_User"] = relationship(foreign_keys=[sender_id])
+    receiver: Mapped["SA_User"] = relationship(foreign_keys=[receiver_id])
 
     __table_args__ = (
         CheckConstraint(

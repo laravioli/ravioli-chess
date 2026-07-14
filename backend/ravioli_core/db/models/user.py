@@ -8,7 +8,7 @@ from ravioli_core.db.types import PrimaryKey, TimestampNow
 from .base import Base
 
 
-class User(Base):
+class SA_User(Base):
     __tablename__ = "user_account"
     id: Mapped[PrimaryKey[uuid.UUID]] = mapped_column(default=uuid.uuid4)
     username: Mapped[str] = mapped_column(String(16), unique=True)
