@@ -28,9 +28,9 @@ type UserRepoDep = Annotated[UserRepo, Depends(get_user_repo)]
 # ╚══════════════════════════════════════╝
 
 
-async def get_connection(http_conn: HTTPConnection) -> AsyncGenerator[AsyncConnection]:
+async def get_connection(env: EnvDep) -> AsyncGenerator[AsyncConnection]:
 
-    async with http_conn.state["env"].core.engine.connect() as db_conn:
+    async with env.core.engine.connect() as db_conn:
         yield db_conn
 
 

@@ -6,13 +6,13 @@ from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
 
 from app.config import settings
-from app.deps import DbConnection, RedisDep, UserRepoDep
+from app.deps import DbConnection, EnvDep, RedisDep
 from app.exceptions import InvalidSession
 from app.user import User, UserWithPref
 from ravioli_core.serializers import msgpack
 
 from .schemas import Session
-from .security import verify_user, verify_user_with_pref
+from .service import AuthService
 
 
 async def get_session_cookie(conn: HTTPConnection):
@@ -36,12 +36,12 @@ async def get_auth_session(
 def user_or_anon(*, with_pref: bool):
     # NOTE : fastapi deps caching rely on function identity
 
-    verify = verify_user_with_pref if with_pref else verify_user
+    verify = AuthService.verify_user_with_pref if with_pref else AuthService.verify_user
 
     async def dep(
+        env: EnvDep,
         redis: RedisDep,
         conn: DbConnection,
-        user_repo: UserRepoDep,
         response: Response,
         session_cookie: SessionCookie = None,
     ):
@@ -50,7 +50,7 @@ def user_or_anon(*, with_pref: bool):
 
         try:
             session = await get_auth_session(redis, session_cookie)
-            user = await verify(user_repo, conn, session)
+            user = await verify(env.auth, conn, session)
             if user is None:
                 await redis.delete(f"session:{session_cookie}")
                 raise InvalidSession()

@@ -1,5 +1,4 @@
 import secrets
-from typing import TYPE_CHECKING
 
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncConnection
@@ -10,10 +9,7 @@ from app.user.repo import UserRepo
 from ravioli_core.serializers import msgpack
 
 from .schemas import Session, UserLogin
-from .security import generate_session_hash, verify_password
-
-if TYPE_CHECKING:
-    from .deps import SessionCookie
+from .security import generate_session_hash, verify_password, verify_session
 
 
 class AuthService:
@@ -33,7 +29,7 @@ class AuthService:
         self,
         user: User,
         expires_in: int,
-        session_cookie: "SessionCookie" = None,
+        session_cookie: str | None = None,
     ) -> str:
         if session_cookie:
             await self._redis.delete(f"session:{session_cookie}")
@@ -53,3 +49,13 @@ class AuthService:
                 break
 
         return session_id
+
+    async def verify_user(self, conn: AsyncConnection, session: Session):
+        user = await self._user_repo.by_id(conn, session.user_id)
+        if user and verify_session(user.hashed_password, session.auth_hash):
+            return user
+
+    async def verify_user_with_pref(self, conn: AsyncConnection, session: Session):
+        data = await self._user_repo.by_id_with_pref(conn, session.user_id)
+        if data and verify_session(data.user.hashed_password, session.auth_hash):
+            return data
