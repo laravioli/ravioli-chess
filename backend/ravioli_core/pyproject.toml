@@ -14,10 +14,11 @@ dependencies = [
     "pydantic-settings>=2.14.2",
     "redis[hiredis]==7.4.0",
     "sqlalchemy[asyncio]>=2.0.45",
+    "piccolo>=1.35.0",
 ]
 [tool.ruff]
 extend = "../../ruff.toml"
-extend-exclude = ["alembic"]
+extend-exclude = ["alembic", "piccolo_migrations"]
 
 [build-system]
 requires = ["hatchling"]

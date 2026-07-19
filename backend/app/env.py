@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass
 
 from app.auth.service import AuthService
@@ -46,12 +47,35 @@ class Env:
 
         return Env(core, ws, user, auth, pref, web, notif, social, challenge)
 
-    async def on_start(self):
+    @classmethod
+    @asynccontextmanager
+    async def lifespan(cls, *, settings: CoreEnvSettings, node_id):
+        env = cls.make(settings=settings)
+        redis = env.core.redis
+        scheduler = env.core.scheduler
+
+        @scheduler.periodic(10, duration=1)
+        async def heartbeat():
+            await redis.hsetex("app:node", node_id, "alive", ex=30)  # type: ignore
+
+        try:
+            await env._on_start()
+
+            #########
+            yield env
+            #########
+
+        finally:
+            with suppress(Exception):
+                await env.core.redis.hdel("app:node", node_id)  # type: ignore
+            await env._on_stop()
+
+    async def _on_start(self):
         await self.core.redis.ping()  # type: ignore
         await self.ws.broadcast.start()
         self.core.scheduler.start()
 
-    async def on_stop(self):
+    async def _on_stop(self):
         await self.core.scheduler.shutdown()
         await self.ws.broadcast.stop()
         await asyncio.gather(
