@@ -1,5 +1,6 @@
 from logging import config
 
+import colorama
 from pydantic import PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from redis.asyncio.retry import Retry
@@ -120,4 +121,5 @@ class LogSettings(BaseSettings):
 
 
 def configure_logging(settings: LogSettings):
+    colorama.deinit()
     config.dictConfig(settings.get_logging_config)
