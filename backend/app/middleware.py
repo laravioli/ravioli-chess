@@ -5,7 +5,6 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from app.config import settings
 
 
-# TODO add X-Requested-with or CSRF token header (piccolo api)
 class CSRFMiddleWare:
     def __init__(self, app: ASGIApp):
         self.app = app
