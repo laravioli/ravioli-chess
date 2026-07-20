@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import asyncpg
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import (
     AsyncConnection,
@@ -10,12 +11,13 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from ravioli_core.config import DbSettings
+from ravioli_core.serializers import json
 
 
 def create_engine(s: DbSettings):
     engine = create_async_engine(
         str(s.SQLALCHEMY_DATABASE_URI),
-        pool_size=5,
+        pool_size=20,
         max_overflow=10,
         pool_pre_ping=False,
         pool_recycle=1800,  # avoid stale sockets
@@ -39,3 +41,15 @@ async def transaction(conn: AsyncConnection | AsyncSession, error_detail="Integr
             setattr(e, "detail", error_detail)
         await conn.rollback()
         raise
+
+
+async def init_db_pool(
+    dsn: str = "postgresql://postgres:postgres@localhost:5432/app", max_size: int = 20
+) -> asyncpg.Pool:
+    async def init_connection(conn: asyncpg.Connection):
+        await conn.set_type_codec(
+            "jsonb", encoder=json.encode, decoder=json.decode, schema="pg_catalog"
+        )
+
+    pool = await asyncpg.create_pool(dsn=dsn, max_size=max_size, init=init_connection)
+    return pool

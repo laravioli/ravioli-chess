@@ -3,8 +3,8 @@ from typing import Annotated, TypedDict
 from fastapi import Depends
 from fastapi.websockets import WebSocket
 
-from app.auth.deps import SessionCookie, get_auth_session
-from app.auth.security import verify_session
+from app.auth.deps import SessionCookie
+from app.auth.security import verify_session_hash
 from app.deps import EnvDep, RedisDep, UserRepoDep
 from app.exceptions import InvalidSession
 
@@ -22,12 +22,12 @@ async def user_or_anon(
         return
 
     try:
-        session = await get_auth_session(redis, session_cookie)
+        session = await env.auth._get_session(session_cookie)
 
         async with env.core.engine.connect() as conn:
             user = await user_repo.by_id(conn, session.user_id)
 
-        if not (user and verify_session(user.hashed_password, session.auth_hash)):
+        if not (user and verify_session_hash(user.hashed_password, session.auth_hash)):
             await redis.delete(f"session:{session_cookie}")
             raise InvalidSession()
 

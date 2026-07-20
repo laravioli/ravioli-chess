@@ -1,18 +1,19 @@
-from typing import Annotated
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
+from typing import Annotated, Literal
 
 from fastapi import Depends, Response, status
 from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
-from redis.asyncio import Redis
 
 from app.config import settings
-from app.deps import DbConnection, EnvDep, RedisDep
+from app.deps import DbConnection
 from app.exceptions import InvalidSession
-from app.user import User, UserWithPref
-from ravioli_core.serializers import msgpack
+from app.user import User
+from app.user.service import UserRepo
 
-from .schemas import Session
-from .service import AuthService
+from .service import AuthService, UserGetter
+from .structs import VerifiableUser
 
 
 async def get_session_cookie(conn: HTTPConnection):
@@ -22,41 +23,22 @@ async def get_session_cookie(conn: HTTPConnection):
 type SessionCookie = Annotated[str | None, Depends(get_session_cookie)]
 
 
-async def get_auth_session(
-    redis: Redis,
-    session_cookie: str,
-) -> Session:
-    data = await redis.get(f"session:{session_cookie}")
-    if data is None:
-        raise InvalidSession()
-
-    return msgpack.decode(data, type_arg=Session)
+@dataclass
+class AuthFlow[T: VerifiableUser]:
+    user_or_none: Callable[[DbConnection, SessionCookie, Response], Awaitable[T | None]]
+    auth_user: Callable[[DbConnection, SessionCookie, Response], Awaitable[T]]
 
 
-def user_or_anon(*, with_pref: bool):
-    # NOTE : fastapi deps caching rely on function identity
-
-    verify = AuthService.verify_user_with_pref if with_pref else AuthService.verify_user
-
-    async def dep(
-        env: EnvDep,
-        redis: RedisDep,
-        conn: DbConnection,
-        response: Response,
-        session_cookie: SessionCookie = None,
-    ):
-        if session_cookie is None:
+def make_flow[T: VerifiableUser](
+    auth: AuthService,
+    user_getter: UserGetter[T],
+):
+    async def user_or_none(conn: DbConnection, session_id: SessionCookie, response: Response):
+        if session_id is None:
             return
-
         try:
-            session = await get_auth_session(redis, session_cookie)
-            user = await verify(env.auth, conn, session)
-            if user is None:
-                await redis.delete(f"session:{session_cookie}")
-                raise InvalidSession()
-
+            user = await auth.verify_user_flow(conn, session_id, user_getter)
             return user
-
         except InvalidSession:
             response.delete_cookie(
                 key=settings.SESSION_COOKIE,
@@ -64,19 +46,41 @@ def user_or_anon(*, with_pref: bool):
                 httponly=True,
                 samesite="lax",
             )
-            return None
 
-    return dep
+    async def auth_user(conn: DbConnection, session_id: SessionCookie, response: Response):
+        user = await user_or_none(conn, session_id, response)
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        return user
 
-
-type UserOrAnon = Annotated[User | None, Depends(user_or_anon(with_pref=False))]
-type UserWithPrefOrAnon = Annotated[UserWithPref | None, Depends(user_or_anon(with_pref=True))]
-
-
-async def auth_user(user: UserOrAnon):
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    return user
+    return AuthFlow(user_or_none, auth_user)
 
 
-type AuthUser = Annotated[User, Depends(auth_user)]
+class AuthUserDep:
+    def __init__(self, key: Literal["user_or_anon", "auth_user"]):
+        self.key = key
+
+    async def __call__(
+        self,
+        conn: HTTPConnection,
+        db_conn: DbConnection,
+        session_id: SessionCookie,
+        response: Response,
+    ):
+        flow = conn.state[self.key]
+
+        return await flow(
+            db_conn,
+            session_id,
+            response,
+        )
+
+
+def wire_auth_dep(auth: AuthService, user_repo: UserRepo):
+    user_flow = make_flow(auth, user_repo.by_id)
+    return {"user_or_anon": user_flow.user_or_none, "auth_user": user_flow.auth_user}
+
+
+type UserOrAnon = Annotated[User | None, Depends(AuthUserDep("user_or_anon"))]
+type UserWithPrefOrAnon = Annotated[User | None, Depends(AuthUserDep("user_or_anon"))]
+type AuthUser = Annotated[User, Depends(AuthUserDep("auth_user"))]

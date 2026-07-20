@@ -1,15 +1,20 @@
 import secrets
+from collections.abc import Awaitable, Callable
+from uuid import UUID
 
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from app.exceptions import InvalidCredentials
+from app.exceptions import InvalidCredentials, InvalidSession
 from app.user import User
 from app.user.repo import UserRepo
 from ravioli_core.serializers import msgpack
 
-from .schemas import Session, UserLogin
-from .security import generate_session_hash, verify_password, verify_session
+from .schemas import UserLogin
+from .security import generate_session_hash, verify_password, verify_session_hash
+from .structs import Session, VerifiableUser
+
+type UserGetter[T] = Callable[[AsyncConnection, UUID], Awaitable[T | None]]
 
 
 class AuthService:
@@ -50,12 +55,26 @@ class AuthService:
 
         return session_id
 
-    async def verify_user(self, conn: AsyncConnection, session: Session):
-        user = await self._user_repo.by_id(conn, session.user_id)
-        if user and verify_session(user.hashed_password, session.auth_hash):
-            return user
+    async def verify_user_flow[T: VerifiableUser](
+        self,
+        conn: AsyncConnection,
+        session_id: str,
+        user_getter: UserGetter[T],
+    ):
+        """
+        Return a Verified User or Raise InvalidSession
+        """
+        session = await self._get_session(session_id)
+        user = await user_getter(conn, session.user_id)
 
-    async def verify_user_with_pref(self, conn: AsyncConnection, session: Session):
-        data = await self._user_repo.by_id_with_pref(conn, session.user_id)
-        if data and verify_session(data.user.hashed_password, session.auth_hash):
-            return data
+        if not (user and verify_session_hash(user.hashed_password, session.auth_hash)):
+            await self._redis.delete(f"session:{session_id}")
+            raise InvalidSession()
+
+        return user
+
+    async def _get_session(self, session_id: str):
+        session = await self._redis.get(f"session:{session_id}")
+        if session is None:
+            raise InvalidSession()
+        return Session.decode(session)

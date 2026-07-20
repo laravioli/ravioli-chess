@@ -26,3 +26,7 @@ class UserWithPref(CoreStruct, frozen=True):
     @classmethod
     def from_mapping(cls, mapping: Mapping):
         return UserWithPref(user=User.from_mapping(mapping), preference=Preference(**mapping))
+
+
+class UserWithPref2(User, frozen=True):
+    preference: Preference

@@ -37,9 +37,9 @@ class UserRepo:
 
     async def _fetch_one[T: CoreStruct](
         self, conn: AsyncConnection, statement: Select, parameters: dict[str, Any], model: type[T]
-    ) -> T:
-        row = await conn.execute(statement, parameters)
-        return model.from_mapping(row.mappings().one())
+    ) -> T | None:
+        row = (await conn.execute(statement, parameters)).mappings().one_or_none()
+        return model.from_mapping(row) if row else None
 
     async def by_id(self, conn: AsyncConnection, user_id: UUID):
         return await self._fetch_one(conn, STMT_ID, {"user_id": user_id}, User)
