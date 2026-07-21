@@ -35,8 +35,8 @@ def upgrade() -> None:
     )
     op.create_table('user_preference',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('board', sa.Enum('WOOD', 'BLUE', 'BLUE2', 'BROWN', name='board'), nullable=False),
-    sa.Column('pieceset', sa.Enum('BASE', 'WIKI', name='pieceset'), nullable=False),
+    sa.Column('board', sa.Enum('wood', 'blue', 'blue2', 'brown', name='board'), nullable=False),
+    sa.Column('pieceset', sa.Enum('base', 'wiki', name='pieceset'), nullable=False),
     sa.Column('user_id', sa.Uuid(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user_account.id'], name=op.f('fk_user_preference_user_id_user_account'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_user_preference')),

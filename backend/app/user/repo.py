@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from app.auth.security import generate_password_hash
 from app.exceptions import DBNotFound
-from app.social.repo import SocialRepo
+from app.social.repo import friendship_criteria
 from ravioli_core.db.models import Friendship as _sa_Friendship
 from ravioli_core.db.models import SA_Preference, SA_User
 from ravioli_core.db.models.pref import Board, PieceSet
@@ -32,9 +32,6 @@ STMT_USERNAME_PREF = stmt_with_pref(SA_User.username == bindparam("user_username
 
 
 class UserRepo:
-    def __init__(self, social_repo: SocialRepo):
-        self._social_repo = social_repo
-
     async def _fetch_one[T: CoreStruct](
         self, conn: AsyncConnection, statement: Select, parameters: dict[str, Any], model: type[T]
     ) -> T | None:
@@ -65,7 +62,7 @@ class UserRepo:
             select(SA_User, _sa_Friendship)
             .outerjoin(
                 _sa_Friendship,
-                and_(*self._social_repo.friendship_criteria(current_user.id, SA_User.id)),
+                and_(*friendship_criteria(current_user.id, SA_User.id)),
             )
             .where(SA_User.username == username)
         )

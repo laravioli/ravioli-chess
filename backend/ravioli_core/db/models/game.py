@@ -1,4 +1,4 @@
-from enum import IntEnum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 
@@ -13,16 +13,16 @@ if TYPE_CHECKING:
     from .user import SA_User
 
 
-class GameStatus(IntEnum):
-    CREATED = 1
-    STARTED = 2
-    ABORTED = 3
-    MATE = 4
-    RESIGN = 5
-    STALEMATE = 6
-    TIMEOUT = 7
-    DRAW = 8
-    NOSTART = 9
+class GameStatus(StrEnum):
+    CREATED = "created"
+    STARTED = "started"
+    ABORTED = "aborted"
+    MATE = "mate"
+    RESIGN = "resign"
+    STALEMATE = "stalemate"
+    TIMEOUT = "timeout"
+    DRAW = "draw"
+    NOSTART = "nostart"
 
 
 class Game(Base):

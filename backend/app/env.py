@@ -36,7 +36,7 @@ class Env:
 
         pref_repo = PrefRepo()
         social_repo = SocialRepo()
-        user_repo = UserRepo(social_repo)
+        user_repo = UserRepo()
 
         user = UserService.make(repo=user_repo, users=ws.users, notif=notif)
         pref = PrefService(repo=pref_repo)

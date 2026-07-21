@@ -26,7 +26,7 @@ def upgrade() -> None:
     sa.Column('game_id', sa.String(length=8), nullable=False),
     sa.Column('white_id', sa.Uuid(), nullable=True),
     sa.Column('black_id', sa.Uuid(), nullable=True),
-    sa.Column('status', sa.Enum('CREATED', 'STARTED', 'ABORTED', 'MATE', 'RESIGN', 'STALEMATE', 'TIMEOUT', 'DRAW', 'NOSTART', name='gamestatus'), nullable=False),
+    sa.Column('status', sa.Enum('created', 'started', 'aborted', 'mate', 'resign', 'stalemate', 'timeout', 'draw', 'nostart', name='gamestatus'), nullable=False),
     sa.Column('pub_date', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('meta', sa.JSON(), nullable=False),
     sa.Column('moves', sa.String(), nullable=True),

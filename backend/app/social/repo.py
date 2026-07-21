@@ -123,7 +123,7 @@ class SocialRepo:
         async with transaction(conn):
             result = await conn.execute(
                 delete(Friendship).where(
-                    *self.friendship_criteria(current_user_id, target_id),
+                    *friendship_criteria(current_user_id, target_id),
                     Friendship.status == FriendshipStatus.accepted,
                 )
             )
@@ -131,10 +131,9 @@ class SocialRepo:
             if result.rowcount == 0:  # type:ignore[attr-defined]
                 raise DBNotFound(detail="friend not found")
 
-    @staticmethod
-    def friendship_criteria(id_a, id_b):
-        return [
-            func.least(Friendship.sender_id, Friendship.receiver_id) == func.least(id_a, id_b),
-            func.greatest(Friendship.sender_id, Friendship.receiver_id)
-            == func.greatest(id_a, id_b),
-        ]
+
+def friendship_criteria(id_a, id_b):
+    return [
+        func.least(Friendship.sender_id, Friendship.receiver_id) == func.least(id_a, id_b),
+        func.greatest(Friendship.sender_id, Friendship.receiver_id) == func.greatest(id_a, id_b),
+    ]
