@@ -19,5 +19,5 @@ class User(Struct, frozen=True):
         return isinstance(value, User) and value.id == self.id
 
 
-class UserWithPref(User, frozen=True):
+class UserFull(User, frozen=True):
     preference: Preference

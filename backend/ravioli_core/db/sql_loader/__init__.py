@@ -1,3 +1,3 @@
-from .loader import sql_from_file
+from .loader import generate_class_from_sql
 
-__all__ = ["sql_from_file"]
+__all__ = ["generate_class_from_sql"]

@@ -1,29 +1,29 @@
 from pathlib import Path
 
 from .exceptions import SQLLoadException
-from .parser import QueryData, parse_sql_to_query_data
+from .parser import QueryData, parse_sql_to_queries
 
 
-class Queries:
-    def add_query(self, q: QueryData):
-        if hasattr(self, q.name):
-            raise SQLLoadException(f"cannot override existing attribute with query: {q.name}")
-        setattr(self, q.name, q.sql)
-
-    def load_from_list(self, query_data: list[QueryData]):
-        for q in query_data:
-            self.add_query(q)
-        return self
-
-
-def sql_from_file(sql_path: str | Path, encoding=None):
-    path = Path(sql_path)
+def generate_class_from_sql(
+    file_path: str | Path, class_name: str, module_name: str, encoding=None
+):
+    path = Path(file_path)
     if not (path.exists() and path.is_file()):
         raise SQLLoadException(f"File does not exist: {path}")
-    query_data = _load_query_data_from_file(path, encoding=encoding)
-    return Queries().load_from_list(query_data)
+    queries = _load_queries_from_sql(path, encoding=encoding)
+    return _new_query_class(class_name, module_name, queries)
 
 
-def _load_query_data_from_file(path: Path, encoding=None):
+def _new_query_class(class_name: str, module_name: str, queries: list[QueryData]):
+    class_attributes = {q.name: q.sql for q in queries}
+    class_annotations = dict.fromkeys(class_attributes, str)
+
+    new_class = type(class_name, (object,), class_attributes)
+    new_class.__annotations__ = class_annotations
+    new_class.__module__ = module_name
+    return new_class
+
+
+def _load_queries_from_sql(path: Path, encoding=None):
     sql = path.read_text(encoding=encoding)
-    return parse_sql_to_query_data(sql, path)
+    return parse_sql_to_queries(sql, path)

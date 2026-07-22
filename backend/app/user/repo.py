@@ -9,46 +9,40 @@ from app.exceptions import DBNotFound
 from ravioli_core.db.models import Friendship as _sa_Friendship
 from ravioli_core.db.models import SA_Preference, SA_User
 from ravioli_core.db.models.pref import Board, PieceSet
-from ravioli_core.db.sql_loader import sql_from_file
+from ravioli_core.db.queries import UserQueries
 from ravioli_core.db.utils import PGConnection, transaction
 
 from .schemas import UserCreate
-from .structs import User, UserWithPref
-
-QUERIES = sql_from_file("./app/queries/user.sql")
+from .structs import User, UserFull
 
 
 class UserRepo:
     async def by_id(self, conn: PGConnection, user_id: UUID):
-        user = await conn.fetchrow(QUERIES.by_id, user_id)  # type: ignore
-        if user:
-            return convert(user, type=User)
+        user = await conn.fetchrow(UserQueries.by_id, user_id)
+        return convert(user, type=User) if user else None
 
     async def by_username(self, conn: PGConnection, username: str):
-        user = await conn.fetchrow(QUERIES.by_username, username)  # type: ignore
-        if user:
-            return convert(user, type=User)
+        user = await conn.fetchrow(UserQueries.by_username, username)
+        return convert(user, type=User) if user else None
 
-    async def by_id_with_pref(self, conn: PGConnection, user_id: UUID):
-        user = await conn.fetchrow(QUERIES.by_id_with_pref, user_id)  # type: ignore
-        if user:
-            return convert(user, type=UserWithPref)
+    async def by_id_full(self, conn: PGConnection, user_id: UUID):
+        user = await conn.fetchrow(UserQueries.by_id_full, user_id)
+        return convert(user, type=UserFull) if user else None
 
-    async def by_username_with_pref(self, conn: PGConnection, username: str):
-        user = await conn.fetchrow(QUERIES.by_username_with_pref, username)  # type: ignore
-        if user:
-            return convert(user, type=UserWithPref)
+    async def by_username_full(self, conn: PGConnection, username: str):
+        user = await conn.fetchrow(UserQueries.by_username_full, username)
+        return convert(user, type=UserFull) if user else None
 
-    async def by_username_with_friendship(
+    async def by_username_profile(
         self,
         conn: PGConnection,
         current_user: User,
         username: str,
     ) -> tuple[SA_User, _sa_Friendship | None] | None:
-        return await conn.fetchrow(QUERIES.by_username_with_friendship, current_user.id, username)  # type: ignore
+        return await conn.fetchrow(UserQueries.by_username_profile, current_user.id, username)
 
     async def search(self, conn: PGConnection, search_query: str, limit: int):
-        return await conn.fetch(QUERIES.search, search_query, limit)  # type: ignore
+        return await conn.fetch(UserQueries.search, search_query, limit)
 
     async def create(
         self,

@@ -37,18 +37,18 @@ class QueryData:
     floc: tuple[Path | str, int]
 
 
-def parse_sql_to_query_data(sql: str, file_name: Path | str = "<unknown>"):
+def parse_sql_to_queries(sql: str, file_name: Path | str = "<unknown>"):
     """Load queries from a string."""
     uncommented_sql = _remove_ml_comments(sql)
     qdefs = _QUERY_DEF.split(uncommented_sql)
     # lineno is from the uncommented file, fix it
     lineno = 1 + qdefs[0].count("\n")
-    data: list[QueryData] = []
+    queries: list[QueryData] = []
     # first item is anything before the first query definition, drop it!
     for qdef in qdefs[1:]:
-        data.append(_make_query_data(qdef, (file_name, lineno)))
+        queries.append(_make_query_data(qdef, (file_name, lineno)))
         lineno += qdef.count("\n")
-    return data
+    return queries
 
 
 def _make_query_data(
