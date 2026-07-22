@@ -7,7 +7,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
 
 from app.config import settings
-from app.deps import DbConnection
+from app.deps import DbConnection, EnvDep, PoolConnection
 from app.exceptions import InvalidSession
 from app.user import User
 from app.user.service import UserRepo
@@ -63,7 +63,7 @@ class AuthUserDep:
     async def __call__(
         self,
         conn: HTTPConnection,
-        db_conn: DbConnection,
+        db_conn: PoolConnection,
         session_id: SessionCookie,
         response: Response,
     ):
@@ -77,10 +77,42 @@ class AuthUserDep:
 
 
 def wire_auth_dep(auth: AuthService, user_repo: UserRepo):
-    user_flow = make_flow(auth, user_repo.by_id)
+    user_flow = make_flow(auth, user_repo.row_test_id)
     return {"user_or_anon": user_flow.user_or_none, "auth_user": user_flow.auth_user}
 
 
-type UserOrAnon = Annotated[User | None, Depends(AuthUserDep("user_or_anon"))]
+# type UserOrAnon = Annotated[User | None, Depends(AuthUserDep("user_or_anon"))]
 type UserWithPrefOrAnon = Annotated[User | None, Depends(AuthUserDep("user_or_anon"))]
-type AuthUser = Annotated[User, Depends(AuthUserDep("auth_user"))]
+# type AuthUser = Annotated[User, Depends(AuthUserDep("auth_user"))]
+
+
+async def user_or_anon(
+    env: EnvDep,
+    conn: PoolConnection,
+    session_id: SessionCookie,
+    response: Response,
+):
+    if session_id is None:
+        return
+    try:
+        user = await env.auth.verify_user_flow(conn, session_id, env.user.user_repo.row_test_id)
+        return user
+    except InvalidSession:
+        response.delete_cookie(
+            key=settings.SESSION_COOKIE,
+            secure=settings.SSL,
+            httponly=True,
+            samesite="lax",
+        )
+
+
+type UserOrAnon = Annotated[User | None, Depends(user_or_anon)]
+
+
+async def auth_user(user: UserOrAnon):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    return user
+
+
+type AuthUser = Annotated[User, Depends(auth_user)]

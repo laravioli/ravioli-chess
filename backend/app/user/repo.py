@@ -1,6 +1,8 @@
 from typing import Any
 from uuid import UUID
 
+from asyncpg import Connection
+from msgspec import convert
 from sqlalchemy import ColumnElement, Select, and_, bindparam, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
@@ -10,11 +12,14 @@ from app.social.repo import friendship_criteria
 from ravioli_core.db.models import Friendship as _sa_Friendship
 from ravioli_core.db.models import SA_Preference, SA_User
 from ravioli_core.db.models.pref import Board, PieceSet
+from ravioli_core.db.sql_loader import sql_from_file
 from ravioli_core.db.utils import transaction
 from ravioli_core.structs import CoreStruct
 
 from .schemas import UserCreate
 from .user import User, UserWithPref
+
+QUERIES = sql_from_file("./app/queries/user.sql")
 
 
 def stmt_by(condition: ColumnElement[bool]):
@@ -51,6 +56,20 @@ class UserRepo:
         return await self._fetch_one(
             conn, STMT_USERNAME_PREF, {"user_username": username}, UserWithPref
         )
+
+    async def row_test_id(self, conn: Connection, user_id: UUID):
+        user = await conn.fetchrow(QUERIES.get_user, user_id)  # type: ignore
+        # convert user
+        if user:
+            return convert(user, type=User)
+
+    async def row_test(self, conn: Connection, user_id: UUID):
+        stmt = """select ua.*, up as preference
+                from user_account ua join user_preference up on ua.id = up.user_id
+                where ua.id = $1"""
+        user = await conn.fetchrow(stmt, user_id)
+        # convert user
+        return user
 
     async def by_username_with_friendship(
         self,
