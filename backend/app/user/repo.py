@@ -1,103 +1,54 @@
-from typing import Any
 from uuid import UUID
 
-from asyncpg import Connection
 from msgspec import convert
-from sqlalchemy import ColumnElement, Select, and_, bindparam, delete, insert, select
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
+from sqlalchemy import delete, insert
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.auth.security import generate_password_hash
 from app.exceptions import DBNotFound
-from app.social.repo import friendship_criteria
 from ravioli_core.db.models import Friendship as _sa_Friendship
 from ravioli_core.db.models import SA_Preference, SA_User
 from ravioli_core.db.models.pref import Board, PieceSet
 from ravioli_core.db.sql_loader import sql_from_file
-from ravioli_core.db.utils import transaction
-from ravioli_core.structs import CoreStruct
+from ravioli_core.db.utils import PGConnection, transaction
 
 from .schemas import UserCreate
-from .user import User, UserWithPref
+from .structs import User, UserWithPref
 
 QUERIES = sql_from_file("./app/queries/user.sql")
 
 
-def stmt_by(condition: ColumnElement[bool]):
-    return select(SA_User).where(condition)
-
-
-def stmt_with_pref(condition: ColumnElement):
-    return select(SA_User, SA_Preference).outerjoin(SA_Preference).where(condition)
-
-
-STMT_ID = stmt_by(SA_User.id == bindparam("user_id"))
-STMT_ID_PREF = stmt_with_pref(SA_User.id == bindparam("user_id"))
-STMT_USERNAME = stmt_by(SA_User.username == bindparam("user_username"))
-STMT_USERNAME_PREF = stmt_with_pref(SA_User.username == bindparam("user_username"))
-
-
 class UserRepo:
-    async def _fetch_one[T: CoreStruct](
-        self, conn: AsyncConnection, statement: Select, parameters: dict[str, Any], model: type[T]
-    ) -> T | None:
-        row = (await conn.execute(statement, parameters)).mappings().one_or_none()
-        return model.from_mapping(row) if row else None
-
-    async def by_id(self, conn: AsyncConnection, user_id: UUID):
-        return await self._fetch_one(conn, STMT_ID, {"user_id": user_id}, User)
-
-    async def by_id_with_pref(self, conn: AsyncConnection, user_id: UUID):
-        return await self._fetch_one(conn, STMT_ID_PREF, {"user_id": user_id}, UserWithPref)
-
-    async def by_username(self, conn: AsyncConnection, username: str):
-        return await self._fetch_one(conn, STMT_USERNAME, {"user_username": username}, User)
-
-    async def by_username_with_pref(self, conn: AsyncConnection, username: str):
-        return await self._fetch_one(
-            conn, STMT_USERNAME_PREF, {"user_username": username}, UserWithPref
-        )
-
-    async def row_test_id(self, conn: Connection, user_id: UUID):
-        user = await conn.fetchrow(QUERIES.get_user, user_id)  # type: ignore
-        # convert user
+    async def by_id(self, conn: PGConnection, user_id: UUID):
+        user = await conn.fetchrow(QUERIES.by_id, user_id)  # type: ignore
         if user:
             return convert(user, type=User)
 
-    async def row_test(self, conn: Connection, user_id: UUID):
-        stmt = """select ua.*, up as preference
-                from user_account ua join user_preference up on ua.id = up.user_id
-                where ua.id = $1"""
-        user = await conn.fetchrow(stmt, user_id)
-        # convert user
-        return user
+    async def by_username(self, conn: PGConnection, username: str):
+        user = await conn.fetchrow(QUERIES.by_username, username)  # type: ignore
+        if user:
+            return convert(user, type=User)
+
+    async def by_id_with_pref(self, conn: PGConnection, user_id: UUID):
+        user = await conn.fetchrow(QUERIES.by_id_with_pref, user_id)  # type: ignore
+        if user:
+            return convert(user, type=UserWithPref)
+
+    async def by_username_with_pref(self, conn: PGConnection, username: str):
+        user = await conn.fetchrow(QUERIES.by_username_with_pref, username)  # type: ignore
+        if user:
+            return convert(user, type=UserWithPref)
 
     async def by_username_with_friendship(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         current_user: User,
         username: str,
     ) -> tuple[SA_User, _sa_Friendship | None] | None:
-        stmt = (
-            select(SA_User, _sa_Friendship)
-            .outerjoin(
-                _sa_Friendship,
-                and_(*friendship_criteria(current_user.id, SA_User.id)),
-            )
-            .where(SA_User.username == username)
-        )
-        result = await session.execute(stmt)
-        return result.first()  # type: ignore
+        return await conn.fetchrow(QUERIES.by_username_with_friendship, current_user.id, username)  # type: ignore
 
-    async def search(self, session: AsyncConnection, search_query: str, limit: int):
-        stmt = (
-            select(SA_User.id, SA_User.username)
-            .where(SA_User.username.like(f"{search_query}%"))
-            .order_by(SA_User.username)
-            .limit(limit)
-        )
-
-        result = await session.execute(stmt)
-        return result.all()
+    async def search(self, conn: PGConnection, search_query: str, limit: int):
+        return await conn.fetch(QUERIES.search, search_query, limit)  # type: ignore
 
     async def create(
         self,

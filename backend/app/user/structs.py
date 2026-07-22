@@ -1,12 +1,12 @@
-from collections.abc import Mapping
 from datetime import datetime
 from uuid import UUID
 
+from msgspec import Struct
+
 from app.pref.schemas import Preference
-from ravioli_core.structs import CoreStruct
 
 
-class User(CoreStruct, frozen=True):
+class User(Struct, frozen=True):
     id: UUID
     username: str
     email: str
@@ -19,10 +19,5 @@ class User(CoreStruct, frozen=True):
         return isinstance(value, User) and value.id == self.id
 
 
-class UserWithPref(CoreStruct, frozen=True):
-    user: User
+class UserWithPref(User, frozen=True):
     preference: Preference
-
-    @classmethod
-    def from_mapping(cls, mapping: Mapping):
-        return UserWithPref(user=User.from_mapping(mapping), preference=Preference(**mapping))

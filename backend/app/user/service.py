@@ -8,7 +8,7 @@ from app.user.repo import UserRepo
 from app.websocket.pubsub import Users
 
 from .schemas import FriendShipProfile, UserCreate, UserProfile, UserSearch, UserWithPref
-from .user import User
+from .structs import User
 
 
 class UserService:

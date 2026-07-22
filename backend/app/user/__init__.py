@@ -1,3 +1,3 @@
-from .user import User, UserWithPref
+from .structs import User, UserWithPref
 
 __all__ = ["User", "UserWithPref"]
