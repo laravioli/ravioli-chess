@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
             node_id=settings.NODE_ID,
         ) as env:
             add_routes(app, env)
-            yield {"env": env, "pool": pool, **wire_auth_dep(env.auth, env.user.user_repo)}
+            yield {"env": env, "pool": pool, **wire_auth_dep(env.auth, env.user.repo)}
     finally:
         # at this point websockets are closed
         await pool.close()

@@ -42,9 +42,6 @@ async def transaction(conn: AsyncConnection | AsyncSession, error_detail="Integr
         raise
 
 
-type PGConnection = asyncpg.Connection | asyncpg.pool.PoolConnectionProxy
-
-
 async def init_db_pool(
     dsn: str = "postgresql://postgres:postgres@localhost:5432/app", max_size: int = 30
 ):

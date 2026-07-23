@@ -1,3 +1,3 @@
-from .structs import User, UserWithPref
+from .structs import User, UserFull
 
-__all__ = ["User", "UserWithPref"]
+__all__ = ["User", "UserFull"]

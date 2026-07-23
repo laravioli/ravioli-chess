@@ -20,7 +20,7 @@ type EnvDep = Annotated[Env, Depends(get_env)]
 
 
 async def get_user_repo(env: EnvDep):
-    return env.user.user_repo
+    return env.user.repo
 
 
 type UserRepoDep = Annotated[UserRepo, Depends(get_user_repo)]

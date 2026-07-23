@@ -60,9 +60,3 @@ class UserProfile(UserBase):
 class UserWithPref(UserBase):
     preference: Preference
     joined_at: AwareDatetime
-
-
-# Note
-# Define once at module level
-# users_adapter = TypeAdapter(list[User])
-# will act as a Pydantic Model

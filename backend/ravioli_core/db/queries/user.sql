@@ -41,3 +41,17 @@ FROM user_account ua
 WHERE ua.username ^@ $1
 ORDER BY ua.username
 LIMIT $2
+
+--name: insert
+INSERT INTO user_account (username, email, hashed_password)
+VALUES ($1,$2,$3)
+RETURNING id
+
+--name: insert_admin
+INSERT INTO user_account (username, email, hashed_password, is_staff)
+VALUES ($1,$2,$3,true)
+RETURNING id
+
+--name: delete
+DELETE FROM user_account
+WHERE user_account.id = $1

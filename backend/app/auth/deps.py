@@ -7,7 +7,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
 
 from app.config import settings
-from app.deps import DbConnection, EnvDep, PoolConnection
+from app.deps import EnvDep, PoolConnection
 from app.exceptions import InvalidSession
 from app.user import User
 from app.user.service import UserRepo
@@ -25,15 +25,15 @@ type SessionCookie = Annotated[str | None, Depends(get_session_cookie)]
 
 @dataclass
 class AuthFlow[T: VerifiableUser]:
-    user_or_none: Callable[[DbConnection, SessionCookie, Response], Awaitable[T | None]]
-    auth_user: Callable[[DbConnection, SessionCookie, Response], Awaitable[T]]
+    user_or_none: Callable[[PoolConnection, SessionCookie, Response], Awaitable[T | None]]
+    auth_user: Callable[[PoolConnection, SessionCookie, Response], Awaitable[T]]
 
 
 def make_flow[T: VerifiableUser](
     auth: AuthService,
     user_getter: UserGetter[T],
 ):
-    async def user_or_none(conn: DbConnection, session_id: SessionCookie, response: Response):
+    async def user_or_none(conn: PoolConnection, session_id: SessionCookie, response: Response):
         if session_id is None:
             return
         try:
@@ -47,7 +47,7 @@ def make_flow[T: VerifiableUser](
                 samesite="lax",
             )
 
-    async def auth_user(conn: DbConnection, session_id: SessionCookie, response: Response):
+    async def auth_user(conn: PoolConnection, session_id: SessionCookie, response: Response):
         user = await user_or_none(conn, session_id, response)
         if user is None:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
@@ -77,7 +77,7 @@ class AuthUserDep:
 
 
 def wire_auth_dep(auth: AuthService, user_repo: UserRepo):
-    user_flow = make_flow(auth, user_repo.row_test_id)
+    user_flow = make_flow(auth, user_repo.by_id)
     return {"user_or_anon": user_flow.user_or_none, "auth_user": user_flow.auth_user}
 
 
@@ -95,7 +95,7 @@ async def user_or_anon(
     if session_id is None:
         return
     try:
-        user = await env.auth.verify_user_flow(conn, session_id, env.user.user_repo.row_test_id)
+        user = await env.auth.verify_user_flow(conn, session_id, env.user.repo.by_id)
         return user
     except InvalidSession:
         response.delete_cookie(

@@ -3,18 +3,18 @@ from collections.abc import Awaitable, Callable
 from uuid import UUID
 
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.exceptions import InvalidCredentials, InvalidSession
 from app.user import User
 from app.user.repo import UserRepo
+from ravioli_core.db.types import PGConnection
 from ravioli_core.serializers import msgpack
 
 from .schemas import UserLogin
 from .security import generate_session_hash, verify_password, verify_session_hash
 from .structs import Session, VerifiableUser
 
-type UserGetter[T] = Callable[[AsyncConnection, UUID], Awaitable[T | None]]
+type UserGetter[T] = Callable[[PGConnection, UUID], Awaitable[T | None]]
 
 
 class AuthService:
@@ -22,12 +22,10 @@ class AuthService:
         self._redis = redis
         self._user_repo = repo
 
-    async def authenticate(self, conn: AsyncConnection, credentials: UserLogin):
-        data = await self._user_repo.by_username_with_pref(conn, credentials.username)
-        if data and verify_password(
-            credentials.password.get_secret_value(), data.user.hashed_password
-        ):
-            return data
+    async def authenticate(self, conn: PGConnection, credentials: UserLogin):
+        user = await self._user_repo.by_username_full(conn, credentials.username)
+        if user and verify_password(credentials.password.get_secret_value(), user.hashed_password):
+            return user
         raise InvalidCredentials()
 
     async def create_session(
@@ -57,7 +55,7 @@ class AuthService:
 
     async def verify_user_flow[T: VerifiableUser](
         self,
-        conn: AsyncConnection,
+        conn: PGConnection,
         session_id: str,
         user_getter: UserGetter[T],
     ):
