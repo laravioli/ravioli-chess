@@ -1,29 +1,25 @@
 from datetime import timedelta
 
-import orjson
 from fastapi import Request, Response
-from itsdangerous import BadSignature, URLSafeSerializer
-from sqlalchemy.ext.asyncio import AsyncConnection
 
+from app.api.cookies import cookie_serializer, load_cookie_data
 from app.config import settings
-from app.pref.schemas import Preference
 from app.user import User
+from ravioli_core.db.types import PGConnection
 
 from .repo import PrefRepo
-from .schemas import CookiePreference, PreferenceUpdate
+from .schemas import PreferenceUpdate
 
 
 class PrefService:
     def __init__(self, *, repo: PrefRepo):
         self._repo = repo
 
-    async def update_user_pref(self, conn: AsyncConnection, user: User, pref: PreferenceUpdate):
-        await self._repo.update(conn, user, pref.model_dump(exclude_none=True))
+    async def update_user_pref(self, conn: PGConnection, user: User, pref: PreferenceUpdate):
+        await self._repo.update(conn, user, pref)
 
     def update_anon_pref(self, request: Request, data: PreferenceUpdate, response: Response):
-        payload = cookie_serializer.dumps(
-            extract_cookie_data(request).update(data).model_dump(mode="json")
-        )
+        payload = cookie_serializer.dumps(load_cookie_data(request).update(data))
         if isinstance(payload, bytes):
             payload = payload.decode("utf-8")
 
@@ -35,22 +31,3 @@ class PrefService:
             httponly=True,
             samesite="lax",
         )
-
-
-cookie_serializer = URLSafeSerializer(
-    secret_key=settings.SECRET_KEY.get_secret_value(),
-    salt="ravioli.cookie",
-    serializer=orjson,
-)
-
-
-def extract_cookie_data(request: Request):
-    raw_cookie = request.cookies.get(settings.ANON_COOKIE)
-    cookie_data = {}
-
-    if raw_cookie:
-        try:
-            cookie_data: CookiePreference = cookie_serializer.loads(raw_cookie)
-        except BadSignature:
-            cookie_data = {}
-    return Preference(**cookie_data)

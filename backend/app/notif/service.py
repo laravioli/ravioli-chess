@@ -6,7 +6,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.background import Background
-from app.types import _SA_Connection
+from ravioli_core.db.types import PGConnection
 from ravioli_core.ipc.w_in import TellUser
 
 from .cache import NotifCache
@@ -21,16 +21,17 @@ class NotifService:
 
     async def get_notifications(
         self,
+        conn: PGConnection,
         session: AsyncSession,
         user_id: UUID,
         params: NotifParams = NotifParams(),
     ):
-        unread_count = await self.get_unread_count(session, user_id)
+        unread_count = await self.get_unread_count(conn, user_id)
         return await self._db.get_notifications(session, user_id, unread_count, params)
 
     async def get_unread_count(
         self,
-        conn: _SA_Connection,
+        conn: PGConnection,
         user_id: UUID,
     ):
         return await self._cache.get_or_set(
@@ -46,12 +47,15 @@ class NotifService:
 
     def notify_one(
         self,
+        conn: PGConnection,
         bg: Background,
         user_id: UUID,
     ):
         async def lazy_notif(session_maker: async_sessionmaker[AsyncSession]):
             async with session_maker() as session:
-                notifications = await self.get_notifications(session, user_id, params=NotifParams())
+                notifications = await self.get_notifications(
+                    conn, session, user_id, params=NotifParams()
+                )
             raw = notification_ta.dump_json(notification_ta.validate_python(notifications))
             return TellUser(type="notifications", data=Raw(raw))
 
@@ -59,11 +63,12 @@ class NotifService:
 
     def notify_many(
         self,
+        conn: PGConnection,
         bg: Background,
         user_ids: Iterable[UUID],
     ):
         for user_id in user_ids:
-            self.notify_one(bg, user_id)
+            self.notify_one(conn, bg, user_id)
 
     async def mark_all_read(self, engine: AsyncEngine, user_id: UUID):
         await self._db.mark_all_read(engine, user_id)

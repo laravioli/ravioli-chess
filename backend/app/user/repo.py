@@ -1,8 +1,12 @@
+from datetime import datetime
+from typing import TypedDict, cast
 from uuid import UUID
 
+from asyncpg import Record
 from msgspec import convert
 
 from app.auth.security import generate_password_hash
+from app.social.structs import Friendship
 from ravioli_core.db.models.pref import Board, PieceSet
 from ravioli_core.db.queries import PrefQueries, UserQueries
 from ravioli_core.db.types import PGConnection
@@ -12,8 +16,8 @@ from .structs import User, UserFull
 
 
 class UserRepo:
+    @staticmethod
     async def by_id(
-        self,
         conn: PGConnection,
         user_id: UUID,
     ):
@@ -50,14 +54,16 @@ class UserRepo:
         current_user: User,
         username: str,
     ):
-        return await conn.fetchrow(UserQueries.by_username_profile, current_user.id, username)
+        row = await conn.fetchrow(UserQueries.by_username_profile, current_user.id, username)
+        if row is not None:
+            return convert(row["user"], type=User), convert(row["friendship"], type=Friendship)
 
     async def search(
         self,
         conn: PGConnection,
         search_query: str,
         limit: int,
-    ):
+    ) -> list[Record]:
         return await conn.fetch(UserQueries.search, search_query, limit)
 
     async def create(
@@ -66,19 +72,19 @@ class UserRepo:
         data: UserCreate,
     ):
         async with conn.transaction():
-            id = await conn.fetchval(
+            row = await conn.fetchrow(
                 UserQueries.insert,
                 data.username,
                 data.email,
                 generate_password_hash(data.password.get_secret_value()),
             )
+            user = cast(UserCreateRow, row)
 
             await conn.execute(
-                PrefQueries.insert,
-                (Board.BLUE.value, PieceSet.BASE.value, id),  # type: ignore
+                PrefQueries.insert, (Board.BLUE.value, PieceSet.BASE.value, user["id"])
             )
 
-        return id
+        return user
 
     async def delete(
         self,
@@ -87,3 +93,9 @@ class UserRepo:
     ):
         async with conn.transaction():
             await conn.execute(UserQueries.delete, user_id)
+
+
+class UserCreateRow(TypedDict):
+    id: UUID
+    username: str
+    joined_at: datetime

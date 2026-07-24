@@ -1,15 +1,23 @@
 from typing import Any
 
-from sqlalchemy import update
-from sqlalchemy.ext.asyncio import AsyncConnection
-
 from app.user import User
-from ravioli_core.db.models import SA_Preference
-from ravioli_core.db.utils import transaction
+from ravioli_core.db.types import PGConnection
+
+from .schemas import PreferenceUpdate
 
 
 class PrefRepo:
-    async def update(self, conn: AsyncConnection, user: User, data: dict[str, Any]):
-        async with transaction(conn):
-            stmt = update(SA_Preference).where(SA_Preference.user_id == user.id).values(data)
-            await conn.execute(stmt)
+    async def update(self, conn: PGConnection, user: User, data: PreferenceUpdate):
+        set_clause: list[str] = []
+        params: list[Any] = [user.id]
+        for i, (col, val) in enumerate(data.to_dict().items(), start=2):
+            set_clause.append(f"{col} = ${i}")
+            params.append(val)
+
+        stmt = f"""
+        UPDATE user_preference up
+        SET {", ".join(set_clause)}
+        WHERE up.user_id = $1
+        """
+
+        await conn.execute(stmt, *params)

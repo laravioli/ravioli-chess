@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
-from sqlalchemy.ext.asyncio import AsyncConnection
+from ravioli_core.db.types import PGConnection
 
 if TYPE_CHECKING:
     from app.web.service import WebService
@@ -29,14 +29,14 @@ class PageCtx:
     def __init__(self, web: "WebService"):
         self._web = web
 
-    async def index(self, conn: AsyncConnection):
+    async def index(self, conn: PGConnection):
         return PagePayload(
             page=CHESS_DEFAULT, data=Metadata(positions=await self._web.get_chess_positions(conn))
         )
 
     async def analyse(
         self,
-        conn: AsyncConnection,
+        conn: PGConnection,
     ):
         return PagePayload(
             page=CHESS_DEFAULT, data=Metadata(positions=await self._web.get_chess_positions(conn))
@@ -44,7 +44,7 @@ class PageCtx:
 
     async def editor(
         self,
-        conn: AsyncConnection,
+        conn: PGConnection,
     ):
         return PagePayload(
             page=CHESS_DEFAULT, data=Metadata(positions=await self._web.get_chess_positions(conn))

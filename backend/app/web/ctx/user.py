@@ -3,7 +3,7 @@ from uuid import UUID
 
 from msgspec import Struct
 
-from app.pref.schemas import Preference
+from app.pref.structs import Preference
 from app.user import User
 
 
@@ -35,7 +35,7 @@ class UserCtx:
 
     @property
     def preference_attrs(self):
-        return self.preference.html_attrs
+        return self.preference.to_html_attrs
 
     @property
     def piece_style(self):

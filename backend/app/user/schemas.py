@@ -12,7 +12,7 @@ from pydantic import (
 )
 
 from app.api.schemas import BaseSchema
-from app.pref.schemas import Preference
+from app.pref.schemas import PreferenceOut
 from ravioli_core.db.models.social import FriendshipStatus
 
 
@@ -58,5 +58,5 @@ class UserProfile(UserBase):
 
 
 class UserWithPref(UserBase):
-    preference: Preference
+    preference: PreferenceOut
     joined_at: AwareDatetime

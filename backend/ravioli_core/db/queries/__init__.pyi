@@ -13,3 +13,9 @@ class UserQueries:
 
 class PrefQueries:
     insert: ClassVar[str] = ...
+
+class NotifQueries:
+    unread_count: ClassVar[str] = ...
+
+class WebQueries:
+    chess_positions: ClassVar[str] = ...

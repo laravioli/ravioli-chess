@@ -1,12 +1,13 @@
 from uuid import UUID
 
 from fastapi_pagination.ext.sqlalchemy import apaginate
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.types import _SA_Connection
 from ravioli_core.db.models import Notification, SA_User
+from ravioli_core.db.queries import NotifQueries
+from ravioli_core.db.types import PGConnection
 
 from .schemas import NotifParams, pagination
 
@@ -31,14 +32,10 @@ class NotifRepo:
 
     async def unread_count(
         self,
-        conn: _SA_Connection,
+        conn: PGConnection,
         user_id: UUID,
-    ):
-        return await conn.scalar(
-            select(func.count())
-            .select_from(Notification)
-            .where(Notification.receiver_id == user_id, Notification.read.is_(False))
-        )
+    ) -> int | None:
+        return await conn.fetchval(NotifQueries.unread_count, user_id)
 
     async def delete_all(
         self,

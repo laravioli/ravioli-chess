@@ -2,9 +2,9 @@ from typing import Annotated
 
 from fastapi import Depends, Request
 
-from app.auth.deps import UserWithPrefOrAnon
-from app.deps import DbConnection, EnvDep
-from app.pref.service import extract_cookie_data
+from app.auth.deps import UserFullOrAnon
+from app.deps import EnvDep, PoolConnection
+from app.pref.service import load_cookie_data
 
 from .ctx.user import UserCtx
 
@@ -12,18 +12,18 @@ from .ctx.user import UserCtx
 # user context
 async def user_ctx(
     request: Request,
-    data: UserWithPrefOrAnon,
+    user: UserFullOrAnon,
     env: EnvDep,
-    conn: DbConnection,
+    conn: PoolConnection,
 ):
-    if data:
+    if user:
         return UserCtx(
-            user=data.user,
-            preference=data.preference,
-            unread_count=await env.notif.get_unread_count(conn, data.user.id),
+            user=user,
+            preference=user.preference,
+            unread_count=await env.notif.get_unread_count(conn, user.id),
         )
     else:
-        return UserCtx(user=None, preference=extract_cookie_data(request))
+        return UserCtx(user=None, preference=load_cookie_data(request))
 
 
 type UserCtxDep = Annotated[UserCtx, Depends(user_ctx)]

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from msgspec import Struct
 
-from app.pref.schemas import Preference
+from app.pref.structs import Preference
 
 
 class User(Struct, frozen=True):

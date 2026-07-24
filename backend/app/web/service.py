@@ -1,9 +1,9 @@
 from fastapi.templating import Jinja2Templates
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.notif.service import NotifService
 from ravioli_core.cache import CacheLib
+from ravioli_core.db.types import PGConnection
 
 from .ctx.page import PageCtx
 from .repo import WebRepo
@@ -17,7 +17,10 @@ class WebService:
         self.page_ctx = PageCtx(self)
         self._repo = repo
 
-    async def get_chess_positions(self, conn: AsyncConnection):
+    async def get_chess_positions(
+        self,
+        conn: PGConnection,
+    ):
         return await self._chess_cache.get_or_set(
             "chess:positions", factory=lambda: self._repo.chess_positions(conn)
         )

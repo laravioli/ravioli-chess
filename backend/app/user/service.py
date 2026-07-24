@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.notif.service import NotifService
-from app.pref.schemas import Preference
+from app.pref.schemas import PreferenceOut
 from app.user.repo import UserRepo
 from app.websocket.pubsub import Users
 from ravioli_core.db.types import PGConnection
@@ -17,13 +17,13 @@ class UserService:
         self._notif = notif
 
     async def create(self, conn: PGConnection, data: UserCreate):
-        id = await self.repo.create(conn, data)
-        return UserWithPref(**row._mapping, preference=Preference())
+        user = await self.repo.create(conn, data)
+        return UserWithPref(**user, preference=PreferenceOut())
 
     async def profile(self, conn: PGConnection, username: str):
         user = await self.repo.by_username(conn, username)
         if user:
-            online = await self._users.is_online(str(user.id))
+            online = await self._users.is_online(user.id)
             return UserProfile(
                 id=user.id,
                 username=user.username,
@@ -53,18 +53,18 @@ class UserService:
             if friendship
             else None,
             joined_at=user.joined_at,
-            online=await self._users.is_online(str(user.id)),
+            online=await self._users.is_online(user.id),
         )
 
     async def search(self, conn: PGConnection, search_query: str, limit: int):
 
         rows = await self.repo.search(conn, search_query, limit)
-        online_status = await self._users.are_online([row.id for row in rows])
+        online_status = await self._users.are_online([row["id"] for row in rows])
 
         return [
             UserSearch(
-                id=row.id,
-                username=row.username,
+                id=row["id"],
+                username=row["username"],
                 online=online,
             )
             for row, online in zip(rows, online_status, strict=True)

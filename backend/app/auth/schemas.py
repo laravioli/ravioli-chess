@@ -1,7 +1,7 @@
 from pydantic import UUID4, Field, SecretStr
 
 from app.api.schemas import BaseSchema
-from app.pref.schemas import Preference
+from app.pref.schemas import PreferenceOut
 
 
 class UserLogin(BaseSchema):
@@ -12,5 +12,5 @@ class UserLogin(BaseSchema):
 class UserSuccess(BaseSchema):
     id: UUID4
     username: str
-    preference: Preference
+    preference: PreferenceOut
     unread_count: int = Field(serialization_alias="unreadCount")

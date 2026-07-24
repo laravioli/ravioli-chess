@@ -45,12 +45,12 @@ LIMIT $2
 --name: insert
 INSERT INTO user_account (username, email, hashed_password)
 VALUES ($1,$2,$3)
-RETURNING id
+RETURNING id, username, joined_at
 
 --name: insert_admin
 INSERT INTO user_account (username, email, hashed_password, is_staff)
 VALUES ($1,$2,$3,true)
-RETURNING id
+RETURNING id, username, joined_at
 
 --name: delete
 DELETE FROM user_account

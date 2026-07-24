@@ -1,15 +1,8 @@
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncConnection
-
-from ravioli_core.db.models import ChessPosition
+from ravioli_core.db.queries import WebQueries
+from ravioli_core.db.types import PGConnection
 
 
 class WebRepo:
-    async def chess_positions(self, conn: AsyncConnection):
-
-        stmt = select(ChessPosition.eco, ChessPosition.name, ChessPosition.fen).order_by(
-            ChessPosition.eco
-        )
-        result = await conn.execute(stmt)
-        data = [dict(row) for row in result.mappings().all()]
-        return data
+    async def chess_positions(self, conn: PGConnection):
+        cps = await conn.fetch(WebQueries.chess_positions)
+        return [dict(**cp) for cp in cps]
