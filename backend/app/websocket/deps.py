@@ -5,15 +5,15 @@ from fastapi.websockets import WebSocket
 
 from app.auth.deps import SessionCookie
 from app.auth.security import verify_session_hash
-from app.deps import DBConnection, EnvDep, RedisDep, UserRepoDep
+from app.deps import EnvDep, RedisDep, UserRepoDep
 from app.exceptions import InvalidSession
 
 from .schemas import Sri, User
 
 
 async def user_or_anon(
+    # NOTE don't use connection context manager here
     env: EnvDep,
-    conn: DBConnection,
     redis: RedisDep,
     user_repo: UserRepoDep,
     session_cookie: SessionCookie = None,
@@ -24,7 +24,8 @@ async def user_or_anon(
 
     try:
         session = await env.auth._get_session(session_cookie)
-        user = await user_repo.by_id(conn, session.user_id)
+        async with env.core.pg_pool.acquire() as conn:
+            user = await user_repo.by_id(conn, session.user_id)  # type: ignore
 
         if not (user and verify_session_hash(user.hashed_password, session.auth_hash)):
             await redis.delete(f"session:{session_cookie}")

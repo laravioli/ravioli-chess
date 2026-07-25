@@ -21,7 +21,7 @@ class PieceSet(StrEnum):
     WIKI = "wiki"
 
 
-class SA_Preference(Base):
+class Preference(Base):
     __tablename__ = "user_preference"
 
     id: Mapped[PrimaryKey[int]]
