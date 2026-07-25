@@ -1,10 +1,9 @@
 from fastapi import APIRouter
-from fastapi.responses import Response
 from pydantic import BaseModel
 
+from app.api.responses import JSONResponse
 from app.deps import DBConnection
 from app.env import Env
-from ravioli_core.serializers import json
 
 
 class ChessPosition(BaseModel):
@@ -21,6 +20,6 @@ def web_api_router(env: Env):
         conn: DBConnection,
     ):
         data = await env.web.get_chess_positions(conn)
-        return Response(content=json.encode(data), media_type="application/json")
+        return JSONResponse(content=data)
 
     return router
