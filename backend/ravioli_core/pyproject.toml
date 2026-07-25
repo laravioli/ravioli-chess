@@ -2,9 +2,7 @@
 name = "ravioli-core"
 version = "0.1.0"
 description = "utilities and shared services"
-authors = [
-    { name = "Victor", email = "victorlecouteur@gmail.com" }
-]
+authors = [{ name = "Victor", email = "victorlecouteur@gmail.com" }]
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.18.4",
@@ -18,7 +16,7 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.45",
 ]
 [tool.ruff]
-extend = "../ruff.toml"
+extend = "../../ruff.toml"
 extend-exclude = ["alembic"]
 
 [build-system]

@@ -1,16 +1,12 @@
 from enum import StrEnum
-from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ravioli_core.db.types import PrimaryKey
 
 from .base import Base
-
-if TYPE_CHECKING:
-    from .user import User
 
 
 class Board(StrEnum):
@@ -34,4 +30,3 @@ class Preference(Base):
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("user_account.id", ondelete="CASCADE"), unique=True
     )
-    user: Mapped["User"] = relationship(back_populates="preference")

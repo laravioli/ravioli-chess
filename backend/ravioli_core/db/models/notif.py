@@ -1,20 +1,13 @@
-from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, String, false
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ravioli_core.db.types import TimestampNow
 
 from .base import Base
 
-if TYPE_CHECKING:
-    from .social import Friendship
-    from .user import User
 
-
-# NOTE 1:1 system
-# NOTE N:N would require 3 tables and more complex queries
 class Notification(Base):
     __tablename__ = "notification"
     __mapper_args__ = {
@@ -26,8 +19,7 @@ class Notification(Base):
     type: Mapped[str] = mapped_column(String(50))
     sender_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
     receiver_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
-    sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id], innerjoin=True)
-    read: Mapped[bool] = mapped_column(default=False)
+    read: Mapped[bool] = mapped_column(server_default=false())
     created_at: Mapped[TimestampNow]
 
 
@@ -40,7 +32,6 @@ class FriendRequest(Notification):
     friendship_id: Mapped[int | None] = mapped_column(
         ForeignKey("friendship.id", ondelete="CASCADE"), use_existing_column=True
     )
-    friendship: Mapped["Friendship"] = relationship(lazy="raise")
 
 
 class FriendRequestAccepted(Notification):
@@ -52,7 +43,6 @@ class FriendRequestAccepted(Notification):
     friendship_id: Mapped[int | None] = mapped_column(
         ForeignKey("friendship.id", ondelete="CASCADE"), use_existing_column=True
     )
-    friendship: Mapped["Friendship"] = relationship(lazy="raise")
 
 
 # NOTE that the mappers for the derived classes Manager and Engineer omit the __tablename__,

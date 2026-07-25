@@ -2,8 +2,8 @@ import clsx from 'clsx';
 
 import { History } from '@/common/components/controls/history';
 
-import layout from '@/analyse/css/layout.module.css';
 import classes from '@/analyse/css/controls.module.css';
+import layout from '@/analyse/css/layout.module.css';
 import { ControlsMenu } from './menu';
 
 export const Controls: React.FC = () => {

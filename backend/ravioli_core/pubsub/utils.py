@@ -19,20 +19,20 @@ class LazyEvent:
     def __exit__(self, exc_type, exc, tb):
         self._event.set()
 
-    def set(self) -> None:
+    def set(self):
         self._event.set()
 
-    def clear(self) -> None:
+    def clear(self):
         self._event.clear()
 
-    def is_set(self) -> bool:
+    def is_set(self):
         return self._event.is_set()
 
-    async def wait(self) -> None:
+    async def wait(self):
         await self._event.wait()
 
 
-def str_if_bytes(value: str | bytes) -> str:
+def str_if_bytes(value: str | bytes):
     if isinstance(value, bytes):
         value = value.decode("utf-8", errors="replace")
     return value

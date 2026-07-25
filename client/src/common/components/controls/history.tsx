@@ -1,15 +1,13 @@
-import { observer } from 'mobx-react-lite';
+import type { AnalyseStore } from '@/analyse/store/analyse';
+import { usePageStore } from '@/core/hooks';
 import { ActionIcon } from '@mantine/core';
 import {
-  IconChevronsLeft,
   IconChevronLeft,
   IconChevronRight,
+  IconChevronsLeft,
   IconChevronsRight,
 } from '@tabler/icons-react';
-
-import { usePageStore } from '@/core/hooks';
-
-import type { AnalyseStore } from '@/analyse/store/analyse';
+import { observer } from 'mobx-react-lite';
 
 export const History: React.FC<{ className: string }> = observer(({ className }) => {
   const pageStore = usePageStore<AnalyseStore>();

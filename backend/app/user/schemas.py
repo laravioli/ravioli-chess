@@ -1,4 +1,4 @@
-from typing import Annotated, TypedDict
+from typing import Annotated
 
 from pydantic import (
     UUID4,
@@ -12,7 +12,7 @@ from pydantic import (
 )
 
 from app.api.schemas import BaseSchema
-from app.pref.schemas import Preference
+from app.pref.schemas import PreferenceOut
 from ravioli_core.db.models.social import FriendshipStatus
 
 
@@ -46,28 +46,17 @@ class UserSearch(UserBase):
     online: bool
 
 
-class FriendShip(BaseSchema):
+class FriendShipProfile(BaseSchema):
     is_sender: bool
     status: FriendshipStatus
 
 
 class UserProfile(UserBase):
-    friendship: FriendShip | None = None
+    friendship: FriendShipProfile | None = None
     joined_at: AwareDatetime
     online: bool
 
 
 class UserWithPref(UserBase):
-    preference: Preference
+    preference: PreferenceOut
     joined_at: AwareDatetime
-
-
-class UserFilter(TypedDict, total=False):
-    with_pref: bool
-    with_online: bool
-
-
-# Note
-# Define once at module level
-# users_adapter = TypeAdapter(list[User])
-# will act as a Pydantic Model

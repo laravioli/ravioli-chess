@@ -1,50 +1,87 @@
 from uuid import UUID
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from redis.asyncio import Redis
 
-from ravioli_core.db.models import Challenge, User
+from app.game.db import id8
+from app.user import User
+from ravioli_core.cache import CacheLib
+from ravioli_core.db.enums import ChessColor
+from ravioli_core.db.queries import ChallQueries
+from ravioli_core.db.types import PGConnection
+
+from .schemas import ChallengeRequest
+from .structs import Challenge
 
 
 class ChallengeService:
-    async def list_challenge(
+    def __init__(self, cache: CacheLib[int]):
+        self._cache = cache
+
+    async def list(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: UUID,
     ):
-        return await session.execute(
-            select(Challenge)
-            .where((Challenge.sender_id == user_id) | (Challenge.receiver_id == user_id))
-            .order_by(Challenge.pub_date.desc())
+        return await conn.fetch(ChallQueries.list, user_id)
+
+    async def create(
+        self,
+        conn: PGConnection,
+        data: ChallengeRequest,
+        user: User | None,
+        target: UUID | None,
+    ):
+        c = Challenge(
+            challenge_id=id8(),
+            sender_id=user.id if user else None,
+            receiver_id=target,
+            color_choice=data.color_choice,
+            color=ChessColor.from_choice(data.color_choice),
+            time_control=data.time_control,
+        )
+        await conn.execute(
+            ChallQueries.create,
+            c.challenge_id,
+            c.sender_id,
+            c.receiver_id,
+            c.color_choice,
+            c.color,
+            c.time_control,
         )
 
-    async def create_challenge(self, session: AsyncSession, user_id: UUID | None):
-        pass
+        return c
 
-    async def accept_challenge(
+    async def accept(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: UUID | None,
         challenge_id: UUID,
     ):
         pass
 
-    async def reject_challenge(
+    async def reject(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: UUID,
         sender_id: UUID,
     ):
         pass
 
-    async def delete_challenge(
+    async def delete(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user: User | None,
         challenge_id: str,
     ):
         pass
 
-
-def make_challenge_service():
-    return ChallengeService()
+    @staticmethod
+    def make(*, redis: Redis):
+        return ChallengeService(
+            cache=CacheLib(
+                redis=redis,
+                namespace="challenge",
+                version="v1",
+                data_type=int,
+            )
+        )

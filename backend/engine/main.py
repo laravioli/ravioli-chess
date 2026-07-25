@@ -5,11 +5,11 @@ import signal
 
 import uvloop
 
-from ravioli_core.config import LogSettings, configure_logging
+from ravioli_core.logging import LogConfig, configure_logging
 
 from .app import App
 
-configure_logging(settings=LogSettings())
+configure_logging(conf=LogConfig())
 logger = logging.getLogger(__name__)
 
 

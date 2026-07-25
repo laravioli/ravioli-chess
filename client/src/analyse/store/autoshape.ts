@@ -1,7 +1,7 @@
 // https://github.com/lichess-org/lila/blob/master/ui/analyse/src/autoShape.ts
-import { parseUci, makeSquare } from 'chessops/util';
-import { isDrop } from 'chessops/types';
 import type { DrawShape } from '@lichess-org/chessground/draw';
+import { isDrop } from 'chessops/types';
+import { makeSquare, parseUci } from 'chessops/util';
 
 import type { AnalyseStore } from './analyse';
 

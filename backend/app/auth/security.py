@@ -28,6 +28,6 @@ def generate_session_hash(hashed_password: bytes) -> bytes:
     return auth_signer.derive_key(secret_key=hashed_password)
 
 
-def verify_session(hashed_password: bytes, session_auth_hash: bytes) -> bool:
+def verify_session_hash(hashed_password: bytes, session_auth_hash: bytes) -> bool:
     expected_hash = generate_session_hash(hashed_password)
     return hmac.compare_digest(expected_hash, session_auth_hash)

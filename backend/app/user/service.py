@@ -1,113 +1,78 @@
-from typing import Unpack
 from uuid import UUID
 
-from sqlalchemy import and_, delete, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
-
-from app.api.env import ApiEnv
-from app.auth.security import generate_password_hash
-from app.exceptions import DBNotFound
-from app.social.db import friendship_criteria
+from app.notif.service import NotifService
+from app.pref.schemas import PreferenceOut
+from app.user.repo import UserRepo
 from app.websocket.pubsub import Users
-from ravioli_core.db.models import Friendship, Preference, User
-from ravioli_core.utils import transaction
+from ravioli_core.db.types import PGConnection
 
-from .schemas import UserCreate, UserFilter, UserSearch
+from .schemas import FriendShipProfile, UserCreate, UserProfile, UserSearch, UserWithPref
+from .structs import User
 
 
-async def user_create(session: AsyncSession, data: UserCreate):
-    async with transaction(session, error_detail="This username or email already exists"):
-        new_user = User(
-            username=data.username,
-            email=data.email,
-            hashed_password=generate_password_hash(data.password.get_secret_value()),
-            preference=Preference(),
+class UserService:
+    def __init__(self, repo: UserRepo, users: Users, notif: NotifService):
+        self.repo = repo
+        self._users = users
+        self._notif = notif
+
+    async def create(self, conn: PGConnection, data: UserCreate):
+        user = await self.repo.create(conn, data)
+        return UserWithPref(**user, preference=PreferenceOut())
+
+    async def profile(self, conn: PGConnection, username: str):
+        user = await self.repo.by_username(conn, username)
+        if user:
+            online = await self._users.is_online(user.id)
+            return UserProfile(
+                id=user.id,
+                username=user.username,
+                joined_at=user.joined_at,
+                online=online,
+            )
+
+    async def profile_with_friendship(
+        self,
+        conn: PGConnection,
+        current_user: User,
+        username: str,
+    ):
+
+        result = await self.repo.by_username_profile(conn, current_user, username)
+        if not result:
+            return
+
+        user, friendship = result
+
+        return UserProfile(
+            id=user.id,
+            username=user.username,
+            friendship=FriendShipProfile(
+                is_sender=friendship.sender_id == current_user.id, status=friendship.status
+            )
+            if friendship
+            else None,
+            joined_at=user.joined_at,
+            online=await self._users.is_online(user.id),
         )
 
-        session.add(new_user)
+    async def search(self, conn: PGConnection, search_query: str, limit: int):
 
-    return new_user
+        rows = await self.repo.search(conn, search_query, limit)
+        online_status = await self._users.are_online([row["id"] for row in rows])
 
+        return [
+            UserSearch(
+                id=row["id"],
+                username=row["username"],
+                online=online,
+            )
+            for row, online in zip(rows, online_status, strict=True)
+        ]
 
-async def user_retrieve(
-    session: AsyncSession, users: Users, username: str, **kwargs: Unpack[UserFilter]
-):
-    options = []
-    if kwargs.get("with_pref"):
-        options.append(joinedload(User.preference))
-    stmt = select(User).where(User.username == username).options(*options)
-    user = await session.scalar(stmt)
+    async def delete(self, conn: PGConnection, user_id: UUID):
+        await self.repo.delete(conn, user_id)
 
-    if user and kwargs.get("with_online"):
-        user.online = await users.is_online(str(user.id))  # type: ignore
-
-    return user
-
-
-async def user_retrieve_with_friendship(
-    session: AsyncSession, users: Users, current_user: User, username: str
-):
-    stmt = (
-        select(User, Friendship)
-        .outerjoin(
-            Friendship,
-            and_(*friendship_criteria(current_user.id, User.id)),
-        )
-        .where(User.username == username)
-    )
-
-    result = await session.execute(stmt)
-    row = result.first()
-
-    if row is None:
-        return None
-
-    user, friendship = row
-    if user:
-        if friendship:
-            friendship.is_sender = friendship.sender_id == current_user.id
-        user.friendship = friendship
-        user.online = await users.is_online(str(user.id))
-
-    return user
-
-
-async def user_search(session: AsyncSession, users: Users, search_query: str, limit: int):
-    stmt = (
-        select(User.id, User.username)
-        .where(User.username.like(f"{search_query}%"))
-        .order_by(User.username)
-        .limit(limit)
-    )
-    result = await session.execute(stmt)
-    rows = result.all()
-
-    online_status = await users.are_online([row.id for row in rows])
-
-    return [
-        UserSearch(
-            id=row.id,
-            username=row.username,
-            online=online,
-        )
-        for row, online in zip(rows, online_status, strict=True)
-    ]
-
-
-async def user_delete(session: AsyncSession, id: UUID):
-    stmt = delete(User).where(User.id == id)
-    result = await session.execute(stmt)
-
-    if result.rowcount == 0:  # type: ignore
-        raise DBNotFound(detail="User does not exist")
-
-    await session.commit()
-
-
-async def user_login(session: AsyncSession, services: ApiEnv, user: User):
-    try:
-        user.unread_count = await services.notif.get_unread_count(session, user.id)  # type: ignore
-    except Exception:
-        user.unread_count = 0  # type: ignore
-    return user
+    @staticmethod
+    def make(*, repo: UserRepo, users: Users, notif: NotifService):
+        return UserService(repo, users, notif)

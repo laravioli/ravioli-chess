@@ -3,8 +3,8 @@ from __future__ import annotations
 from contextlib import AbstractAsyncContextManager
 
 from ravioli_core.ipc.channels import EngChan
+from ravioli_core.ipc.redis import RedisConfig, create_async_redis
 from ravioli_core.pubsub import Connection
-from ravioli_core.utils import create_async_redis
 
 from .game import Games
 from .pubsub import Listener, Publisher, make_handler
@@ -12,7 +12,7 @@ from .pubsub import Listener, Publisher, make_handler
 
 class App(AbstractAsyncContextManager):
     def __init__(self):
-        self.redis = create_async_redis()
+        self.redis = create_async_redis(config=RedisConfig())  # type: ignore
         self.pub = Publisher(self.redis)
         self.games = Games(self.pub)
         self.listener = Listener(Connection(EngChan.all, self.redis))

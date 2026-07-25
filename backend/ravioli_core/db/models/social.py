@@ -1,16 +1,12 @@
 import uuid
 from enum import StrEnum
-from typing import TYPE_CHECKING
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ravioli_core.db.types import TimestampUpdated
 
 from .base import Base
-
-if TYPE_CHECKING:
-    from .user import User
 
 
 class FriendshipStatus(StrEnum):
@@ -27,8 +23,6 @@ class Friendship(Base):
     receiver_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user_account.id", ondelete="CASCADE")
     )
-    sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id], innerjoin=True)
-    receiver: Mapped["User"] = relationship("User", foreign_keys=[receiver_id], innerjoin=True)
     status: Mapped[FriendshipStatus] = mapped_column(default=FriendshipStatus.pending)
     last_update: Mapped[TimestampUpdated]
 

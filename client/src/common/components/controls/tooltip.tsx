@@ -1,5 +1,5 @@
-import React, { createContext, useContext } from 'react';
 import type { TooltipProps } from '@mantine/core';
+import React, { createContext, useContext } from 'react';
 
 type ToolTipConfig = Partial<Omit<TooltipProps, 'label'>>;
 

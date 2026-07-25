@@ -1,29 +1,32 @@
 from dataclasses import dataclass
+from typing import TypedDict
 
+from asyncpg import Pool
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from ravioli_core.config import DbSettings
+from ravioli_core.db.pool import PoolConfig, create_db_pool
+from ravioli_core.ipc.redis import RedisConfig, create_async_redis
 from ravioli_core.pubsub.publisher import Publisher
 from ravioli_core.scheduler import Scheduler
-from ravioli_core.utils import (
-    create_async_redis,
-    create_engine_and_sessionmaker,
-)
+
+
+class CoreConfig(TypedDict):
+    pool: PoolConfig
+    redis: RedisConfig
 
 
 @dataclass(slots=True, frozen=True)
 class CoreEnv:
     redis: Redis
+    pg_pool: Pool
     pub: Publisher
-    engine: AsyncEngine
-    session_maker: async_sessionmaker[AsyncSession]
     scheduler: Scheduler
 
     @staticmethod
-    def make():
-        redis = create_async_redis()
+    async def make(*, config: CoreConfig):
+        redis = create_async_redis(config["redis"])
+        pg_pool = await create_db_pool(config["pool"])
         pub = Publisher(redis)
         scheduler = Scheduler()
-        engine, session_maker = create_engine_and_sessionmaker(settings=DbSettings())  # type: ignore
-        return CoreEnv(redis, pub, engine, session_maker, scheduler)
+
+        return CoreEnv(redis, pg_pool, pub, scheduler)

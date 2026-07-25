@@ -2,7 +2,6 @@ from typing import Any
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import IntegrityError
 
 
 class AppException(Exception):
@@ -32,8 +31,4 @@ def add_exception_handler(app: FastAPI):
     def exc_handler(request: Request, exc: Any):  # noqa: ARG001
         return JSONResponse({"detail": exc.detail}, status_code=exc.status)
 
-    def exc_integrity_error(request: Request, exc: Any):  # noqa: ARG001
-        return JSONResponse({"detail": exc.detail}, status_code=status.HTTP_409_CONFLICT)
-
     app.add_exception_handler(AppException, exc_handler)
-    app.add_exception_handler(IntegrityError, exc_integrity_error)

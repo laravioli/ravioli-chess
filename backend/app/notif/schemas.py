@@ -5,7 +5,7 @@ from fastapi import Query
 from fastapi_pagination import Page, Params, set_page
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.customization import CustomizedPage, UseAdditionalFields, UseName, UseParams
-from pydantic import UUID4, AliasPath, Field, TypeAdapter
+from pydantic import UUID4, Field, TypeAdapter
 
 from app.api.schemas import BaseSchema
 
@@ -13,23 +13,21 @@ from app.api.schemas import BaseSchema
 class NotificationBase(BaseSchema):
     id: int
     sender_id: UUID4
-    sender: str = Field(
-        validation_alias=AliasPath("sender", "username"),
-    )
+    sender: str
     created_at: datetime
     type: str
 
 
 class FriendRequestSchema(NotificationBase):
-    type: Literal["friend_request"]
+    notif_type: Literal["friend_request"] = Field(validation_alias="type")
 
 
 class FriendRequestAcceptedSchema(NotificationBase):
-    type: Literal["friend_request_accepted"]
+    notif_type: Literal["friend_request_accepted"] = Field(validation_alias="type")
 
 
 type Notification = Annotated[
-    FriendRequestSchema | FriendRequestAcceptedSchema, Field(discriminator="type")
+    FriendRequestSchema | FriendRequestAcceptedSchema, Field(discriminator="notif_type")
 ]
 
 

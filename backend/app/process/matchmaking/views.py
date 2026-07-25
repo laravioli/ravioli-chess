@@ -1,40 +1,37 @@
-from fastapi import APIRouter, HTTPException, status
-from pydantic import UUID4
+from fastapi import APIRouter
 
+from app.api.schemas import Redirect
 from app.auth.deps import UserOrAnon
 from app.challenge.schemas import ChallengeRequest
-from app.deps import DbSession
-from app.process.deps import MatchmakingDep
+from app.deps import DBConnection
+from app.process.env import Env
 
-router = APIRouter(prefix="/mm", tags=["matchmaking"])
-
-
-@router.post("/ai")
-async def match_ai(current_user: UserOrAnon, level: int):
-    pass
+from .deps import MatchableUsers
 
 
-@router.post("/random")
-async def match_random(current_user: UserOrAnon):
-    pass
+def create_mm_api_router(env: Env):
 
+    router = APIRouter(prefix="/mm", tags=["matchmaking"])
 
-@router.post("/{target}/friend")
-async def match_friend(
-    session: DbSession,
-    challenge: ChallengeRequest,
-    current_user: UserOrAnon,
-    mm: MatchmakingDep,
-    target: UUID4 | None = None,
-):
-    if (not current_user) and target:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="you must be connected to challenge users",
-        )
-    challenge_id = await mm.friend(session, challenge, current_user, target)
-    if current_user and target:
-        # send a notif with background
+    @router.post("/ai")
+    async def match_ai(current_user: UserOrAnon, level: int):
         pass
 
-    return challenge_id
+    @router.post("/random")
+    async def match_random(current_user: UserOrAnon):
+        pass
+
+    @router.post("/friend", response_model=Redirect)
+    async def match_friend(
+        conn: DBConnection,
+        data: ChallengeRequest,
+        pair: MatchableUsers,
+    ):
+        chall = await env.challenge.create(conn, data, pair.sender, pair.receiver)
+        if pair.sender and pair.receiver:
+            # send a notif with background
+            pass
+
+        return Redirect(redirect=f"chall/{chall.challenge_id}")
+
+    return router

@@ -1,13 +1,13 @@
-import { makeObservable, observable } from 'mobx';
+import { parseUci } from 'chessops';
 import { Chess } from 'chessops/chess';
+import { chessgroundDests } from 'chessops/compat';
 import { makeFen, parseFen } from 'chessops/fen';
 import { makeSanAndPlay } from 'chessops/san';
-import { chessgroundDests } from 'chessops/compat';
-import { parseUci } from 'chessops';
+import { makeObservable, observable } from 'mobx';
 
 import type { Node } from '@/lib/tree/interface';
 
-import { uciToId, cgToUci } from './utils';
+import { cgToUci, uciToId } from './utils';
 
 export function makeObservableNode(node: Node): Node {
   return makeObservable(node, {

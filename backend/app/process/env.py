@@ -1,15 +1,33 @@
+import asyncio
 from dataclasses import dataclass
 
-from app.challenge.service import make_challenge_service
+from app.challenge.service import ChallengeService
+from ravioli_core.env import CoreConfig, CoreEnv
 
-from .matchmaking.service import MatchMakingService, make_mm_service
+from .matchmaking.service import MatchMakingService
 
 
 @dataclass(slots=True, frozen=True)
 class Env:
+    core: CoreEnv
+    challenge: ChallengeService
     matchmaking: MatchMakingService
 
     @staticmethod
-    def make():
-        mm = make_mm_service(make_challenge_service())
-        return Env(matchmaking=mm)
+    async def make(*, config: CoreConfig):
+        core = await CoreEnv.make(config=config)
+        challenge = ChallengeService.make(redis=core.redis)
+        matchmaking = MatchMakingService.make(challenge=challenge)
+        return Env(core=core, challenge=challenge, matchmaking=matchmaking)
+
+    async def on_start(self):
+        await self.core.redis.ping()  # type: ignore
+        self.core.scheduler.start()
+
+    async def on_stop(self):
+        await self.core.scheduler.shutdown()
+        await asyncio.gather(
+            self.core.redis.aclose(),
+            self.core.pg_pool.close(),
+            return_exceptions=True,
+        )

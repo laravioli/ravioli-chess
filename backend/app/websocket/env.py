@@ -16,7 +16,7 @@ class WsEnv:
     users: Users
 
     @staticmethod
-    def make(redis: Redis, scheduler: Scheduler, notif: NotifService):
+    def make(*, redis: Redis, scheduler: Scheduler, notif: NotifService):
         conn = Connection(WsChan.all, redis)
         users = Users(conn, redis, scheduler)
         broadcast = Broadcast(conn, users)

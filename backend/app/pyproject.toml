@@ -14,4 +14,4 @@ dependencies = [
 ]
 
 [tool.ruff]
-extend = "../ruff.toml"
+extend = "../../ruff.toml"

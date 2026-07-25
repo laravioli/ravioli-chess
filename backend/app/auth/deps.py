@@ -3,17 +3,15 @@ from typing import Annotated
 from fastapi import Depends, Response, status
 from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
-from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 
 from app.config import settings
-from app.deps import DbSession, RedisClient
+from app.deps import DBConnection, EnvDep
 from app.exceptions import InvalidSession
-from ravioli_core.db.models import User
-from ravioli_core.serializers import msgpack
+from app.user import User, UserFull
+from ravioli_core.db.types import PGConnection
 
-from .schemas import Session
-from .security import verify_session
+from .service import AuthService, UserGetter
+from .structs import VerifiableUser
 
 
 async def get_session_cookie(conn: HTTPConnection):
@@ -23,63 +21,55 @@ async def get_session_cookie(conn: HTTPConnection):
 type SessionCookie = Annotated[str | None, Depends(get_session_cookie)]
 
 
-async def get_auth_session(
-    redis: RedisClient,
-    session_cookie: str,
-) -> Session:
-    data = await redis.get(f"session:{session_cookie}")
-    if not data:
-        raise InvalidSession()
-
-    return msgpack.decode(data, type_arg=Session)
-
-
-def user_or_anon(with_pref=False):
-    # NOTE : fastapi deps caching rely on function identity
-
-    async def dep(
-        redis: RedisClient,
-        db: DbSession,
-        response: Response,
-        session_cookie: SessionCookie = None,
-    ) -> User | None:
-        if not session_cookie:
-            return
-        try:
-            session = await get_auth_session(redis, session_cookie)
-
-            stmt = select(User).where(User.id == session.user_id)
-            if with_pref:
-                stmt = stmt.options(joinedload(User.preference))
-
-            result = await db.execute(stmt)
-            user = result.scalar_one_or_none()
-
-            if not (user and verify_session(user.hashed_password, session.auth_hash)):
-                await redis.delete(f"session:{session_cookie}")
-                raise InvalidSession()
-            return user
-
-        except InvalidSession:
-            response.delete_cookie(
-                key=settings.SESSION_COOKIE,
-                secure=settings.SSL,
-                httponly=True,
-                samesite="lax",
-            )
-            return None
-
-    return dep
+async def _user_or_none[T: VerifiableUser](
+    auth: AuthService,
+    conn: PGConnection,
+    session_id: str | None,
+    user_getter: UserGetter[T],
+    response: Response,
+):
+    if session_id is None:
+        return
+    try:
+        user = await auth.verify_user_flow(conn, session_id, user_getter)
+        return user
+    except InvalidSession:
+        response.delete_cookie(
+            key=settings.SESSION_COOKIE,
+            secure=settings.SSL,
+            httponly=True,
+            samesite="lax",
+        )
 
 
-type UserOrAnon = Annotated[User | None, Depends(user_or_anon(with_pref=False))]
-type UserWithPrefOrAnon = Annotated[User | None, Depends(user_or_anon(with_pref=True))]
+async def user_or_anon(
+    env: EnvDep,
+    conn: DBConnection,
+    session_id: SessionCookie,
+    response: Response,
+):
+    return await _user_or_none(env.auth, conn, session_id, env.user.repo.by_id, response)
+
+
+type UserOrAnon = Annotated[User | None, Depends(user_or_anon)]
 
 
 async def auth_user(user: UserOrAnon):
-    if not user:
+    if user is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return user
 
 
 type AuthUser = Annotated[User, Depends(auth_user)]
+
+
+async def user_full_or_anon(
+    env: EnvDep,
+    conn: DBConnection,
+    session_id: SessionCookie,
+    response: Response,
+):
+    return await _user_or_none(env.auth, conn, session_id, env.user.repo.by_id_full, response)
+
+
+type UserFullOrAnon = Annotated[UserFull | None, Depends(user_full_or_anon)]

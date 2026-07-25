@@ -1,9 +1,8 @@
-from enum import IntEnum
-from typing import TYPE_CHECKING
+from enum import StrEnum
 from uuid import UUID
 
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import CheckConstraint, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ravioli_core.db.types import (
     ChallengeId8,
@@ -17,17 +16,14 @@ from ravioli_core.db.types import (
 from ..enums import ChessColor, ChessColorChoice
 from .base import Base
 
-if TYPE_CHECKING:
-    from .user import User
-
 INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 
-class ChallengeStatus(IntEnum):
-    CREATED = 1
-    CANCELED = 2
-    DECLINED = 3
-    ACCEPTED = 4
+class ChallengeStatus(StrEnum):
+    CREATED = "created"
+    CANCELED = "canceled"
+    DECLINED = "declined"
+    ACCEPTED = "accepted"
 
 
 class Challenge(Base):
@@ -43,10 +39,19 @@ class Challenge(Base):
     )
     status: Mapped[ChallengeStatus] = mapped_column(default=ChallengeStatus.CREATED)
     color_choice: Mapped[ChessColorChoice]
-    color: Mapped[ChessColor | None]
-    inital_fen: Mapped[Fen] = mapped_column(default=INITIAL_FEN)
+    color: Mapped[ChessColor]
+    initial_fen: Mapped[Fen] = mapped_column(default=INITIAL_FEN)
     pub_date: Mapped[TimestampNow]
     expire_at: Mapped[ExpireAfter1Week]
-    time_control: Mapped[TimeControl]  # todo write something that make sense for timecontrol
-    sender: Mapped["User"] = relationship(foreign_keys=[sender_id])
-    receiver: Mapped["User"] = relationship(foreign_keys=[receiver_id])
+    time_control: Mapped[TimeControl]
+
+    __table_args__ = (
+        CheckConstraint(
+            "sender_id IS NOT NULL OR receiver_id IS NULL",
+            name="challenge_sender_required_for_receiver",
+        ),
+        CheckConstraint(
+            "sender_id <> receiver_id",
+            name="challenge_no_self_challenge",
+        ),
+    )

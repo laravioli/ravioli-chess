@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import Iterable
 from contextlib import suppress
 from typing import Any
+from uuid import UUID
 
 from redis.asyncio import Redis
 
@@ -79,18 +80,18 @@ class Users:
                     self._disconnects.add(user_id)
                     del self._users[user_id]
 
-    async def is_online(self, user_id: str):
+    async def is_online(self, user_id: str | UUID):
         # NOTE relying on "pubsub_numsub~=online" means:
         # NOTE 1- no cluster
         # NOTE 2- users:user_id subscribers are websockets only
         if user_id in self._users:
             return True
         else:
-            return (await self._redis.pubsub_numsub(WsChan.users(user_id)))[0][1] > 0
+            return (await self._redis.pubsub_numsub(WsChan.users(str(user_id))))[0][1] > 0
 
-    async def are_online(self, user_ids: Iterable[str]):
+    async def are_online(self, user_ids: Iterable[str | UUID]):
         result: list[tuple[str, int]] = await self._redis.pubsub_numsub(
-            *(WsChan.users(user_id) for user_id in user_ids)
+            *(WsChan.users(str(user_id)) for user_id in user_ids)
         )
         return (bool(c) for _, c in result)
 

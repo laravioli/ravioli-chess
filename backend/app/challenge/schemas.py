@@ -1,9 +1,12 @@
+from enum import StrEnum
 from typing import Annotated
 
-from pydantic import UUID4, StringConstraints
+from pydantic import ConfigDict, Field, StringConstraints
 
 from app.api.schemas import BaseSchema
-from ravioli_core.db.enums import ChessColorChoice
+from app.user.schemas import UserBase
+from ravioli_core.db.enums import ChessColor, ChessColorChoice
+from ravioli_core.db.models import ChallengeStatus
 
 type TimeControl = Annotated[
     str,
@@ -16,9 +19,20 @@ class ChallengeRequest(BaseSchema):
     time_control: TimeControl | None = None
 
 
+class Direction(StrEnum):
+    IN = "in"
+    OUT = "out"
+
+
 class ChallengeNotif(BaseSchema):
+    model_config = ConfigDict(use_enum_values=True)
+
     challenge_id: str
-    sender_id: UUID4
-    receiver_id: UUID4
+    status: ChallengeStatus
+    sender: UserBase
+    receiver: UserBase
     color_choice: ChessColorChoice
+    final_color: ChessColor = Field(validation_alias="color")
     time_control: TimeControl
+    initial_fen: str
+    # direction: Direction

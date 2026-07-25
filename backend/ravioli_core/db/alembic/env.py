@@ -1,5 +1,7 @@
 # type: ignore
 import asyncio
+from pydantic_settings import SettingsConfigDict, BaseSettings
+from pydantic import PostgresDsn, computed_field
 
 from logging.config import fileConfig
 from alembic import context
@@ -21,7 +23,6 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from ravioli_core.config import DbSettings  # noqa
 from ravioli_core.db.models.base import Base  # noqa
 
 target_metadata = Base.metadata
@@ -30,6 +31,28 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+class DbSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="POSTGRES_", env_file=".env", extra="ignore", env_ignore_empty=True
+    )
+
+    HOST: str
+    PORT: int = 5432
+    USER: str
+    PASSWORD: str = ""
+    DB: str = ""
+
+    @computed_field
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+        return PostgresDsn.build(
+            scheme="postgresql+asyncpg",
+            username=self.USER,
+            password=self.PASSWORD,
+            host=self.HOST,
+            port=self.PORT,
+            path=self.DB,
+        )
 
 db_settings = DbSettings()
 
@@ -56,6 +79,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=True,
+        compare_server_default=True,
     )
 
     with context.begin_transaction():
@@ -63,7 +88,10 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(connection=connection,
+                      target_metadata=target_metadata,
+                      compare_type=True,
+                      compare_server_default=True,)
 
     with context.begin_transaction():
         context.run_migrations()

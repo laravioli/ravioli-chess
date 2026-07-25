@@ -11,7 +11,7 @@ type MenuViewKey = string;
 
 export const useMenu = (
   menuViews: Record<MenuViewKey, MenuViewFC> & { main: MenuViewFC },
-  setOpened: (value: React.SetStateAction<boolean>) => void,
+  setOpened?: (value: React.SetStateAction<boolean>) => void,
 ) => {
   const [view, setView] = useState<MenuViewKey>('main');
 

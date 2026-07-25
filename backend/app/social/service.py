@@ -1,72 +1,71 @@
 import logging
 import uuid
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.background import Background
 from app.notif.service import NotifService
 from ravioli_core.db.models.social import FriendshipStatus
+from ravioli_core.db.types import PGConnection
 
-from .db import SocialDB
 from .notif import SocialNotif
+from .repo import SocialRepo
 
 logger = logging.getLogger(__name__)
 
 
 class SocialService:
-    def __init__(self, db: SocialDB, notif: SocialNotif):
-        self.db = db
-        self.notif = notif
+    def __init__(self, repo: SocialRepo, notif: SocialNotif):
+        self._repo = repo
+        self._notif = notif
 
     async def create_request(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: PGConnection,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        await self.db.create_request(session, sender_id, receiver_id)
-        await self.notif.create(bg, receiver_id)
+        await self._repo.create_request(conn, sender_id, receiver_id)
+        await self._notif.create(bg, receiver_id)
 
     async def accept_request(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: PGConnection,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        await self.db.accept_request(session, sender_id, receiver_id)
-        await self.notif.accept(bg, sender_id, receiver_id)
+        await self._repo.accept_request(conn, sender_id, receiver_id)
+        await self._notif.accept(bg, sender_id, receiver_id)
 
     async def delete_request(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: PGConnection,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
 
-        await self.db.delete_request(session, sender_id, receiver_id)
-        await self.notif.delete(bg, receiver_id)
+        await self._repo.delete_request(conn, sender_id, receiver_id)
+        await self._notif.delete(bg, receiver_id)
 
     async def list_friendship(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: uuid.UUID,
         status: FriendshipStatus,
     ):
-        return await self.db.list_friendship(session, user_id, status)
+        return await self._repo.list_friendship(conn, user_id, status)
 
     async def delete_friend(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: PGConnection,
         current_user_id: uuid.UUID,
         target_id: uuid.UUID,
     ):
-        await self.db.delete_friend(session, current_user_id, target_id)
-        await self.notif.delete_friend(bg, current_user_id, target_id)
+        await self._repo.delete_friend(conn, current_user_id, target_id)
+        await self._notif.delete_friend(bg, current_user_id, target_id)
 
-
-def make_social_service(notif: NotifService):
-    return SocialService(db=SocialDB(), notif=SocialNotif(notif=notif))
+    @staticmethod
+    def make(*, repo: SocialRepo, notif: NotifService):
+        return SocialService(repo=repo, notif=SocialNotif(notif=notif))

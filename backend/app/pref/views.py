@@ -1,31 +1,37 @@
 from fastapi import APIRouter, Request, Response, status
 
-from app.auth.deps import UserWithPrefOrAnon
-from app.deps import DbSession
+from app.api.responses import JSONResponse
+from app.auth.deps import UserFullOrAnon, UserOrAnon
+from app.deps import DBConnection
+from app.env import Env
 
-from .schemas import Preference, PreferenceUpdate
-from .service import extract_cookie_data, update_anon_pref, update_user_pref
+from .schemas import PreferenceOut, PreferenceUpdate
+from .service import load_cookie_data
 
 router = APIRouter(prefix="/pref", tags=["preferences"])
 
 
-@router.get("", response_model=Preference)
-async def get_pref(user: UserWithPrefOrAnon, request: Request):
-    if user:
-        return user.preference
-    else:
-        return extract_cookie_data(request)
+def pref_router(env: Env):
 
+    @router.get("", response_model=PreferenceOut)
+    async def get_pref(user: UserFullOrAnon, request: Request):
+        if user:
+            pref = user.preference
+        else:
+            pref = load_cookie_data(request)
+        return JSONResponse(pref)
 
-@router.post("", status_code=status.HTTP_204_NO_CONTENT)
-async def update_pref(
-    session: DbSession,
-    user: UserWithPrefOrAnon,
-    pref: PreferenceUpdate,
-    request: Request,
-    response: Response,
-):
-    if user:
-        await update_user_pref(session, user, pref)
-    else:
-        update_anon_pref(request, pref, response)
+    @router.post("", status_code=status.HTTP_204_NO_CONTENT)
+    async def update_pref(
+        conn: DBConnection,
+        user: UserOrAnon,
+        pref: PreferenceUpdate,
+        request: Request,
+        response: Response,
+    ):
+        if user:
+            await env.pref.update_user_pref(conn, user, pref)
+        else:
+            env.pref.update_anon_pref(request, pref, response)
+
+    return router

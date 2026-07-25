@@ -12,12 +12,13 @@ class SiteConsumer(Consumer):
         match msg:
             # test
             case c_out.GameCreate(data):
-                game = await db_create_game(
-                    self.core_env.engine,
-                    game_with_id(
-                        NewGame(white_player=data.white_player, black_player=data.black_player)
-                    ),
-                )
+                async with self.env.core.pg_pool.acquire() as conn:
+                    game = await db_create_game(
+                        conn,  # type: ignore
+                        game_with_id(
+                            NewGame(white_player=data.white_player, black_player=data.black_player)
+                        ),
+                    )
 
                 await self.pub.publish(
                     EngChan.game,

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-{% set piece_style = request.state.user.piece_style %}
+{% set piece_style = user.piece_style %}
 {% cache 'header?style=' ~ piece_style %}
     <head>
         <meta name="description" content="a chess website for ravioli">
@@ -26,7 +26,7 @@
     {% endwith %}
     </head>
 {% endcache %}
-    <body {{request.state.user.pref_attr | safe}}>
+    <body {{user.preference_attrs | safe}}>
         {% block content %}
         {% endblock content %}
     </body>
