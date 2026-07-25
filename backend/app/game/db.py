@@ -1,11 +1,9 @@
 import secrets
 import string
 
-from sqlalchemy import insert
-from sqlalchemy.ext.asyncio import AsyncEngine
-
 from app.types import GameId
-from ravioli_core.db.models import Game
+from ravioli_core.db.queries import GameQueries
+from ravioli_core.db.types import PGConnection
 
 from .schemas import GameWithId, NewGame
 
@@ -22,8 +20,6 @@ def game_with_id(new_game: NewGame):
     )
 
 
-async def db_create_game(engine: AsyncEngine, game: GameWithId):
-    async with engine.begin() as conn:
-        await conn.execute(insert(Game).values({"game_id": game.id}))
-        await conn.commit()
+async def db_create_game(conn: PGConnection, game: GameWithId):
+    await conn.execute(GameQueries.create, game.id, game.white_player, game.black_player)
     return game

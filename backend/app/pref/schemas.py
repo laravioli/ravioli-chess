@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import ConfigDict, model_validator
 
 from app.api.schemas import BaseSchema
 from ravioli_core.db.models.pref import Board, PieceSet
@@ -22,6 +22,6 @@ class PreferenceUpdate(BaseSchema):
         return self.model_dump(exclude_unset=True)
 
 
-class PreferenceOut(BaseModel):
+class PreferenceOut(BaseSchema):
     board: Board = Board.BLUE
     pieceset: PieceSet = PieceSet.BASE

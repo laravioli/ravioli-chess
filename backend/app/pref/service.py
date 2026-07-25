@@ -19,7 +19,8 @@ class PrefService:
         await self._repo.update(conn, user, pref)
 
     def update_anon_pref(self, request: Request, data: PreferenceUpdate, response: Response):
-        payload = cookie_serializer.dumps(load_cookie_data(request).update(data))
+        new_pref = load_cookie_data(request).update(data)
+        payload = cookie_serializer.dumps(new_pref)
         if isinstance(payload, bytes):
             payload = payload.decode("utf-8")
 

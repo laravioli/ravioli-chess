@@ -1,59 +1,9 @@
 from logging import config
 
-from pydantic import PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from redis.asyncio.retry import Retry
-from redis.backoff import ExponentialWithJitterBackoff
 
 
-class DbSettings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix="POSTGRES_", env_file=".env", extra="ignore", env_ignore_empty=True
-    )
-
-    HOST: str
-    PORT: int = 5432
-    USER: str
-    PASSWORD: str = ""
-    DB: str = ""
-
-    @computed_field
-    @property
-    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
-        return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
-            username=self.USER,
-            password=self.PASSWORD,
-            host=self.HOST,
-            port=self.PORT,
-            path=self.DB,
-        )
-
-
-class RedisSettings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix="REDIS_", env_file=".env", extra="ignore", env_ignore_empty=True
-    )
-
-    HOST: str
-    PORT: str
-    UNIX_SOCKET_PATH: str | None = None
-
-    def as_dict(self):
-        return {
-            "host": self.HOST,
-            "port": self.PORT,
-            "socket_connect_timeout": 15,
-            "socket_timeout": 5,
-            "unix_socket_path": self.UNIX_SOCKET_PATH,
-            "decode_responses": False,
-            "retry": Retry(backoff=ExponentialWithJitterBackoff(base=1, cap=10), retries=3),
-            "health_check_interval": 3,
-            "protocol": 3,
-        }
-
-
-class LogSettings(BaseSettings):
+class LogConfig(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_ignore_empty=True)
 
     LOG_LEVEL: str = "INFO"
@@ -119,5 +69,5 @@ class LogSettings(BaseSettings):
         }
 
 
-def configure_logging(settings: LogSettings):
-    config.dictConfig(settings.get_logging_config)
+def configure_logging(conf: LogConfig):
+    config.dictConfig(conf.get_logging_config)

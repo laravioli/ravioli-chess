@@ -23,7 +23,8 @@ async def user_ctx(
             unread_count=await env.notif.get_unread_count(conn, user.id),
         )
     else:
-        return UserCtx(user=None, preference=load_cookie_data(request))
+        _user = UserCtx(user=None, preference=load_cookie_data(request))
+        return _user
 
 
 type UserCtxDep = Annotated[UserCtx, Depends(user_ctx)]

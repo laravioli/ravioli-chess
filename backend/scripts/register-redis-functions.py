@@ -1,10 +1,9 @@
 import asyncio
 from pathlib import Path
 
-from ravioli_core.config import RedisSettings
-from ravioli_core.ipc.utils import create_async_redis
+from ravioli_core.ipc.redis import RedisConfig, create_async_redis
 
-redis = create_async_redis(RedisSettings())  # type: ignore
+redis = create_async_redis(config=RedisConfig())  # type: ignore
 script_path = f"{Path(__file__).resolve().parent}/redis-script.lua"
 
 

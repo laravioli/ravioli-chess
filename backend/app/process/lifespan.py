@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 
-from ravioli_core.config import DbSettings, RedisSettings
+from ravioli_core.db.pool import PoolConfig
+from ravioli_core.ipc.redis import RedisConfig
 
 from .env import Env
 from .routes import add_routes
@@ -27,7 +28,7 @@ async def on_stop(env: Env):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    env = await Env.make(settings={"db": DbSettings(), "redis": RedisSettings()})  # type: ignore
+    env = await Env.make(config={"pool": PoolConfig(), "redis": RedisConfig()})  # type: ignore
     try:
         await on_start(env)
         add_routes(app, env)

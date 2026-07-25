@@ -3,11 +3,11 @@ from fastapi import FastAPI
 from app.api.utils import custom_generate_unique_id
 from app.exceptions import add_exception_handler
 from app.middleware import CSRFMiddleWare
-from ravioli_core.config import LogSettings, configure_logging
+from ravioli_core.logging import LogConfig, configure_logging
 
 from .lifespan import lifespan
 
-configure_logging(settings=LogSettings())
+configure_logging(conf=LogConfig())
 
 app = FastAPI(
     title="Raviolichess Matchmaking",

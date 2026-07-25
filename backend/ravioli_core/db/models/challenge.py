@@ -1,9 +1,8 @@
 from enum import StrEnum
-from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import CheckConstraint, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ravioli_core.db.types import (
     ChallengeId8,
@@ -16,9 +15,6 @@ from ravioli_core.db.types import (
 
 from ..enums import ChessColor, ChessColorChoice
 from .base import Base
-
-if TYPE_CHECKING:
-    from .user import SA_User
 
 INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -47,9 +43,7 @@ class Challenge(Base):
     initial_fen: Mapped[Fen] = mapped_column(default=INITIAL_FEN)
     pub_date: Mapped[TimestampNow]
     expire_at: Mapped[ExpireAfter1Week]
-    time_control: Mapped[TimeControl]  # todo write something that make sense for timecontrol
-    sender: Mapped["SA_User"] = relationship(foreign_keys=[sender_id])
-    receiver: Mapped["SA_User"] = relationship(foreign_keys=[receiver_id])
+    time_control: Mapped[TimeControl]
 
     __table_args__ = (
         CheckConstraint(

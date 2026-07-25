@@ -16,7 +16,7 @@ def challenge_router(env: Env):
         user: AuthUser,
         conn: PoolConnection,
     ):
-        await env.challenge.list(conn, user.id)
+        return await env.challenge.list(conn, user.id)
 
     @router.post("{challenge_id}/accept")
     async def accept_challenge(

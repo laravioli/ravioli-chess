@@ -10,7 +10,7 @@ class Preference(Struct, frozen=True):
     pieceset: PieceSet = PieceSet.BASE
 
     def update(self, patch: PreferenceUpdate):
-        return structs.replace(self, **patch.model_dump())
+        return structs.replace(self, **patch.model_dump(exclude_unset=True))
 
     @property
     def to_html_attrs(self):

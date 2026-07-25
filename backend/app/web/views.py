@@ -16,7 +16,6 @@ def create_web_router(env: Env):
         user_ctx: UserCtx,
         page_payload: PagePayload,
     ):
-        # print(user_ctx.preference_attrs, user_ctx.piece_style)
         ctx = {"user": user_ctx, "payload": {**page_payload, "user": user_ctx.payload}}
         return env.web.templates.TemplateResponse(
             request=request,

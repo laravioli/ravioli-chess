@@ -2,7 +2,7 @@ import asyncio
 from dataclasses import dataclass
 
 from app.challenge.service import ChallengeService
-from ravioli_core.env import CoreEnv, CoreEnvSettings
+from ravioli_core.env import CoreConfig, CoreEnv
 
 from .matchmaking.service import MatchMakingService
 
@@ -14,8 +14,8 @@ class Env:
     matchmaking: MatchMakingService
 
     @staticmethod
-    async def make(*, settings: CoreEnvSettings):
-        core = await CoreEnv.make(settings=settings)
+    async def make(*, config: CoreConfig):
+        core = await CoreEnv.make(config=config)
         challenge = ChallengeService.make(redis=core.redis)
         matchmaking = MatchMakingService.make(challenge=challenge)
         return Env(core=core, challenge=challenge, matchmaking=matchmaking)
@@ -28,7 +28,6 @@ class Env:
         await self.core.scheduler.shutdown()
         await asyncio.gather(
             self.core.redis.aclose(),
-            self.core.engine.dispose(),
             self.core.pg_pool.close(),
             return_exceptions=True,
         )

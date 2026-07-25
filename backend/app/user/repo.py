@@ -56,7 +56,10 @@ class UserRepo:
     ):
         row = await conn.fetchrow(UserQueries.by_username_profile, current_user.id, username)
         if row is not None:
-            return convert(row["user"], type=User), convert(row["friendship"], type=Friendship)
+            friendship = row["friendship"]
+            return convert(row["user"], type=User), convert(
+                friendship, type=Friendship
+            ) if friendship else None
 
     async def search(
         self,

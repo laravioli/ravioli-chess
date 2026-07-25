@@ -1,4 +1,9 @@
+from collections.abc import Mapping
+
+from asyncpg import Record
 from pydantic import BaseModel, ConfigDict
+
+Mapping.register(Record)  # type: ignore
 
 
 class BaseSchema(BaseModel):

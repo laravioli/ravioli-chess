@@ -12,3 +12,4 @@ NotifQueries = generate_class_from_sql(current_folder / "notif.sql", "NotifQueri
 WebQueries = generate_class_from_sql(current_folder / "web.sql", "WebQueries", __name__)
 SocialQueries = generate_class_from_sql(current_folder / "social.sql", "SocialQueries", __name__)
 ChallQueries = generate_class_from_sql(current_folder / "challenge.sql", "ChallQueries", __name__)
+GameQueries = generate_class_from_sql(current_folder / "game.sql", "GameQueries", __name__)

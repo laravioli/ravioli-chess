@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import Annotated
 
-from pydantic import ConfigDict, StringConstraints
+from pydantic import ConfigDict, Field, StringConstraints
 
 from app.api.schemas import BaseSchema
 from app.user.schemas import UserBase
@@ -27,12 +27,12 @@ class Direction(StrEnum):
 class ChallengeNotif(BaseSchema):
     model_config = ConfigDict(use_enum_values=True)
 
-    id: str
+    challenge_id: str
     status: ChallengeStatus
     sender: UserBase
     receiver: UserBase
     color_choice: ChessColorChoice
-    final_color: ChessColor
+    final_color: ChessColor = Field(validation_alias="color")
     time_control: TimeControl
     initial_fen: str
-    direction: Direction
+    # direction: Direction

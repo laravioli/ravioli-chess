@@ -43,6 +43,14 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['user_account.id'], name=op.f('fk_notification_user_id_user_account'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_notification'))
     )
+
+    op.execute("""
+        CREATE VIEW user_base AS
+        SELECT
+            id,
+            username,
+        FROM user_account;
+    """)
     # ### end Alembic commands ###
 
 
@@ -53,4 +61,7 @@ def downgrade() -> None:
     op.drop_index('ix_unique_friendship', table_name='friendship')
     op.drop_table('friendship')
     op.execute("DROP TYPE friendshipstatus")
+    op.execute("""
+        DROP VIEW IF EXISTS user_base;
+    """)
     # ### end Alembic commands ###

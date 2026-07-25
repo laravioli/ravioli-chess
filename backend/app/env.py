@@ -13,7 +13,7 @@ from app.user.repo import UserRepo
 from app.user.service import UserService
 from app.web.service import WebService
 from app.websocket.env import WsEnv
-from ravioli_core.env import CoreEnv, CoreEnvSettings
+from ravioli_core.env import CoreConfig, CoreEnv
 
 
 @dataclass(slots=True, frozen=True)
@@ -29,8 +29,8 @@ class Env:
     challenge: ChallengeService
 
     @staticmethod
-    async def make(*, settings: CoreEnvSettings):
-        core = await CoreEnv.make(settings=settings)
+    async def make(*, core_config: CoreConfig):
+        core = await CoreEnv.make(config=core_config)
         notif = NotifService.make(pg_pool=core.pg_pool, redis=core.redis)
         ws = WsEnv.make(redis=core.redis, scheduler=core.scheduler, notif=notif)
 
@@ -49,9 +49,9 @@ class Env:
 
     @classmethod
     @asynccontextmanager
-    async def lifespan(cls, *, settings: CoreEnvSettings, node_id: str):
+    async def lifespan(cls, *, config: CoreConfig, node_id: str):
 
-        env = await cls.make(settings=settings)
+        env = await cls.make(core_config=config)
 
         redis = env.core.redis
         scheduler = env.core.scheduler
@@ -82,7 +82,6 @@ class Env:
         await self.ws.broadcast.stop()
         await asyncio.gather(
             self.core.redis.aclose(),
-            self.core.engine.dispose(),
             self.core.pg_pool.close(),
             return_exceptions=True,
         )
