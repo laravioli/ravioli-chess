@@ -1,7 +1,7 @@
 # type: ignore
 import asyncio
 from pydantic_settings import SettingsConfigDict, BaseSettings
-from pydantic import PostgresDsn
+from pydantic import PostgresDsn, computed_field
 
 from logging.config import fileConfig
 from alembic import context
