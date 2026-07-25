@@ -5,7 +5,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.requests import HTTPConnection
 
 from app.config import settings
-from app.deps import EnvDep, PoolConnection
+from app.deps import DBConnection, EnvDep
 from app.exceptions import InvalidSession
 from app.user import User, UserFull
 from ravioli_core.db.types import PGConnection
@@ -44,7 +44,7 @@ async def _user_or_none[T: VerifiableUser](
 
 async def user_or_anon(
     env: EnvDep,
-    conn: PoolConnection,
+    conn: DBConnection,
     session_id: SessionCookie,
     response: Response,
 ):
@@ -65,7 +65,7 @@ type AuthUser = Annotated[User, Depends(auth_user)]
 
 async def user_full_or_anon(
     env: EnvDep,
-    conn: PoolConnection,
+    conn: DBConnection,
     session_id: SessionCookie,
     response: Response,
 ):

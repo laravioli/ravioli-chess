@@ -5,7 +5,7 @@ from fastapi.websockets import WebSocket
 
 from app.auth.deps import SessionCookie
 from app.auth.security import verify_session_hash
-from app.deps import EnvDep, PoolConnection, RedisDep, UserRepoDep
+from app.deps import DBConnection, EnvDep, RedisDep, UserRepoDep
 from app.exceptions import InvalidSession
 
 from .schemas import Sri, User
@@ -13,7 +13,7 @@ from .schemas import Sri, User
 
 async def user_or_anon(
     env: EnvDep,
-    conn: PoolConnection,
+    conn: DBConnection,
     redis: RedisDep,
     user_repo: UserRepoDep,
     session_cookie: SessionCookie = None,

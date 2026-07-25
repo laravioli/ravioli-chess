@@ -4,7 +4,7 @@ from fastapi import APIRouter, Response, status
 from fastapi.exceptions import HTTPException
 
 from app.config import settings
-from app.deps import PoolConnection
+from app.deps import DBConnection
 from app.env import Env
 from app.exceptions import InvalidCredentials
 from app.pref.schemas import PreferenceOut
@@ -18,7 +18,7 @@ def auth_router(env: Env):
 
     @router.post("/login", response_model=UserSuccess)
     async def login(
-        conn: PoolConnection,
+        conn: DBConnection,
         credentials: UserLogin,
         response: Response,
         session_cookie: SessionCookie = None,

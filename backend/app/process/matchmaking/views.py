@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.schemas import Redirect
 from app.auth.deps import UserOrAnon
 from app.challenge.schemas import ChallengeRequest
-from app.deps import PoolConnection
+from app.deps import DBConnection
 from app.process.env import Env
 
 from .deps import MatchableUsers
@@ -23,7 +23,7 @@ def create_mm_api_router(env: Env):
 
     @router.post("/friend", response_model=Redirect)
     async def match_friend(
-        conn: PoolConnection,
+        conn: DBConnection,
         data: ChallengeRequest,
         pair: MatchableUsers,
     ):

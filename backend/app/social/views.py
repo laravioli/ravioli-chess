@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from pydantic import UUID4
 
 from app.auth.deps import AuthUser
-from app.deps import BackgroundDep, PoolConnection
+from app.deps import BackgroundDep, DBConnection
 from app.env import Env
 from ravioli_core.db.models.social import FriendshipStatus
 
@@ -15,14 +15,14 @@ def social_router(env: Env):
 
     @router.get("/friends/me", response_model=list[Friend])
     async def list_my_friends(
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
     ):
         return await env.social.list_friendship(conn, user.id, status=FriendshipStatus.accepted)
 
     @router.get("/friends/{target_id}", response_model=list[Friend])
     async def list_friends(
-        conn: PoolConnection,
+        conn: DBConnection,
         target_id: UUID4,
     ):
         return await env.social.list_friendship(conn, target_id, status=FriendshipStatus.accepted)
@@ -30,7 +30,7 @@ def social_router(env: Env):
     @router.delete("/friends/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
     async def remove_friend(
         background: BackgroundDep,
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
         target_id: UUID4,
     ):
@@ -40,7 +40,7 @@ def social_router(env: Env):
 
     @router.get("/requests", response_model=list[FriendRequest])
     async def list_friend_request(
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
     ):
         return await env.social.list_friendship(conn, user.id, status=FriendshipStatus.pending)
@@ -52,7 +52,7 @@ def social_router(env: Env):
     )
     async def send_friend_request(
         background: BackgroundDep,
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
         target_id: UUID4,
     ):
@@ -67,7 +67,7 @@ def social_router(env: Env):
     @router.delete("/requests/{target_id}", status_code=status.HTTP_204_NO_CONTENT)
     async def cancel_friend_request(
         background: BackgroundDep,
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
         target_id: UUID4,
     ):
@@ -76,7 +76,7 @@ def social_router(env: Env):
     @router.post("/requests/{target_id}/accept", responses={200: {"model": FriendShip}})
     async def accept_friend_request(
         background: BackgroundDep,
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
         target_id: UUID4,
     ):
@@ -86,7 +86,7 @@ def social_router(env: Env):
     @router.delete("/requests/{target_id}/reject", status_code=status.HTTP_204_NO_CONTENT)
     async def reject_friend_request(
         background: BackgroundDep,
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
         target_id: UUID4,
     ):

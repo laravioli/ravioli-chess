@@ -34,7 +34,7 @@ async def get_pool_connection(env: EnvDep):
         yield conn
 
 
-type PoolConnection = Annotated[Connection, Depends(get_pool_connection, scope="function")]
+type DBConnection = Annotated[Connection, Depends(get_pool_connection, scope="function")]
 
 
 async def get_redis(env: EnvDep) -> Redis:

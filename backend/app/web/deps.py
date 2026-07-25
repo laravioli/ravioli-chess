@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from app.auth.deps import UserFullOrAnon
-from app.deps import EnvDep, PoolConnection
+from app.deps import DBConnection, EnvDep
 from app.pref.service import load_cookie_data
 
 from .ctx.user import UserCtx
@@ -14,7 +14,7 @@ async def user_ctx(
     request: Request,
     user: UserFullOrAnon,
     env: EnvDep,
-    conn: PoolConnection,
+    conn: DBConnection,
 ):
     if user:
         return UserCtx(

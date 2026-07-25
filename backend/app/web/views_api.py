@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import Response
 from pydantic import BaseModel
 
-from app.deps import PoolConnection
+from app.deps import DBConnection
 from app.env import Env
 from ravioli_core.serializers import json
 
@@ -18,7 +18,7 @@ def web_api_router(env: Env):
 
     @router.get("/positions", response_model=list[ChessPosition])
     async def chess_positions(
-        conn: PoolConnection,
+        conn: DBConnection,
     ):
         data = await env.web.get_chess_positions(conn)
         return Response(content=json.encode(data), media_type="application/json")

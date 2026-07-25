@@ -6,7 +6,7 @@ from fastapi.exceptions import HTTPException
 from app.api.schemas import Message
 from app.auth.deps import AuthUser, SessionCookie, UserOrAnon
 from app.config import settings
-from app.deps import PoolConnection
+from app.deps import DBConnection
 from app.env import Env
 
 from .schemas import UserBase, UserCreate, UserProfile, UserSearch, UserWithPref
@@ -21,7 +21,7 @@ def user_router(env: Env):
 
     @router.delete("/me", responses={200: {"model": Message}})
     async def delete_user(
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
         response: Response,
         session_cookie: SessionCookie = None,
@@ -41,7 +41,7 @@ def user_router(env: Env):
 
     @router.get("/{username}", response_model=UserProfile, response_model_exclude_unset=True)
     async def get_user(
-        conn: PoolConnection,
+        conn: DBConnection,
         current_user: UserOrAnon,
         username: str,
     ):
@@ -57,7 +57,7 @@ def user_router(env: Env):
 
     @router.get("", response_model=list[UserSearch])
     async def list_user(
-        conn: PoolConnection,
+        conn: DBConnection,
         q: Annotated[str | None, Query()] = None,
         limit: Annotated[int, Query(le=50)] = 20,
     ):
@@ -65,7 +65,7 @@ def user_router(env: Env):
 
     @router.post("", response_model=UserWithPref, status_code=status.HTTP_201_CREATED)
     async def register_user(
-        conn: PoolConnection,
+        conn: DBConnection,
         body: UserCreate,
     ):
         return await env.user.create(conn, body)

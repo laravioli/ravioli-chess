@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
-from app.deps import PoolConnection
+from app.deps import DBConnection
 from app.env import Env
 
 from .ctx.page import PagePayload
@@ -31,7 +31,7 @@ def create_web_router(env: Env):
 
     @router.get("/", response_class=HTMLResponse, name="root")
     async def index(
-        conn: PoolConnection,
+        conn: DBConnection,
         request: Request,
         user_ctx: UserCtxDep,
     ):
@@ -40,7 +40,7 @@ def create_web_router(env: Env):
 
     @router.get("/analysis", response_class=HTMLResponse, name="analyse")
     async def analysis(
-        conn: PoolConnection,
+        conn: DBConnection,
         request: Request,
         user_ctx: UserCtxDep,
     ):
@@ -49,7 +49,7 @@ def create_web_router(env: Env):
 
     @router.get("/editor", response_class=HTMLResponse, name="editor")
     async def editor(
-        conn: PoolConnection,
+        conn: DBConnection,
         request: Request,
         user_ctx: UserCtxDep,
     ):

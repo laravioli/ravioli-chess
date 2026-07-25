@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response, status
 from fastapi_pagination import resolve_params
 
 from app.auth.deps import AuthUser
-from app.deps import PoolConnection
+from app.deps import DBConnection
 from app.env import Env
 
 from .schemas import Notification, NotifPagination
@@ -13,7 +13,7 @@ def notif_router(env: Env):
 
     @router.get("", response_model=NotifPagination[Notification])
     async def list_notif(
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
     ):
         params = resolve_params()
@@ -25,7 +25,7 @@ def notif_router(env: Env):
 
     @router.delete("/clear", status_code=status.HTTP_204_NO_CONTENT)
     async def clear_notif(
-        conn: PoolConnection,
+        conn: DBConnection,
         user: AuthUser,
     ):
         await env.notif.delete_all(conn, user.id)

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Response, status
 
 from app.api.responses import JSONResponse
 from app.auth.deps import UserFullOrAnon, UserOrAnon
-from app.deps import PoolConnection
+from app.deps import DBConnection
 from app.env import Env
 
 from .schemas import PreferenceOut, PreferenceUpdate
@@ -23,7 +23,7 @@ def pref_router(env: Env):
 
     @router.post("", status_code=status.HTTP_204_NO_CONTENT)
     async def update_pref(
-        conn: PoolConnection,
+        conn: DBConnection,
         user: UserOrAnon,
         pref: PreferenceUpdate,
         request: Request,
