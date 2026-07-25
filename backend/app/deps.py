@@ -1,12 +1,9 @@
-from collections.abc import AsyncGenerator
 from typing import Annotated
 
-from asyncpg import Pool
-from asyncpg.pool import PoolConnectionProxy
+from asyncpg import Connection
 from fastapi import BackgroundTasks, Depends
 from fastapi.requests import HTTPConnection
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
 
 from .background import Background
 from .env import Env, UserRepo
@@ -31,38 +28,17 @@ type UserRepoDep = Annotated[UserRepo, Depends(get_user_repo)]
 # ╚══════════════════════════════════════╝
 
 
-async def get_pool_connection(http_conn: HTTPConnection):
-    pool: Pool = http_conn.state["pool"]
+async def get_pool_connection(env: EnvDep):
 
-    async with pool.acquire() as conn:
+    async with env.core.pg_pool.acquire() as conn:
         yield conn
 
 
-type PoolConnection = Annotated[PoolConnectionProxy, Depends(get_pool_connection, scope="function")]
+type PoolConnection = Annotated[Connection, Depends(get_pool_connection, scope="function")]
 
 
-async def get_connection(env: EnvDep) -> AsyncGenerator[AsyncConnection]:
-
-    async with env.core.engine.connect() as db_conn:
-        yield db_conn
-
-
-type DbConnection = Annotated[AsyncConnection, Depends(get_connection, scope="function")]
-
-
-async def get_session(env: EnvDep) -> AsyncGenerator[AsyncSession]:
-
-    async with AsyncSession(
-        bind=env.core.engine, autoflush=False, expire_on_commit=False
-    ) as session:
-        yield session
-
-
-type DbSession = Annotated[AsyncSession, Depends(get_session, scope="function")]
-
-
-async def get_redis(http_conn: HTTPConnection) -> Redis:
-    return http_conn.state["env"].core.redis
+async def get_redis(env: EnvDep) -> Redis:
+    return env.core.redis
 
 
 type RedisDep = Annotated[Redis, Depends(get_redis)]
@@ -75,7 +51,7 @@ type RedisDep = Annotated[Redis, Depends(get_redis)]
 
 async def get_background(http_conn: HTTPConnection, background_tasks: BackgroundTasks):
     env: Env = http_conn.state["env"]
-    return Background(env.core.pub, env.core.session_maker, background_tasks)
+    return Background(env.core.pub, background_tasks)
 
 
 type BackgroundDep = Annotated[Background, Depends(get_background)]

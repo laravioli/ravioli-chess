@@ -12,7 +12,7 @@ from app.env import Env
 from .schemas import UserBase, UserCreate, UserProfile, UserSearch, UserWithPref
 
 
-def create_user_api_router(env: Env):
+def user_router(env: Env):
     router = APIRouter(prefix="/users", tags=["users"])
 
     @router.get("/me", response_model=UserBase)

@@ -27,7 +27,7 @@ async def on_stop(env: Env):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    env = Env.make(settings={"db": DbSettings(), "redis": RedisSettings()})  # type: ignore
+    env = await Env.make(settings={"db": DbSettings(), "redis": RedisSettings()})  # type: ignore
     try:
         await on_start(env)
         add_routes(app, env)

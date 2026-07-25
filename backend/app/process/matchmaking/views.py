@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.schemas import Redirect
 from app.auth.deps import UserOrAnon
 from app.challenge.schemas import ChallengeRequest
-from app.deps import DbSession
+from app.deps import PoolConnection
 from app.process.env import Env
 
 from .deps import MatchableUsers
@@ -23,11 +23,11 @@ def create_mm_api_router(env: Env):
 
     @router.post("/friend", response_model=Redirect)
     async def match_friend(
-        session: DbSession,
+        conn: PoolConnection,
         data: ChallengeRequest,
         pair: MatchableUsers,
     ):
-        chall = await env.challenge.create(session, data, pair.sender, pair.receiver)
+        chall = await env.challenge.create(conn, data, pair.sender, pair.receiver)
         if pair.sender and pair.receiver:
             # send a notif with background
             pass

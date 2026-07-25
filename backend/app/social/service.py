@@ -1,11 +1,10 @@
 import logging
 import uuid
 
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession
-
 from app.background import Background
 from app.notif.service import NotifService
 from ravioli_core.db.models.social import FriendshipStatus
+from ravioli_core.db.types import PGConnection
 
 from .notif import SocialNotif
 from .repo import SocialRepo
@@ -21,46 +20,46 @@ class SocialService:
     async def create_request(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: PGConnection,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        await self._repo.create_request(session, sender_id, receiver_id)
+        await self._repo.create_request(conn, sender_id, receiver_id)
         await self._notif.create(bg, receiver_id)
 
     async def accept_request(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: PGConnection,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
-        await self._repo.accept_request(session, sender_id, receiver_id)
+        await self._repo.accept_request(conn, sender_id, receiver_id)
         await self._notif.accept(bg, sender_id, receiver_id)
 
     async def delete_request(
         self,
         bg: Background,
-        session: AsyncSession,
+        conn: PGConnection,
         sender_id: uuid.UUID,
         receiver_id: uuid.UUID,
     ):
 
-        await self._repo.delete_request(session, sender_id, receiver_id)
+        await self._repo.delete_request(conn, sender_id, receiver_id)
         await self._notif.delete(bg, receiver_id)
 
     async def list_friendship(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: uuid.UUID,
         status: FriendshipStatus,
     ):
-        return await self._repo.list_friendship(session, user_id, status)
+        return await self._repo.list_friendship(conn, user_id, status)
 
     async def delete_friend(
         self,
         bg: Background,
-        conn: AsyncConnection,
+        conn: PGConnection,
         current_user_id: uuid.UUID,
         target_id: uuid.UUID,
     ):

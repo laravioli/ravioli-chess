@@ -47,4 +47,5 @@ type TimeControl = Annotated[str, mapped_column(String(10), nullable=True)]
 # ║          OTHER                       ║
 # ╚══════════════════════════════════════╝
 
-type PGConnection = asyncpg.Connection | asyncpg.pool.PoolConnectionProxy
+type PGConnection = asyncpg.Connection
+type PGPool = asyncpg.Pool

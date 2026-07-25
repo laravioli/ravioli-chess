@@ -1,17 +1,16 @@
 from uuid import UUID
 
 from redis.asyncio import Redis
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.game.db import id8
 from app.user import User
 from ravioli_core.cache import CacheLib
 from ravioli_core.db.enums import ChessColor
-from ravioli_core.db.models import Challenge
-from ravioli_core.db.utils import transaction
+from ravioli_core.db.queries import ChallQueries
+from ravioli_core.db.types import PGConnection
 
 from .schemas import ChallengeRequest
+from .structs import Challenge
 
 
 class ChallengeService:
@@ -20,39 +19,41 @@ class ChallengeService:
 
     async def list(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: UUID,
     ):
-        return await session.execute(
-            select(Challenge)
-            .where((Challenge.sender_id == user_id) | (Challenge.receiver_id == user_id))
-            .order_by(Challenge.pub_date.desc())
-        )
+        return await conn.fetch(ChallQueries.list, user_id)
 
     async def create(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         data: ChallengeRequest,
         user: User | None,
         target: UUID | None,
     ):
-        async with transaction(session, error_detail="unable to create challenge"):
-            challenge_id = id8()
-            challenge = Challenge(
-                challenge_id=challenge_id,
-                sender_id=user.id if user else None,
-                receiver_id=target,
-                color_choice=data.color_choice,
-                color=ChessColor.from_choice(data.color_choice),
-                time_control=data.time_control,
-            )
-            session.add(challenge)
+        c = Challenge(
+            challenge_id=id8(),
+            sender_id=user.id if user else None,
+            receiver_id=target,
+            color_choice=data.color_choice,
+            color=ChessColor.from_choice(data.color_choice),
+            time_control=data.time_control,
+        )
+        await conn.execute(
+            ChallQueries.create,
+            c.challenge_id,
+            c.sender_id,
+            c.receiver_id,
+            c.color_choice,
+            c.color,
+            c.time_control,
+        )
 
-        return challenge
+        return c
 
     async def accept(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: UUID | None,
         challenge_id: UUID,
     ):
@@ -60,7 +61,7 @@ class ChallengeService:
 
     async def reject(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user_id: UUID,
         sender_id: UUID,
     ):
@@ -68,7 +69,7 @@ class ChallengeService:
 
     async def delete(
         self,
-        session: AsyncSession,
+        conn: PGConnection,
         user: User | None,
         challenge_id: str,
     ):

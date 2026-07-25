@@ -11,7 +11,7 @@ from .service import load_cookie_data
 router = APIRouter(prefix="/pref", tags=["preferences"])
 
 
-def create_pref_api_router(env: Env):
+def pref_router(env: Env):
 
     @router.get("", response_model=PreferenceOut)
     async def get_pref(user: UserFullOrAnon, request: Request):

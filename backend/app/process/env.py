@@ -14,8 +14,8 @@ class Env:
     matchmaking: MatchMakingService
 
     @staticmethod
-    def make(*, settings: CoreEnvSettings):
-        core = CoreEnv.make(settings=settings)
+    async def make(*, settings: CoreEnvSettings):
+        core = await CoreEnv.make(settings=settings)
         challenge = ChallengeService.make(redis=core.redis)
         matchmaking = MatchMakingService.make(challenge=challenge)
         return Env(core=core, challenge=challenge, matchmaking=matchmaking)
@@ -27,5 +27,8 @@ class Env:
     async def on_stop(self):
         await self.core.scheduler.shutdown()
         await asyncio.gather(
-            self.core.redis.aclose(), self.core.engine.dispose(), return_exceptions=True
+            self.core.redis.aclose(),
+            self.core.engine.dispose(),
+            self.core.pg_pool.close(),
+            return_exceptions=True,
         )

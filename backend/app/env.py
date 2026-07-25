@@ -29,9 +29,9 @@ class Env:
     challenge: ChallengeService
 
     @staticmethod
-    def make(*, settings: CoreEnvSettings):
-        core = CoreEnv.make(settings=settings)
-        notif = NotifService.make(redis=core.redis)
+    async def make(*, settings: CoreEnvSettings):
+        core = await CoreEnv.make(settings=settings)
+        notif = NotifService.make(pg_pool=core.pg_pool, redis=core.redis)
         ws = WsEnv.make(redis=core.redis, scheduler=core.scheduler, notif=notif)
 
         pref_repo = PrefRepo()
@@ -49,8 +49,10 @@ class Env:
 
     @classmethod
     @asynccontextmanager
-    async def lifespan(cls, *, settings: CoreEnvSettings, node_id):
-        env = cls.make(settings=settings)
+    async def lifespan(cls, *, settings: CoreEnvSettings, node_id: str):
+
+        env = await cls.make(settings=settings)
+
         redis = env.core.redis
         scheduler = env.core.scheduler
 
@@ -79,5 +81,8 @@ class Env:
         await self.core.scheduler.shutdown()
         await self.ws.broadcast.stop()
         await asyncio.gather(
-            self.core.redis.aclose(), self.core.engine.dispose(), return_exceptions=True
+            self.core.redis.aclose(),
+            self.core.engine.dispose(),
+            self.core.pg_pool.close(),
+            return_exceptions=True,
         )

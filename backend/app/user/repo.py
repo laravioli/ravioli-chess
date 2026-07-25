@@ -8,7 +8,7 @@ from msgspec import convert
 from app.auth.security import generate_password_hash
 from app.social.structs import Friendship
 from ravioli_core.db.models.pref import Board, PieceSet
-from ravioli_core.db.queries import PrefQueries, UserQueries
+from ravioli_core.db.queries import UserQueries
 from ravioli_core.db.types import PGConnection
 
 from .schemas import UserCreate
@@ -71,28 +71,23 @@ class UserRepo:
         conn: PGConnection,
         data: UserCreate,
     ):
-        async with conn.transaction():
-            row = await conn.fetchrow(
-                UserQueries.insert,
-                data.username,
-                data.email,
-                generate_password_hash(data.password.get_secret_value()),
-            )
-            user = cast(UserCreateRow, row)
-
-            await conn.execute(
-                PrefQueries.insert, (Board.BLUE.value, PieceSet.BASE.value, user["id"])
-            )
-
-        return user
+        row = await conn.fetchrow(
+            UserQueries.insert,
+            data.username,
+            data.email,
+            generate_password_hash(data.password.get_secret_value()),
+            False,
+            Board.BLUE.value,
+            PieceSet.BASE.value,
+        )
+        return cast(UserCreateRow, row)
 
     async def delete(
         self,
         conn: PGConnection,
         user_id: UUID,
     ):
-        async with conn.transaction():
-            await conn.execute(UserQueries.delete, user_id)
+        await conn.execute(UserQueries.delete, user_id)
 
 
 class UserCreateRow(TypedDict):

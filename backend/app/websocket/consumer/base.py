@@ -81,9 +81,7 @@ class Consumer[T: Context = Context](ABC):
             case c_out.Notified():
                 user = self.ctx.user
                 if user:
-                    self.add_background_task(
-                        self.env.notif.mark_all_read(self.env.core.engine, cast(UUID, user.id))
-                    )
+                    self.add_background_task(self.env.notif.mark_all_read(cast(UUID, user.id)))
 
     def add_background_task(self, coro):
         task = asyncio.create_task(coro)

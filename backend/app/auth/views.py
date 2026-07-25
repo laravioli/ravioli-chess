@@ -13,7 +13,7 @@ from .deps import SessionCookie
 from .schemas import UserLogin, UserSuccess
 
 
-def create_auth_api_router(env: Env):
+def auth_router(env: Env):
     router = APIRouter(prefix="/auth", tags=["auth"])
 
     @router.post("/login", response_model=UserSuccess)

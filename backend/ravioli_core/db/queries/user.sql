@@ -43,14 +43,16 @@ ORDER BY ua.username
 LIMIT $2
 
 --name: insert
-INSERT INTO user_account (username, email, hashed_password)
-VALUES ($1,$2,$3)
-RETURNING id, username, joined_at
-
---name: insert_admin
-INSERT INTO user_account (username, email, hashed_password, is_staff)
-VALUES ($1,$2,$3,true)
-RETURNING id, username, joined_at
+WITH new_user AS (
+    INSERT INTO user_account (username, email, hashed_password, is_staff)
+    VALUES ($1,$2,$3,$4)
+    RETURNING id, username, joined_at
+), _ AS (
+    INSERT INTO user_preference (board, pieceset, user_id)
+    SELECT $5, $6, id FROM new_user
+)
+SELECT id, username, joined_at
+FROM new_user;
 
 --name: delete
 DELETE FROM user_account

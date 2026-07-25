@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ravioli_core.db.types import TimestampNow
@@ -25,7 +25,7 @@ class Notification(Base):
     sender_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
     receiver_id: Mapped[UUID] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
     sender: Mapped["SA_User"] = relationship("SA_User", foreign_keys=[sender_id], innerjoin=True)
-    read: Mapped[bool] = mapped_column(default=False)
+    read: Mapped[bool] = mapped_column(server_default=false())
     created_at: Mapped[TimestampNow]
 
 
