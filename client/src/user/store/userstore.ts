@@ -1,14 +1,14 @@
-import { observable, action, computed } from 'mobx';
-import type { UserServer } from './interface';
-import type { Preference, UserSuccess } from '@/lib/api';
-import { wsReload } from '@/lib/socket';
-import { setPreference } from './utils';
 import { UserCacheEvent } from '@/core/boot/interface';
+import type { PreferenceOut, UserSuccess } from '@/lib/api';
+import { wsReload } from '@/lib/socket';
+import { action, computed, observable } from 'mobx';
+import type { UserServer } from './interface';
+import { setPreference } from './utils';
 
 const ANON = {
   id: '',
   username: 'Anonymous',
-  preference: { board: 'blue', pieceset: 'base' } as Preference,
+  preference: { board: 'blue', pieceset: 'base' } as PreferenceOut,
 };
 
 type UserEvent = ({ type: 'login' } & UserSuccess) | { type: 'logout' };
@@ -50,7 +50,7 @@ export class UserStore {
     this.channel?.close();
     this.channel = undefined;
   }
-  private set preference(pref: Preference) {
+  private set preference(pref: PreferenceOut) {
     setPreference(pref);
   }
 

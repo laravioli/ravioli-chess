@@ -19,7 +19,7 @@ export function hydrate(payload: ServerPayload, client: QueryClient): UserCacheE
 
   if (payload) {
     if (defined(payload.user.unread_count)) setUnreadCount(payload.user.unread_count);
-    const chessPositions = payload.data?.positions;
+    const chessPositions = payload.page?.data?.positions;
     if (defined(chessPositions)) {
       const chessPositionsKey = chessPositionsQueryKey();
       client.setQueryData(chessPositionsKey, chessPositions);

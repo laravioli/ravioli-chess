@@ -1,7 +1,7 @@
-import { useRef, useEffect, type ReactNode } from 'react';
 import type { GlobalStore, PageStore } from '@/core/app/deps';
-import type { ProvidedData } from '@/core/boot/interface';
-import { GlobalStoreContext, PageStoreContext, DataContext } from './context';
+import type { PageData } from '@/core/boot/interface';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { DataContext, GlobalStoreContext, PageStoreContext } from './context';
 
 export const GlobalStoreProvider = ({
   children,
@@ -60,14 +60,8 @@ export const PageStoreProvider = <T extends PageStore>({
   return <PageStoreContext.Provider value={storeRef.current}>{children}</PageStoreContext.Provider>;
 };
 
-export const DataProvider = ({
-  children,
-  data,
-}: {
-  children: React.ReactNode;
-  data: ProvidedData;
-}) => {
-  const dataRef = useRef<ProvidedData | null>(null);
+export const DataProvider = ({ children, data }: { children: React.ReactNode; data: PageData }) => {
+  const dataRef = useRef<PageData | null>(null);
 
   if (!dataRef.current) {
     dataRef.current = data;

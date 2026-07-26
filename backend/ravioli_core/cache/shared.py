@@ -34,7 +34,7 @@ def json_serializer[T](type_arg: type[T] | TypeAdapter[T] | None) -> Serializer[
             return Serializer()
 
 
-class CacheLib[T]:
+class RedisCache[T]:
     """
     Cache using redis as a backend store\n
     Each instance may precise a data_type for serialization

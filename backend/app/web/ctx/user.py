@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from uuid import UUID
 
 from msgspec import Struct
@@ -7,31 +6,30 @@ from app.pref.structs import Preference
 from app.user import User
 
 
-class AuthPayload(Struct):
-    id: UUID
+class UserData(Struct, frozen=True, omit_defaults=True):
     username: str
     is_auth: bool
-    unread_count: int | None
+    id: UUID | None = None
+    unread_count: int | None = None
 
 
-ANON_PAYLOAD = {"id": "", "username": "", "is_auth": False}
+ANON_DATA = UserData(username="", is_auth=False)
 
 
-@dataclass(slots=True, frozen=True)
-class UserCtx:
+class UserCtx(Struct, frozen=True):
     user: User | None
     preference: Preference
     unread_count: int | None = None
 
     @property
-    def payload(self):
+    def data(self):
         if self.user:
             me = self.user
-            return AuthPayload(
+            return UserData(
                 id=me.id, username=me.username, is_auth=True, unread_count=self.unread_count
             )
         else:
-            return ANON_PAYLOAD
+            return ANON_DATA
 
     @property
     def preference_attrs(self):

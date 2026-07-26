@@ -1,19 +1,19 @@
 import { type MantineProviderProps } from '@mantine/core';
 import { QueryClient } from '@tanstack/react-query';
 
-import type { ServerPayload, ProvidedData, UserCacheEvent } from '@/core/boot/interface';
-import { LobbySettings } from '@/lobby/localstorage';
-import { UserStore } from '@/user/store/userstore';
-import { Ceval } from '@/lib/eval/ceval';
 import type { AnalyseStore } from '@/analyse/store/analyse';
+import type { PageData, ServerPayload, UserCacheEvent } from '@/core/boot/interface';
 import type { EditorStore } from '@/editor/store/editor';
+import { Ceval } from '@/lib/eval/ceval';
+import { LobbySettings } from '@/lobby/localstorage';
 import type { PlayStore } from '@/play/store/play';
+import { UserStore } from '@/user/store/userstore';
 import { CONFIG } from './config';
 import { siteHandlers } from './socket';
 
 export interface AppDeps {
   mantineConfig: MantineProviderProps;
-  data: ProvidedData;
+  data: PageData;
   queryClient: QueryClient;
   globalStore: GlobalStore;
 }
@@ -41,6 +41,6 @@ export const makeDeps = (
       lobbySettings: new LobbySettings(),
       socketReceive: siteHandlers(queryClient),
     },
-    data: { page: payload.page, data: payload.data },
+    data: payload.page,
   };
 };

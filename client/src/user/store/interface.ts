@@ -1,5 +1,5 @@
 export interface UserServer {
-  id: string;
+  id?: string;
   username: string;
   is_auth?: boolean;
 }

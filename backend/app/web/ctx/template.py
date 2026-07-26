@@ -1,4 +1,8 @@
 from fastapi import Request
+from msgspec import Struct
+
+from .page import PageData
+from .user import UserData
 
 PIECE_VARS = {
     "---white-pawn": "wP",
@@ -24,3 +28,8 @@ PAGE_DEFAULT = {
 
 def web_context(request: Request):  # noqa: ARG001
     return {"pieces": PIECE_VARS}
+
+
+class Payload(Struct, frozen=True):
+    page: PageData
+    user: UserData

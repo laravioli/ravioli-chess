@@ -1,61 +1,39 @@
-from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
+from msgspec import UNSET, Raw, Struct, UnsetType
 
-from ravioli_core.db.types import PGConnection
-
-if TYPE_CHECKING:
-    from app.web.service import WebService
+from app.web.static_data.chess_positions import positions
 
 
-class PageData(TypedDict):
-    orientation: NotRequired[str]
-    fen: NotRequired[str]
+class PageConfig(Struct):
+    orientation: str | UnsetType = UNSET
+    fen: str | UnsetType = UNSET
 
 
-CHESS_DEFAULT = PageData(
+DEFAULT_CONFIG = PageConfig(
     orientation="white", fen="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 )
 
 
-class Metadata(TypedDict):
-    positions: NotRequired[list[Any]]
+class Metadata(Struct):
+    positions: Raw | UnsetType = UNSET
 
 
-class PagePayload(TypedDict):
-    page: PageData
-    data: NotRequired[Metadata]
+class PageData(Struct):
+    config: PageConfig
+    data: Metadata | UnsetType = UNSET
 
 
 class PageCtx:
-    def __init__(self, web: "WebService"):
-        self._web = web
+    def index(self):
+        return PageData(config=DEFAULT_CONFIG, data=Metadata(positions=Raw(positions.json)))
 
-    async def index(self, conn: PGConnection):
-        return PagePayload(
-            page=CHESS_DEFAULT, data=Metadata(positions=await self._web.get_chess_positions(conn))
-        )
+    def analyse(self):
+        return PageData(config=DEFAULT_CONFIG, data=Metadata(positions=Raw(positions.json)))
 
-    async def analyse(
-        self,
-        conn: PGConnection,
-    ):
-        return PagePayload(
-            page=CHESS_DEFAULT, data=Metadata(positions=await self._web.get_chess_positions(conn))
-        )
+    def editor(self):
+        return PageData(config=DEFAULT_CONFIG, data=Metadata(positions=Raw(positions.json)))
 
-    async def editor(
-        self,
-        conn: PGConnection,
-    ):
-        return PagePayload(
-            page=CHESS_DEFAULT, data=Metadata(positions=await self._web.get_chess_positions(conn))
-        )
+    def play(self):
+        return PageData(config=DEFAULT_CONFIG)
 
-    async def play(
-        self,
-    ):
-        return PagePayload(page=CHESS_DEFAULT)
-
-    async def profile(
-        self,
-    ):
-        return PagePayload(page=CHESS_DEFAULT)
+    def profile(self):
+        return PageData(config=DEFAULT_CONFIG)

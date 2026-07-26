@@ -3,10 +3,10 @@ import asyncio
 from collections.abc import Iterable
 from uuid import UUID
 
-from ravioli_core.cache import CacheLib
+from ravioli_core.cache import RedisCache
 
 
-class NotifCache(CacheLib[int]):
+class NotifCache(RedisCache[int]):
     async def _get(self, key: str, **kwargs):
         return await self.redis.fcall("notif_get", 1, key)
 

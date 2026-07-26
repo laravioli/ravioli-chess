@@ -1,21 +1,21 @@
-import clsx from 'clsx';
-import { useCallback, useRef, useState } from 'react';
+import { defined } from '@/lib/common';
+import c from '@/shell/css/notif.module.css';
 import {
-  Combobox,
-  useCombobox,
   ActionIcon,
-  Text,
-  Stack,
   Button,
-  Indicator,
-  Tooltip,
+  Combobox,
   Group,
+  Indicator,
+  Stack,
+  Text,
+  Tooltip,
+  useCombobox,
 } from '@mantine/core';
 import { IconBell, IconChevronDown, IconChevronUp, IconTrash } from '@tabler/icons-react';
-import c from '@/shell/css/notif.module.css';
-import { defined } from '@/lib/common';
+import clsx from 'clsx';
+import { useCallback, useRef, useState } from 'react';
 import * as api from './api';
-import { FriendRequestNotif, FriendRequestAcceptedNotif } from './content';
+import { FriendRequestAcceptedNotif, FriendRequestNotif } from './content';
 
 export const Notifications: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -160,8 +160,9 @@ const PageNotif: React.FC<{
 }> = ({ notifications }) => {
   const options =
     notifications?.items.map((data) => {
-      if (data.type === 'friend_request') return <FriendRequestNotif data={data} key={data.id} />;
-      if (data.type === 'friend_request_accepted')
+      if (data.notif_type === 'friend_request')
+        return <FriendRequestNotif data={data} key={data.id} />;
+      if (data.notif_type === 'friend_request_accepted')
         return <FriendRequestAcceptedNotif data={data} key={data.id} />;
     }) ?? [];
 

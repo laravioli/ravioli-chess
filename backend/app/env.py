@@ -42,7 +42,7 @@ class Env:
         pref = PrefService(repo=pref_repo)
         auth = AuthService(redis=core.redis, repo=user_repo)
         social = SocialService.make(repo=social_repo, notif=notif)
-        web = WebService.make(redis=core.redis, notif=notif)
+        web = WebService.make()
         challenge = ChallengeService.make(redis=core.redis)
 
         return Env(core, ws, user, auth, pref, web, notif, social, challenge)

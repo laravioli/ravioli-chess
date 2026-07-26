@@ -4,7 +4,7 @@ from redis.asyncio import Redis
 
 from app.game.db import id8
 from app.user import User
-from ravioli_core.cache import CacheLib
+from ravioli_core.cache import RedisCache
 from ravioli_core.db.enums import ChessColor
 from ravioli_core.db.queries import ChallQueries
 from ravioli_core.db.types import PGConnection
@@ -14,7 +14,7 @@ from .structs import Challenge
 
 
 class ChallengeService:
-    def __init__(self, cache: CacheLib[int]):
+    def __init__(self, cache: RedisCache[int]):
         self._cache = cache
 
     async def list(
@@ -78,7 +78,7 @@ class ChallengeService:
     @staticmethod
     def make(*, redis: Redis):
         return ChallengeService(
-            cache=CacheLib(
+            cache=RedisCache(
                 redis=redis,
                 namespace="challenge",
                 version="v1",

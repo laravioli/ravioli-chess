@@ -1,4 +1,4 @@
-import type { Board, PieceSet, Preference } from '@/lib/api';
+import type { Board, PieceSet, PreferenceOut } from '@/lib/api';
 
 const pieceVars = [
   ['---white-pawn', 'wP'],
@@ -36,7 +36,7 @@ export function setBoardColor(color: Board) {
   document.body.dataset['board'] = color;
 }
 
-export function setPreference(preference: Preference) {
+export function setPreference(preference: PreferenceOut) {
   if (preference.board) setBoardColor(preference.board);
   if (preference.pieceset) setPieceSet(preference.pieceset);
 }
