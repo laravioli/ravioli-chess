@@ -13,7 +13,7 @@ class SocialNotif:
         bg: Background,
         receiver_id: UUID,
     ):
-        await self._notif._cache.incrby(f"{receiver_id}", 1)
+        await self._notif._unread_cache.incrby(f"{receiver_id}", 1)
         self._notif.notify_one(bg, receiver_id)
 
     async def accept(
@@ -22,7 +22,7 @@ class SocialNotif:
         sender_id: UUID,
         receiver_id: UUID,
     ):
-        await self._notif._cache.incrby_many({f"{sender_id}": 1, f"{receiver_id}": -1})
+        await self._notif._unread_cache.incrby_many({f"{sender_id}": 1, f"{receiver_id}": -1})
         self._notif.notify_many(bg, [sender_id, receiver_id])
 
     async def delete(
@@ -30,7 +30,7 @@ class SocialNotif:
         bg: Background,
         receiver_id: UUID,
     ):
-        await self._notif._cache.incrby(f"{receiver_id}", -1)
+        await self._notif._unread_cache.incrby(f"{receiver_id}", -1)
         self._notif.notify_one(bg, receiver_id)
 
     async def delete_friend(
@@ -40,5 +40,5 @@ class SocialNotif:
         target_id: UUID,
     ):
         users = [current_user_id, target_id]
-        await self._notif._cache.invalidate_count(users)
+        await self._notif._unread_cache.delete(*map(str, users))
         self._notif.notify_many(bg, users)

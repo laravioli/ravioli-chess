@@ -1,41 +1,52 @@
-import hashlib
-import json
-import random
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import Any
+from random import randint
+from typing import Concatenate, NamedTuple
 
-type KeyParams = dict[str, Any] | None
+from pydantic import BaseModel, TypeAdapter
+
+from ravioli_core.serializers import json
 
 
-@dataclass(frozen=True, slots=True)
-class CacheKey:
-    namespace: str
+class CacheSerializer[T](NamedTuple):
+    encoder: Callable[[T], bytes | str] = json.encode
+    decoder: Callable[[bytes | str], T] = json.decode
+
+    @classmethod
+    def make(cls, value_type: type[T] | TypeAdapter[T]):
+        match value_type:
+            case type():
+                if issubclass(value_type, BaseModel):
+                    return cls(
+                        lambda v: value_type.model_validate(v).model_dump_json(),
+                        lambda v: value_type.model_validate_json(v),
+                    )
+                else:
+                    return cls(decoder=lambda v: json.decode(v, type_arg=value_type))
+            case TypeAdapter():
+                return cls(
+                    lambda v: value_type.dump_json(value_type.validate_python(v)),
+                    lambda v: value_type.validate_json(v),
+                )
+
+
+@dataclass(slots=True, frozen=True, kw_only=True)
+class KeyBuilder:
     prefix: str = "cache"
     version: str = "v1"
+    name: str
 
-    def pattern(self, pattern):
-        return f"{self.prefix}:{self.version}:{self.namespace}:{pattern}"
-
-    def build(
-        self,
-        id: str,
-        params: KeyParams = None,
-    ) -> str:
-        """
-        Format: {prefix}:{version}:{namespace}:{id}[:{param_hash}]
-
-        Args:
-            id: unique identifier within namespace
-            params: Optional dict of parameters to hash into key
-        """
-        parts = [self.prefix, self.version, self.namespace, id]
-        if params:
-            param_str = json.dumps(params, sort_keys=True)
-            param_hash = hashlib.sha256(param_str.encode()).hexdigest()[:12]
-            parts.append(param_hash)
-        return ":".join(parts)
+    def __call__(self, key):
+        return f"{self.prefix}:{self.version}:{self.name}:{key}"
 
 
-def jitter(base_ttl: int, jitter_percent: float = 0.1) -> int:
-    jitter = int(base_ttl * jitter_percent)
-    return base_ttl + random.randint(-jitter, jitter)
+type ValueBuilder[T, **P] = Callable[Concatenate[str, P], Awaitable[T | None]]
+
+
+@dataclass(slots=True, frozen=True)
+class Jitter:
+    ttl: int = 300
+    ratio: float = 0.1
+
+    def compute(self):
+        return self.ttl + randint(0, int(self.ttl * self.ratio))

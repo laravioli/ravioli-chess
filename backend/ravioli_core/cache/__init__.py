@@ -1,3 +1,3 @@
-from .shared import RedisCache
+from .redis import RedisCache
 
 __all__ = ["RedisCache"]

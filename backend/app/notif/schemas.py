@@ -15,7 +15,6 @@ class NotificationBase(BaseSchema):
     sender_id: UUID4
     sender: str
     created_at: datetime
-    type: str
 
 
 class FriendRequestSchema(NotificationBase):

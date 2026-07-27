@@ -53,6 +53,6 @@ ORDER BY uf.last_update DESC
 --param: target_id: UUID
 DELETE FROM friendship f
 WHERE f.status = 'accepted'
-AND least(f.sender_id, f.receiver_id) = least($1, $2) 
-AND greatest(f.sender_id, f.receiver_id) = greatest($1, $2)
+AND least(f.sender_id, f.receiver_id) = least($1::uuid, $2::uuid) 
+AND greatest(f.sender_id, f.receiver_id) = greatest($1::uuid, $2::uuid)
 RETURNING f.id

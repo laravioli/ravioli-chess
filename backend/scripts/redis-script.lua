@@ -1,24 +1,24 @@
 #!lua name=raviolib
 
 --Publish
-local function publish(keys,args)
+local function publish(keys, args)
   local data = args[1]
 
   for _, channel in ipairs(keys) do
-      redis.call("PUBLISH", channel, data)
+    redis.call("PUBLISH", channel, data)
   end
 end
 
 --Notifications
 local function notif_incrby(keys, args)
-  for i=1,#keys do
+  for i = 1, #keys do
     local hash = keys[i]
     if redis.call("EXISTS", hash) == 1 then
       local counter = redis.call("HGET", hash, "counter")
       local incr = tonumber(args[i])
       if counter then
-          redis.call("HSET", hash, "counter", math.max(0, tonumber(counter)+incr))
-      elseif args[i] > 0 then
+        redis.call("HSET", hash, "counter", math.max(0, tonumber(counter) + incr))
+      elseif incr > 0 then
         redis.call("HINCRBY", hash, "temporary", incr)
       end
     end
@@ -36,7 +36,7 @@ local function notif_get(keys, args)
     --set update to acc increment values
     redis.call("HSETNX", hash, "temporary", 0)
   end
-  redis.call("EXPIRE", hash , 300)
+  redis.call("EXPIRE", hash, 300)
   return result
 end
 
@@ -50,8 +50,7 @@ local function notif_set(keys, args)
     -- first set win
     redis.call('HSETNX', hash, "counter", tonumber(args[1]) + tonumber(update))
   end
-  redis.call("EXPIRE", hash , 300)
-
+  redis.call("EXPIRE", hash, 300)
 end
 
 --Register

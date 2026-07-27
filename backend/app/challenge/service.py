@@ -14,7 +14,7 @@ from .structs import Challenge
 
 
 class ChallengeService:
-    def __init__(self, cache: RedisCache[int]):
+    def __init__(self, cache: RedisCache):
         self._cache = cache
 
     async def list(
@@ -77,11 +77,15 @@ class ChallengeService:
 
     @staticmethod
     def make(*, redis: Redis):
+        async def build(key: str):  # noqa: ARG001
+            return 42
+
         return ChallengeService(
             cache=RedisCache(
                 redis=redis,
-                namespace="challenge",
+                name="challenge",
                 version="v1",
-                data_type=int,
+                value_type=int,
+                value_builder=build,
             )
         )

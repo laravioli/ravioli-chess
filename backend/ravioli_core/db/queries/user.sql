@@ -29,8 +29,8 @@ WHERE ua.username = $1
 --param: username: str
 SELECT ua AS user, f AS friendship
 FROM user_account ua LEFT OUTER JOIN friendship f
-ON least(f.sender_id, f.receiver_id) = least($1, ua.id) 
-AND greatest(f.sender_id, f.receiver_id) = greatest($1, ua.id)
+ON least(f.sender_id, f.receiver_id) = least($1::uuid, ua.id) 
+AND greatest(f.sender_id, f.receiver_id) = greatest($1::uuid, ua.id)
 WHERE ua.username = $2
 
 --name: search

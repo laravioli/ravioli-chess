@@ -14,10 +14,16 @@ from .schemas import NotifParams, notification_ta
 
 
 class NotifService:
-    def __init__(self, pool: PGPool, db: NotifRepo, cache: NotifCache):
+    def __init__(self, redis: Redis, pool: PGPool, db: NotifRepo):
         self._pool = pool
         self._db = db
-        self._cache = cache
+        self._unread_cache = NotifCache(
+            redis=redis,
+            name="notifications",
+            version="v1",
+            value_type=int,
+            value_builder=lambda key, conn: db.unread_count(conn, UUID(key)),
+        )
 
     async def get_notifications(
         self,
@@ -33,9 +39,7 @@ class NotifService:
         conn: PGConnection,
         user_id: UUID,
     ):
-        return await self._cache.get_or_set(
-            f"{user_id}", factory=lambda: self._db.unread_count(conn, user_id)
-        )
+        return await self._unread_cache.get_or_set(str(user_id), conn)
 
     async def delete_all(
         self,
@@ -69,17 +73,8 @@ class NotifService:
         async with self._pool.acquire() as conn:
             await self._db.mark_all_read(conn, user_id)  # type: ignore
         # set0 would create write-write race condition with incr
-        await self._cache.invalidate_count([user_id])
+        await self._unread_cache.delete(str(user_id))
 
     @staticmethod
     def make(*, pg_pool: PGPool, redis: Redis):
-        return NotifService(
-            pg_pool,
-            db=NotifRepo(),
-            cache=NotifCache(
-                redis=redis,
-                namespace="notifications",
-                version="v1",
-                data_type=int,
-            ),
-        )
+        return NotifService(redis=redis, pool=pg_pool, db=NotifRepo())
